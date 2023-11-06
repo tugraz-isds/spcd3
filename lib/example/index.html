@@ -12,7 +12,7 @@
   <script src="../plugins/popper.min.js"></script>
   <script src="../plugins/tippy-bundle.umd.js"></script>
 
-  <script src="../../package/cjs/spc.js"> </script>
+  <script src="../../package/cjs/spc.js" > </script>
 
   <script src="main.js"></script>
 
@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="styles.css">
   <title>Parallel Coordinates</title>
 </head>
+
 <body>
+<link rel="styles" type="text/css" href="styles.css">
+<header class="main">
+  <div><h1 align="center">Parallel Coordinates</h1></div>
+</header>
 
-
-  <div><h1>Parallel Coordinates</h1></div>
-
+<aside class="sideNav">
   <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
-  <button class="button" onclick="openFileDialog()">Upload File</button>
+  <button class="input-button" onclick="openFileDialog()">Upload File</button>
+</aside>
 
+<div class="plot" id="parallelcoords"></div>
 
-
-  <div id="parallelcoords"></div>
-
-  <h2> Steerable parameters</h2>
-  <h4>Select dimensions</h4>
-  <div id="checkboxContainer" style="margin-bottom: 20px"></div>
-  <h4>Invert dimensions</h4>
-  <div id="invert_container"></div>
-
+<hr id="line" class="seperator">
+<section>
+  <h4 id="checkboxHeader">Select dimensions</h4>
+  <div id="checkboxContainer"></div>
+  <h4 id="invertContainerHeader">Invert dimensions</h4>
+  <div id="invert_container" class="invert_container"></div>
+</section>
 <!--  <button class="button" onclick="invertMaths()">Invert Maths</button>-->
-
-
-
 </body>
 
 </html>
