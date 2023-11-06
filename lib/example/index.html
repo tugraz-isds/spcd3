@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script>var exports = {};</script>
+
+  <!-- Plugins -->
+  <script src="../plugins/d3.v7.js"></script>
+  <script src="../plugins/popper.min.js"></script>
+  <script src="../plugins/tippy-bundle.umd.js"></script>
+
+  <script src="../parallelcoordinates.js" > </script>
+
+  <script src="main.js"></script>
+
+  <link rel="shortcut icon" href="#">
+  <link rel="stylesheet" href="styles.css">
+  <title>Parallel Coordinates</title>
+</head>
+<body>
+
+
+  <div><h1>Parallel Coordinates</h1></div>
+
+  <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
+  <button class="button" onclick="openFileDialog()">Upload File</button>
+
+
+
+  <div id="parallelcoords"></div>
+
+  <h2> Steerable parameters</h2>
+  <h4>Select dimensions</h4>
+  <div id="checkboxContainer" style="margin-bottom: 20px"></div>
+  <h4>Invert dimensions</h4>
+  <div id="invert_container"></div>
+
+<!--  <button class="button" onclick="invertMaths()">Invert Maths</button>-->
+
+
+
+</body>
+
+</html>

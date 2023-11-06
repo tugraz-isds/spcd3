@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "d3": "^7.8.5"
+  },
+  "devDependencies": {
+    "webpack": "^5.87.0"
+  }
+}
