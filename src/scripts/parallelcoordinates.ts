@@ -52,7 +52,7 @@ export class SteerableParcoords {
     const dimension_id = "#dimension_axis_" + dimension;
     const textElement = d3.select(invert_id);
     const currentText = textElement.text();
-    const newText = currentText === '▼' ? '▲' : '▼';
+    const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
     textElement.text(newText);
 
     d3.select(dimension_id)
@@ -370,7 +370,7 @@ export class SteerableParcoords {
         .each(function (d) {
           d3.select(this)
               .attr('id', 'dimension_invert_' + d.name)
-              .text('▼')
+              .text('\u2193')
         })
         .on("click", this.onInvert(this));
   }
