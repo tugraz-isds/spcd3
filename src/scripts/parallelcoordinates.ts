@@ -1,7 +1,7 @@
 declare const d3: any;
 declare const tippy: any;
 
-class SteerableParcoords {
+export class SteerableParcoords {
   private data: any;
   private newFeatures: any;
   private width: number;

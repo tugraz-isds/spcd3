@@ -1,8 +1,38 @@
 {
-  "dependencies": {
-    "d3": "^7.8.5"
+  "name": "spcd3",
+  "version": "1.0.0",
+  "description": "Steerable Parallel Coordinates in D3",
+  "main": "",
+  "types": "",
+  "files": [
+    "/lib",
+    "/package"
+  ],
+  "scripts": {
+    "test": "tsc -d",
+    "clean": "gulp clean",
+    "build": "gulp build"
   },
+  "author": "Philipp Drescher, Jeremias Kleinschuster, Sebastian Schreiner, Burim Vrella, Romana Gruber",
+  "license": "MIT",
   "devDependencies": {
-    "webpack": "^5.87.0"
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "typescript": "^4.2.4",
+    "tslib": "^2.2.0",
+    "gulp-rollup": "^2.17.0",
+    "rollup": "^2.60.0",
+    "rollup-plugin-dts": "^3.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "8.3.3",
+    "rollup-plugin-gzip": "^2.5.0"
+  },
+  "dependencies": {
+    "d3": "^7.8.5",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "tippy.js": "^6.3.7",
+    "vinyl": "^3.0.0"
   }
 }

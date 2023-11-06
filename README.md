@@ -1,16 +1,37 @@
-# SteerableParallelCoordinates
+# Steerable Parallel Coordinates in D3
 
-## How to build the SPC library
+## How to build the spcd3 library
 
 ### Install dependencies
-- Open terminal and execute the following command:
-  - npm install
+- Open terminal and execute the following command to install all of the dependencies:
 
-### Compile SPC library
-- Navigate to ParallelCoordinates folder
-- Open terminal and execute the following command:
-  -  tsc -p tsconfig.json
-- Then you should see the parallelcoordinates.js file in the lib folder
+
+``` 
+npm install 
+```
+
+### Gulp Build And Development
+
+Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
+defines for now two public tasks:
+
+- The `clean` task removes the existing `package` directory in
+  order to enable a clean rebuild of the project.
+
+- The `build` task creates a new build of the framework and stores the generated .js file into
+  `package` folder.
+
+
+The public tasks can be invoked either by directly running gulp or
+by running the equivalent scripts in package.json:
+
+```
+npm run clean
+gulp clean
+
+npm run build
+gulp build
+```
 
 ## Project Git Workflow
 

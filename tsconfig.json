@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es2022",
     "sourceMap": false,
-    "outDir": "lib",
+    "outDir": "package",
     "pretty": true,
-    "downlevelIteration" : true
+    "downlevelIteration" : true,
+    "declaration": true,
+    "declarationDir": "types",
+    "moduleResolution":"node"
   },
   "include": [
     "src/**/*"
