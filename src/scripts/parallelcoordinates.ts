@@ -194,7 +194,7 @@ export class SteerableParcoords {
       }
       else {
         var max = Math.max(...this.newDataset.map(o => o[x.name]))
-        var min = Math.min(...this.newDataset.map(o => o[x.name]))
+        var min = 0 //Math.min(...this.newDataset.map(o => o[x.name]))
         this.yScales[x.name] = d3.scaleLinear()
             .domain([min, max]).nice()
             .range([this.height - this.padding, this.padding])
