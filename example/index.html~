@@ -8,11 +8,11 @@
   <script>var exports = {};</script>
 
   <!-- Plugins -->
-  <script src="../plugins/d3.v7.js"></script>
-  <script src="../plugins/popper.min.js"></script>
-  <script src="../plugins/tippy-bundle.umd.js"></script>
+  <script src="./lib/d3.v7.js"></script>
+  <script src="./lib/popper.min.js"></script>
+  <script src="./lib/tippy-bundle.umd.js"></script>
 
-  <script src="../../package/cjs/spc.js" > </script>
+  <script src=".lib/spcd3.js" > </script>
 
   <script src="main.js"></script>
 

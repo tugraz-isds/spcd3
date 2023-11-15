@@ -27,10 +27,10 @@ by running the equivalent scripts in package.json:
 
 ```
 npm run clean
-gulp clean
+npx gulp clean
 
 npm run build
-gulp build
+npx gulp build
 ```
 
 ## Project Git Workflow

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script>var exports = {};</script>
+
+  <!-- Plugins -->
+  <script src="./lib/d3.v7.js"></script>
+  <script src="./lib/popper.min.js"></script>
+  <script src="./lib/tippy-bundle.umd.js"></script>
+
+  <script src="./lib/spcd3.js" > </script>
+
+  <script src="main.js"></script>
+
+  <link rel="shortcut icon" href="#">
+  <link rel="stylesheet" href="styles.css">
+  <title>Parallel Coordinates</title>
+</head>
+
+<body>
+<link rel="styles" type="text/css" href="styles.css">
+<header class="main">
+  <div><h1 align="center">Parallel Coordinates</h1></div>
+</header>
+
+<aside class="sideNav">
+  <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
+  <button class="input-button" onclick="openFileDialog()">Upload File</button>
+</aside>
+
+<div class="plot" id="parallelcoords"></div>
+
+<hr id="line" class="seperator">
+<section>
+  <h4 id="checkboxHeader">Select dimensions</h4>
+  <div id="checkboxContainer"></div>
+  <h4 id="invertContainerHeader">Invert dimensions</h4>
+  <div id="invert_container" class="invert_container"></div>
+</section>
+<!--  <button class="button" onclick="invertMaths()">Invert Maths</button>-->
+</body>
+
+</html>

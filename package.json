@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "test": "tsc -d",
-    "clean": "gulp clean",
-    "build": "gulp build"
+    "clean": "npx gulp clean",
+    "build": "npx gulp build"
   },
   "author": "Philipp Drescher, Jeremias Kleinschuster, Sebastian Schreiner, Burim Vrella, Romana Gruber",
   "license": "MIT",
