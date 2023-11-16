@@ -31,7 +31,7 @@ class SteerableParcoords {
     }
     loadCSV(csv) {
         var tmp_data = d3.csvParse(csv);
-        this.data = tmp_data.sort((a, b) => a.Name.toLowerCase() > b.Name.toLowerCase() ? 1 : -1);
+        this.data = tmp_data.sort((a, b) => a.Name > b.Name ? 1 : -1);
     }
     //not happy with this, but at the moment we need it
     getData() {
@@ -42,14 +42,15 @@ class SteerableParcoords {
         this.newFeatures.reverse();
     }
     invert(dimension) {
-        const invert_id = "#dimension_invert_" + dimension;
-        const dimension_id = "#dimension_axis_" + dimension;
+        let cleanDimension = dimension.replace(/ /g, "_");
+        cleanDimension = cleanDimension.replace(/[\[{()}\]]/g, '');
+        const invert_id = "#dimension_invert_" + cleanDimension;
+        const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
         const currentText = textElement.text();
         const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
         textElement.text(newText);
-        d3.select(dimension_id)
-            .call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
+        d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
             .transition();
         // force update lines
         this.active.attr('d', this.linePath.bind(this));
@@ -138,16 +139,17 @@ class SteerableParcoords {
         Object.keys(this.newDataset[0]).forEach(element => this.features.push({ 'name': element }));
     }
     setupScales() {
-        //TODO check if integer and if then get all values for max and min
         this.features.map(x => {
-            if (x.name === "Name") {
+            const testValue = this.newDataset.map(o => o[x.name]);
+            if (isNaN(testValue[0]) !== false) {
                 this.yScales[x.name] = d3.scalePoint()
-                    .domain(this.newDataset.map(function (d) { return d.Name; }))
-                    .range([this.padding, this.height - this.padding]);
+                    .domain(this.newDataset.map(o => o[x.name]))
+                    .range([this.padding, this.height - this.padding])
+                    .padding(0.2); //TODO: check padding!
             }
             else {
                 var max = Math.max(...this.newDataset.map(o => o[x.name]));
-                var min = 0; //Math.min(...this.newDataset.map(o => o[x.name]))
+                var min = Math.min(...this.newDataset.map(o => o[x.name]));
                 this.yScales[x.name] = d3.scaleLinear()
                     .domain([min, max]).nice()
                     .range([this.height - this.padding, this.padding]);
@@ -279,8 +281,10 @@ class SteerableParcoords {
         this.featureAxisG
             .append('g')
             .each(function (d) {
+            let cleanString = d.name.replace(/ /g, "_");
+            cleanString = cleanString.replace(/[\[{()}\]]/g, '');
             d3.select(this)
-                .attr('id', 'dimension_axis_' + d.name)
+                .attr('id', 'dimension_axis_' + cleanString)
                 .call(yaxis[d.name]);
         });
         this.featureAxisG
@@ -300,8 +304,10 @@ class SteerableParcoords {
             .attr("text-anchor", "middle")
             .attr('y', this.padding / 2 + 17)
             .each(function (d) {
+            let cleanString = d.name.replace(/ /g, "_");
+            cleanString = cleanString.replace(/[\[{()}\]]/g, '');
             d3.select(this)
-                .attr('id', 'dimension_invert_' + d.name)
+                .attr('id', 'dimension_invert_' + cleanString)
                 .text('\u2193');
         })
             .on("click", this.onInvert(this));

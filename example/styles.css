@@ -1,40 +1,27 @@
 .main {
-  margin-left: 1.5%;
-  margin-right: 1.5%;
+  margin-left: 1.1rem;
+  margin-right: 1.1rem;
 }
 
 header {
-  margin-left: 21%;
+  margin-left: 0.6rem;
   background-color: #476e9e;
-  border-radius:5px;
+  border-radius:0.3rem;
   color: #ffffff;
-  padding:3px 50px;
-  margin-bottom: 30px;
+  padding:0.2rem 3.1rem;
+  margin-bottom: 1.9rem;
 }
 
 body {
-  font-family: Trebuchet MS;
+  font-family: Trebuchet MS, sans-serif;
   background-color: #F7F9F9;
   color: #283966;
-  align: center;
-  margin-bottom: 3px;
+  margin-bottom: 0.1rem;
   height: 100%;
 }
 
-.sideNav {
-  width: 150px;
-  position: fixed;
-  z-index: 1;
-  top: 90px;
-  bottom: 0;
-  left: 0px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  padding: 10px;
-}
-
 section {
-  margin-left: 160px;
+  margin-left: 2rem;
 }
 
 .inactive path{
@@ -45,26 +32,26 @@ section {
 
 .active path{
   fill: none;
-  stroke-width: 1.5px;
+  stroke-width: 0.1rem;
   stroke:#0081af;
 }
 
 .input-button, input::file-selector-button {
   appearance: none;
   background-color: #FAFBFC;
-  border: 1px solid rgba(27, 31, 35, 0.15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  border: 0.05rem solid rgba(27, 31, 35, 0.15);
+  border-radius: 0.4rem;
+  box-shadow: rgba(27, 31, 35, 0.04) 0 0.05rem 0, rgba(255, 255, 255, 0.25) 0 0.05rem 0 inset;
   box-sizing: border-box;
   color: #24292E;
   cursor: pointer;
   display: inline-block;
   font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 1.25rem;
   list-style: none;
-  padding: 6px 16px;
+  padding: 0.4rem 1rem;
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
@@ -73,9 +60,7 @@ section {
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
-  margin-bottom: 4px;
-  margin-left: 20px;
-  margin-top: 30px;
+  margin: 0.4rem 0.6rem 0.25rem 1.25rem;
 }
 
 .input-button:hover, input::file-selector-button:hover {
@@ -93,22 +78,22 @@ section {
 
 .input-button:active, input::file-selector-button:active {
   background-color: #EDEFF2;
-  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 0.05rem 0 inset;
   transition: none 0s;
 }
 
 .seperator {
   visibility: hidden;
-  border: 4px solid;
+  border: 0.25rem solid;
   color: #476e9e;
   background-color: #476e9e;
-  margin-left: 160px;
-  margin-right: 20px;
-  border-radius:5px;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  border-radius: 0.3rem;
 }
 
 .plot {
-  margin-left: 160px;
+  margin-left: 2rem;
 }
 
 .checkboxHeader {
@@ -116,7 +101,7 @@ section {
 }
 
 .checkboxContainer {
-  margin-right: 20px;
+  margin-right: 1.25rem;
 }
 
 h4 {
@@ -129,19 +114,19 @@ h4 {
 .dimension-button {
   appearance: none;
   background-color: #FAFBFC;
-  border: 1px solid rgba(27, 31, 35, 0.15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  border: 0.01rem solid rgba(27, 31, 35, 0.15);
+  border-radius: 0.4rem;
+  box-shadow: rgba(27, 31, 35, 0.04) 0 0.01rem 0, rgba(255, 255, 255, 0.25) 0 0.01rem 0 inset;
   box-sizing: border-box;
   color: #24292E;
   cursor: pointer;
   display: inline-block;
   font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 1.25rem;
   list-style: none;
-  padding: 6px 16px;
+  padding: 0.4rem 1rem;
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
@@ -150,9 +135,9 @@ h4 {
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
-  margin-bottom: 4px;
-  margin-top: 5px;
-  margin-right: 10px;
+  margin-bottom: 0.25rem;
+  margin-top: 0.3rem;
+  margin-right: 0.6rem;
 }
 
 .dimension-button:hover, input::file-selector-button:hover {
@@ -170,6 +155,6 @@ h4 {
 
 .dimension-button:active, input::file-selector-button:active {
   background-color: #EDEFF2;
-  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 0.01rem 0 inset;
   transition: none 0s;
 }

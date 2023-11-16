@@ -27,16 +27,15 @@
   <div><h1 align="center">Parallel Coordinates</h1></div>
 </header>
 
-<aside class="sideNav">
-  <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
-  <button class="input-button" onclick="openFileDialog()">Upload File</button>
-</aside>
+
+<input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
+<button class="input-button" onclick="openFileDialog()">Upload File</button>
 
 <div class="plot" id="parallelcoords"></div>
 
 <hr id="line" class="seperator">
 <section>
-  <h4 id="checkboxHeader">Select dimensions</h4>
+  <h4 id="checkboxHeader">Show dimensions</h4>
   <div id="checkboxContainer"></div>
   <h4 id="invertContainerHeader">Invert dimensions</h4>
   <div id="invert_container" class="invert_container"></div>
