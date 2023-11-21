@@ -30,25 +30,48 @@ async function bundleJS() {
       { extension: 'min.js', plugins: gzPlugins },
     ];
     return writeConfigurationsIIFE.map((c) => bundle.write({
-      file:`${location}/spc.${c.extension}`,
+      file:`${location}/spcd3.${c.extension}`,
       format,
-      name: 'spc',
+      name: 'spcd3',
       plugins: c.plugins,
       sourcemap: true,
     }).then(() => {
-      const fileData = fs.readFileSync(`${location}/spc.${c.extension}`, 'utf8');
+      const fileData = fs.readFileSync(`${location}/spcd3.${c.extension}`, 'utf8');
       const formatString = format === 'iife' ? 'IIFE' :
         format === 'esm' ? 'ESM' :
           format === 'cjs' ? 'CommonJS' : ''
       const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${formatString}\n` + fileData
-      fs.writeFileSync(`${location}/spc.${c.extension}`, dataWithHeaderLine, 'utf8');
+      fs.writeFileSync(`${location}/spcd3.${c.extension}`, dataWithHeaderLine, 'utf8');
     }))
   }
 
+  function writeLibToExample(format) {
+    const location = `./example/lib/${format}`;
+    const writeConfigurationsIIFE = [
+      { extension: 'js', plugins: [] }
+    ];
+    return writeConfigurationsIIFE.map((c) => bundle.write({
+      file:`${location}/spcd3.${c.extension}`,
+      format,
+      name: 'spcd3',
+      plugins: c.plugins,
+      sourcemap: true,
+    }).then(() => {
+      const fileData = fs.readFileSync(`${location}/spcd3.${c.extension}`, 'utf8');
+      const formatString = format === 'iife' ? 'IIFE' :
+          format === 'esm' ? 'ESM' :
+              format === 'cjs' ? 'CommonJS' : ''
+      const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${formatString}\n` + fileData
+      fs.writeFileSync(`${location}/spcd3.${c.extension}`, dataWithHeaderLine, 'utf8');
+    }))
+  }
+
+  //TODO: change mode
   const mode = 'production';
   return Promise.all([
-    ...write('esm'),
-    ...((mode === 'production') ? [write('iife'), write('cjs')] : [])
+      ...writeLibToExample('cjs'),
+      ...write('esm'),
+      ...((mode === 'production') ? [write('iife'), write('cjs')] : [])
   ])
 }
 

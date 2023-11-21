@@ -207,10 +207,30 @@ export class SteerableParcoords {
         .domain(this.features.map(x => x.name))
   }
 
-  setupYAxis() 
+  setupYAxis()
   {
-    Object.entries(this.yScales).map(x => {
-        this.yAxis[x[0]] = d3.axisLeft(x[1]);
+    let counter = 0;
+    const limit = 30;
+    Object.entries(this.yScales).map(key => {
+      let temp_var_features = Array.from(this.features.values()).map(c => c.name);
+      let temp_var_values = this.newDataset.map(o => o[temp_var_features[counter]]);
+      counter = counter + 1;
+
+      if(isNaN(temp_var_values[0])) {
+        if(temp_var_values.length > limit)
+        {
+          const newArr = temp_var_values.filter(function(value, index, array) {
+            return index % 3 == 0;
+          });
+          this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(newArr)
+        }
+        else {
+          this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(temp_var_values)
+        }
+      }
+      else {
+        this.yAxis[key[0]] = d3.axisLeft(key[1]);
+      }
     });
     return this.yAxis;
   }
@@ -346,7 +366,7 @@ export class SteerableParcoords {
         .append('g')
         .each(function (d) {
           let cleanString = d.name.replace(/ /g,"_");
-          cleanString = cleanString.replace(/[\[{()}\]]/g, '');
+          cleanString = cleanString.replace(/[\[{()}\]´]/g, '');
           d3.select(this)
               .attr('id', 'dimension_axis_' + cleanString)
               .call(yaxis[d.name]);
