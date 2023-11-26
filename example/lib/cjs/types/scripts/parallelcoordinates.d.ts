@@ -16,6 +16,7 @@ export declare class SteerableParcoords {
     private newDataset;
     yBrushes: {};
     yAxis: {};
+    private dimensions;
     constructor(data?: any, newFeatures?: any);
     loadCSV(csv: any): void;
     getData(): any;

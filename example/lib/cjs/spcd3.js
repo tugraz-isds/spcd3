@@ -21,6 +21,7 @@ class SteerableParcoords {
     newDataset;
     yBrushes;
     yAxis;
+    dimensions;
     constructor(data, newFeatures) {
         if (data) {
             this.data = data;
@@ -141,11 +142,12 @@ class SteerableParcoords {
     setupScales() {
         this.features.map(x => {
             const testValue = this.newDataset.map(o => o[x.name]);
+            Math.max(...(testValue.map(el => el.length)));
             if (isNaN(testValue[0]) !== false) {
                 this.yScales[x.name] = d3.scalePoint()
                     .domain(this.newDataset.map(o => o[x.name]))
                     .range([this.padding, this.height - this.padding])
-                    .padding(0.2); //TODO: check padding!
+                    .padding(0.2);
             }
             else {
                 var max = Math.max(...this.newDataset.map(o => o[x.name]));
@@ -155,9 +157,10 @@ class SteerableParcoords {
                     .range([this.height - this.padding, this.padding]);
             }
         });
+        this.padding;
         this.xScales = d3.scalePoint()
-            .range([this.width - this.padding, this.padding])
-            .domain(this.features.map(x => x.name));
+            .domain(this.features.map(x => x.name))
+            .range([this.width - this.padding, this.padding]);
     }
     setupYAxis() {
         let counter = 0;
@@ -167,11 +170,14 @@ class SteerableParcoords {
             let temp_var_values = this.newDataset.map(o => o[temp_var_features[counter]]);
             counter = counter + 1;
             if (isNaN(temp_var_values[0])) {
-                if (temp_var_values.length > limit) {
-                    const newArr = temp_var_values.filter(function (value, index, array) {
+                var unique_arr = temp_var_values.filter(function (elem, index, self) {
+                    return index === self.indexOf(elem);
+                });
+                if (unique_arr.length > limit) {
+                    const filtered_arr = temp_var_values.filter(function (value, index, array) {
                         return index % 3 == 0;
                     });
-                    this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(newArr);
+                    this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(filtered_arr);
                 }
                 else {
                     this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(temp_var_values);
@@ -228,7 +234,7 @@ class SteerableParcoords {
         });
     }
     initContent() {
-        this.width = 1200;
+        this.width = this.newFeatures.length * 80;
         this.height = 400;
         this.padding = 50;
         this.brushWidth = 20;
@@ -255,7 +261,12 @@ class SteerableParcoords {
         var brushes = this.setupBrush();
         const svg = d3.select("#parallelcoords")
             .append('svg')
-            .attr("viewBox", "0 0 1200 400");
+            .attr("viewBox", [0, 0, this.width, this.height])
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .attr("style", "width: auto; max-height: 100%")
+            .attr("style", "overflow-x: scroll");
+        //.attr("preserveAspectRatio", "none");
         this.inactive = svg.append('g')
             .attr('class', 'inactive')
             .selectAll('path')
@@ -300,10 +311,11 @@ class SteerableParcoords {
             .append('g')
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
-            cleanString = cleanString.replace(/[\[{()}\]´]/g, '');
+            cleanString = cleanString.replace(/[\[{()}\]]/g, '');
             d3.select(this)
                 .attr('id', 'dimension_axis_' + cleanString)
-                .call(yaxis[d.name]);
+                .call(yaxis[d.name])
+                .attr("fill", "#FFFF0080");
         });
         this.featureAxisG
             .each(function (d) {
@@ -312,15 +324,30 @@ class SteerableParcoords {
                 .attr('class', 'brush')
                 .call(brushes[d.name]);
         });
+        var tooltip = d3.select('#parallelcoords')
+            .append('g')
+            .style("position", "absolute")
+            .style("visibility", "hidden");
         this.featureAxisG
             .append("text")
             .attr("text-anchor", "middle")
-            .attr('y', this.padding / 2)
-            .text(d => d.name);
+            .attr('y', this.padding / 2.5)
+            .text(d => d.name.length > 10 ? d.name.substr(0, 10) + " ..." : d.name)
+            .style("font-size", "0.7rem")
+            .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
+            .on("mousemove", (event, d) => {
+            var index = this.newFeatures.indexOf(d.name);
+            tooltip.text(d.name);
+            tooltip.style("top", 12.2 + "rem").style("left", this.width - index * 80 + "px");
+            tooltip.style("font-size", "0.75rem").style("border-width", 1 + "rem").style("border-radius", 0.375 + "rem")
+                .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
+            return tooltip;
+        })
+            .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
         this.featureAxisG
             .append("text")
             .attr("text-anchor", "middle")
-            .attr('y', this.padding / 2 + 17)
+            .attr('y', this.padding / 1.2)
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
             cleanString = cleanString.replace(/[\[{()}\]]/g, '');
@@ -344,19 +371,21 @@ class SteerableParcoords {
         return (lineGenerator(points));
     }
     highlight(d) {
-        var selected_student = d.target.__data__.Name;
+        console.log(d.target.__data__.Name);
+        let selectedValue = d.target.__data__.Name.replace(/[0123456789%&'\[{()}\]]/g, '');
         // Second the hovered specie takes its color
-        d3.selectAll("." + selected_student)
+        d3.selectAll("." + selectedValue)
             .transition().duration(5)
-            .style("stroke", selected_student)
+            .style("stroke", selectedValue)
             .style("opacity", "5")
             .style('stroke', 'red');
     }
     doNotHighlight(d) {
-        var selected_student = d.target.__data__.Name;
-        d3.selectAll("." + selected_student)
+        console.log(d.target.__data__.Name);
+        let selectedValue = d.target.__data__.Name.replace(/[0123456789%&'\[{()}\]]/g, '');
+        d3.selectAll("." + selectedValue)
             .transition().duration(5)
-            .style("stroke", selected_student)
+            .style("stroke", selectedValue)
             .style("opacity", ".4")
             .style('stroke', '#0081af');
     }

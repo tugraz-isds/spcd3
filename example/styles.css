@@ -93,7 +93,7 @@ section {
 }
 
 .plot {
-  margin-left: 2rem;
+
 }
 
 .checkboxHeader {
@@ -157,4 +157,11 @@ h4 {
   background-color: #EDEFF2;
   box-shadow: rgba(225, 228, 232, 0.2) 0 0.01rem 0 inset;
   transition: none 0s;
+}
+
+div#parallelcoords {
+  width: 75rem;
+  height:25rem;
+  overflow-x: auto;
+  margin-left: 2rem;
 }
