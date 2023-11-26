@@ -44,13 +44,14 @@ class SteerableParcoords {
     invert(dimension) {
         let cleanDimension = dimension.replace(/ /g, "_");
         cleanDimension = cleanDimension.replace(/[.,*\-%&'\[{()}\]]/g, '_');
-        console.log(cleanDimension);
         const invert_id = "#dimension_invert_" + cleanDimension;
         const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
         const currentText = textElement.text();
         const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
+        const arrowStyle = currentText === '\u2193' ? 's-resize' : 'n-resize';
         textElement.text(newText);
+        textElement.style('cursor', arrowStyle);
         d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
             .transition();
         // force update lines
@@ -332,6 +333,7 @@ class SteerableParcoords {
             .attr('y', this.padding / 1.7)
             .text(d => d.name.length > 10 ? d.name.substr(0, 10) + " ..." : d.name)
             .style("font-size", "0.7rem")
+            .style("cursor", "ew-resize")
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
             .on("mousemove", (event, d) => {
             //var index = this.newFeatures.indexOf(d.name);
@@ -351,7 +353,8 @@ class SteerableParcoords {
             cleanString = cleanString.replace(/[.,*\-%&'\[{()}\]]/g, '_');
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
-                .text('\u2193');
+                .text('\u2193')
+                .style('cursor', 'n-resize');
         })
             .on("click", this.onInvert(this));
     }
