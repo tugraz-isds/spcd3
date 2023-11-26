@@ -14,7 +14,7 @@ function cleanExampleLib() {
 
 exports.clean = parallel(cleanPackage, cleanExampleLib);
 
-exports.build = series(cleanExampleLib, bundleJS, bundleDeclaration);
+exports.build = series(exports.clean, bundleJS, bundleDeclaration);
 
 // temp
 exports.compile = task('compile', async function(){

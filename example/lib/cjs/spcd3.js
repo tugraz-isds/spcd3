@@ -21,7 +21,6 @@ class SteerableParcoords {
     newDataset;
     yBrushes;
     yAxis;
-    dimensions;
     constructor(data, newFeatures) {
         if (data) {
             this.data = data;
@@ -44,7 +43,8 @@ class SteerableParcoords {
     }
     invert(dimension) {
         let cleanDimension = dimension.replace(/ /g, "_");
-        cleanDimension = cleanDimension.replace(/[\[{()}\]]/g, '');
+        cleanDimension = cleanDimension.replace(/[.,*\-%&'\[{()}\]]/g, '_');
+        console.log(cleanDimension);
         const invert_id = "#dimension_invert_" + cleanDimension;
         const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
@@ -142,7 +142,6 @@ class SteerableParcoords {
     setupScales() {
         this.features.map(x => {
             const testValue = this.newDataset.map(o => o[x.name]);
-            Math.max(...(testValue.map(el => el.length)));
             if (isNaN(testValue[0]) !== false) {
                 this.yScales[x.name] = d3.scalePoint()
                     .domain(this.newDataset.map(o => o[x.name]))
@@ -157,7 +156,6 @@ class SteerableParcoords {
                     .range([this.height - this.padding, this.padding]);
             }
         });
-        this.padding;
         this.xScales = d3.scalePoint()
             .domain(this.features.map(x => x.name))
             .range([this.width - this.padding, this.padding]);
@@ -236,7 +234,7 @@ class SteerableParcoords {
     initContent() {
         this.width = this.newFeatures.length * 80;
         this.height = 400;
-        this.padding = 50;
+        this.padding = 80;
         this.brushWidth = 20;
         this.filters = {};
         this.features = [];
@@ -265,8 +263,8 @@ class SteerableParcoords {
             .attr("width", this.width)
             .attr("height", this.height)
             .attr("style", "width: auto; max-height: 100%")
-            .attr("style", "overflow-x: scroll");
-        //.attr("preserveAspectRatio", "none");
+            .attr("style", "overflow-x: scroll")
+            .attr("preserveAspectRatio", "none");
         this.inactive = svg.append('g')
             .attr('class', 'inactive')
             .selectAll('path')
@@ -311,7 +309,7 @@ class SteerableParcoords {
             .append('g')
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
-            cleanString = cleanString.replace(/[\[{()}\]]/g, '');
+            cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
             d3.select(this)
                 .attr('id', 'dimension_axis_' + cleanString)
                 .call(yaxis[d.name])
@@ -331,14 +329,14 @@ class SteerableParcoords {
         this.featureAxisG
             .append("text")
             .attr("text-anchor", "middle")
-            .attr('y', this.padding / 2.5)
+            .attr('y', this.padding / 1.7)
             .text(d => d.name.length > 10 ? d.name.substr(0, 10) + " ..." : d.name)
             .style("font-size", "0.7rem")
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
             .on("mousemove", (event, d) => {
-            var index = this.newFeatures.indexOf(d.name);
+            //var index = this.newFeatures.indexOf(d.name);
             tooltip.text(d.name);
-            tooltip.style("top", 12.2 + "rem").style("left", this.width - index * 80 + "px");
+            tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
             tooltip.style("font-size", "0.75rem").style("border-width", 1 + "rem").style("border-radius", 0.375 + "rem")
                 .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
             return tooltip;
@@ -350,7 +348,7 @@ class SteerableParcoords {
             .attr('y', this.padding / 1.2)
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
-            cleanString = cleanString.replace(/[\[{()}\]]/g, '');
+            cleanString = cleanString.replace(/[.,*\-%&'\[{()}\]]/g, '_');
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
                 .text('\u2193');
@@ -371,8 +369,7 @@ class SteerableParcoords {
         return (lineGenerator(points));
     }
     highlight(d) {
-        console.log(d.target.__data__.Name);
-        let selectedValue = d.target.__data__.Name.replace(/[0123456789%&'\[{()}\]]/g, '');
+        let selectedValue = d.target.__data__.Name.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         // Second the hovered specie takes its color
         d3.selectAll("." + selectedValue)
             .transition().duration(5)
@@ -381,8 +378,7 @@ class SteerableParcoords {
             .style('stroke', 'red');
     }
     doNotHighlight(d) {
-        console.log(d.target.__data__.Name);
-        let selectedValue = d.target.__data__.Name.replace(/[0123456789%&'\[{()}\]]/g, '');
+        let selectedValue = d.target.__data__.Name.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         d3.selectAll("." + selectedValue)
             .transition().duration(5)
             .style("stroke", selectedValue)

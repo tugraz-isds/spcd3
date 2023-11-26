@@ -2,10 +2,10 @@
   "name": "spcd3",
   "version": "1.0.0",
   "description": "Steerable Parallel Coordinates in D3",
-  "main": "",
-  "types": "",
+  "main": "./package/cjs/spcd3.js",
+  "module": "./package/esm/spcd3.js",
+  "types": "./package/index.d.ts",
   "files": [
-    "/lib",
     "/package"
   ],
   "scripts": {
@@ -13,6 +13,16 @@
     "clean": "npx gulp clean",
     "build": "npx gulp build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tugraz-isds/spcd3"
+  },
+  "keywords": [
+    "d3",
+    "svg",
+    "visualisation",
+    "parallel coordinates"
+  ],
   "author": "Philipp Drescher, Jeremias Kleinschuster, Sebastian Schreiner, Burim Vrella, Romana Gruber",
   "license": "MIT",
   "devDependencies": {

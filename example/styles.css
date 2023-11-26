@@ -5,6 +5,7 @@
 
 header {
   margin-left: 0.6rem;
+  margin-right: 0.6rem;
   background-color: #476e9e;
   border-radius:0.3rem;
   color: #ffffff;
@@ -164,4 +165,5 @@ div#parallelcoords {
   height:25rem;
   overflow-x: auto;
   margin-left: 2rem;
+  margin-right: 2rem;
 }
