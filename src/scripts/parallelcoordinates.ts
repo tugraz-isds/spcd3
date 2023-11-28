@@ -174,6 +174,15 @@ export class SteerableParcoords {
 
   prepareData()
   {
+    /*Array.from(new Set(this.data.map((item: any) => item.id)))
+    Array.from(new Set(this.newDataset.map((item: any) => item.id)))
+    Array.from(new Set(this.features.map((item: any) => item.id)))
+    this.newFeatures = [...new Set(this.newFeatures)];
+    console.log(this.data);
+    console.log(this.newDataset);
+    console.log(this.features);
+    console.log(this.newFeatures);*/
+
     this.data.forEach(obj => {
       var newdata = {};
       this.newFeatures.forEach(feature => {
@@ -341,7 +350,12 @@ export class SteerableParcoords {
         .data(this.data)
         .enter()
         .append('path')
-        .attr("class", function (d) { return "line " + d.Name })
+        .attr("class", function (d) {
+          const keys = Object.keys(d);
+          const first_key = keys[0];
+          const selected_value = d[first_key];
+          return "line " + selected_value
+        })
         .attr('d', this.linePath.bind(this))
         .style("opacity", 0.5)
         .on("mouseover", this.highlight)
@@ -442,23 +456,25 @@ export class SteerableParcoords {
     return (lineGenerator(points));
   }
 
-
-  highlight(d) {
-    let selectedValue = d.target.__data__.Name.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-    // Second the hovered specie takes its color
-    d3.selectAll("." + selectedValue)
+  highlight(d, i) {
+    const keys = Object.keys(i);
+    const first_key = keys[0];
+    const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+    d3.selectAll("." + selected_value)
         .transition().duration(5)
-        .style("stroke", selectedValue)
+        .style("stroke", selected_value)
         .style("opacity", "5")
-        .style('stroke', 'red');
+        .style("stroke", "red");
   }
 
-  doNotHighlight(d) {
-    let selectedValue = d.target.__data__.Name.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-    d3.selectAll("." + selectedValue)
+  doNotHighlight(d, i) {
+    const keys = Object.keys(i);
+    const first_key = keys[0];
+    const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+    d3.selectAll("." + selected_value)
         .transition().duration(5)
-        .style("stroke", selectedValue)
+        .style("stroke", selected_value)
         .style("opacity", ".4")
-        .style('stroke', '#0081af');
+        .style("stroke", "#0081af");
   }
 }

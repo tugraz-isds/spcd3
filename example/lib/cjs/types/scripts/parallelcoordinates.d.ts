@@ -45,6 +45,6 @@ export declare class SteerableParcoords {
     private initContent;
     generateSVG(): void;
     linePath(d: any): any;
-    highlight(d: any): void;
-    doNotHighlight(d: any): void;
+    highlight(d: any, i: any): void;
+    doNotHighlight(d: any, i: any): void;
 }
