@@ -273,7 +273,7 @@ class SteerableParcoords {
             .attr("height", this.height)
             .attr("style", "width: auto; max-height: 100%")
             .attr("style", "overflow-x: scroll")
-            .attr("preserveAspectRatio", "xMinYMin");
+            .attr("preserveAspectRatio", "none");
         this.inactive = svg.append('g')
             .attr('class', 'inactive')
             .selectAll('path')

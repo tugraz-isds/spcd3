@@ -21,6 +21,9 @@ defines for now two public tasks:
 - The `build` task creates a new build of the framework and stores the generated .js file into
   `package` folder.
 
+- The `serve` task executes the build task, then additionally executes a private task called watcher which 
+is used to initialize a live server which serves the `example` directory.
+
 
 The public tasks can be invoked either by directly running gulp or
 by running the equivalent scripts in package.json:
@@ -31,6 +34,9 @@ npx gulp clean
 
 npm run build
 npx gulp build
+
+npm run serve
+npx gulp serve
 ```
 
 ## Project Git Workflow

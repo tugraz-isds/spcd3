@@ -11,7 +11,8 @@
   "scripts": {
     "test": "tsc -d",
     "clean": "npx gulp clean",
-    "build": "npx gulp build"
+    "build": "npx gulp build",
+    "serve": "npx gulp serve"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,8 @@
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "8.3.3",
-    "rollup-plugin-gzip": "^2.5.0"
+    "rollup-plugin-gzip": "^2.5.0",
+    "browser-sync": "^2.27.5"
   },
   "dependencies": {
     "d3": "^7.8.5",
