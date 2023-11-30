@@ -17,7 +17,9 @@ export declare class SteerableParcoords {
     yBrushes: {};
     yAxis: {};
     constructor(data?: any, newFeatures?: any);
-    loadCSV(csv: any): void;
+    removeDuplicateColumnNames(value: string): string;
+    checkIfDuplicatesExists(value: string): boolean;
+    loadCSV(csv: string): void;
     getData(): any;
     setDimensions(newDimension: any): void;
     invert(dimension: any): void;

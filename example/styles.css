@@ -167,6 +167,7 @@ div#parallelcoords {
   width: 75rem;
   height:25rem;
   overflow-x: auto;
+  overflow-y: hidden;
   margin-left: 2rem;
   margin-right: 2rem;
 }

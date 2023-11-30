@@ -53,7 +53,7 @@ function getSelectedDimensions()
 }
 
 function selectDimensions(){
-    var data = parcoords.getData()
+    var data = parcoords.getData();
     var dimensions = data["columns"];
 
     document.getElementById('checkboxHeader').style.visibility = "visible";

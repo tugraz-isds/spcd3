@@ -29,8 +29,24 @@ class SteerableParcoords {
             this.newFeatures = newFeatures;
         }
     }
+    removeDuplicateColumnNames(value) {
+        let complete_arr = value.split(/\r?\n/);
+        let column_string = d3.csvParse(complete_arr[0]);
+        let n = 0;
+        const unique = arr => arr.map((s => v => !s.has(v) && s.add(v) ? v : `${v}(${n += 1})`)(new Set));
+        let column_string_wo_dup = unique(column_string["columns"]).toString();
+        complete_arr[0] = column_string_wo_dup;
+        return complete_arr.join('\r\n');
+    }
+    checkIfDuplicatesExists(value) {
+        return new Set(value).size !== value.length;
+    }
     loadCSV(csv) {
-        var tmp_data = d3.csvParse(csv);
+        let complete_arr = csv.split(/\r?\n/);
+        if (this.checkIfDuplicatesExists(complete_arr[0])) {
+            csv = this.removeDuplicateColumnNames(csv);
+        }
+        let tmp_data = d3.csvParse(csv);
         this.data = tmp_data.sort((a, b) => a.Name > b.Name ? 1 : -1);
     }
     //not happy with this, but at the moment we need it
@@ -131,14 +147,6 @@ class SteerableParcoords {
         }
     }
     prepareData() {
-        /*Array.from(new Set(this.data.map((item: any) => item.id)))
-        Array.from(new Set(this.newDataset.map((item: any) => item.id)))
-        Array.from(new Set(this.features.map((item: any) => item.id)))
-        this.newFeatures = [...new Set(this.newFeatures)];
-        console.log(this.data);
-        console.log(this.newDataset);
-        console.log(this.features);
-        console.log(this.newFeatures);*/
         this.data.forEach(obj => {
             var newdata = {};
             this.newFeatures.forEach(feature => {
@@ -181,7 +189,7 @@ class SteerableParcoords {
                     return index === self.indexOf(elem);
                 });
                 if (unique_arr.length > limit) {
-                    const filtered_arr = temp_var_values.filter(function (value, index, array) {
+                    var filtered_arr = temp_var_values.filter(function (value, index, array) {
                         return index % 3 == 0;
                     });
                     this.yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(filtered_arr);
@@ -271,8 +279,10 @@ class SteerableParcoords {
             .attr("viewBox", [0, 0, this.width, this.height])
             .attr("width", this.width)
             .attr("height", this.height)
-            .attr("style", "width: auto; max-height: 100%")
-            .attr("style", "overflow-x: scroll")
+            .attr("font-family", "Verdana, sans-serif")
+            .attr("style", "width: 75rem; max-height: 25rem")
+            .attr("style", "overflow-x: auto")
+            .attr("style", "overflow-y: hidden")
             .attr("preserveAspectRatio", "none");
         this.inactive = svg.append('g')
             .attr('class', 'inactive')
@@ -344,7 +354,7 @@ class SteerableParcoords {
             .append("text")
             .attr("text-anchor", "middle")
             .attr('y', this.padding / 1.7)
-            .text(d => d.name.length > 10 ? d.name.substr(0, 10) + " ..." : d.name)
+            .text(d => d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name)
             .style("font-size", "0.7rem")
             .style("cursor", "ew-resize")
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
@@ -352,7 +362,9 @@ class SteerableParcoords {
             //var index = this.newFeatures.indexOf(d.name);
             tooltip.text(d.name);
             tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
-            tooltip.style("font-size", "0.75rem").style("border-width", 1 + "rem").style("border-radius", 0.375 + "rem")
+            tooltip.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
+                .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
+                .style("padding", 0.12 + "rem")
                 .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
             return tooltip;
         })
