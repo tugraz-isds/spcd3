@@ -124,11 +124,17 @@ class SteerableParcoords {
     onDragEventHandler(parcoords) {
         {
             return function onDrag(d) {
-                parcoords.dragging[(d.subject).name] = Math.min(parcoords.width, Math.max(0, this.__origin__ += d.dx));
-                parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
-                parcoords.newFeatures.sort((a, b) => { return parcoords.position(b, parcoords) - parcoords.position(a, parcoords); });
-                parcoords.xScales.domain(parcoords.newFeatures);
-                parcoords.featureAxisG.attr("transform", (d) => { return "translate(" + parcoords.position(d.name, parcoords) + ")"; });
+                if (parcoords.xScales((d.subject).name) > 80) {
+                    parcoords.dragging[(d.subject).name] = Math.min(parcoords.width, Math.max(0, this.__origin__ += d.dx));
+                    parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
+                    parcoords.newFeatures.sort((a, b) => {
+                        return parcoords.position(b, parcoords) - parcoords.position(a, parcoords);
+                    });
+                    parcoords.xScales.domain(parcoords.newFeatures);
+                    parcoords.featureAxisG.attr("transform", (d) => {
+                        return "translate(" + parcoords.position(d.name, parcoords) + ")";
+                    });
+                }
             };
         }
     }
@@ -366,14 +372,13 @@ class SteerableParcoords {
             .style("visibility", "hidden");
         this.featureAxisG
             .append("text")
+            .attr("id", "dimension")
             .attr("text-anchor", "middle")
             .attr('y', this.padding / 1.7)
             .text(d => d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name)
             .style("font-size", "0.7rem")
-            .style("cursor", "ew-resize")
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
             .on("mousemove", (event, d) => {
-            //var index = this.newFeatures.indexOf(d.name);
             tooltip.text(d.name);
             tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
             tooltip.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
@@ -383,6 +388,20 @@ class SteerableParcoords {
             return tooltip;
         })
             .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
+        this.featureAxisG
+            .select("#dimension")
+            .on("mousemove", (event, d) => {
+            if (event.clientX > 160) {
+                this.featureAxisG
+                    .select("#dimension")
+                    .style("cursor", "ew-resize");
+            }
+            else {
+                this.featureAxisG
+                    .select("#dimension")
+                    .style("cursor", "auto");
+            }
+        });
         this.featureAxisG
             .append("text")
             .attr("text-anchor", "middle")
