@@ -93,7 +93,18 @@ class SteerableParcoords {
     }
     getSelected() {
     }
-    select(records) {
+    select(d, i) {
+        const keys = Object.keys(i);
+        const first_key = keys[0];
+        const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+        const current_color_line = d3.select(this).style('stroke');
+        const path = d3.selectAll("." + selected_value);
+        if (current_color_line === "orange") {
+            path.style("stroke", "#0081af");
+        }
+        else {
+            path.style("stroke", "orange");
+        }
     }
     saveAsSVG() {
     }
@@ -307,6 +318,7 @@ class SteerableParcoords {
             .style("opacity", 0.5)
             .on("mouseover", this.highlight)
             .on("mouseleave", this.doNotHighlight)
+            .on("click", this.select)
             .each(function (d) {
             const lineData = d; // Access the line data associated with the current line element
             const lineElement = this; // Reference to the current line element
@@ -315,6 +327,8 @@ class SteerableParcoords {
                 followCursor: 'initial',
                 onShow(instance) {
                     var dimensionName = self.features[self.features.length - 1].name;
+                    //console.log(dimensionName);
+                    //console.log(lineData + " " + lineData[dimensionName]);
                     instance.setContent(`${lineData[dimensionName]}`);
                 }
             });
@@ -400,21 +414,27 @@ class SteerableParcoords {
         const keys = Object.keys(i);
         const first_key = keys[0];
         const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        d3.selectAll("." + selected_value)
-            .transition().duration(5)
-            .style("stroke", selected_value)
-            .style("opacity", "5")
-            .style("stroke", "red");
+        const current_color_line = d3.select(this).style('stroke');
+        if (current_color_line !== "orange") {
+            d3.selectAll("." + selected_value)
+                .transition().duration(5)
+                .style("stroke", selected_value)
+                .style("opacity", "5")
+                .style("stroke", "red");
+        }
     }
     doNotHighlight(d, i) {
         const keys = Object.keys(i);
         const first_key = keys[0];
         const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        d3.selectAll("." + selected_value)
-            .transition().duration(5)
-            .style("stroke", selected_value)
-            .style("opacity", ".4")
-            .style("stroke", "#0081af");
+        const current_color_line = d3.select(this).style('stroke');
+        if (current_color_line !== "orange") {
+            d3.selectAll("." + selected_value)
+                .transition().duration(5)
+                .style("stroke", selected_value)
+                .style("opacity", ".4")
+                .style("stroke", "#0081af");
+        }
     }
 }
 

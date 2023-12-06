@@ -29,7 +29,7 @@ export declare class SteerableParcoords {
     getFilter(dimension: any): void;
     setFilter(dimension: any): void;
     getSelected(): void;
-    select(records: any): void;
+    select(d: any, i: any): void;
     saveAsSVG(): void;
     position(this: any, d: any, parcoords: any): any;
     onDragStartEventHandler(parcoords: any): (d: any) => void;
