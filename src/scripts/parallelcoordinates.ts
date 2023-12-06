@@ -450,19 +450,6 @@ export class SteerableParcoords {
         .style("font-size", "0.7rem")
         .on("mouseover", function(){return tooltip.style("visibility", "visible");})
         .on("mousemove", (event, d) => {
-          tooltip.text(d.name);
-          tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
-          tooltip.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
-              .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
-              .style("padding", 0.12 + "rem")
-              .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
-          return tooltip;
-        })
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-
-    this.featureAxisG
-        .select("#dimension")
-        .on("mousemove", (event, d) => {
           if(event.clientX > 160)
           {
             this.featureAxisG
@@ -475,7 +462,15 @@ export class SteerableParcoords {
                 .select("#dimension")
                 .style("cursor", "auto");
           }
-        });
+          tooltip.text(d.name);
+          tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
+          tooltip.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
+              .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
+              .style("padding", 0.12 + "rem")
+              .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
+          return tooltip;
+        })
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
 
     this.featureAxisG
