@@ -59,7 +59,8 @@ class SteerableParcoords {
     }
     invert(dimension) {
         let cleanDimension = dimension.replace(/ /g, "_");
-        cleanDimension = cleanDimension.replace(/[.,*\-%&'\[{()}\]]/g, '_');
+        cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+        console.log(cleanDimension);
         const invert_id = "#dimension_invert_" + cleanDimension;
         const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
@@ -72,8 +73,8 @@ class SteerableParcoords {
             .transition();
         // force update lines
         this.active.attr('d', this.linePath.bind(this));
-        delete textElement.__origin__;
-        delete this.active[dimension];
+        //delete textElement.__origin__;
+        //delete this.active[dimension];
         this.transition(this.active).attr('d', this.linePath.bind(this));
         this.inactive.attr('d', this.linePath.bind(this))
             .transition()
@@ -375,7 +376,7 @@ class SteerableParcoords {
             .attr('y', this.padding / 1.2)
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
-            cleanString = cleanString.replace(/[.,*\-%&'\[{()}\]]/g, '_');
+            cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
                 .text('\u2193')
