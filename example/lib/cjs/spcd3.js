@@ -330,8 +330,8 @@ class SteerableParcoords {
             .style("opacity", "0.4")
             .style("pointer-events", "stroke")
             .on("mouseover", this.highlight)
-            .on("mouseleave", this.doNotHighlight, function () { return tooltip_path.style("visibility", "visible"); })
-            .on("mouseout", function () { return tooltip_path.style("visibility", "visible"); })
+            .on("mouseleave", this.doNotHighlight, function () { return tooltip_path.style("visibility", "hidden"); })
+            .on("mouseout", function () { return tooltip_path.style("visibility", "hidden"); })
             .on("click", this.select)
             .on("mousemove", (event, d) => {
             const data = this.getAllPointerEventsData(event);
