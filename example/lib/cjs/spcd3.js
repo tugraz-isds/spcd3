@@ -101,9 +101,11 @@ class SteerableParcoords {
         const path = d3.selectAll("." + selected_value);
         if (current_color_line === "orange") {
             path.style("stroke", "#0081af");
+            path.style("opacity", "0.4");
         }
         else {
             path.style("stroke", "orange");
+            path.style("opacity", "15");
         }
     }
     saveAsSVG() {
@@ -288,9 +290,12 @@ class SteerableParcoords {
         this.initContent();
         this.prepareData();
         this.setupScales();
-        var self = this;
-        var yaxis = this.setupYAxis();
-        var brushes = this.setupBrush();
+        let yaxis = this.setupYAxis();
+        let brushes = this.setupBrush();
+        let tooltip_path = d3.select('#parallelcoords')
+            .append('g')
+            .style("position", "absolute")
+            .style("visibility", "hidden");
         const svg = d3.select("#parallelcoords")
             .append('svg')
             .attr("viewBox", [0, 0, this.width, this.height])
@@ -307,6 +312,7 @@ class SteerableParcoords {
             .data(this.data)
             .enter()
             .append('path')
+            .style("pointer-events", "none")
             .attr('d', this.linePath.bind(this));
         this.active = svg.append('g')
             .attr('class', 'active')
@@ -321,23 +327,15 @@ class SteerableParcoords {
             return "line " + selected_value;
         })
             .attr('d', this.linePath.bind(this))
-            .style("opacity", 0.5)
+            .style("opacity", "0.4")
+            .style("pointer-events", "stroke")
             .on("mouseover", this.highlight)
-            .on("mouseleave", this.doNotHighlight)
+            .on("mouseleave", this.doNotHighlight, function () { return tooltip_path.style("visibility", "visible"); })
+            .on("mouseout", function () { return tooltip_path.style("visibility", "visible"); })
             .on("click", this.select)
-            .each(function (d) {
-            const lineData = d; // Access the line data associated with the current line element
-            const lineElement = this; // Reference to the current line element
-            tippy(lineElement, {
-                content: `-`,
-                followCursor: 'initial',
-                onShow(instance) {
-                    var dimensionName = self.features[self.features.length - 1].name;
-                    //console.log(dimensionName);
-                    //console.log(lineData + " " + lineData[dimensionName]);
-                    instance.setContent(`${lineData[dimensionName]}`);
-                }
-            });
+            .on("mousemove", (event, d) => {
+            const data = this.getAllPointerEventsData(event);
+            this.createTooltipForPathLine(data, tooltip_path, event);
         });
         this.featureAxisG = svg.selectAll('g.feature')
             .data(this.features)
@@ -366,7 +364,7 @@ class SteerableParcoords {
                 .attr('class', 'brush')
                 .call(brushes[d.name]);
         });
-        var tooltip = d3.select('#parallelcoords')
+        var tooltip_dim = d3.select('#parallelcoords')
             .append('g')
             .style("position", "absolute")
             .style("visibility", "hidden");
@@ -377,7 +375,7 @@ class SteerableParcoords {
             .attr('y', this.padding / 1.7)
             .text(d => d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name)
             .style("font-size", "0.7rem")
-            .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
+            .on("mouseover", function () { return tooltip_dim.style("visibility", "visible"); })
             .on("mousemove", (event, d) => {
             if (event.clientX > 160) {
                 this.featureAxisG
@@ -389,15 +387,15 @@ class SteerableParcoords {
                     .select("#dimension")
                     .style("cursor", "auto");
             }
-            tooltip.text(d.name);
-            tooltip.style("top", 13.6 + "rem").style("left", event.clientX + "px");
-            tooltip.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
+            tooltip_dim.text(d.name);
+            tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
+            tooltip_dim.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
                 .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
                 .style("padding", 0.12 + "rem")
                 .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
-            return tooltip;
+            return tooltip_dim;
         })
-            .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
+            .on("mouseout", function () { return tooltip_dim.style("visibility", "hidden"); });
         this.featureAxisG
             .append("text")
             .attr("text-anchor", "middle")
@@ -405,12 +403,18 @@ class SteerableParcoords {
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
             cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+            //d3.xml("arrow.svg").then(data => {
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
                 .text('\u2193')
                 .style('cursor', 'n-resize');
+            //.node().append(data.documentElement)})
         })
             .on("click", this.onInvert(this));
+        /*d3.xml("arrow.svg")
+            .then(data => {
+              d3.select("svg").node().append(data.documentElement)
+            });*/
     }
     linePath(d) {
         var lineGenerator = d3.line();
@@ -429,12 +433,12 @@ class SteerableParcoords {
         const keys = Object.keys(i);
         const first_key = keys[0];
         const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        const current_color_line = d3.select(this).style('stroke');
+        const current_color_line = d3.select("." + selected_value).style('stroke');
         if (current_color_line !== "orange") {
             d3.selectAll("." + selected_value)
                 .transition().duration(5)
                 .style("stroke", selected_value)
-                .style("opacity", "5")
+                .style("opacity", "15")
                 .style("stroke", "red");
         }
     }
@@ -450,6 +454,32 @@ class SteerableParcoords {
                 .style("opacity", ".4")
                 .style("stroke", "#0081af");
         }
+    }
+    createTooltipForPathLine(tooltip_text, tooltip_path, event) {
+        if (tooltip_text.length !== 0) {
+            let temp_text = tooltip_text.toString();
+            temp_text = temp_text.split(',').join("\r\n");
+            tooltip_path.text(temp_text);
+            tooltip_path.style("visibility", "visible");
+            tooltip_path.style("top", event.clientY + "px").style("left", event.clientX + "px");
+            tooltip_path.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
+                .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
+                .style("padding", 0.12 + "rem").style("white-space", "pre-line")
+                .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
+            return tooltip_path;
+        }
+    }
+    getAllPointerEventsData(event) {
+        const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter("path");
+        const object = selection._groups;
+        const data = [];
+        for (let i = 0; i < object[0].length; i++) {
+            const items = object.map(item => item[i]);
+            const keys = Object.keys(items);
+            const text = items[keys[0]].className.baseVal.replace("line ", "");
+            data.push(text);
+        }
+        return data;
     }
 }
 

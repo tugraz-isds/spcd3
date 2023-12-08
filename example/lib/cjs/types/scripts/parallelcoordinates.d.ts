@@ -49,4 +49,6 @@ export declare class SteerableParcoords {
     linePath(d: any): any;
     highlight(d: any, i: any): void;
     doNotHighlight(d: any, i: any): void;
+    createTooltipForPathLine(tooltip_text: any, tooltip_path: any, event: any): any;
+    getAllPointerEventsData(event: any): any[];
 }
