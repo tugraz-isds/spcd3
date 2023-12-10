@@ -16,6 +16,7 @@ export declare class SteerableParcoords {
     private newDataset;
     yBrushes: {};
     yAxis: {};
+    selected_path: string;
     constructor(data?: any, newFeatures?: any);
     removeDuplicateColumnNames(value: string): string;
     checkIfDuplicatesExists(value: string): boolean;
@@ -47,8 +48,8 @@ export declare class SteerableParcoords {
     private initContent;
     generateSVG(): void;
     linePath(d: any): any;
-    highlight(d: any, i: any): void;
-    doNotHighlight(d: any, i: any): void;
+    highlight(data: any): void;
+    doNotHighlight(event: any, i: any): void;
     createTooltipForPathLine(tooltip_text: any, tooltip_path: any, event: any): any;
     getAllPointerEventsData(event: any): any[];
 }

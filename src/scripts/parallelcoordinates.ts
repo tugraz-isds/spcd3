@@ -18,6 +18,7 @@ export class SteerableParcoords {
   private newDataset: any;
   yBrushes: {};
   yAxis: {};
+  selected_path: string;
 
   constructor(data?, newFeatures?) {
     if(data) {
@@ -124,19 +125,25 @@ export class SteerableParcoords {
 
   select(d, i)
   {
+    this.selected_path = "";
     const keys = Object.keys(i);
     const first_key = keys[0];
     const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
     const current_color_line = d3.select(this).style('stroke');
-    const path = d3.selectAll("." + selected_value)
 
     if(current_color_line === "orange") {
-      path.style("stroke", "#0081af");
-      path.style("opacity", "0.4");
+      d3.selectAll("." + selected_value)
+          .transition()
+          .style("stroke", selected_value)
+          .style("stroke", "#0081af")
+          .style("opacity", "0.4");
     }
     else {
-      path.style("stroke", "orange");
-      path.style("opacity", "15");
+      d3.selectAll("." + selected_value)
+          .transition()
+          .style("stroke", selected_value)
+          .style("stroke", "orange")
+          .style("opacity", "1");
     }
   }
 
@@ -392,14 +399,20 @@ export class SteerableParcoords {
         .attr('d', this.linePath.bind(this))
         .style("opacity", "0.4")
         .style("pointer-events", "stroke")
-        .on("mouseover", this.highlight)
-        .on("mouseleave", this.doNotHighlight, function(){return tooltip_path.style("visibility", "hidden");})
-        .on("mouseout", function(){return tooltip_path.style("visibility", "hidden");})
-        .on("click", this.select)
-        .on("mousemove", (event, d) => {
+        .on("pointerenter", (event, d) => {
           const data = this.getAllPointerEventsData(event);
+          this.highlight(data);
           this.createTooltipForPathLine(data, tooltip_path, event);
-        });
+        })
+        .on("pointerleave", (event, d) => {
+          this.doNotHighlight(event, d);
+          return tooltip_path.style("visibility", "hidden");
+        })
+        .on("pointerout", (event, d) => {
+          this.doNotHighlight(event, d);
+          return tooltip_path.style("visibility", "hidden");
+        })
+        .on("click", this.select);
 
     this.featureAxisG = svg.selectAll('g.feature')
         .data(this.features)
@@ -506,34 +519,32 @@ export class SteerableParcoords {
     return (lineGenerator(points));
   }
 
-  highlight(d, i) {
-    const keys = Object.keys(i);
-    const first_key = keys[0];
-    const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-    const current_color_line = d3.select("." + selected_value).style('stroke');
+  highlight(data) {
+    if (data.length !== 0) {
+      let temp_text = data.toString();
+      temp_text = temp_text.replaceAll(",", ",.");
+      temp_text = temp_text.replace(/[*\-0123456789%&'\[{()}\]]/g, '');
+      this.selected_path = temp_text;
 
-    if(current_color_line !== "orange") {
-      d3.selectAll("." + selected_value)
+      d3.selectAll("." + this.selected_path)
           .transition().duration(5)
-          .style("stroke", selected_value)
-          .style("opacity", "15")
+          .style("stroke", this.selected_path)
+          .style("opacity", "1")
           .style("stroke", "red");
     }
   }
 
-  doNotHighlight(d, i) {
-    const keys = Object.keys(i);
-    const first_key = keys[0];
-    const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-    const current_color_line = d3.select(this).style('stroke');
+  doNotHighlight(event, i) {
 
-    if(current_color_line !== "orange") {
-      d3.selectAll("." + selected_value)
-          .transition().duration(5)
-          .style("stroke", selected_value)
-          .style("opacity", ".4")
+    if(this.selected_path !== "") {
+      d3.selectAll("." + this.selected_path)
+          .transition()
+          .style("stroke", this.selected_path)
+          .style("opacity", "0.4")
           .style("stroke", "#0081af");
     }
+
+    this.selected_path = "";
   }
 
   createTooltipForPathLine(tooltip_text, tooltip_path, event) {
