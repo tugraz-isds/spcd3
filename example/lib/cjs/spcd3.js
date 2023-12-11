@@ -94,24 +94,22 @@ class SteerableParcoords {
     }
     getSelected() {
     }
-    select(d, i) {
+    select(event, d) {
         this.selected_path = "";
-        const keys = Object.keys(i);
+        const keys = Object.keys(d);
         const first_key = keys[0];
-        const selected_value = i[first_key].replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        const current_color_line = d3.select(this).style('stroke');
-        if (current_color_line === "orange") {
-            d3.selectAll("." + selected_value)
+        let selected_value = d[first_key].replace(/[*\-0123456789%&'\[{()}\]]/g, '');
+        const current_color_line = d3.select("." + selected_value).style('stroke');
+        if (current_color_line === "rgb(255, 165, 0)") {
+            d3.select("." + selected_value)
                 .transition()
-                .style("stroke", selected_value)
-                .style("stroke", "#0081af")
-                .style("opacity", "0.4");
+                .style("stroke", "rgb(0, 129, 175)")
+                .style("opacity", "0.2");
         }
         else {
-            d3.selectAll("." + selected_value)
+            d3.select("." + selected_value)
                 .transition()
-                .style("stroke", selected_value)
-                .style("stroke", "orange")
+                .style("stroke", "rgb(255, 165, 0)")
                 .style("opacity", "1");
         }
     }
@@ -334,8 +332,9 @@ class SteerableParcoords {
             return "line " + selected_value;
         })
             .attr('d', this.linePath.bind(this))
-            .style("opacity", "0.4")
+            .style("opacity", "0.2")
             .style("pointer-events", "stroke")
+            .style("stroke", "rgb(0, 129, 175)")
             .on("pointerenter", (event, d) => {
             const data = this.getAllPointerEventsData(event);
             this.highlight(data);
@@ -349,7 +348,9 @@ class SteerableParcoords {
             this.doNotHighlight(event, d);
             return tooltip_path.style("visibility", "hidden");
         })
-            .on("click", this.select);
+            .on("click", (event, d) => {
+            this.select(event, d);
+        });
         this.featureAxisG = svg.selectAll('g.feature')
             .data(this.features)
             .enter()
@@ -368,7 +369,7 @@ class SteerableParcoords {
             d3.select(this)
                 .attr('id', 'dimension_axis_' + cleanString)
                 .call(yaxis[d.name])
-                .attr("fill", "#FFFF0080");
+                .attr("fill", "rgb(255, 255, 0, 0.5)");
         });
         this.featureAxisG
             .each(function (d) {
@@ -448,20 +449,40 @@ class SteerableParcoords {
             temp_text = temp_text.replaceAll(",", ",.");
             temp_text = temp_text.replace(/[*\-0123456789%&'\[{()}\]]/g, '');
             this.selected_path = temp_text;
-            d3.selectAll("." + this.selected_path)
-                .transition().duration(5)
-                .style("stroke", this.selected_path)
-                .style("opacity", "1")
-                .style("stroke", "red");
+            temp_text = temp_text.split(",.");
+            let new_temp_text = [];
+            for (let i = 0; i < temp_text.length; i++) {
+                let isOrange = d3.select("." + temp_text[i]).style("stroke");
+                if (isOrange !== "rgb(255, 165, 0)") {
+                    new_temp_text.push(temp_text[i]);
+                }
+            }
+            this.selected_path = new_temp_text.join(",.");
+            if (this.selected_path) {
+                d3.selectAll("." + this.selected_path)
+                    .transition().duration(5)
+                    .style("opacity", "1")
+                    .style("stroke", "rgb(200, 28, 38)");
+            }
         }
     }
     doNotHighlight(event, i) {
         if (this.selected_path !== "") {
-            d3.selectAll("." + this.selected_path)
-                .transition()
-                .style("stroke", this.selected_path)
-                .style("opacity", "0.4")
-                .style("stroke", "#0081af");
+            let temp_text = this.selected_path.split(",.");
+            let new_temp_text = [];
+            for (let i = 0; i < temp_text.length; i++) {
+                let isOrange = d3.select("." + temp_text[i]).style("stroke");
+                if (isOrange !== "rgb(255, 165, 0)") {
+                    new_temp_text.push(temp_text[i]);
+                }
+            }
+            this.selected_path = new_temp_text.join(",.");
+            if (this.selected_path) {
+                d3.selectAll("." + this.selected_path)
+                    .transition()
+                    .style("opacity", "0.2")
+                    .style("stroke", "rgb(0, 129, 175)");
+            }
         }
         this.selected_path = "";
     }

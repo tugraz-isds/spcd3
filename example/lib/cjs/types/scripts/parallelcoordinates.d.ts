@@ -16,7 +16,7 @@ export declare class SteerableParcoords {
     private newDataset;
     yBrushes: {};
     yAxis: {};
-    selected_path: string;
+    private selected_path;
     constructor(data?: any, newFeatures?: any);
     removeDuplicateColumnNames(value: string): string;
     checkIfDuplicatesExists(value: string): boolean;
@@ -30,7 +30,7 @@ export declare class SteerableParcoords {
     getFilter(dimension: any): void;
     setFilter(dimension: any): void;
     getSelected(): void;
-    select(d: any, i: any): void;
+    select(event: any, d: any): void;
     saveAsSVG(): void;
     position(this: any, d: any, parcoords: any): any;
     onDragStartEventHandler(parcoords: any): (d: any) => void;
