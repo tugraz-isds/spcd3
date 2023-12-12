@@ -318,6 +318,9 @@ class SteerableParcoords {
             .enter()
             .append('path')
             .style("pointer-events", "none")
+            .style("fill", "none")
+            .style("stroke", "lightgrey")
+            .style("stroke-opacity", "0.4")
             .attr('d', this.linePath.bind(this));
         this.active = svg.append('g')
             .attr('class', 'active')
@@ -337,9 +340,11 @@ class SteerableParcoords {
             return d[first_key];
         })
             .attr('d', this.linePath.bind(this))
-            .style("opacity", "0.2")
+            .style("opacity", "0.4")
             .style("pointer-events", "stroke")
             .style("stroke", "rgb(0, 129, 175)")
+            .style("stroke-width", "0.1rem")
+            .style("fill", "none")
             .on("pointerenter", (event, d) => {
             const data = this.getAllPointerEventsData(event);
             this.highlight(data);

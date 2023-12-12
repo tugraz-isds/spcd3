@@ -9,9 +9,6 @@
 
   <!-- Plugins -->
   <script src="./lib/d3.v7.js"></script>
-  <script src="./lib/popper.min.js"></script>
-  <script src="./lib/tippy-bundle.umd.js"></script>
-
   <script src="./lib/cjs/spcd3.js" > </script>
 
   <script src="main.js"></script>
@@ -23,24 +20,22 @@
 
 <body>
 <link rel="styles" type="text/css" href="styles.css">
+
 <header>
-<div><h1 class="title">Parallel Coordinates</h1></div>
+<h1>Parallel Coordinates</h1>
 </header>
 
-
 <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
-<button class="input-button" onclick="openFileDialog()">Upload File</button>
+<button class="input-button" id="input" onclick="openFileDialog()">Upload File</button>
 
-<div class="plot" id="parallelcoords"></div>
+<div id="parallelcoords"></div>
 
-<hr id="line" class="seperator">
 <section>
-  <h4 id="checkboxHeader">Show dimensions</h4>
+  <div id="checkboxHeader">Show dimensions</div>
   <div id="checkboxContainer"></div>
-  <h4 id="invertContainerHeader">Invert dimensions</h4>
-  <div id="invert_container" class="invert_container"></div>
+  <div id="invertContainerHeader">Invert dimensions</div>
+  <div id="invert_container"></div>
 </section>
-<!--  <button class="button" onclick="invertMaths()">Invert Maths</button>-->
 </body>
 
 </html>

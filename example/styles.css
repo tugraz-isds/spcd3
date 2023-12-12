@@ -1,9 +1,7 @@
-
-
 header {
   margin-left: 1.1rem;
   margin-right: 1.1rem;
-  background-color: #476e9e;
+  background-color: #0081af;
   border-radius:0.3rem;
   color: #ffffff;
   padding:0.2rem 3.1rem;
@@ -12,112 +10,22 @@ header {
 
 body {
   font-family: Trebuchet MS, sans-serif;
-  background-color: #F7F9F9;
-  color: #283966;
+  background-color: #f7f9f9;
+  color: #2b2b2b;
   margin-bottom: 0.1rem;
-  height: 100%;
 }
 
-
-h1.title {
+h1 {
   text-align: center;
 }
-
 
 section {
   margin-left: 2rem;
 }
 
-.inactive path{
-  fill: none;
-  stroke:lightgrey;
-  stroke-opacity: .4;
-}
-
-.active path{
-  fill: none;
-  stroke-width: 0.1rem;
-  stroke:#0081af;
-}
-
-.input-button, input::file-selector-button {
+.input-button {
   appearance: none;
-  background-color: #FAFBFC;
-  border: 0.05rem solid rgba(27, 31, 35, 0.15);
-  border-radius: 0.4rem;
-  box-shadow: rgba(27, 31, 35, 0.04) 0 0.05rem 0, rgba(255, 255, 255, 0.25) 0 0.05rem 0 inset;
-  box-sizing: border-box;
-  color: #24292E;
-  cursor: pointer;
-  display: inline-block;
-  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.25rem;
-  list-style: none;
-  padding: 0.4rem 1rem;
-  position: relative;
-  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: middle;
-  white-space: nowrap;
-  word-wrap: break-word;
-  margin: 0.4rem 0.6rem 0.25rem 1.25rem;
-}
-
-.input-button:hover, input::file-selector-button:hover {
-  background-color: #F3F4F6;
-  text-decoration: none;
-  transition-duration: 0.1s;
-}
-
-.input-button:disabled, input::file-selector-button:disabled {
-  background-color: #FAFBFC;
-  border-color: rgba(27, 31, 35, 0.15);
-  color: #959DA5;
-  cursor: default;
-}
-
-.input-button:active, input::file-selector-button:active {
-  background-color: #EDEFF2;
-  box-shadow: rgba(225, 228, 232, 0.2) 0 0.05rem 0 inset;
-  transition: none 0s;
-}
-
-.seperator {
-  visibility: hidden;
-  border: 0.25rem solid;
-  color: #476e9e;
-  background-color: #476e9e;
-  margin-left: 2rem;
-  margin-right: 2rem;
-  border-radius: 0.3rem;
-}
-
-.plot {
-
-}
-
-.checkboxHeader {
-  visibility: hidden;
-}
-
-.checkboxContainer {
-  margin-right: 1.25rem;
-}
-
-h4 {
-  visibility: hidden;
-}
-.invertContainerHeader {
-  visibility: hidden;
-}
-
-.dimension-button {
-  appearance: none;
-  background-color: #FAFBFC;
+  background-color: #fafbfc;
   border: 0.01rem solid rgba(27, 31, 35, 0.15);
   border-radius: 0.4rem;
   box-shadow: rgba(27, 31, 35, 0.04) 0 0.01rem 0, rgba(255, 255, 255, 0.25) 0 0.01rem 0 inset;
@@ -144,30 +52,57 @@ h4 {
   margin-right: 0.6rem;
 }
 
-.dimension-button:hover, input::file-selector-button:hover {
-  background-color: #F3F4F6;
+.input-button:hover, input::file-selector-button:hover {
+  background-color: #f3f4f6;
   text-decoration: none;
   transition-duration: 0.1s;
 }
 
-.dimension-button:disabled, input::file-selector-button:disabled {
-  background-color: #FAFBFC;
+.input-button:disabled, input::file-selector-button:disabled {
+  background-color: #fafbfc;
   border-color: rgba(27, 31, 35, 0.15);
   color: #959DA5;
   cursor: default;
 }
 
-.dimension-button:active, input::file-selector-button:active {
-  background-color: #EDEFF2;
+.input-button:active, input::file-selector-button:active {
+  background-color: #edeff2;
   box-shadow: rgba(225, 228, 232, 0.2) 0 0.01rem 0 inset;
   transition: none 0s;
 }
 
+button#input {
+  margin-left: 1.1rem;
+}
+
 div#parallelcoords {
   width: 75rem;
-  height:25rem;
+  height:21rem;
   overflow-x: auto;
   overflow-y: hidden;
-  margin-left: 2rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+div#checkboxHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  border-top: #0081af 0.4rem;
+  border-top-style: solid;
   margin-right: 2rem;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+div#invertContainerHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+.checkboxContainer {
+  margin-right: 1.25rem;
 }

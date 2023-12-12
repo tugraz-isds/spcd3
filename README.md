@@ -1,5 +1,8 @@
 # Steerable Parallel Coordinates in D3
 
+A live version of the `main` branch can be found at
+[spcd3.netlify.app](https://spcd3.netlify.app/).
+
 ## How to build the spcd3 library
 
 ### Install dependencies
@@ -38,23 +41,3 @@ npx gulp build
 npm run serve
 npx gulp serve
 ```
-
-## Project Git Workflow
-
-### Example
-- e.g. Feature "implement..." -> create a branch with the name "implement..." -> implement the functions -> create a merge request to the dev branch
--> let another member take a look at the merge request -> if everything is ok accept merge request -> if the project is finished we merge the dev branch into the main branch and publish the work
-
-### Main Branch
-- The main branch is only for the release
-- Every participant needs to accept the merge request from the dev branch
-- Only the dev branch can be merged into the main branch.
-
-### Dev Branch
-- The dev branch is used to merge feature branches
-- The merge of a feature branch can be done only if another member accepts the merge request
-
-### Feature Branch
-- Feature branches are to be created for every new functionality that needs to be implemented
-- After finishing the implementation of the feature create a merge request to the dev
-

@@ -57,7 +57,6 @@ function selectDimensions(){
     var dimensions = data["columns"];
 
     document.getElementById('checkboxHeader').style.visibility = "visible";
-    document.getElementById('line').style.visibility = "visible";
     const container = document.getElementById('checkboxContainer');
 
     dimensions.forEach(function(dimension) {
@@ -83,7 +82,6 @@ function generateInvertButtons()
     var dimensions = data["columns"];
 
     document.getElementById('invertContainerHeader').style.visibility = "visible";
-    document.getElementById('line').style.visibility = "visible";
 
     const container = document.getElementById('invert_container');
 
@@ -92,7 +90,7 @@ function generateInvertButtons()
         button.type = 'button';
         button.name = 'dimension';
         button.value = dimension;
-        button.className = 'dimension-button';
+        button.className = 'input-button';
         button.onclick = () => parcoords.invert(dimension);
         container.appendChild(button);
     });
