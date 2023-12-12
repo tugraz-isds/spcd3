@@ -128,7 +128,7 @@ export class SteerableParcoords {
     this.selected_path = "";
     const keys = Object.keys(d);
     const first_key = keys[0];
-    let selected_value = d[first_key].replace(/[*\-0123456789%&'\[{()}\]]/g, '');
+    let selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
     const current_color_line = d3.select("." + selected_value).style('stroke');
 
     if(current_color_line === "rgb(255, 165, 0)") {
@@ -391,8 +391,13 @@ export class SteerableParcoords {
         .attr("class", function (d) {
           const keys = Object.keys(d);
           const first_key = keys[0];
-          const selected_value = d[first_key];
+          const selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
           return "line " + selected_value
+        })
+        .attr("id", function (d) {
+          const keys = Object.keys(d);
+          const first_key = keys[0];
+          return d[first_key];
         })
         .attr('d', this.linePath.bind(this))
         .style("opacity", "0.2")
@@ -524,16 +529,16 @@ export class SteerableParcoords {
     if (data.length !== 0) {
       let temp_text = data.toString();
       temp_text = temp_text.replaceAll(",", ",.");
-      temp_text = temp_text.replace(/[*\-0123456789%&'\[{()}\]]/g, '');
+      temp_text = temp_text.replace(/[*\- 0123456789%&'\[{()}\]]/g, '');
       this.selected_path = temp_text;
 
       temp_text = temp_text.split(",.");
 
       let new_temp_text = [];
       for(let i = 0; i < temp_text.length; i++) {
-        let isOrange = d3.select("." + temp_text[i]).style("stroke");
+        let isOrange = d3.select("." + temp_text[i].replace(/,./g, "")).style("stroke");
         if(isOrange !== "rgb(255, 165, 0)") {
-          new_temp_text.push(temp_text[i]);
+          new_temp_text.push(temp_text[i].replace(/,./g, ""));
         }
         else {
           // do nothing
@@ -601,7 +606,7 @@ export class SteerableParcoords {
     for (let i = 0; i < object[0].length; i++) {
       const items = object.map(item => item[i]);
       const keys = Object.keys(items);
-      const text = items[keys[0]].className.baseVal.replace("line ", "");
+      const text = items[keys[0]].id;
       data.push(text);
     }
     return data;
