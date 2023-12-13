@@ -470,7 +470,7 @@ export class SteerableParcoords {
         .style("font-size", "0.7rem")
         .on("mouseover", function(){return tooltip_dim.style("visibility", "visible");})
         .on("mousemove", (event, d) => {
-          if(event.clientX > 160)
+          if(event.clientX > 140)
           {
             this.featureAxisG
                 .select("#dimension")
