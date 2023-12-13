@@ -71,19 +71,24 @@ export class SteerableParcoords {
     cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
     const invert_id = "#dimension_invert_" + cleanDimension;
     const dimension_id = "#dimension_axis_" + cleanDimension;
-    const textElement = d3.select(invert_id);
-    const currentText = textElement.text();
-    const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
-    const arrowStyle = currentText === '\u2193' ? 's-resize' : 'n-resize';
-    textElement.text(newText);
-    textElement.style('cursor', arrowStyle);
+    const current_element = d3.select(invert_id);
+    const current_cursor = current_element.style("cursor");
+    const cursor_style = current_cursor === 'n-resize' ? 's-resize' : 'n-resize';
+    const arrow_style = current_cursor === 'n-resize' ? './svg/arrow_up.svg' : './svg/arrow_down.svg';
+
+    current_element.attr('id', 'dimension_invert_' + cleanDimension)
+        .style('cursor', cursor_style);
+    current_element._groups[0][0].childNodes[0].remove();
+    d3.xml(arrow_style)
+        .then(data => {
+          current_element.node().append(data.documentElement)});
+
 
     d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
         .transition();
 
         // force update lines
         this.active.attr('d', this.linePath.bind(this));
-        delete textElement.__origin__;
         delete this.active[dimension];
         this.transition(this.active).attr('d', this.linePath.bind(this));
         this.inactive.attr('d', this.linePath.bind(this))
@@ -470,7 +475,7 @@ export class SteerableParcoords {
         .style("font-size", "0.7rem")
         .on("mouseover", function(){return tooltip_dim.style("visibility", "visible");})
         .on("mousemove", (event, d) => {
-          if(event.clientX > 140)
+          if(event.clientX > 160)
           {
             this.featureAxisG
                 .select("#dimension")
@@ -494,26 +499,22 @@ export class SteerableParcoords {
 
 
     this.featureAxisG
-        .append("text")
-        .attr("text-anchor", "middle")
-        .attr('y', this.padding / 1.2)
+        .append("g")
+        .attr('transform', 'translate(-12,30)')
         .each(function (d) {
           let cleanString = d.name.replace(/ /g,"_");
           cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-          //d3.xml("arrow.svg").then(data => {
+          d3.xml('./svg/arrow_down.svg')
+              .then(data => {
+                console.log(cleanString);
+                d3.select(this).node().append(data.documentElement)});
           d3.select(this)
               .attr('id', 'dimension_invert_' + cleanString)
-              .text('\u2193')
-              .style('cursor', 'n-resize')
-              //.node().append(data.documentElement)})
+              .style('cursor', 'n-resize');
+          const test = d3.select("g.feature").attr("transform");
+          console.log(test);
         })
         .on("click", this.onInvert(this));
-
-    /*d3.xml("arrow.svg")
-        .then(data => {
-          d3.select("svg").node().append(data.documentElement)
-        });*/
-
   }
 
   linePath(d) {
