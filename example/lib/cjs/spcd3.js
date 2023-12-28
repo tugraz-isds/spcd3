@@ -22,6 +22,7 @@ class SteerableParcoords {
     yBrushes;
     yAxis;
     selected_path;
+    ids;
     constructor(data, newFeatures) {
         if (data) {
             this.data = data;
@@ -63,21 +64,17 @@ class SteerableParcoords {
         cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         const invert_id = "#dimension_invert_" + cleanDimension;
         const dimension_id = "#dimension_axis_" + cleanDimension;
-        const current_element = d3.select(invert_id);
-        const current_cursor = current_element.style("cursor");
-        const cursor_style = current_cursor === 'n-resize' ? 's-resize' : 'n-resize';
-        const arrow_style = current_cursor === 'n-resize' ? './svg/arrow_up.svg' : './svg/arrow_down.svg';
-        current_element.attr('id', 'dimension_invert_' + cleanDimension)
-            .style('cursor', cursor_style);
-        current_element._groups[0][0].childNodes[0].remove();
-        d3.xml(arrow_style)
-            .then(data => {
-            current_element.node().append(data.documentElement);
-        });
+        const textElement = d3.select(invert_id);
+        const currentText = textElement.text();
+        const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
+        const arrowStyle = currentText === '\u2193' ? 's-resize' : 'n-resize';
+        textElement.text(newText);
+        textElement.style('cursor', arrowStyle);
         d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
             .transition();
         // force update lines
         this.active.attr('d', this.linePath.bind(this));
+        delete textElement.__origin__;
         delete this.active[dimension];
         this.transition(this.active).attr('d', this.linePath.bind(this));
         this.inactive.attr('d', this.linePath.bind(this))
@@ -103,19 +100,10 @@ class SteerableParcoords {
         const keys = Object.keys(d);
         const first_key = keys[0];
         let selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-        const current_color_line = d3.select("." + selected_value).style('stroke');
-        if (current_color_line === "rgb(255, 165, 0)") {
-            d3.select("." + selected_value)
-                .transition()
-                .style("stroke", "rgb(0, 129, 175)")
-                .style("opacity", "0.2");
-        }
-        else {
-            d3.select("." + selected_value)
-                .transition()
-                .style("stroke", "rgb(255, 165, 0)")
-                .style("opacity", "1");
-        }
+        d3.select("." + selected_value)
+            .transition()
+            .style("stroke", "rgb(255, 165, 0)")
+            .style("opacity", "1");
     }
     saveAsSVG() {
     }
@@ -135,17 +123,15 @@ class SteerableParcoords {
     onDragEventHandler(parcoords) {
         {
             return function onDrag(d) {
-                if (parcoords.xScales((d.subject).name) > 80) {
-                    parcoords.dragging[(d.subject).name] = Math.min(parcoords.width, Math.max(0, this.__origin__ += d.dx));
-                    parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
-                    parcoords.newFeatures.sort((a, b) => {
-                        return parcoords.position(b, parcoords) - parcoords.position(a, parcoords);
-                    });
-                    parcoords.xScales.domain(parcoords.newFeatures);
-                    parcoords.featureAxisG.attr("transform", (d) => {
-                        return "translate(" + parcoords.position(d.name, parcoords) + ")";
-                    });
-                }
+                parcoords.dragging[(d.subject).name] = Math.min(parcoords.width - 79, Math.max(79, this.__origin__ += d.dx));
+                parcoords.active.attr('d', parcoords.linePath.bind(parcoords));
+                parcoords.newFeatures.sort((a, b) => {
+                    return parcoords.position(b, parcoords) - parcoords.position(a, parcoords);
+                });
+                parcoords.xScales.domain(parcoords.newFeatures);
+                parcoords.featureAxisG.attr("transform", (d) => {
+                    return "translate(" + parcoords.position(d.name, parcoords) + ")";
+                });
             };
         }
     }
@@ -293,6 +279,7 @@ class SteerableParcoords {
         this.yBrushes = {};
         this.yAxis = {};
         d3.select("svg").remove();
+        this.ids = [];
     }
     // TODO refactor
     generateSVG() {
@@ -332,13 +319,14 @@ class SteerableParcoords {
             .data(this.data)
             .enter()
             .append('path')
-            .attr("class", function (d) {
+            .attr("class", (d) => {
             const keys = Object.keys(d);
             const first_key = keys[0];
             const selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+            this.ids.push(selected_value);
             return "line " + selected_value;
         })
-            .attr("id", function (d) {
+            .attr("id", (d) => {
             const keys = Object.keys(d);
             const first_key = keys[0];
             return d[first_key];
@@ -405,15 +393,21 @@ class SteerableParcoords {
             .style("font-size", "0.7rem")
             .on("mouseover", function () { return tooltip_dim.style("visibility", "visible"); })
             .on("mousemove", (event, d) => {
-            if (event.clientX > 160) {
+            if (event.clientX > this.width - 120) {
+                console.log(event.clientX);
                 this.featureAxisG
                     .select("#dimension")
-                    .style("cursor", "ew-resize");
+                    .style("cursor", "w-resize");
+            }
+            else if (event.clientX <= 100) {
+                this.featureAxisG
+                    .select("#dimension")
+                    .style("cursor", "e-resize");
             }
             else {
                 this.featureAxisG
                     .select("#dimension")
-                    .style("cursor", "auto");
+                    .style("cursor", "ew-resize");
             }
             tooltip_dim.text(d.name);
             tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
@@ -425,23 +419,29 @@ class SteerableParcoords {
         })
             .on("mouseout", function () { return tooltip_dim.style("visibility", "hidden"); });
         this.featureAxisG
-            .append("g")
-            .attr('transform', 'translate(-12,30)')
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr('y', this.padding / 1.2)
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
             cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-            d3.xml('./svg/arrow_down.svg')
-                .then(data => {
-                console.log(cleanString);
-                d3.select(this).node().append(data.documentElement);
-            });
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
+                .text('\u2193')
                 .style('cursor', 'n-resize');
-            const test = d3.select("g.feature").attr("transform");
-            console.log(test);
         })
             .on("click", this.onInvert(this));
+        window.onclick = (event) => {
+            if (!(event.ctrlKey || event.metaKey)) {
+                for (let i = 0; i < this.ids.length; i++) {
+                    d3.select('.' + this.ids[i]).style("stroke", "rgb(0, 129, 175)");
+                }
+            }
+        };
+        /*d3.xml("arrow.svg")
+            .then(data => {
+              d3.select("svg").node().append(data.documentElement)
+            });*/
     }
     linePath(d) {
         var lineGenerator = d3.line();

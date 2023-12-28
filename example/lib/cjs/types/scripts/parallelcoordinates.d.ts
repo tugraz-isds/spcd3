@@ -17,6 +17,7 @@ export declare class SteerableParcoords {
     yBrushes: {};
     yAxis: {};
     private selected_path;
+    private ids;
     constructor(data?: any, newFeatures?: any);
     removeDuplicateColumnNames(value: string): string;
     checkIfDuplicatesExists(value: string): boolean;

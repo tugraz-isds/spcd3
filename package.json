@@ -39,12 +39,11 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "8.3.3",
     "rollup-plugin-gzip": "^2.5.0",
-    "browser-sync": "^2.27.5"
+    "browser-sync": "^2.27.5",
+    "url": "^0.11.3"
   },
   "dependencies": {
     "d3": "^7.8.5",
-    "gulp-typescript": "^6.0.0-alpha.1",
-    "tippy.js": "^6.3.7",
-    "vinyl": "^3.0.0"
+    "gulp-typescript": "^6.0.0-alpha.1"
   }
 }
