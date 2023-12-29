@@ -185,7 +185,7 @@ export class SteerableParcoords {
       return function onDragEnd(d) {
         delete this.__origin__;
         delete parcoords.dragging[(d.subject).name];
-        parcoords.transition(d3.select(this)).attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
+        //parcoords.transition(d3.select(this)).attr('transform', d => ('translate(' + parcoords.xScales(d.name)  + ')'));
         parcoords.transition(parcoords.active).attr('d', parcoords.linePath.bind(parcoords));
         parcoords.inactive.attr('d', parcoords.linePath.bind(parcoords))
             .transition()
@@ -296,11 +296,10 @@ export class SteerableParcoords {
           return;
         }
         if (event.selection != null) {
-            const remappedSelection = event.selection.map((x) => {
-                const scale = parcoords.yScales[features.name];// Get the appropriate scale based on features
-                return scale.invert(x); // Remap the selection value
+          parcoords.filters[features.name] = event.selection.map((x) => {
+              const scale = parcoords.yScales[features.name];// Get the appropriate scale based on features
+              return scale.invert(x); // Remap the selection value
             });
-            parcoords.filters[features.name] = remappedSelection;
         } else {
           if (features.name in parcoords.filters)
             delete (parcoords.filters[features.name])
@@ -423,12 +422,8 @@ export class SteerableParcoords {
         .enter()
         .append('g')
         .attr('class', 'feature')
-        .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'))
-        .call(d3.drag()
-            .on("start", this.onDragStartEventHandler(this))
-            .on("drag", this.onDragEventHandler(this))
-            .on("end", this.onDragEndEventHandler(this))
-        );
+        .attr('id', 'feature')
+        .attr('transform', d => ('translate(' + this.xScales(d.name) + ')'));
 
     this.featureAxisG
         .append('g')
@@ -461,6 +456,11 @@ export class SteerableParcoords {
         .attr('y', this.padding / 1.7)
         .text(d => d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name)
         .style("font-size", "0.7rem")
+        .call(d3.drag()
+            .on("start", this.onDragStartEventHandler(this))
+            .on("drag", this.onDragEventHandler(this))
+            .on("end", this.onDragEndEventHandler(this))
+        )
         .on("mouseover", function(){return tooltip_dim.style("visibility", "visible");})
         .on("mousemove", (event, d) => {
           if(event.clientX > this.width - 120)
@@ -480,7 +480,6 @@ export class SteerableParcoords {
                 .select("#dimension")
                 .style("cursor", "ew-resize");
           }
-
           tooltip_dim.text(d.name);
           tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
           tooltip_dim.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
@@ -506,6 +505,7 @@ export class SteerableParcoords {
         .on("click", this.onInvert(this));
 
     window.onclick = (event) => {
+      //d3.selectAll("g.brush").call(d3.brush.clear());
       if (!(event.ctrlKey || event.metaKey)) {
         for (let i = 0; i < this.ids.length; i++) {
           d3.select('.' + this.ids[i]).style("stroke", "rgb(0, 129, 175)")
@@ -519,6 +519,7 @@ export class SteerableParcoords {
         });*/
 
   }
+
 
   linePath(d) {
     var lineGenerator = d3.line();
