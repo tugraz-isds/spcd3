@@ -66,11 +66,15 @@ class SteerableParcoords {
         const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
         const currentText = textElement.text();
-        const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
-        const arrowStyle = currentText === '\u2193' ? 'url("./svg/arrow_up.svg") 9 9, auto' : 'url("./svg/arrow_down.svg") 9 9, auto';
-        textElement.text(newText);
+        const newPath = currentText === 'down' ? 'M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 z' :
+            'M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z';
+        const arrowStyle = currentText === 'down' ? 'url("./svg/arrow_up.svg") 8 8, auto' :
+            'url("./svg/arrow_down.svg") 8 8, auto';
+        textElement.text(currentText === 'down' ? 'up' : 'down');
+        textElement.attr("d", newPath);
         textElement.style('cursor', arrowStyle);
-        d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension].domain().reverse())))
+        d3.select(dimension_id).call(this.yAxis[dimension].scale(this.yScales[dimension].domain(this.yScales[dimension]
+            .domain().reverse())))
             .transition();
         // force update lines
         this.active.attr('d', this.linePath.bind(this));
@@ -416,16 +420,18 @@ class SteerableParcoords {
         })
             .on("mouseout", function () { return tooltip_dim.style("visibility", "hidden"); });
         this.featureAxisG
-            .append("text")
-            .attr("text-anchor", "middle")
-            .attr('y', this.padding / 1.2)
+            .append("svg")
+            .attr('y', this.padding / 1.4)
+            .attr('x', -3)
+            .append("path")
+            .attr("d", "M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z")
             .each(function (d) {
             let cleanString = d.name.replace(/ /g, "_");
             cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
             d3.select(this)
                 .attr('id', 'dimension_invert_' + cleanString)
-                .text('\u2193')
-                .style('cursor', 'url("./svg/arrow_down.svg") 9 9, auto');
+                .text('down')
+                .style('cursor', 'url("./svg/arrow_down.svg") 8 8, auto');
         })
             .on("click", this.onInvert(this));
         window.onclick = (event) => {
