@@ -75,7 +75,7 @@ export class SteerableParcoords {
     const textElement = d3.select(invert_id);
     const currentText = textElement.text();
     const newText = currentText === '\u2193' ? '\u2191' : '\u2193';
-    const arrowStyle = currentText === '\u2193' ? 's-resize' : 'n-resize';
+    const arrowStyle = currentText === '\u2193' ? 'url("./svg/arrow_up.svg") 9 9, auto' : 'url("./svg/arrow_down.svg") 9 9, auto';
     textElement.text(newText);
     textElement.style('cursor', arrowStyle);
 
@@ -502,7 +502,7 @@ export class SteerableParcoords {
           d3.select(this)
               .attr('id', 'dimension_invert_' + cleanString)
               .text('\u2193')
-              .style('cursor', 'n-resize')
+              .style('cursor', 'url("./svg/arrow_down.svg") 9 9, auto')
         })
         .on("click", this.onInvert(this));
 
