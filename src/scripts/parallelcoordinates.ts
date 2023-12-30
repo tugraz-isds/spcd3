@@ -231,7 +231,7 @@ export class SteerableParcoords {
         var max = Math.max(...this.newDataset.map(o => o[x.name]));
         var min = Math.min(...this.newDataset.map(o => o[x.name]));
         this.yScales[x.name] = d3.scaleLinear()
-            .domain([min, max]).nice()
+            .domain([0, max]).nice()
             .range([this.height - this.padding, this.padding]);
       }
     })
@@ -280,9 +280,9 @@ export class SteerableParcoords {
                     [this.brushWidth / 2, this.height - this.padding]];
 
       this.yBrushes[x[0]] = d3.brushY()
-        .extent(extent)
-        .on('brush',this.onBrushEventHandler(this))
-        .on('end', this.onBrushEventHandler(this))
+          .extent(extent)
+          .on('start', this.onBrushEventHandler(this))
+          .on('brush', this.onBrushEventHandler(this))
     });
     return this.yBrushes;
   }
@@ -290,21 +290,20 @@ export class SteerableParcoords {
   onBrushEventHandler(parcoords) {
     {
       return function brushEventHandler(event,features) {
-        if (event.sourceEvent && event.sourceEvent.type === 'zoom')
-        return;
-        if (parcoords.features === 'Name') {
+        if (event.sourceEvent && event.sourceEvent.type === 'zoom') {
           return;
         }
-        if (event.selection != null) {
+
+        if (event.selection !== null) {
           parcoords.filters[features.name] = event.selection.map((x) => {
-              const scale = parcoords.yScales[features.name];// Get the appropriate scale based on features
-              return scale.invert(x); // Remap the selection value
+            const scale = parcoords.yScales[features.name];// Get the appropriate scale based on features
+            return scale.invert(x); // Remap the selection value
             });
         } else {
-          if (features.name in parcoords.filters)
-            delete (parcoords.filters[features.name])
+
         }
         parcoords.applyFilters();
+        delete (parcoords.filters[features.name]);
       };
     }
   }
@@ -317,6 +316,9 @@ export class SteerableParcoords {
   selected(d) {
     const tempFilters = Object.entries(this.filters)
     return tempFilters.every(f => {
+      if (f[1][1] === 0 && f[1][0] === 0) {
+        return true;
+      }
       return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
     });
   }
@@ -441,7 +443,7 @@ export class SteerableParcoords {
           d3.select(this)
               .append('g')
               .attr('class', 'brush')
-              .call(brushes[d.name]);
+              .call(brushes[d.name])
         });
 
     var tooltip_dim = d3.select('#parallelcoords')
@@ -505,13 +507,12 @@ export class SteerableParcoords {
         .on("click", this.onInvert(this));
 
     window.onclick = (event) => {
-      //d3.selectAll("g.brush").call(d3.brush.clear());
       if (!(event.ctrlKey || event.metaKey)) {
         for (let i = 0; i < this.ids.length; i++) {
           d3.select('.' + this.ids[i]).style("stroke", "rgb(0, 129, 175)")
         }
       }
-    }
+      }
 
     /*d3.xml("arrow.svg")
         .then(data => {
