@@ -10,7 +10,7 @@ function cleanPackage() {
 }
 
 function cleanExampleLib() {
-    return del('example/lib/cjs', {force: true});
+    return del('example/lib/esm', {force: true});
 }
 
 exports.clean = parallel(cleanPackage, cleanExampleLib);

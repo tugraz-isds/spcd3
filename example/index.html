@@ -5,28 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script>var exports = {};</script>
-
   <!-- Plugins -->
-  <script src="./lib/d3.v7.js"></script>
-  <script src="./lib/cjs/spcd3.js" > </script>
+  <script type="module" src="./lib/d3.v7.js"></script>
+  <script type="module" src="./lib/esm/spcd3.js" ></script>
 
-  <script src="main.js"></script>
+  <script type="module" src="./main.js"></script>
+
 
   <link rel="shortcut icon" href="#">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./styles.css">
   <title>Parallel Coordinates</title>
 </head>
 
 <body>
-<link rel="styles" type="text/css" href="styles.css">
+<link rel="styles" type="text/css" href="./styles.css">
 
 <header>
 <h1>Parallel Coordinates</h1>
 </header>
 
-<input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event);">
-<button class="input-button" id="input" onclick="openFileDialog()">Upload File</button>
+<input type="file" id="fileInput" style="display: none">
+<button class="input-button" id="input">Upload File</button>
 
 <div id="parallelcoords"></div>
 

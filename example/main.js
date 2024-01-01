@@ -1,5 +1,13 @@
-var parcoords = new SteerableParcoords();
+import {loadCSV, generateSVG, invert, setDimensions} from './lib/esm/spcd3.js';
+
 var data;
+var newData;
+var newFeatures;
+
+var inputButton = document.getElementById("input");
+inputButton.addEventListener("click", openFileDialog, false);
+var inputFile = document.getElementById('fileInput');
+inputFile.addEventListener("change", handleFileSelect, event);
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -14,12 +22,12 @@ function handleFileSelect(event) {
         reader.onload = function(e) {
             clearPlot();
             data = e.target.result;
-            parcoords.loadCSV(data);
+            newData = loadCSV(data);
             selectDimensions();
             generateInvertButtons();
-            selected_dimensions = getSelectedDimensions();
-            parcoords.setDimensions(selected_dimensions);
-            parcoords.generateSVG();
+            var selected_dimensions = getSelectedDimensions();
+            newFeatures = setDimensions(selected_dimensions);
+            generateSVG(newData, newFeatures);
         };
 
         reader.readAsText(file);
@@ -29,14 +37,14 @@ function handleFileSelect(event) {
 function invertMaths()
 {
     console.log("invert maths");
-    parcoords.invert("Maths");
+    invert("Maths");
 }
 
 function updateDimensions()
 {
-    selected_dimensions = getSelectedDimensions();
-    parcoords.setDimensions(selected_dimensions);
-    parcoords.generateSVG();
+    var selected_dimensions = getSelectedDimensions();
+    setDimensions(selected_dimensions);
+    generateSVG();
     console.log("update dimensions");
 }
 
@@ -53,8 +61,8 @@ function getSelectedDimensions()
 }
 
 function selectDimensions(){
-    var data = parcoords.getData();
-    var dimensions = data["columns"];
+    //var data = getData();
+    var dimensions = newData["columns"];
 
     document.getElementById('checkboxHeader').style.visibility = "visible";
     const container = document.getElementById('checkboxContainer');
@@ -78,8 +86,8 @@ function selectDimensions(){
 
 function generateInvertButtons()
 {
-    var data = parcoords.getData()
-    var dimensions = data["columns"];
+    //var data = getData()
+    var dimensions = newData["columns"];
 
     document.getElementById('invertContainerHeader').style.visibility = "visible";
 
@@ -91,7 +99,7 @@ function generateInvertButtons()
         button.name = 'dimension';
         button.value = dimension;
         button.className = 'input-button';
-        button.onclick = () => parcoords.invert(dimension);
+        button.onclick = () => invert(dimension);
         container.appendChild(button);
     });
 }

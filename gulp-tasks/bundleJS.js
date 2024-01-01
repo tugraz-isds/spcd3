@@ -69,7 +69,7 @@ async function bundleJS() {
   //TODO: change mode
   const mode = 'production';
   return Promise.all([
-      ...writeLibToExample('cjs'),
+      ...writeLibToExample('esm'),
       ...write('esm'),
       ...((mode === 'production') ? [write('iife'), write('cjs')] : [])
   ])
