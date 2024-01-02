@@ -1,12 +1,15 @@
-import {loadCSV, generateSVG, invert, setDimensions} from './lib/esm/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/esm/spcd3.js';
 
-var data;
-var newData;
-var newFeatures;
+let data;
+let newData;
+let newFeatures;
+let yScales;
+let xScales;
+let yAxis;
 
-var inputButton = document.getElementById("input");
+let inputButton = document.getElementById("input");
 inputButton.addEventListener("click", openFileDialog, false);
-var inputFile = document.getElementById('fileInput');
+let inputFile = document.getElementById('fileInput');
 inputFile.addEventListener("change", handleFileSelect, event);
 
 function openFileDialog() {
@@ -24,9 +27,9 @@ function handleFileSelect(event) {
             data = e.target.result;
             newData = loadCSV(data);
             selectDimensions();
-            generateInvertButtons();
-            var selected_dimensions = getSelectedDimensions();
+            let selected_dimensions = getSelectedDimensions();
             newFeatures = setDimensions(selected_dimensions);
+            generateInvertButtons();
             generateSVG(newData, newFeatures);
         };
 
@@ -34,18 +37,11 @@ function handleFileSelect(event) {
     }
 }
 
-function invertMaths()
-{
-    console.log("invert maths");
-    invert("Maths");
-}
-
 function updateDimensions()
 {
-    var selected_dimensions = getSelectedDimensions();
+    let selected_dimensions = getSelectedDimensions();
     setDimensions(selected_dimensions);
-    generateSVG();
-    console.log("update dimensions");
+    generateSVG(newData, selected_dimensions);
 }
 
 function getSelectedDimensions()
@@ -61,7 +57,7 @@ function getSelectedDimensions()
 }
 
 function selectDimensions(){
-    //var data = getData();
+
     var dimensions = newData["columns"];
 
     document.getElementById('checkboxHeader').style.visibility = "visible";
@@ -86,8 +82,13 @@ function selectDimensions(){
 
 function generateInvertButtons()
 {
-    //var data = getData()
-    var dimensions = newData["columns"];
+    let dataset = prepareData(newData, newFeatures);
+    let features = dataset[0];
+    let newDataset = dataset[1];
+    yScales = setupYScales(400, 80, features, newDataset);
+    xScales = setupXScales(newFeatures.length * 80, 80, features);
+    yAxis = setupYAxis(features, yScales, newDataset);
+    let dimensions = newData["columns"];
 
     document.getElementById('invertContainerHeader').style.visibility = "visible";
 
@@ -99,11 +100,10 @@ function generateInvertButtons()
         button.name = 'dimension';
         button.value = dimension;
         button.className = 'input-button';
-        button.onclick = () => invert(dimension);
+        button.onclick = () => invert(dimension, newFeatures, xScales, yScales, yAxis);
         container.appendChild(button);
     });
 }
-
 
 function clearPlot() {
     const parentElement = document.getElementById('parallelcoords');

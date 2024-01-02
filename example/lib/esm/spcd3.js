@@ -8775,7 +8775,7 @@ class SteerableParcoords {
     setDimensions(newDimension) {
         return newDimension.reverse();
     }
-    invert(dimension, newFeatures, xScales, yScales, yAxis, active, inactive) {
+    invert(dimension, newFeatures, xScales, yScales, yAxis) {
         let cleanDimension = dimension.replace(/ /g, "_");
         cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         const invert_id = "#dimension_invert_" + cleanDimension;
@@ -8784,8 +8784,8 @@ class SteerableParcoords {
         const currentText = textElement.text();
         const newPath = currentText === 'down' ? 'M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 z' :
             'M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z';
-        const arrowStyle = currentText === 'down' ? 'url("./svg/arrow_up.svg") 8 8, auto' :
-            'url("./svg/arrow_down.svg") 8 8, auto';
+        const arrowStyle = currentText === 'down' ? 'url("./svg/arrow_down.svg") 8 8, auto' :
+            'url("./svg/arrow_up.svg") 8 8, auto';
         textElement.text(currentText === 'down' ? 'up' : 'down');
         textElement.attr("d", newPath);
         textElement.style('cursor', arrowStyle);
@@ -8793,16 +8793,18 @@ class SteerableParcoords {
             .domain().reverse())))
             .transition();
         // force update lines
-        active.attr('d', (d) => {
-            linePath(d, newFeatures, xScales, yScales);
-        });
+        let active = select$1('g.active')
+            .selectAll('path')
+            .attr('d', (d) => { linePath(d, newFeatures, xScales, yScales); });
         delete textElement.__origin__;
         delete active[dimension];
         transition(active).each(function (d) {
             select$1(this)
                 .attr('d', linePath(d, newFeatures, xScales, yScales));
         });
-        inactive.each(function (d) {
+        select$1('g.inactive')
+            .selectAll('path')
+            .each(function (d) {
             select$1(this)
                 .attr('d', linePath(d, newFeatures, xScales, yScales));
         })
@@ -8889,10 +8891,10 @@ class SteerableParcoords {
             };
         }
     }
-    onInvert(newFeatures, xScales, yScales, yAxis, active, inactive) {
+    onInvert(newFeatures, xScales, yScales, yAxis) {
         {
             return function invertDim(event, d) {
-                invert(d.name, newFeatures, xScales, yScales, yAxis, active, inactive);
+                invert(d.name, newFeatures, xScales, yScales, yAxis);
             };
         }
     }
@@ -9020,7 +9022,7 @@ class SteerableParcoords {
         let active = null;
         let inactive = null;
         let ids = [];
-        let selected_path;
+        let selected_path = null;
         let dragging = {};
         initContent();
         let dataset = prepareData(content, newFeatures);
@@ -9178,9 +9180,9 @@ class SteerableParcoords {
             select$1(this)
                 .attr('id', 'dimension_invert_' + cleanString)
                 .text('down')
-                .style('cursor', 'url("./svg/arrow_down.svg") 8 8, auto');
+                .style('cursor', 'url("./svg/arrow_up.svg") 8 8, auto');
         })
-            .on("click", onInvert(newFeatures, xScales, yScales, yAxis, active, inactive));
+            .on("click", onInvert(newFeatures, xScales, yScales, yAxis));
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
                 for (let i = 0; i < ids.length; i++) {
