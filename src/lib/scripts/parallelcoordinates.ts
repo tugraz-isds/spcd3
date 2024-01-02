@@ -102,16 +102,15 @@ export default class SteerableParcoords {
 
     }
 
-    select(event, d)
+    select(data)
     {
-        const keys = Object.keys(d);
-        const first_key = keys[0];
-        let selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-
-        d3.select("." + selected_value)
-            .transition()
-            .style("stroke", "rgb(255, 165, 0)")
-            .style("opacity", "1")
+        for(let i = 0; i < data.length; i++) {
+            let selected_value = data[i].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+            d3.select("." + selected_value)
+                .transition()
+                .style("stroke", "rgb(255, 165, 0)")
+                .style("opacity", "1")
+        }
     }
 
     saveAsSVG()
@@ -415,7 +414,8 @@ export default class SteerableParcoords {
                 return tooltip_path.style("visibility", "hidden");
             })
             .on("click", (event, d) => {
-                select(event, d);
+                const data = getAllPointerEventsData(event);
+                select(data);
             });
 
         featureAxisG = svg.selectAll('g.feature')
