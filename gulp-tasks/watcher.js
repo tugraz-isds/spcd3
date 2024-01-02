@@ -10,12 +10,12 @@ function reloadBrowser(cb) {
 }
 function watcher(cb) {
     browserSync.init({
-        server: './example',
+        server: './dist/example',
         startPath: '/',
     });
 
     const watchOptions = { ignoreInitial: true };
-    gulp.watch('/src/scripts/**/*', watchOptions,
+    gulp.watch('/src/lib/scripts/**/*', watchOptions,
         gulp.series(bundleJS, reloadBrowser));
 
     cb()

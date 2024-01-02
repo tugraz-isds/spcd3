@@ -11,7 +11,7 @@ const fs = require("fs");
 
 async function bundleJS() {
   const bundle = await rollup.rollup({
-    input: './src/index.ts',
+    input: './src/lib/index.ts',
     plugins: [
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
@@ -23,7 +23,7 @@ async function bundleJS() {
   const gzPlugins = [rollupTerser(), rollupGzip()];
 
   function write(format) {
-    const location = `./package/${format}`;
+    const location = `./dist/library/${format}`;
     const writeConfigurationsIIFE = [
       { extension: 'js', plugins: [] },
       { extension: 'min.js', plugins: minPlugins },
@@ -46,7 +46,7 @@ async function bundleJS() {
   }
 
   function writeLibToExample(format) {
-    const location = `./example/lib/${format}`;
+    const location = `./dist/example/lib/${format}`;
     const writeConfigurationsIIFE = [
       { extension: 'js', plugins: [] }
     ];

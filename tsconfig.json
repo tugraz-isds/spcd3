@@ -3,7 +3,7 @@
     "module": "esnext",
     "target": "es2022",
     "sourceMap": false,
-    "outDir": "package",
+    "outDir": "dist",
     "pretty": true,
     "downlevelIteration" : true,
     "declaration": true,

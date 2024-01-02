@@ -1,27 +1,19 @@
-const {src, dest, task, series, parallel} = require('gulp');
-var typescript = require('gulp-typescript');
+const {src, dest, series} = require('gulp');
 const del = require('del');
 const { bundleJS } = require("./gulp-tasks/bundleJS");
 const { bundleDeclaration } = require("./gulp-tasks/bundleDeclaration");
 const {watcher} = require("./gulp-tasks/watcher");
 
-function cleanPackage() {
-    return del('package', {force: true});
+function cleanDistFolder() {
+    return del('dist', {force: true});
 }
 
-function cleanExampleLib() {
-    return del('example/lib/esm', {force: true});
+function copyExampleFolder() {
+    return src('./src/example/**/*').pipe(dest('./dist/example'));
 }
 
-exports.clean = parallel(cleanPackage, cleanExampleLib);
+exports.clean = cleanDistFolder;
 
-exports.build = series(exports.clean, bundleJS, bundleDeclaration);
+exports.build = series(cleanDistFolder, copyExampleFolder, bundleJS, bundleDeclaration);
 
 exports.serve = series(exports.build, watcher)
-
-// temp
-exports.compile = task('compile', async function(){
-    src('src/scripts/*.ts')
-        .pipe(typescript())
-        .pipe(dest('example/lib/'));
-});

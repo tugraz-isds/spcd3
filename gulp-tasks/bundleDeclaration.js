@@ -5,11 +5,11 @@ const dts = require("rollup-plugin-dts");
 
 async function bundleDeclaration() {
   const bundle = await rollup.rollup({
-    input: './package/esm/types/index.d.ts',
+    input: './dist/library/esm/types/index.d.ts',
     plugins: [dts.default()]
   });
   await bundle.write({
-    file: './package/index.d.ts',
+    file: './dist/library/index.d.ts',
     format: "esm"
   })
 }
