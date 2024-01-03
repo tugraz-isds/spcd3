@@ -76,7 +76,7 @@ button#input {
 }
 
 div#parallelcoords {
-  width: 75rem;
+  width: 100%;
   height:21rem;
   overflow-x: auto;
   overflow-y: hidden;

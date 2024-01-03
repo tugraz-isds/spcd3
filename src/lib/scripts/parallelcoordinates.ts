@@ -353,9 +353,6 @@ export default class SteerableParcoords {
             .attr("width", width)
             .attr("height", height)
             .attr("font-family", "Verdana, sans-serif")
-            .attr("style", "width: 75rem; max-height: 25rem")
-            .attr("style", "overflow-x: auto")
-            .attr("style", "overflow-y: hidden")
             .attr("preserveAspectRatio", "none");
 
         inactive = svg.append('g')
