@@ -318,8 +318,8 @@ export default class SteerableParcoords {
         });
     }
 
-     initContent() {
-        d3.select("svg").remove();
+     resetSVG() {
+        d3.select("pc_svg").remove();
     }
 
     // TODO refactor
@@ -334,7 +334,6 @@ export default class SteerableParcoords {
         let selected_path = null;
         let dragging = {};
 
-        initContent();
         let dataset = prepareData(content, newFeatures);
         let features = dataset[0];
         let newDataset = dataset[1];
@@ -349,6 +348,7 @@ export default class SteerableParcoords {
 
         const svg = d3.select("#parallelcoords")
             .append('svg')
+            .attr("id", "pc_svg")
             .attr("viewBox", [0, 0, width, height])
             .attr("width", width)
             .attr("height", height)
@@ -619,5 +619,5 @@ export default class SteerableParcoords {
 
 export const { loadCSV, invert, setDimensions, generateSVG, removeDuplicateColumnNames, checkIfDuplicatesExists, select,
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData,
-    setupYScales, setupXScales, setupYAxis, setupBrush, onBrushEventHandler, applyFilters, selected, initContent, linePath, highlight,
+    setupYScales, setupXScales, setupYAxis, setupBrush, onBrushEventHandler, applyFilters, selected, resetSVG, linePath, highlight,
     doNotHighlight, createTooltipForPathLine, getAllPointerEventsData } = new SteerableParcoords();

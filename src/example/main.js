@@ -10,7 +10,10 @@ let yAxis;
 let inputButton = document.getElementById("input");
 inputButton.addEventListener("click", openFileDialog, false);
 let inputFile = document.getElementById('fileInput');
-inputFile.addEventListener("change", handleFileSelect, event);
+inputFile.addEventListener("change", handleFileSelect, false);
+inputFile.addEventListener("click", (event) => {
+    event.target.value = null;
+})
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
