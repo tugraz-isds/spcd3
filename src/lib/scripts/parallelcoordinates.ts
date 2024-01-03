@@ -531,19 +531,25 @@ export default class SteerableParcoords {
     }
 
     highlight(data) {
-        let selected_path;
-        if (data.length !== 0) {
-            let temp_text = data.toString();
+        let selected_path = "";
+        let data_wo_sc = [];
+        for(let i = 0; i < data.length; i++) {
+            let temp = data[i].replaceAll(/[.,]/g, "");
+            data_wo_sc.push(temp);
+        }
+
+        if (data_wo_sc.length !== 0) {
+            let temp_text = data_wo_sc.toString();
             temp_text = temp_text.replaceAll(",", ",.");
             temp_text = temp_text.replace(/[*\- 0123456789%&'\[{()}\]]/g, '');
             selected_path = temp_text;
-            temp_text = temp_text.split(",.");
+            data_wo_sc = temp_text.split(",.");
 
             let new_temp_text = [];
-            for(let i = 0; i < temp_text.length; i++) {
-                let isOrange = d3.select("." + temp_text[i].replace(/,./g, "")).style("stroke");
+            for(let i = 0; i < data_wo_sc.length; i++) {
+                let isOrange = d3.select("." + data_wo_sc[i].replace(/,./g, "")).style("stroke");
                 if(isOrange !== "rgb(255, 165, 0)") {
-                    new_temp_text.push(temp_text[i].replace(/,./g, ""));
+                    new_temp_text.push(data_wo_sc[i].replace(/,./g, ""));
                 }
                 else {
                     // do nothing
