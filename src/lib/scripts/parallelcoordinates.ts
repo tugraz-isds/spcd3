@@ -506,8 +506,10 @@ export default class SteerableParcoords {
 
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
-                for (let i = 0; i < ids.length; i++) {
-                    d3.select('.' + ids[i]).style("stroke", "rgb(0, 129, 175)")
+                if(!(event.target.id.includes("dimension_invert_"))) {
+                    for (let i = 0; i < ids.length; i++) {
+                        d3.select('.' + ids[i]).style("stroke", "rgb(0, 129, 175)")
+                    }
                 }
             }
         }
