@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/esm/spcd3.js';
+import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/esm/spcd3.js';
 
 let data;
 let newData;
@@ -103,7 +103,7 @@ function generateInvertButtons()
         button.name = 'dimension';
         button.value = dimension;
         button.className = 'input-button';
-        button.onclick = () => invert(dimension, newFeatures, xScales, yScales, yAxis);
+        button.onclick = () => invertD(dimension, newFeatures, xScales, yScales, yAxis);
         container.appendChild(button);
     });
 }

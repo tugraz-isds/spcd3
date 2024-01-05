@@ -31,7 +31,7 @@ export default class SteerableParcoords {
         return newDimension.reverse();
     }
 
-    invert(dimension, newFeatures, xScales, yScales, yAxis) {
+    invertD(dimension, newFeatures, xScales, yScales, yAxis) {
         let cleanDimension = dimension.replace(/ /g,"_");
         cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         const invert_id = "#dimension_invert_" + cleanDimension;
@@ -182,7 +182,7 @@ export default class SteerableParcoords {
     onInvert(newFeatures, xScales, yScales, yAxis) {
         {
             return function invertDim(event, d) {
-                invert(d.name, newFeatures, xScales, yScales, yAxis);
+                invertD(d.name, newFeatures, xScales, yScales, yAxis);
             };
         }
     }
@@ -270,6 +270,7 @@ export default class SteerableParcoords {
         const height = 400;
         const padding = 80;
         const brushWidth = 20;
+
         Object.entries(yScales).map(x => {
             let extent = [[-(brushWidth / 2), padding - 1],
                 [brushWidth / 2, height - padding]];
@@ -280,6 +281,8 @@ export default class SteerableParcoords {
                 .on('brush', onBrushEventHandler(filters, yScales))
         });
         return yBrushes;
+
+
     }
 
     onBrushEventHandler(filters, yScales) {
@@ -292,7 +295,9 @@ export default class SteerableParcoords {
                 if (event.selection !== null) {
                     filters[features.name] = event.selection.map((x) => {
                         const scale = yScales[features.name];// Get the appropriate scale based on features
-                        return scale.invert(x); // Remap the selection value
+                        var sd = scale.invert(x);
+                        console.log(sd);
+                        return sd; // Remap the selection value
                     });
                 } else {
 
@@ -312,8 +317,12 @@ export default class SteerableParcoords {
         const tempFilters = Object.entries(filters)
         return tempFilters.every(f => {
             if (f[1][1] === 0 && f[1][0] === 0) {
+                console.log("test");
                 return true;
             }
+            console.log(f[1][1]);
+            console.log(f[1][0]);
+            console.log(d[f[0]]);
             return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
         });
     }
@@ -376,7 +385,7 @@ export default class SteerableParcoords {
             .data(content)
             .enter()
             .append('path')
-            .attr("class", (d)=> {
+            .attr("class", (d) => {
                 const keys = Object.keys(d);
                 const first_key = keys[0];
                 const selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
@@ -426,7 +435,7 @@ export default class SteerableParcoords {
         featureAxisG
             .append('g')
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g,"_");
+                let cleanString = d.name.replace(/ /g, "_");
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + cleanString)
@@ -459,24 +468,22 @@ export default class SteerableParcoords {
                 .on("drag", onDragEventHandler(newFeatures, xScales, yScales, dragging, active, featureAxisG, width))
                 .on("end", onDragEndEventHandler(newFeatures, xScales, yScales, dragging, inactive, active))
             )
-            .on("mouseover", function(){return tooltip_dim.style("visibility", "visible");})
+            .on("mouseover", function () {
+                return tooltip_dim.style("visibility", "visible");
+            })
             .on("mousemove", (event, d) => {
-                if(event.clientX > width - 120)
-                {
+                if (event.clientX > width - 120) {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", "w-resize");
-                }
-                else if (event.clientX <= 100)
-                {
+                        .style("cursor", 'url("./svg/arrow_right.svg") 8 8, auto');
+                } else if (event.clientX <= 100) {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", "e-resize");
-                }
-                else {
+                        .style("cursor", 'url("./svg/arrow_left.svg") 8 8, auto');
+                } else {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", "ew-resize");
+                        .style("cursor", 'url("./svg/arrow_left_and_right.svg") 8 8, auto');
                 }
                 tooltip_dim.text(d.name);
                 tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
@@ -486,16 +493,18 @@ export default class SteerableParcoords {
                     .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
                 return tooltip_dim;
             })
-            .on("mouseout", function(){return tooltip_dim.style("visibility", "hidden");});
+            .on("mouseout", function () {
+                return tooltip_dim.style("visibility", "hidden");
+            });
 
         featureAxisG
             .append("svg")
-            .attr('y', padding/1.4)
+            .attr('y', padding / 1.4)
             .attr('x', -3)
             .append("path")
             .attr("d", "M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z")
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g,"_");
+                let cleanString = d.name.replace(/ /g, "_");
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .attr('id', 'dimension_invert_' + cleanString)
@@ -506,7 +515,7 @@ export default class SteerableParcoords {
 
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
-                if(!(event.target.id.includes("dimension_invert_"))) {
+                if (!(event.target.id.includes("dimension_invert_"))) {
                     for (let i = 0; i < ids.length; i++) {
                         d3.select('.' + ids[i]).style("stroke", "rgb(0, 129, 175)")
                     }
@@ -514,6 +523,7 @@ export default class SteerableParcoords {
             }
         }
     }
+
     linePath(d, newFeatures, xScales, yScales) {
         var lineGenerator = d3.line();
         const tempdata = Object.entries(d).filter(x => x[0]);
@@ -622,7 +632,7 @@ export default class SteerableParcoords {
     }
 }
 
-export const { loadCSV, invert, setDimensions, generateSVG, removeDuplicateColumnNames, checkIfDuplicatesExists, select,
+export const { loadCSV, invertD, setDimensions, generateSVG, removeDuplicateColumnNames, checkIfDuplicatesExists, select,
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData,
     setupYScales, setupXScales, setupYAxis, setupBrush, onBrushEventHandler, applyFilters, selected, resetSVG, linePath, highlight,
     doNotHighlight, createTooltipForPathLine, getAllPointerEventsData } = new SteerableParcoords();
