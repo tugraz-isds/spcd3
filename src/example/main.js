@@ -43,8 +43,8 @@ function handleFileSelect(event) {
 function updateDimensions()
 {
     let selected_dimensions = getSelectedDimensions();
-    setDimensions(selected_dimensions);
-    generateSVG(newData, selected_dimensions);
+    let new_selected_dimensions = setDimensions(selected_dimensions);
+    generateSVG(newData, new_selected_dimensions);
 }
 
 function getSelectedDimensions()

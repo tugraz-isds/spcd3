@@ -281,8 +281,6 @@ export default class SteerableParcoords {
                 .on('brush', onBrushEventHandler(filters, yScales))
         });
         return yBrushes;
-
-
     }
 
     onBrushEventHandler(filters, yScales) {
@@ -295,9 +293,7 @@ export default class SteerableParcoords {
                 if (event.selection !== null) {
                     filters[features.name] = event.selection.map((x) => {
                         const scale = yScales[features.name];// Get the appropriate scale based on features
-                        var sd = scale.invert(x);
-                        console.log(sd);
-                        return sd; // Remap the selection value
+                        return scale.invert(x); // Remap the selection value
                     });
                 } else {
 
@@ -317,22 +313,19 @@ export default class SteerableParcoords {
         const tempFilters = Object.entries(filters)
         return tempFilters.every(f => {
             if (f[1][1] === 0 && f[1][0] === 0) {
-                console.log("test");
                 return true;
             }
-            console.log(f[1][1]);
-            console.log(f[1][0]);
-            console.log(d[f[0]]);
             return f[1][1] <= d[f[0]] && d[f[0]] <= f[1][0];
         });
     }
 
      resetSVG() {
-        d3.select("pc_svg").remove();
+        d3.select("#pc_svg").remove();
     }
 
     // TODO refactor
     generateSVG(content, newFeatures) {
+        resetSVG();
         const padding = 80;
         const width = newFeatures.length * padding;
         const height = 400;
