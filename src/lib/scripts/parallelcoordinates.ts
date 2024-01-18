@@ -435,6 +435,7 @@ export default class SteerableParcoords {
                                 .attr("height", 240 - height_top - height_bottom);
 
                             let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
+                            let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
 
                             let dim = cleanString;
                             let max = parcoords.yScales[dim].domain()[1];
@@ -446,12 +447,12 @@ export default class SteerableParcoords {
                                 const key = keys[0];
                                 const data = d[key];
                                 if(isNaN(max)){
-                                    value = parcoords.yScales[dim](d);
+                                    value = parcoords.yScales[dim](data);
                                 }
                                 else {
                                     value = 240 / max * (max - d[dim]) + 80;
                                 }
-                                if (value <= range_a) {
+                                if (value < range_a || value > range_b) {
                                     d3.select("#"+data).style("pointer-events", "none")
                                         .style("fill", "none")
                                         .style("stroke", "lightgrey")
@@ -502,6 +503,7 @@ export default class SteerableParcoords {
                         d3.select("#rect_" + cleanString)
                             .attr("height", 240 - height_top - height_bottom);
 
+                        let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
                         let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
 
                         let dim = cleanString;
@@ -513,12 +515,12 @@ export default class SteerableParcoords {
                             const key = keys[0];
                             const data = d[key];
                             if(isNaN(max)){
-                                value = parcoords.yScales[dim](d);
+                                value = parcoords.yScales[dim](data);
                             }
                             else {
                                 value = 240 / max * (max - d[dim]) + 80;
                             }
-                            if (value > range_b) {
+                            if (value < range_a || value > range_b) {
                                 d3.select("#"+data).style("pointer-events", "none")
                                     .style("fill", "none")
                                     .style("stroke", "lightgrey")
