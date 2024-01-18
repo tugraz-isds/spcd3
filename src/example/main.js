@@ -3,8 +3,6 @@ import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales,
 let data;
 let newData;
 let newFeatures;
-let yScales;
-let xScales;
 let yAxis;
 
 let inputButton = document.getElementById("input");
@@ -32,7 +30,7 @@ function handleFileSelect(event) {
             selectDimensions();
             let selected_dimensions = getSelectedDimensions();
             newFeatures = setDimensions(selected_dimensions);
-            generateInvertButtons();
+            generateDropdownForInvert();
             generateSVG(newData, newFeatures);
         };
 
@@ -49,63 +47,63 @@ function updateDimensions()
 
 function getSelectedDimensions()
 {
-    const checkboxes = document.querySelectorAll('input[name="dimension"]:checked');
-    const checkedDimensions = [];
-
-    checkboxes.forEach(function(checkbox) {
-        checkedDimensions.push(checkbox.value);
-    });
-
-    return checkedDimensions;
+    return Array.from(document.getElementById("selectDim").options)
+        .filter(option => option.selected).map(option => option.value);
 }
 
 function selectDimensions(){
 
-    var dimensions = newData["columns"];
+    let dimensions = newData["columns"];
 
     document.getElementById('checkboxHeader').style.visibility = "visible";
     const container = document.getElementById('checkboxContainer');
 
+    const dropdown = document.createElement('select');
+    dropdown.multiple = true;
+    dropdown.id = "selectDim";
+    dropdown.addEventListener('change', updateDimensions);
+
     dimensions.forEach(function(dimension) {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.name = 'dimension';
-        checkbox.value = dimension;
-        checkbox.checked = true;
-
-        checkbox.addEventListener('change', updateDimensions);
-
-        const label = document.createElement('label');
-        label.appendChild(document.createTextNode(dimension));
-
-        container.appendChild(checkbox);
-        container.appendChild(label);
-    });
+        let option = document.createElement("option");
+        option.textContent = dimension;
+        option.value = dimension;
+        option.selected = true;
+        dropdown.appendChild(option);
+    })
+    container.appendChild(dropdown);
 }
 
-function generateInvertButtons()
+function generateDropdownForInvert()
 {
     let dataset = prepareData(newData, newFeatures);
-    let features = dataset[0];
-    let newDataset = dataset[1];
-    yScales = setupYScales(400, 80, features, newDataset);
-    xScales = setupXScales(newFeatures.length * 80, 80, features);
-    yAxis = setupYAxis(features, yScales, newDataset);
+
+    let parcoords = {
+        xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
+        yScales : setupYScales(400, 80, dataset[0], dataset[1]),
+        dragging : {},
+        newFeatures : newFeatures,
+        features : dataset[0],
+        newDataset : dataset[1],
+        datasetForBrushing : dataset[1],
+    }
+    yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+
     let dimensions = newData["columns"];
 
     document.getElementById('invertContainerHeader').style.visibility = "visible";
 
     const container = document.getElementById('invert_container');
 
+    const dropdown = document.createElement('select');
+    dropdown.onchange = () => invertD(dropdown.value, newFeatures, parcoords, yAxis);
+
     dimensions.forEach(function(dimension) {
-        const button = document.createElement('input');
-        button.type = 'button';
-        button.name = 'dimension';
-        button.value = dimension;
-        button.className = 'input-button';
-        button.onclick = () => invertD(dimension, newFeatures, xScales, yScales, yAxis);
-        container.appendChild(button);
-    });
+        let option = document.createElement("option");
+        option.textContent = dimension;
+        option.value = dimension;
+        dropdown.appendChild(option);
+    })
+    container.appendChild(dropdown);
 }
 
 function clearPlot() {
