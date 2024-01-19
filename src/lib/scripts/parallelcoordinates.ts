@@ -70,6 +70,11 @@ export default class SteerableParcoords {
             .delay(5)
             .duration(0)
             .attr("visibility", null);
+
+        /*let domain = parcoords.yScales[dimension].domain();
+        let range = parcoords.yScales[dimension].range();
+        console.log(domain);
+        console.log(range);*/
     }
 
     getInversionStatus(dimension)
@@ -392,7 +397,7 @@ export default class SteerableParcoords {
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .append("g")
-                        .attr("class", "brush")
+                        .attr("class", "brush_" + cleanString)
                     .append('svg:image')
                         .attr("id", "triangle_up_" + cleanString)
                         .attr('y', 70)
@@ -466,7 +471,9 @@ export default class SteerableParcoords {
                                         .style("fill", "none")
                                 }
                             })
-                        }))});
+                        })
+            
+                        )});
 
         featureAxisG
             .each(function (d) {
@@ -474,7 +481,7 @@ export default class SteerableParcoords {
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .append("g")
-                        .attr("class", "brush")
+                        .attr("class", "brush_" + cleanString)
                     .append('svg:image')
                         .attr("id", "triangle_down_" + cleanString)
                         .attr('y', 317)
@@ -488,8 +495,8 @@ export default class SteerableParcoords {
                         if (event.y < other_triangle) {
                             new_y = other_triangle;
                         }
-                        else if (event.y > 317) {
-                            new_y = 317;
+                        else if (event.y > 318) {
+                            new_y = 318;
                         }
                         else {
                             new_y = event.y;
@@ -542,7 +549,7 @@ export default class SteerableParcoords {
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .append("g")
-                    .attr("class", "rect")
+                    .attr("class", "rect_" + cleanString)
                     .append("rect")
                     .attr("id", "rect_" + cleanString)
                     .attr("width", 12)
@@ -550,7 +557,68 @@ export default class SteerableParcoords {
                     .attr("x", -6)
                     .attr("y", 80)
                     .attr("fill",  "rgb(255, 255, 0, 0.4)")
-            });
+                    .call(d3.drag().on("drag", (event, d) => {
+                        let cleanString = d.name.replace(/ /g, "_");
+                        cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+                        var rect_height = svg.select("#rect_" + cleanString).node().getBoundingClientRect().height;
+                        let y_top;
+                        if (event.y < 80) {
+                            y_top = 80;
+                        }
+                        else if (event.y + rect_height > 320) {
+                            y_top = 320 - rect_height;
+                        }
+                        else {
+                            y_top = event.y;
+                        }
+
+                        let y_bottom;
+                        if (event.y + rect_height-3 > 318) {
+                            y_bottom = 318;
+                        }
+                        else {
+                            y_bottom = y_top + rect_height-3;
+                        }
+
+                        if(rect_height < 240) {
+                        d3.select("#rect_" + cleanString)
+                            .attr("y", y_top);
+                        d3.select("#triangle_up_" + cleanString)
+                            .attr("y", y_top-10);
+                        d3.select("#triangle_down_" + cleanString)
+                            .attr("y", y_bottom);
+    
+                            let dim = d.name;
+                            let max = parcoords.yScales[dim].domain()[1];
+    
+                            active.each(function(d) {
+                                let value;
+                                const keys = Object.keys(d);
+                                const key = keys[0];
+                                const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+                                if(isNaN(max)){
+                                    value = parcoords.yScales[dim](d[dim]);
+                                }
+                                else {
+                                    value = 240 / max * (max - d[dim]) + 80;
+                                }
+                                if (value < event.y || value > event.y + rect_height) {
+                                    d3.select("."+data).style("pointer-events", "none")
+                                        .style("fill", "none")
+                                        .style("stroke", "lightgrey")
+                                        .style("stroke-opacity", "0.4")
+                                }
+                                else {
+                                    d3.select("."+data).style("opacity", "0.7")
+                                        .style("pointer-events", "stroke")
+                                        .style("stroke", "rgb(0, 129, 175)")
+                                        .style("stroke-width", "0.1rem")
+                                        .style("fill", "none")
+                                }
+                        })
+                    }
+                    })
+                    )});
 
         let tooltip_dim = d3.select('#parallelcoords')
             .append('g')
