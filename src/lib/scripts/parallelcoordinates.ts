@@ -437,7 +437,7 @@ export default class SteerableParcoords {
                             let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
                             let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
 
-                            let dim = cleanString;
+                            let dim = d.name;
                             let max = parcoords.yScales[dim].domain()[1];
                             let min = parcoords.yScales[dim].domain()[0];
 
@@ -445,21 +445,21 @@ export default class SteerableParcoords {
                                 let value;
                                 const keys = Object.keys(d);
                                 const key = keys[0];
-                                const data = d[key];
+                                const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
                                 if(isNaN(max)){
-                                    value = parcoords.yScales[dim](data);
+                                    value = parcoords.yScales[dim](d[dim]);
                                 }
                                 else {
                                     value = 240 / max * (max - d[dim]) + 80;
                                 }
                                 if (value < range_a || value > range_b) {
-                                    d3.select("#"+data).style("pointer-events", "none")
+                                    d3.select("."+data).style("pointer-events", "none")
                                         .style("fill", "none")
                                         .style("stroke", "lightgrey")
                                         .style("stroke-opacity", "0.4")
                                 }
                                 else {
-                                    d3.select("#"+data).style("opacity", "0.7")
+                                    d3.select("."+data).style("opacity", "0.7")
                                         .style("pointer-events", "stroke")
                                         .style("stroke", "rgb(0, 129, 175)")
                                         .style("stroke-width", "0.1rem")
@@ -506,28 +506,28 @@ export default class SteerableParcoords {
                         let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
                         let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
 
-                        let dim = cleanString;
+                        let dim = d.name;
                         let max = parcoords.yScales[dim].domain()[1];
 
                         active.each(function(d) {
                             let value;
                             const keys = Object.keys(d);
                             const key = keys[0];
-                            const data = d[key];
+                            const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
                             if(isNaN(max)){
-                                value = parcoords.yScales[dim](data);
+                                value = parcoords.yScales[dim](d[dim]);
                             }
                             else {
                                 value = 240 / max * (max - d[dim]) + 80;
                             }
                             if (value < range_a || value > range_b) {
-                                d3.select("#"+data).style("pointer-events", "none")
+                                d3.select("."+data).style("pointer-events", "none")
                                     .style("fill", "none")
                                     .style("stroke", "lightgrey")
                                     .style("stroke-opacity", "0.4")
                             }
                             else {
-                                d3.select("#"+data).style("opacity", "0.7")
+                                d3.select("."+data).style("opacity", "0.7")
                                     .style("pointer-events", "stroke")
                                     .style("stroke", "rgb(0, 129, 175)")
                                     .style("stroke-width", "0.1rem")
@@ -612,7 +612,8 @@ export default class SteerableParcoords {
                 d3.select(this)
                     .attr('id', 'dimension_invert_' + cleanString)
                     .text('down')
-                    .style('cursor', 'url("./svg/arrow_up.svg"), auto')
+                    //.style('cursor', 'url("./svg/arrow_up.svg"), auto')
+                    .style('cursor', 'url("data:image/svg+xml,' + 'arrow_up.svg');
             })
             .on("click", onInvert(newFeatures, parcoords, yAxis));
 
