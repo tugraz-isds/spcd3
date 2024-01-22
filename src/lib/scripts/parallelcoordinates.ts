@@ -32,19 +32,19 @@ export default class SteerableParcoords {
     }
 
     invertD(dimension, newFeatures, parcoords, yAxis) {
+        const arrow_down_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpdGRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=";
+        const arrow_up_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgNCBMIDMgMCBMIDYgNCBMIDQgNCBMIDQgMTAgTCAyIDEwIEwgMiA0IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
         let cleanDimension = dimension.replace(/ /g,"_");
         cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
         const invert_id = "#dimension_invert_" + cleanDimension;
         const dimension_id = "#dimension_axis_" + cleanDimension;
         const textElement = d3.select(invert_id);
         const currentText = textElement.text();
-        const arrow = currentText === 'down' ? 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgNCBMIDMgMCBMIDYgNCBMIDQgNCBMIDQgMTAgTCAyIDEwIEwgMiA0IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==' :
-            'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=';
-        const arrowStyle = currentText === 'down' ? 'url("./svg/arrow_down.svg") 8 8, auto' :
-            'url("./svg/arrow_up.svg") 8 8, auto';
+        const arrow = currentText === 'down' ? arrow_up_base64 : arrow_down_base64;
+        const arrowStyle = currentText === 'down' ? arrow_down_base64 : arrow_up_base64;
         textElement.text(currentText === 'down' ? 'up' : 'down');
         textElement.attr('href', 'data:image/svg+xml;base64,' + arrow)
-        textElement.style('cursor', arrowStyle);
+        textElement.style('cursor', `url('data:image/svg+xml;base64,${arrowStyle}') 8 8 , auto`);
 
         d3.select(dimension_id).call(yAxis[dimension].scale(parcoords.yScales[dimension].domain(parcoords.yScales[dimension]
             .domain().reverse())))
@@ -276,6 +276,14 @@ export default class SteerableParcoords {
     // TODO refactor
     generateSVG(content, newFeatures) {
 
+        const arrow_down_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpdGRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=";
+        const arrow_up_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgNCBMIDMgMCBMIDYgNCBMIDQgNCBMIDQgMTAgTCAyIDEwIEwgMiA0IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
+        const arrow_left_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDAgNCB6IiAvPgogICAgPC9nPgo8L3N2Zz4=";
+        const arrow_right_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCAxMCA2IgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgMyBMIDQgMCBMIDQgMiBMIDEwIDIgTCAxMCA0IEwgNCA0IEwgNCA2IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
+        const arrow_left_right_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAzIEwgNCAwIEwgNCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDQgNCBMIDQgNiB6IiAvPgogICAgPC9nPgo8L3N2Zz4=";
+        const arrow_top_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCA1IEwgMyAwIEwgNiA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
+        const arrow_bottom_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgNiAwIEwgMyA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
+
         resetSVG();
 
         const padding = 80;
@@ -404,7 +412,8 @@ export default class SteerableParcoords {
                         .attr('x', -5)
                         .attr('width', 10)
                         .attr('height', 12)
-                        .attr('href', 'data:image/svg+xml;base64,' + 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgNiAwIEwgMyA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==')
+                        .attr('href', 'data:image/svg+xml;base64,' + arrow_bottom_base64)
+                        .attr('cursor', `url('data:image/svg+xml;base64,${arrow_bottom_base64}') 8 8 , auto`)
                     .call(d3.drag()
                         .on("drag", (event, d) => {
 
@@ -488,7 +497,8 @@ export default class SteerableParcoords {
                         .attr('x', -5)
                         .attr('width', 10)
                         .attr('height', 12)
-                        .attr('href', 'data:image/svg+xml;base64,' + 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCA1IEwgMyAwIEwgNiA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==')
+                        .attr('href', 'data:image/svg+xml;base64,' + arrow_top_base64)
+                        .attr('cursor', `url('data:image/svg+xml;base64,${arrow_top_base64}') 8 8 , auto`)
                     .call(d3.drag().on("drag", (event, d) => {
                         let other_triangle = d3.select("#triangle_up_" + cleanString).attr("y");
                         let new_y;
@@ -641,19 +651,22 @@ export default class SteerableParcoords {
                 return tooltip_dim.style("visibility", "visible");
             })
             .on("mousemove", (event, d) => {
+               
                 if (event.clientX > width - 120) {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", 'url("./svg/arrow_right.svg") 8 8, auto');
+                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_right_base64}') 8 8 , auto`);
                 } else if (event.clientX <= 100) {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", 'url("./svg/arrow_left.svg") 8 8, auto');
+                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_left_base64}') 8 8 , auto`);
+                        
                 } else {
                     featureAxisG
                         .select("#dimension")
-                        .style("cursor", 'url("./svg/arrow_left_and_right.svg") 8 8, auto');
+                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_left_right_base64}') 8 8 , auto`);
                 }
+
                 tooltip_dim.text(d.name);
                 tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
                 tooltip_dim.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
@@ -670,18 +683,17 @@ export default class SteerableParcoords {
             .append("svg")
             .attr('y', padding / 1.5)
             .attr('x', -6)
-            .append("image")
+            .append('image')
             .attr('width', 12)
             .attr('height', 12)
-            .attr('href', 'data:image/svg+xml;base64,' + 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=')
+            .attr('href', "data:image/svg+xml;base64," + arrow_down_base64)
             .each(function (d) {
                 let cleanString = d.name.replace(/ /g, "_");
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .attr('id', 'dimension_invert_' + cleanString)
                     .text('down')
-                    //.style('cursor', 'url("./svg/arrow_up.svg"), auto')
-                    .style('cursor', 'url("data:image/svg+xml,' + 'arrow_up.svg');
+                    .style('cursor', `url('data:image/svg+xml;base64,${arrow_up_base64}') 8 8, auto`)
             })
             .on("click", onInvert(newFeatures, parcoords, yAxis));
 
