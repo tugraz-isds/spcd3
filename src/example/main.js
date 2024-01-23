@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/esm/spcd3.js';
+import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/spcd3.js';
 
 let data;
 let newData;

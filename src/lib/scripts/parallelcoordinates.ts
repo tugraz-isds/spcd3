@@ -1,30 +1,8 @@
 import * as d3 from 'd3';
+import * as base64 from './base64Arrows';
+import * as brush from './brush';
 
 export default class SteerableParcoords {
-
-    removeDuplicateColumnNames(value :string) {
-        let complete_arr = value.split(/\r?\n/);
-        let column_string = d3.csvParse(complete_arr[0]);
-        let n = 0;
-        const unique = arr => arr.map((s => v => !s.has(v) && s.add(v) ? v : `${v}(${n+=1})`)(new Set));
-        complete_arr[0] = unique(column_string["columns"]).toString();
-        return complete_arr.join('\r\n');
-    }
-
-    checkIfDuplicatesExists(value :string) {
-        return new Set(value).size !== value.length
-    }
-
-    loadCSV(csv :string)
-    {
-        let complete_arr = csv.split(/\r?\n/);
-        if (checkIfDuplicatesExists(complete_arr[0]))
-        {
-            csv = removeDuplicateColumnNames(csv);
-        }
-        let tmp_data = d3.csvParse(csv);
-        return tmp_data.sort((a,b) => a.Name > b.Name ? 1 : -1);
-    }
 
     setDimensions(newDimension): void
     {
@@ -32,16 +10,14 @@ export default class SteerableParcoords {
     }
 
     invertD(dimension, newFeatures, parcoords, yAxis) {
-        const arrow_down_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpdGRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=";
-        const arrow_up_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgNCBMIDMgMCBMIDYgNCBMIDQgNCBMIDQgMTAgTCAyIDEwIEwgMiA0IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
-        let cleanDimension = dimension.replace(/ /g,"_");
+        let cleanDimension = dimension.replace(/ /g,'_');
         cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        const invert_id = "#dimension_invert_" + cleanDimension;
-        const dimension_id = "#dimension_axis_" + cleanDimension;
+        const invert_id = '#dimension_invert_' + cleanDimension;
+        const dimension_id = '#dimension_axis_' + cleanDimension;
         const textElement = d3.select(invert_id);
         const currentText = textElement.text();
-        const arrow = currentText === 'down' ? arrow_up_base64 : arrow_down_base64;
-        const arrowStyle = currentText === 'down' ? arrow_down_base64 : arrow_up_base64;
+        const arrow = currentText === 'down' ? base64.getArrowUpBase64() : base64.getArrowDownBase64();
+        const arrowStyle = currentText === 'down' ? base64.getArrowDownBase64() : base64.getArrowUpBase64();
         textElement.text(currentText === 'down' ? 'up' : 'down');
         textElement.attr('href', 'data:image/svg+xml;base64,' + arrow)
         textElement.style('cursor', `url('data:image/svg+xml;base64,${arrowStyle}') 8 8 , auto`);
@@ -69,12 +45,20 @@ export default class SteerableParcoords {
             .transition()
             .delay(5)
             .duration(0)
-            .attr("visibility", null);
+            .attr('visibility', null);
 
         /*let domain = parcoords.yScales[dimension].domain();
         let range = parcoords.yScales[dimension].range();
         console.log(domain);
         console.log(range);*/
+    }
+
+    onInvert(newFeatures, parcoords, yAxis) {
+        {
+            return function invertDim(event, d) {
+                invertD(d.name, newFeatures, parcoords, yAxis);
+            };
+        }
     }
 
     getInversionStatus(dimension)
@@ -107,25 +91,20 @@ export default class SteerableParcoords {
 
     }
 
-    select(data)
-    {
-        for(let i = 0; i < data.length; i++) {
-            let selected_value = data[i].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-            d3.select("." + selected_value)
-                .transition()
-                .style("stroke", "rgb(255, 165, 0)")
-                .style("opacity", "1")
-        }
-    }
-
     saveAsSVG()
     {
 
     }
 
-    position(d, dragging, xScales) {
-        var v = dragging[d];
-        return v == null ? xScales(d) : v;
+    select(data)
+    {
+        for(let i = 0; i < data.length; i++) {
+            let selected_value = data[i].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+            d3.select('.' + selected_value)
+                .transition()
+                .style('stroke', 'rgb(255, 165, 0)')
+                .style('opacity', '1')
+        }
     }
 
     onDragStartEventHandler(parcoords, inactive)
@@ -135,7 +114,7 @@ export default class SteerableParcoords {
             {
                 this.__origin__ = parcoords.xScales((d.subject).name);
                 parcoords.dragging[(d.subject).name] = this.__origin__;
-                inactive.attr("visibility", "hidden");
+                inactive.attr('visibility', 'hidden');
             }
         }
     }
@@ -152,15 +131,11 @@ export default class SteerableParcoords {
                     return position(b, parcoords.dragging, parcoords.xScales) - position(a, parcoords.dragging, parcoords.xScales);
                 });
                 parcoords.xScales.domain(parcoords.newFeatures);
-                featureAxisG.attr("transform", (d) => {
-                    return "translate(" + position(d.name, parcoords.dragging, parcoords.xScales) + ")";
+                featureAxisG.attr('transform', (d) => {
+                    return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
                 });
             }
         }
-    }
-
-    transition(g) {
-        return g.transition().duration(50);
     }
 
     onDragEndEventHandler(parcoords, inactive, active) {
@@ -179,18 +154,20 @@ export default class SteerableParcoords {
                     .transition()
                     .delay(5)
                     .duration(0)
-                    .attr("visibility", null);
+                    .attr('visibility', null);
             };
         }
     }
 
-    onInvert(newFeatures, parcoords, yAxis) {
-        {
-            return function invertDim(event, d) {
-                invertD(d.name, newFeatures, parcoords, yAxis);
-            };
-        }
+    transition(g) {
+        return g.transition().duration(50);
     }
+
+    position(d, dragging, xScales) {
+        var v = dragging[d];
+        return v == null ? xScales(d) : v;
+    }
+
 
     prepareData(data, newFeatures)
     {
@@ -270,19 +247,11 @@ export default class SteerableParcoords {
 
 
      resetSVG() {
-        d3.select("#pc_svg").remove();
+        d3.select('#pc_svg').remove();
     }
 
     // TODO refactor
     generateSVG(content, newFeatures) {
-
-        const arrow_down_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpdGRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxwYXRoIGQ9Ik0gMCA2IEwgMiA2IEwgMiAwIEwgNCAwIEwgNCA2IEwgNiA2IEwgMyAxMCB6IiAvPgo8L3N2Zz4=";
-        const arrow_up_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDEwIgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgNCBMIDMgMCBMIDYgNCBMIDQgNCBMIDQgMTAgTCAyIDEwIEwgMiA0IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
-        const arrow_left_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDAgNCB6IiAvPgogICAgPC9nPgo8L3N2Zz4=";
-        const arrow_right_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCAxMCA2IgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgMyBMIDQgMCBMIDQgMiBMIDEwIDIgTCAxMCA0IEwgNCA0IEwgNCA2IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
-        const arrow_left_right_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAzIEwgNCAwIEwgNCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDQgNCBMIDQgNiB6IiAvPgogICAgPC9nPgo8L3N2Zz4=";
-        const arrow_top_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCA1IEwgMyAwIEwgNiA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
-        const arrow_bottom_base64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCA2IDUiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAwIEwgNiAwIEwgMyA1IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==";
 
         resetSVG();
 
@@ -307,19 +276,19 @@ export default class SteerableParcoords {
 
         let yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
 
-        const svg = d3.select("#parallelcoords")
+        const svg = d3.select('#parallelcoords')
             .append('svg')
-            .attr("id", "pc_svg")
-            .attr("viewBox", [0, 0, width, height])
-            .attr("width", width)
-            .attr("height", height)
-            .attr("font-family", "Verdana, sans-serif")
-            .attr("preserveAspectRatio", "none");
+            .attr('id', 'pc_svg')
+            .attr('viewBox', [0, 0, width, height])
+            .attr('width', width)
+            .attr('height', height)
+            .attr('font-family', 'Verdana, sans-serif')
+            .attr('preserveAspectRatio', 'none');
 
         let tooltip_path = d3.select('#parallelcoords')
             .append('g')
-            .style("position", "absolute")
-            .style("visibility", "hidden");
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
 
         let inactive = svg.append('g')
             .attr('class', 'inactive')
@@ -327,10 +296,10 @@ export default class SteerableParcoords {
             .data(content)
             .enter()
             .append('path')
-            .style("pointer-events", "none")
-            .style("fill", "none")
-            .style("stroke", "lightgrey")
-            .style("stroke-opacity", "0.4")
+            .style('pointer-events', 'none')
+            .style('fill', 'none')
+            .style('stroke', 'lightgrey')
+            .style('stroke-opacity', '0.4')
             .each(function (d) {
                 d3.select(this)
                     .attr('d', linePath(d, newFeatures, parcoords))
@@ -342,14 +311,14 @@ export default class SteerableParcoords {
             .data(content)
             .enter()
             .append('path')
-            .attr("class", (d) => {
+            .attr('class', (d) => {
                 const keys = Object.keys(d);
                 const first_key = keys[0];
                 const selected_value = d[first_key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
                 ids.push(selected_value);
-                return "line " + selected_value;
+                return 'line ' + selected_value;
             })
-            .attr("id", (d) => {
+            .attr('id', (d) => {
                 const keys = Object.keys(d);
                 const first_key = keys[0];
                 return d[first_key];
@@ -358,25 +327,25 @@ export default class SteerableParcoords {
                 d3.select(this)
                     .attr('d', linePath(d, newFeatures, parcoords))
             })
-            .style("opacity", "0.7")
-            .style("pointer-events", "stroke")
-            .style("stroke", "rgb(0, 129, 175)")
-            .style("stroke-width", "0.1rem")
-            .style("fill", "none")
-            .on("pointerenter", (event, d) => {
+            .style('opacity', '0.7')
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'rgb(0, 129, 175)')
+            .style('stroke-width', '0.1rem')
+            .style('fill', 'none')
+            .on('pointerenter', (event, d) => {
                 const data = getAllPointerEventsData(event);
                 selected_path = highlight(data);
                 createTooltipForPathLine(data, tooltip_path, event);
             })
-            .on("pointerleave", (event, d) => {
+            .on('pointerleave', (event, d) => {
                 doNotHighlight(event, d, selected_path);
-                return tooltip_path.style("visibility", "hidden");
+                return tooltip_path.style('visibility', 'hidden');
             })
-            .on("pointerout", (event, d) => {
+            .on('pointerout', (event, d) => {
                 doNotHighlight(event, d, selected_path);
-                return tooltip_path.style("visibility", "hidden");
+                return tooltip_path.style('visibility', 'hidden');
             })
-            .on("click", (event, d) => {
+            .on('click', (event, d) => {
                 const data = getAllPointerEventsData(event);
                 select(data);
             });
@@ -392,7 +361,7 @@ export default class SteerableParcoords {
         featureAxisG
             .append('g')
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g, "_");
+                let cleanString = d.name.replace(/ /g, '_');
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + cleanString)
@@ -401,308 +370,131 @@ export default class SteerableParcoords {
 
         featureAxisG
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g, "_");
-                cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+                let cleanDimension = d.name.replace(/ /g, '_');
+                cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
-                    .append("g")
-                        .attr("class", "brush_" + cleanString)
+                    .append('g')
+                        .attr('class', 'brush_' + cleanDimension)
                     .append('svg:image')
-                        .attr("id", "triangle_up_" + cleanString)
+                        .attr('id', 'triangle_up_' + cleanDimension)
                         .attr('y', 70)
                         .attr('x', -5)
                         .attr('width', 10)
                         .attr('height', 12)
-                        .attr('href', 'data:image/svg+xml;base64,' + arrow_bottom_base64)
-                        .attr('cursor', `url('data:image/svg+xml;base64,${arrow_bottom_base64}') 8 8 , auto`)
+                        .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowBottomBase64())
+                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomBase64()}') 8 8 , auto`)
                     .call(d3.drag()
-                        .on("drag", (event, d) => {
-
-                            let other_triangle = d3.select("#triangle_down_" + cleanString).attr("y");
-                            let new_y;
-                            if (event.y < 70) {
-                                new_y = 70;
-                            }
-                            else if (event.y > other_triangle) {
-                                new_y = other_triangle;
-                            }
-                            else {
-                                new_y = event.y;
-                            }
-
-                            d3.select("#triangle_up_" + cleanString).attr("y", new_y);
-
-                            let rect_y;
-                            if (event.y+10 < 80) {
-                                rect_y = 80;
-                            }
-                            else if (event.y+10 > 320) {
-                                rect_y = 320;
-                            }
-                            else {
-                                rect_y = event.y+10;
-                            }
-
-                            let height_top = rect_y - 80;
-                            let height_bottom = 320 - other_triangle;
-                            d3.select("#rect_" + cleanString)
-                                .attr("y", rect_y)
-                                .attr("height", 240 - height_top - height_bottom);
-
-                            let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
-                            let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
-
-                            let dim = d.name;
-                            let max = parcoords.yScales[dim].domain()[1];
-                            let min = parcoords.yScales[dim].domain()[0];
-
-                            active.each(function(d) {
-                                let value;
-                                const keys = Object.keys(d);
-                                const key = keys[0];
-                                const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-                                if(isNaN(max)){
-                                    value = parcoords.yScales[dim](d[dim]);
-                                }
-                                else {
-                                    value = 240 / max * (max - d[dim]) + 80;
-                                }
-                                if (value < range_a || value > range_b) {
-                                    d3.select("."+data).style("pointer-events", "none")
-                                        .style("fill", "none")
-                                        .style("stroke", "lightgrey")
-                                        .style("stroke-opacity", "0.4")
-                                }
-                                else {
-                                    d3.select("."+data).style("opacity", "0.7")
-                                        .style("pointer-events", "stroke")
-                                        .style("stroke", "rgb(0, 129, 175)")
-                                        .style("stroke-width", "0.1rem")
-                                        .style("fill", "none")
-                                }
-                            })
-                        })
-            
-                        )});
+                        .on('drag', (event, d) => {brush.brushDown(cleanDimension, event, d, parcoords, active);}))
+                });
 
         featureAxisG
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g, "_");
-                cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+                let cleanDimension = d.name.replace(/ /g, '_');
+                cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
-                    .append("g")
-                        .attr("class", "brush_" + cleanString)
+                    .append('g')
+                        .attr('class', 'brush_' + cleanDimension)
                     .append('svg:image')
-                        .attr("id", "triangle_down_" + cleanString)
+                        .attr('id', 'triangle_down_' + cleanDimension)
                         .attr('y', 317)
                         .attr('x', -5)
                         .attr('width', 10)
                         .attr('height', 12)
-                        .attr('href', 'data:image/svg+xml;base64,' + arrow_top_base64)
-                        .attr('cursor', `url('data:image/svg+xml;base64,${arrow_top_base64}') 8 8 , auto`)
-                    .call(d3.drag().on("drag", (event, d) => {
-                        let other_triangle = d3.select("#triangle_up_" + cleanString).attr("y");
-                        let new_y;
-                        if (event.y < other_triangle) {
-                            new_y = other_triangle;
-                        }
-                        else if (event.y > 318) {
-                            new_y = 318;
-                        }
-                        else {
-                            new_y = event.y;
-                        }
-
-                        d3.select("#triangle_down_" + cleanString)
-                            .attr("y", new_y);
-
-                        let height_bottom = 317 - new_y;
-                        let height_top = other_triangle - 70;
-                        d3.select("#rect_" + cleanString)
-                            .attr("height", 240 - height_top - height_bottom);
-
-                        let range_a = d3.select("#triangle_up_" + cleanString).attr("y");
-                        let range_b = d3.select("#triangle_down_" + cleanString).attr("y");
-
-                        let dim = d.name;
-                        let max = parcoords.yScales[dim].domain()[1];
-
-                        active.each(function(d) {
-                            let value;
-                            const keys = Object.keys(d);
-                            const key = keys[0];
-                            const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-                            if(isNaN(max)){
-                                value = parcoords.yScales[dim](d[dim]);
-                            }
-                            else {
-                                value = 240 / max * (max - d[dim]) + 80;
-                            }
-                            if (value < range_a || value > range_b) {
-                                d3.select("."+data).style("pointer-events", "none")
-                                    .style("fill", "none")
-                                    .style("stroke", "lightgrey")
-                                    .style("stroke-opacity", "0.4")
-                            }
-                            else {
-                                d3.select("."+data).style("opacity", "0.7")
-                                    .style("pointer-events", "stroke")
-                                    .style("stroke", "rgb(0, 129, 175)")
-                                    .style("stroke-width", "0.1rem")
-                                    .style("fill", "none")
-                            }
-                        })
-            }))});
+                        .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
+                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopBase64()}') 8 8 , auto`)
+                    .call(d3.drag().on('drag', (event, d) => {brush.brushUp(cleanDimension, event, d, parcoords, active);}))
+                });
 
         featureAxisG
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g, "_");
-                cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+                let cleanDimension = d.name.replace(/ /g, '_');
+                cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
-                    .append("g")
-                    .attr("class", "rect_" + cleanString)
-                    .append("rect")
-                    .attr("id", "rect_" + cleanString)
-                    .attr("width", 12)
-                    .attr("height", 240)
-                    .attr("x", -6)
-                    .attr("y", 80)
-                    .attr("fill",  "rgb(255, 255, 0, 0.4)")
-                    .call(d3.drag().on("drag", (event, d) => {
-                        let cleanString = d.name.replace(/ /g, "_");
-                        cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-                        var rect_height = svg.select("#rect_" + cleanString).node().getBoundingClientRect().height;
-                        let y_top;
-                        if (event.y < 80) {
-                            y_top = 80;
-                        }
-                        else if (event.y + rect_height > 320) {
-                            y_top = 320 - rect_height;
-                        }
-                        else {
-                            y_top = event.y;
-                        }
-
-                        let y_bottom;
-                        if (event.y + rect_height-3 > 318) {
-                            y_bottom = 318;
-                        }
-                        else {
-                            y_bottom = y_top + rect_height-3;
-                        }
-
-                        if(rect_height < 240) {
-                        d3.select("#rect_" + cleanString)
-                            .attr("y", y_top);
-                        d3.select("#triangle_up_" + cleanString)
-                            .attr("y", y_top-10);
-                        d3.select("#triangle_down_" + cleanString)
-                            .attr("y", y_bottom);
-    
-                            let dim = d.name;
-                            let max = parcoords.yScales[dim].domain()[1];
-    
-                            active.each(function(d) {
-                                let value;
-                                const keys = Object.keys(d);
-                                const key = keys[0];
-                                const data = d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
-                                if(isNaN(max)){
-                                    value = parcoords.yScales[dim](d[dim]);
-                                }
-                                else {
-                                    value = 240 / max * (max - d[dim]) + 80;
-                                }
-                                if (value < event.y || value > event.y + rect_height) {
-                                    d3.select("."+data).style("pointer-events", "none")
-                                        .style("fill", "none")
-                                        .style("stroke", "lightgrey")
-                                        .style("stroke-opacity", "0.4")
-                                }
-                                else {
-                                    d3.select("."+data).style("opacity", "0.7")
-                                        .style("pointer-events", "stroke")
-                                        .style("stroke", "rgb(0, 129, 175)")
-                                        .style("stroke-width", "0.1rem")
-                                        .style("fill", "none")
-                                }
-                        })
-                    }
-                    })
-                    )});
+                    .append('g')
+                    .attr('class', 'rect_' + cleanDimension)
+                    .append('rect')
+                    .attr('id', 'rect_' + cleanDimension)
+                    .attr('width', 12)
+                    .attr('height', 240)
+                    .attr('x', -6)
+                    .attr('y', 80)
+                    .attr('fill',  'rgb(255, 255, 0, 0.4)')
+                    .call(d3.drag().on('drag', (event, d) => {brush.dragAndBrush(d, svg, event, parcoords, active);}))
+                });
 
         let tooltip_dim = d3.select('#parallelcoords')
             .append('g')
-            .style("position", "absolute")
-            .style("visibility", "hidden");
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
 
         featureAxisG
-            .append("text")
-            .attr("id", "dimension")
-            .attr("text-anchor", "middle")
+            .append('text')
+            .attr('id', 'dimension')
+            .attr('text-anchor', 'middle')
             .attr('y', padding / 1.7)
-            .text(d => d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name)
-            .style("font-size", "0.7rem")
+            .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
+            .style('font-size', '0.7rem')
             .call(d3.drag()
-                .on("start", onDragStartEventHandler(parcoords, inactive))
-                .on("drag", onDragEventHandler(parcoords, active, featureAxisG, width))
-                .on("end", onDragEndEventHandler(parcoords, inactive, active))
+                .on('start', onDragStartEventHandler(parcoords, inactive))
+                .on('drag', onDragEventHandler(parcoords, active, featureAxisG, width))
+                .on('end', onDragEndEventHandler(parcoords, inactive, active))
             )
-            .on("mouseover", function () {
-                return tooltip_dim.style("visibility", "visible");
+            .on('mouseover', function () {
+                return tooltip_dim.style('visibility', 'visible');
             })
-            .on("mousemove", (event, d) => {
+            .on('mousemove', (event, d) => {
                
                 if (event.clientX > width - 120) {
                     featureAxisG
-                        .select("#dimension")
-                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_right_base64}') 8 8 , auto`);
+                        .select('#dimension')
+                        .style('cursor', `url('data:image/svg+xml;base64,${base64.getArrowRightBase64()}') 8 8 , auto`);
                 } else if (event.clientX <= 100) {
                     featureAxisG
-                        .select("#dimension")
-                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_left_base64}') 8 8 , auto`);
+                        .select('#dimension')
+                        .style('cursor', `url('data:image/svg+xml;base64,${base64.getArrowLeftBase64()}') 8 8 , auto`);
                         
                 } else {
                     featureAxisG
-                        .select("#dimension")
-                        .style("cursor", `url('data:image/svg+xml;base64,${arrow_left_right_base64}') 8 8 , auto`);
+                        .select('#dimension')
+                        .style('cursor', `url('data:image/svg+xml;base64,${base64.getArrowLeftAndRightBase64()}') 8 8 , auto`);
                 }
 
                 tooltip_dim.text(d.name);
-                tooltip_dim.style("top", 13.6 + "rem").style("left", event.clientX + "px");
-                tooltip_dim.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
-                    .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
-                    .style("padding", 0.12 + "rem")
-                    .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
+                tooltip_dim.style('top', 13.6 + 'rem').style('left', event.clientX + 'px');
+                tooltip_dim.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+                    .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+                    .style('padding', 0.12 + 'rem')
+                    .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
                 return tooltip_dim;
             })
-            .on("mouseout", function () {
-                return tooltip_dim.style("visibility", "hidden");
+            .on('mouseout', function () {
+                return tooltip_dim.style('visibility', 'hidden');
             });
 
         featureAxisG
-            .append("svg")
+            .append('svg')
             .attr('y', padding / 1.5)
             .attr('x', -6)
             .append('image')
             .attr('width', 12)
             .attr('height', 12)
-            .attr('href', "data:image/svg+xml;base64," + arrow_down_base64)
+            .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowDownBase64())
             .each(function (d) {
-                let cleanString = d.name.replace(/ /g, "_");
+                let cleanString = d.name.replace(/ /g, '_');
                 cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .attr('id', 'dimension_invert_' + cleanString)
                     .text('down')
-                    .style('cursor', `url('data:image/svg+xml;base64,${arrow_up_base64}') 8 8, auto`)
+                    .style('cursor', `url('data:image/svg+xml;base64,${base64.getArrowUpBase64()}') 8 8, auto`)
             })
-            .on("click", onInvert(newFeatures, parcoords, yAxis));
+            .on('click', onInvert(newFeatures, parcoords, yAxis));
 
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
-                if (!(event.target.id.includes("dimension_invert_"))) {
+                if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style("stroke") !== "lightgrey") {
-                            d3.select('.' + ids[i]).style("stroke", "rgb(0, 129, 175, 0.7)").style("pointer-events", "stroke")
+                        if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
+                            d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175, 0.7)').style('pointer-events', 'stroke')
                         }
                     }
                 }
@@ -726,51 +518,51 @@ export default class SteerableParcoords {
     }
 
     highlight(data) {
-        let selected_path = "";
+        let selected_path = '';
         let data_wo_sc = [];
         for(let i = 0; i < data.length; i++) {
-            let temp = data[i].replaceAll(/[.,]/g, "");
+            let temp = data[i].replaceAll(/[.,]/g, '');
             data_wo_sc.push(temp);
         }
 
         if (data_wo_sc.length !== 0) {
             let temp_text = data_wo_sc.toString();
-            temp_text = temp_text.replaceAll(",", ",.");
+            temp_text = temp_text.replaceAll(',', ',.');
             temp_text = temp_text.replace(/[*\- 0123456789%&'\[{()}\]]/g, '');
             selected_path = temp_text;
-            data_wo_sc = temp_text.split(",.");
+            data_wo_sc = temp_text.split(',.');
 
             let new_temp_text = [];
             for(let i = 0; i < data_wo_sc.length; i++) {
-                let isOrange = d3.select("." + data_wo_sc[i].replace(/,./g, "")).style("stroke");
-                if(isOrange !== "rgb(255, 165, 0)") {
-                    new_temp_text.push(data_wo_sc[i].replace(/,./g, ""));
+                let isOrange = d3.select('.' + data_wo_sc[i].replace(/,./g, '')).style('stroke');
+                if(isOrange !== 'rgb(255, 165, 0)') {
+                    new_temp_text.push(data_wo_sc[i].replace(/,./g, ''));
                 }
                 else {
                     // do nothing
                 }
             }
 
-            selected_path = new_temp_text.join(",.");
+            selected_path = new_temp_text.join(',.');
 
             if(selected_path) {
-                d3.selectAll("." + selected_path)
+                d3.selectAll('.' + selected_path)
                     .transition().duration(5)
-                    .style("opacity", "0.7")
-                    .style("stroke", "rgb(200, 28, 38)");
+                    .style('opacity', '0.7')
+                    .style('stroke', 'rgb(200, 28, 38)');
             }
         }
         return selected_path;
     }
 
     doNotHighlight(event, i, selected_path) {
-        if(selected_path !== "") {
-            let temp_text = selected_path.split(",.");
+        if(selected_path !== '') {
+            let temp_text = selected_path.split(',.');
             let new_temp_text = [];
             for(let i = 0; i < temp_text.length; i++) {
-                let isOrange = d3.select("." + temp_text[i]).style("stroke");
+                let isOrange = d3.select('.' + temp_text[i]).style('stroke');
 
-                if(isOrange !== "rgb(255, 165, 0)") {
+                if(isOrange !== 'rgb(255, 165, 0)') {
                     new_temp_text.push(temp_text[i]);
                 }
                 else {
@@ -778,13 +570,13 @@ export default class SteerableParcoords {
                 }
             }
 
-            selected_path = new_temp_text.join(",.");
+            selected_path = new_temp_text.join(',.');
 
             if(selected_path) {
-                d3.selectAll("." + selected_path)
+                d3.selectAll('.' + selected_path)
                     .transition()
-                    .style("opacity", "0.7")
-                    .style("stroke", "rgb(0, 129, 175)");
+                    .style('opacity', '0.7')
+                    .style('stroke', 'rgb(0, 129, 175)');
             }
         }
     }
@@ -792,20 +584,20 @@ export default class SteerableParcoords {
     createTooltipForPathLine(tooltip_text, tooltip_path, event) {
         if (tooltip_text.length !== 0) {
             let temp_text = tooltip_text.toString();
-            temp_text = temp_text.split(',').join("\r\n");
+            temp_text = temp_text.split(',').join('\r\n');
             tooltip_path.text(temp_text);
-            tooltip_path.style("visibility", "visible");
-            tooltip_path.style("top", event.clientY + "px").style("left", event.clientX + "px");
-            tooltip_path.style("font-size", "0.75rem").style("border", 0.08 + "rem solid gray")
-                .style("border-radius", 0.1 + "rem").style("margin", 0.5 + "rem")
-                .style("padding", 0.12 + "rem").style("white-space", "pre-line")
-                .style("background-color", "LightGray").style("margin-left", 0.5 + "rem");
+            tooltip_path.style('visibility', 'visible');
+            tooltip_path.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+            tooltip_path.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+                .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+                .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+                .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
             return tooltip_path;
         }
     }
 
     getAllPointerEventsData(event) {
-        const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter("path");
+        const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
         const object = selection._groups;
         const data = [];
         for (let i = 0; i < object[0].length; i++) {
@@ -818,7 +610,7 @@ export default class SteerableParcoords {
     }
 }
 
-export const { loadCSV, invertD, setDimensions, generateSVG, removeDuplicateColumnNames, checkIfDuplicatesExists, select,
+export const { invertD, setDimensions, generateSVG, select,
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData,
     setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, createTooltipForPathLine,
     getAllPointerEventsData } = new SteerableParcoords();

@@ -11,6 +11,10 @@ function cleanDistFolder() {
     return del('dist', {force: true});
 }
 
+function deleteTypesFolder() {
+    return del('./dist/example/lib/types', {force: true});
+}
+
 function copyExampleFolder() {
     return src('./src/example/**/*').pipe(dest('./dist/example'));
 }
@@ -43,6 +47,6 @@ function convertToBase64() {
 
 exports.clean = cleanDistFolder;
 
-exports.build = series(cleanDistFolder, copyExampleFolder, convertToBase64, bundleJS, bundleDeclaration);
+exports.build = series(cleanDistFolder, copyExampleFolder, convertToBase64, bundleJS, bundleDeclaration, deleteTypesFolder);
 
 exports.serve = series(exports.build, watcher)

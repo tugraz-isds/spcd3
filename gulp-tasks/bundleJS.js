@@ -46,7 +46,7 @@ async function bundleJS() {
   }
 
   function writeLibToExample(format) {
-    const location = `./dist/example/lib/${format}`;
+    const location = `./dist/example/lib`;
     const writeConfigurationsIIFE = [
       { extension: 'js', plugins: [] }
     ];
