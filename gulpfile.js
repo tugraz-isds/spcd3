@@ -36,13 +36,13 @@ function createSVGs() {
 
 function convertToBase64() {
     return src('./src/lib/svg/*.svg')
-        .pipe(base64('./dist/example/test'))
-        .pipe(dest('./dist/example/test'));
+        .pipe(base64('./dist/example/svg'))
+        .pipe(dest('./dist/example/svg'));
 }
 
 
 exports.clean = cleanDistFolder;
 
-exports.build = series(cleanDistFolder, copyExampleFolder, bundleJS, bundleDeclaration);
+exports.build = series(cleanDistFolder, copyExampleFolder, convertToBase64, bundleJS, bundleDeclaration);
 
 exports.serve = series(exports.build, watcher)
