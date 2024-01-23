@@ -15,10 +15,29 @@ export function removeDuplicateColumnNames(value :string) {
     let column_string = d3.csvParse(complete_arr[0]);
     let n = 0;
     const unique = arr => arr.map((s => v => !s.has(v) && s.add(v) ? v : `${v}(${n+=1})`)(new Set));
-    complete_arr[0] = unique(column_string["columns"]).toString();
+    complete_arr[0] = unique(column_string['columns']).toString();
     return complete_arr.join('\r\n');
 }
 
 export function checkIfDuplicatesExists(value :string) {
     return new Set(value).size !== value.length
+}
+
+export function saveAsSvg() {
+    let svg = document.getElementById('pc_svg');
+    saveSvg(svg, 'test.svg');
+}
+
+export function saveSvg(data, name) {
+    data.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    let svgData = data.outerHTML;
+    let preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    let svgBlob = new Blob([preface, svgData], {type:'image/svg+xml;charset=utf-8'});
+    let svgUrl = URL.createObjectURL(svgBlob);
+    let downloadLink = document.createElement('a');
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 }

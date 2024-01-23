@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -12,6 +12,9 @@ inputFile.addEventListener("change", handleFileSelect, false);
 inputFile.addEventListener("click", (event) => {
     event.target.value = null;
 })
+let downloadButton = document.getElementById("download");
+    downloadButton.addEventListener("click", saveAsSvg, false);
+    downloadButton.style.visibility = "hidden";
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -32,6 +35,7 @@ function handleFileSelect(event) {
             newFeatures = setDimensions(selected_dimensions);
             generateDropdownForInvert();
             generateSVG(newData, newFeatures);
+            downloadButton.style.visibility = "visible";
         };
 
         reader.readAsText(file);
