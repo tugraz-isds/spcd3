@@ -130,7 +130,7 @@ export default class SteerableParcoords {
                 })
             
                 parcoords.newFeatures.sort((a, b) => {
-                    return position(b, parcoords.dragging, parcoords.xScales) - position(a, parcoords.dragging, parcoords.xScales);
+                    return position(b, parcoords.dragging, parcoords.xScales) - position(a, parcoords.dragging, parcoords.xScales) - 1;
                 });
                 
                 parcoords.xScales.domain(parcoords.newFeatures);
