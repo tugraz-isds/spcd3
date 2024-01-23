@@ -122,15 +122,19 @@ export default class SteerableParcoords {
     onDragEventHandler(parcoords, active, featureAxisG, width) {
         {
             return function onDrag(d) {
-                parcoords.dragging[(d.subject).name] = Math.min(width - 79, Math.max(79, this.__origin__ += d.dx));
+                parcoords.dragging[(d.subject).name] = Math.min(width-80, Math.max(80, this.__origin__ += d.x));
+        
                 active.each(function (d) {
                     d3.select(this)
                         .attr('d', linePath(d, parcoords.newFeatures, parcoords))
                 })
+            
                 parcoords.newFeatures.sort((a, b) => {
                     return position(b, parcoords.dragging, parcoords.xScales) - position(a, parcoords.dragging, parcoords.xScales);
                 });
+                
                 parcoords.xScales.domain(parcoords.newFeatures);
+
                 featureAxisG.attr('transform', (d) => {
                     return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
                 });
@@ -164,7 +168,7 @@ export default class SteerableParcoords {
     }
 
     position(d, dragging, xScales) {
-        var v = dragging[d];
+        let v = dragging[d];    
         return v == null ? xScales(d) : v;
     }
 
