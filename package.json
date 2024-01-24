@@ -42,7 +42,8 @@
     "@rollup/plugin-typescript": "8.3.3",
     "rollup-plugin-gzip": "^2.5.0",
     "browser-sync": "^2.27.5",
-    "url": "^0.11.3"
+    "url": "^0.11.3",
+    "xml-formatter": "^3.6.2"
   },
   "dependencies": {
     "d3": "^7.8.5",

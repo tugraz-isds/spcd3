@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as base64 from './base64Arrows'
 
 export function brushDown(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {
     let other_triangle = d3.select("#triangle_down_" + cleanString).attr("y");
@@ -12,6 +13,8 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
     else {
         new_y = event.y;
     }
+
+    d3.select("#rect_" + cleanString).attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`)
 
     d3.select("#triangle_up_" + cleanString).attr("y", new_y);
 
@@ -78,6 +81,8 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
     else {
         new_y = event.y;
     }
+
+    d3.select("#rect_" + cleanString).attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`)
 
     d3.select("#triangle_down_" + cleanString)
         .attr("y", new_y);
@@ -179,5 +184,8 @@ export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales:
                     .style("fill", "none");
             }
         });
+    }
+    else {
+        d3.select("#rect_" + cleanString).attr('cursor', 'auto')
     }
 }

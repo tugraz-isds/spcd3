@@ -91,11 +91,6 @@ export default class SteerableParcoords {
 
     }
 
-    saveAsSVG()
-    {
-
-    }
-
     select(data)
     {
         for(let i = 0; i < data.length; i++) {
@@ -249,8 +244,7 @@ export default class SteerableParcoords {
         return yAxis;
     }
 
-
-     resetSVG() {
+    resetSVG() {
         d3.select('#pc_svg').remove();
     }
 
@@ -408,7 +402,7 @@ export default class SteerableParcoords {
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopBase64()}') 8 8 , auto`)
                     .call(d3.drag().on('drag', (event, d) => {brush.brushUp(cleanDimension, event, d, parcoords, active);}))
                 });
-
+       
         featureAxisG
             .each(function (d) {
                 let cleanDimension = d.name.replace(/ /g, '_');
@@ -447,8 +441,11 @@ export default class SteerableParcoords {
                 return tooltip_dim.style('visibility', 'visible');
             })
             .on('mousemove', (event, d) => {
-               
-                if (event.clientX > width - 120) {
+                let screenwidth = width - 120;
+                if (screenwidth > screen.width) {
+                    screenwidth = screen.width - 130;
+                }
+                if (event.clientX > screenwidth) {
                     featureAxisG
                         .select('#dimension')
                         .style('cursor', `url('data:image/svg+xml;base64,${base64.getArrowRightBase64()}') 8 8 , auto`);
@@ -614,7 +611,6 @@ export default class SteerableParcoords {
     }
 }
 
-export const { invertD, setDimensions, generateSVG, select,
-    position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData,
-    setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, createTooltipForPathLine,
-    getAllPointerEventsData } = new SteerableParcoords();
+export const { invertD, setDimensions, generateSVG, select, position, onDragStartEventHandler, onDragEventHandler, transition, 
+    onDragEndEventHandler, onInvert, prepareData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, 
+    doNotHighlight, createTooltipForPathLine, getAllPointerEventsData } = new SteerableParcoords();

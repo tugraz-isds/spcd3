@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import xmlFormat from 'xml-formatter';
 
 export function loadCSV(csv :string) {
         let complete_arr = csv.split(/\r?\n/);
@@ -25,14 +26,21 @@ export function checkIfDuplicatesExists(value :string) {
 
 export function saveAsSvg() {
     let svg = document.getElementById('pc_svg');
-    saveSvg(svg, 'test.svg');
+    saveSvg(svg, 'parcoords.svg');
 }
 
 export function saveSvg(data, name) {
+    
     data.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     let svgData = data.outerHTML;
+
+    svgData = svgData.replaceAll(/cursor="[^"]*"/g, '')
+    svgData = svgData.replace(/style="cursor:[^"]*"/g, '')
+
+    let processedData = xmlFormat(svgData);
+
     let preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    let svgBlob = new Blob([preface, svgData], {type:'image/svg+xml;charset=utf-8'});
+    let svgBlob = new Blob([preface, processedData], {type:'image/svg+xml;charset=utf-8'});
     let svgUrl = URL.createObjectURL(svgBlob);
     let downloadLink = document.createElement('a');
     downloadLink.href = svgUrl;
