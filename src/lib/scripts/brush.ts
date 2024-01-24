@@ -53,18 +53,26 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
         else {
             value = 240 / max * (max - d[dim]) + 80;
         }
-        if (value < range_a || value > range_b) {
+
+        let check = d3.select("." + data).text();
+        let checkcolor = d3.select("." + data).style("pointer-events");
+        if ((value < range_a || value > range_b)) {
             d3.select("." + data).style("pointer-events", "none")
                 .style("fill", "none")
                 .style("stroke", "lightgrey")
-                .style("stroke-opacity", "0.4");
+                .style("stroke-opacity", "0.4")
+                .text(cleanString);
         }
-        else {
+        else if (check === cleanString && check !== "") {
             d3.select("." + data).style("opacity", "0.7")
                 .style("pointer-events", "stroke")
                 .style("stroke", "rgb(0, 129, 175)")
                 .style("stroke-width", "0.1rem")
-                .style("fill", "none");
+                .style("fill", "none")
+                .text("");
+        }
+        else {
+            // do nothing
         }
     })
 }
@@ -109,18 +117,25 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
         else {
             value = 240 / max * (max - d[dim]) + 80;
         }
-        if (value < range_a || value > range_b) {
+        let check = d3.select("." + data).text();
+        let checkcolor = d3.select("." + data).style("pointer-events");
+        if ((value < range_a || value > range_b)) {
             d3.select("." + data).style("pointer-events", "none")
                 .style("fill", "none")
                 .style("stroke", "lightgrey")
-                .style("stroke-opacity", "0.4");
+                .style("stroke-opacity", "0.4")
+                .text(cleanString);
         }
-        else {
+        else if (check === cleanString && check !== "") {
             d3.select("." + data).style("opacity", "0.7")
                 .style("pointer-events", "stroke")
                 .style("stroke", "rgb(0, 129, 175)")
                 .style("stroke-width", "0.1rem")
-                .style("fill", "none");
+                .style("fill", "none")
+                .text("");
+        }
+        else {
+            //do nothing
         }
     });
 }
@@ -170,19 +185,27 @@ export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales:
             else {
                 value = 240 / max * (max - d[dim]) + 80;
             }
-            if (value < event.y || value > event.y + rect_height) {
+            let check = d3.select("." + data).text();
+            let checkcolor = d3.select("." + data).style("stroke");
+            
+            if ((value < event.y || value > event.y + rect_height)) {
                 d3.select("." + data).style("pointer-events", "none")
                     .style("fill", "none")
                     .style("stroke", "lightgrey")
-                    .style("stroke-opacity", "0.4");
+                    .style("stroke-opacity", "0.4")
+                    //.text(cleanString);
             }
-            else {
+            else {//if (check === cleanString) {
                 d3.select("." + data).style("opacity", "0.7")
                     .style("pointer-events", "stroke")
                     .style("stroke", "rgb(0, 129, 175)")
                     .style("stroke-width", "0.1rem")
-                    .style("fill", "none");
+                    .style("fill", "none")
+                    //.text("");
             }
+            /*else {
+                //do nothing
+            }*/
         });
     }
     else {

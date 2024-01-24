@@ -37,6 +37,27 @@ export default class SteerableParcoords {
             d3.select(this)
                 .attr('d', linePath(d, newFeatures, parcoords))});
 
+        let height = d3.select("#rect_" + dimension).node().getBoundingClientRect().height;
+        let y_top = d3.select("#rect_" + dimension).attr("y");
+        let y_bottom = Number(y_top) + Number(height);
+
+        if(y_top > 80 && y_bottom < 317) {
+            //tbd
+            //console.log(d3.select("#rect_" + dimension).node().getBoundingClientRect());
+        }
+        else if (y_top > 80 && y_bottom >= 317) {
+            d3.select("#rect_" + dimension).attr("y", 80);
+            d3.select("#rect_" + dimension).attr("height", 240-(y_top-80));
+            d3.select("#triangle_up_" + dimension).attr("y", 70);
+            d3.select("#triangle_down_" + dimension).attr("y", 317-(y_top-80));
+        }
+        else if (y_top <= 80 && y_bottom < 317) {
+            d3.select("#rect_" + dimension).attr("y", 317-height);
+            d3.select("#rect_" + dimension).attr("height", 240 - (317 - y_bottom));
+            d3.select("#triangle_up_" + dimension).attr("y", 80 + (317 - y_bottom)-10);
+            d3.select("#triangle_down_" + dimension).attr("y", 317);
+        }        
+
         d3.select('g.inactive')
             .selectAll('path')
             .each(function (d) {
@@ -46,11 +67,6 @@ export default class SteerableParcoords {
             .delay(5)
             .duration(0)
             .attr('visibility', null);
-
-        /*let domain = parcoords.yScales[dimension].domain();
-        let range = parcoords.yScales[dimension].range();
-        console.log(domain);
-        console.log(range);*/
     }
 
     onInvert(newFeatures, parcoords, yAxis) {
@@ -259,6 +275,7 @@ export default class SteerableParcoords {
         let ids = [];
         let selected_path = null;
         let active = null;
+        let test = [];
 
         let dataset = prepareData(content, newFeatures);
 
@@ -409,7 +426,7 @@ export default class SteerableParcoords {
                 cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
                 d3.select(this)
                     .append('g')
-                    .attr('class', 'rect_' + cleanDimension)
+                    .attr('class', 'rect')
                     .append('rect')
                     .attr('id', 'rect_' + cleanDimension)
                     .attr('width', 12)
