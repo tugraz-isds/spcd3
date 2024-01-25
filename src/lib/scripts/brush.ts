@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as base64 from './base64Arrows'
 
-export function brushDown(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {
+export function brushDown(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, test: any) {
     let other_triangle = d3.select("#triangle_down_" + cleanString).attr("y");
     let new_y;
     if (event.y < 70) {
@@ -17,6 +17,13 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
     d3.select("#rect_" + cleanString).attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`)
 
     d3.select("#triangle_up_" + cleanString).attr("y", new_y);
+
+
+    var key = "top";
+    var new_obj = {};
+    new_obj[key] = new_y;
+    const target = test.find((obj) => obj.key == d.name);
+    Object.assign(target, new_obj);
 
     let rect_y;
     if (event.y + 10 < 80) {
@@ -55,36 +62,93 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
         }
 
         let check = d3.select("." + data).text();
-        let checkcolor = d3.select("." + data).style("pointer-events");
-        if ((value < range_a || value > range_b)) {
+        
+        if (value < range_a || value > range_b) {
+            if (check == "") {
             d3.select("." + data).style("pointer-events", "none")
                 .style("fill", "none")
                 .style("stroke", "lightgrey")
                 .style("stroke-opacity", "0.4")
-                .text(cleanString);
+                .text(dim);
+            }
         }
-        else if (check === cleanString && check !== "") {
-            d3.select("." + data).style("opacity", "0.7")
-                .style("pointer-events", "stroke")
-                .style("stroke", "rgb(0, 129, 175)")
-                .style("stroke-width", "0.1rem")
-                .style("fill", "none")
-                .text("");
+        else if (check == dim && check != "") {
+            let check_data = [];
+            test.forEach(function (arrayItem) {
+                let value;
+                if (arrayItem.key != dim && arrayItem.top != 70) {
+                    let max = parcoords.yScales[arrayItem.key].domain()[1];
+                        
+                    if (isNaN(max)) {
+                        value = parcoords.yScales[arrayItem.key](d[arrayItem.key]);
+                    }
+                    else {
+                        value = 240 / max * (max - d[arrayItem.key]) + 80;
+                    }  
+                    if(value < arrayItem.top) {
+                        check_data.push(data);
+                        d3.select("." + data).text(arrayItem.key);
+                    }
+                    else {
+                        d3.select("." + data).style("opacity", "0.7")
+                            .style("pointer-events", "stroke")
+                            .style("stroke", "rgb(0, 129, 175)")
+                            .style("stroke-width", "0.1rem")
+                            .style("fill", "none")
+                            .text("");
+                    }
+                }
+                else if(arrayItem.key != dim && arrayItem.bottom != 320) {
+                    let max = parcoords.yScales[arrayItem.key].domain()[1];
+                        
+                    if (isNaN(max)) {
+                        value = parcoords.yScales[arrayItem.key](d[arrayItem.key]);
+                    }
+                    else {
+                        value = 240 / max * (max - d[arrayItem.key]) + 80;
+                    }  
+                    if(value > arrayItem.bottom) {
+                        check_data.push(data);
+                        d3.select("." + data).text(arrayItem.key);
+                    }
+                    else {
+                        d3.select("." + data).style("opacity", "0.7")
+                            .style("pointer-events", "stroke")
+                            .style("stroke", "rgb(0, 129, 175)")
+                            .style("stroke-width", "0.1rem")
+                            .style("fill", "none")
+                            .text("");
+                    }
+                }
+                else {
+                    //do nothing
+                }
+
+            });
+            if(!check_data.includes(data)) {
+                d3.select("." + data).style("opacity", "0.7")
+                    .style("pointer-events", "stroke")
+                    .style("stroke", "rgb(0, 129, 175)")
+                    .style("stroke-width", "0.1rem")
+                    .style("fill", "none")
+                    .text("");
+            }
         }
         else {
             // do nothing
         }
-    })
+    });
+    return test;
 }
 
-export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {
+export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, test: any) {
     let other_triangle = d3.select("#triangle_up_" + cleanString).attr("y");
     let new_y;
     if (event.y < other_triangle) {
         new_y = other_triangle;
     }
-    else if (event.y > 318) {
-        new_y = 318;
+    else if (event.y > 322) {
+        new_y = 322;
     }
     else {
         new_y = event.y;
@@ -92,10 +156,15 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
 
     d3.select("#rect_" + cleanString).attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`)
 
-    d3.select("#triangle_down_" + cleanString)
-        .attr("y", new_y);
+    d3.select("#triangle_down_" + cleanString).attr("y", new_y);
 
-    let height_bottom = 317 - new_y;
+    var key = "bottom";
+    var new_obj = {};
+    new_obj[key] = new_y;
+    const target = test.find((obj) => obj.key == d.name);
+    Object.assign(target, new_obj);
+
+    let height_bottom = 320 - new_y;
     let height_top = other_triangle - 70;
     d3.select("#rect_" + cleanString)
         .attr("height", 240 - height_top - height_bottom);
@@ -118,26 +187,83 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
             value = 240 / max * (max - d[dim]) + 80;
         }
         let check = d3.select("." + data).text();
-        let checkcolor = d3.select("." + data).style("pointer-events");
-        if ((value < range_a || value > range_b)) {
+       
+        if (value < range_a || value > range_b) {
+            if (check == "") {
             d3.select("." + data).style("pointer-events", "none")
                 .style("fill", "none")
                 .style("stroke", "lightgrey")
                 .style("stroke-opacity", "0.4")
-                .text(cleanString);
+                .text(dim);
+            }
         }
-        else if (check === cleanString && check !== "") {
-            d3.select("." + data).style("opacity", "0.7")
-                .style("pointer-events", "stroke")
-                .style("stroke", "rgb(0, 129, 175)")
-                .style("stroke-width", "0.1rem")
-                .style("fill", "none")
-                .text("");
+        else if (check == dim && check != "") {
+            let check_data = [];
+            test.forEach(function (arrayItem) {
+                let value;
+                if (arrayItem.key != dim && arrayItem.bottom != 320) {
+                    let max = parcoords.yScales[arrayItem.key].domain()[1];
+                        
+                    if (isNaN(max)) {
+                        value = parcoords.yScales[arrayItem.key](d[arrayItem.key]);
+                    }
+                    else {
+                        value = 240 / max * (max - d[arrayItem.key]) + 80;
+                    }  
+                    if(value > arrayItem.bottom) {
+                        check_data.push(data);
+                        d3.select("." + data).text(arrayItem.key);
+                    }
+                    else {
+                        d3.select("." + data).style("opacity", "0.7")
+                            .style("pointer-events", "stroke")
+                            .style("stroke", "rgb(0, 129, 175)")
+                            .style("stroke-width", "0.1rem")
+                            .style("fill", "none")
+                            .text("");
+                    }
+                }
+                else if (arrayItem.key != dim && arrayItem.top != 70) {
+                    let max = parcoords.yScales[arrayItem.key].domain()[1];
+                        
+                    if (isNaN(max)) {
+                        value = parcoords.yScales[arrayItem.key](d[arrayItem.key]);
+                    }
+                    else {
+                        value = 240 / max * (max - d[arrayItem.key]) + 80;
+                    }  
+                    if(value < arrayItem.top) {
+                        check_data.push(data);
+                        d3.select("." + data).text(arrayItem.key);
+                    }
+                    else {
+                        d3.select("." + data).style("opacity", "0.7")
+                            .style("pointer-events", "stroke")
+                            .style("stroke", "rgb(0, 129, 175)")
+                            .style("stroke-width", "0.1rem")
+                            .style("fill", "none")
+                            .text("");
+                    }
+                }
+                else {
+                    //do nothing
+                }
+
+            });
+            if(!check_data.includes(data)) {
+                d3.select("." + data).style("opacity", "0.7")
+                    .style("pointer-events", "stroke")
+                    .style("stroke", "rgb(0, 129, 175)")
+                    .style("stroke-width", "0.1rem")
+                    .style("fill", "none")
+                    .text("");
+            }
         }
         else {
-            //do nothing
+            // do nothing
         }
     });
+    return test;
 }
 
 export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {
@@ -156,8 +282,8 @@ export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales:
     }
 
     let y_bottom;
-    if (event.y + rect_height - 3 > 318) {
-        y_bottom = 318;
+    if (event.y + rect_height - 3 > 320) {
+        y_bottom = 320;
     }
     else {
         y_bottom = y_top + rect_height - 3;

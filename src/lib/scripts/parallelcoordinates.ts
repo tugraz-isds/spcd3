@@ -41,23 +41,23 @@ export default class SteerableParcoords {
         let y_top = d3.select("#rect_" + dimension).attr("y");
         let y_bottom = Number(y_top) + Number(height);
 
-        if(y_top > 80 && y_bottom < 317) {
-            let distance_bottom = 317 - d3.select("#triangle_down_" + dimension).attr("y");
+        if(y_top > 80 && y_bottom < 320) {
+            let distance_bottom = 320 - d3.select("#triangle_down_" + dimension).attr("y");
             d3.select("#rect_" + dimension).attr("y", 80 + distance_bottom);
             d3.select("#triangle_up_" + dimension).attr("y", 70 + distance_bottom);
             d3.select("#triangle_down_" + dimension).attr("y", 80 + distance_bottom + Number(height));
         }
-        else if (y_top > 80 && y_bottom >= 317) {
+        else if (y_top > 80 && y_bottom >= 320) {
             d3.select("#rect_" + dimension).attr("y", 80);
             d3.select("#rect_" + dimension).attr("height", 240-(y_top-80));
             d3.select("#triangle_up_" + dimension).attr("y", 70);
-            d3.select("#triangle_down_" + dimension).attr("y", 317-(y_top-80));
+            d3.select("#triangle_down_" + dimension).attr("y", 320-(y_top-80));
         }
-        else if (y_top <= 80 && y_bottom < 317) {
-            d3.select("#rect_" + dimension).attr("y", 317-height);
-            d3.select("#rect_" + dimension).attr("height", 240 - (317 - y_bottom));
-            d3.select("#triangle_up_" + dimension).attr("y", 80 + (317 - y_bottom)-10);
-            d3.select("#triangle_down_" + dimension).attr("y", 317);
+        else if (y_top <= 80 && y_bottom < 320) {
+            d3.select("#rect_" + dimension).attr("y", 320-height);
+            d3.select("#rect_" + dimension).attr("height", 240 - (320 - y_bottom));
+            d3.select("#triangle_up_" + dimension).attr("y", 80 + (320 - y_bottom)-10);
+            d3.select("#triangle_down_" + dimension).attr("y", 320);
         }        
 
         d3.select('g.inactive')
@@ -389,6 +389,7 @@ export default class SteerableParcoords {
             .each(function (d) {
                 let cleanDimension = d.name.replace(/ /g, '_');
                 cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+                test.push({key: d.name, top: 70, bottom: 320})
                 d3.select(this)
                     .append('g')
                         .attr('class', 'brush_' + cleanDimension)
@@ -401,7 +402,9 @@ export default class SteerableParcoords {
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowBottomBase64())
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomBase64()}') 8 8 , auto`)
                     .call(d3.drag()
-                        .on('drag', (event, d) => {brush.brushDown(cleanDimension, event, d, parcoords, active);}))
+                        .on('drag', (event, d) => {
+                            brush.brushDown(cleanDimension, event, d, parcoords, active, test);
+                        }))
                 });
 
         featureAxisG
@@ -413,13 +416,15 @@ export default class SteerableParcoords {
                         .attr('class', 'brush_' + cleanDimension)
                     .append('svg:image')
                         .attr('id', 'triangle_down_' + cleanDimension)
-                        .attr('y', 317)
+                        .attr('y', 320)
                         .attr('x', -5)
                         .attr('width', 10)
                         .attr('height', 12)
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopBase64()}') 8 8 , auto`)
-                    .call(d3.drag().on('drag', (event, d) => {brush.brushUp(cleanDimension, event, d, parcoords, active);}))
+                    .call(d3.drag().on('drag', (event, d) => {
+                        brush.brushUp(cleanDimension, event, d, parcoords, active, test);
+                    }))
                 });
        
         featureAxisG
