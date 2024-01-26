@@ -266,36 +266,38 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
     return currentPosOfDims;
 }
 
-export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {
+export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, currentPosOfDims: any, deltaY) {
     let cleanString = d.name.replace(/ /g, "_");
     cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
     var rect_height = svg.select("#rect_" + cleanString).node().getBoundingClientRect().height;
-    let y_top;
-    if (event.y < 80) {
-        y_top = 80;
-    }
-    else if (event.y + rect_height > 320) {
-        y_top = 320 - rect_height;
-    }
-    else {
-        y_top = event.y;
-    }
 
+
+    let y_top;
     let y_bottom;
-    if (event.y + rect_height - 3 > 320) {
+    let y_rect;
+    if (event.y + deltaY - 10 <= 70) {
+        y_top = 70;
+        y_bottom = 80 + rect_height;
+        y_rect = 80;
+    }
+    else if (event.y + deltaY + rect_height >= 320) {
+        y_top = 320 - rect_height - 10;
         y_bottom = 320;
+        y_rect = 320 - rect_height;
     }
     else {
-        y_bottom = y_top + rect_height - 3;
+        y_top = event.y + deltaY - 10;
+        y_bottom = y_rect + rect_height;
+        y_rect = y_top + 10;
     }
 
     if (rect_height < 240) {
         d3.select("#rect_" + cleanString)
-            .attr("y", y_top);
+            .attr("y", y_rect);
         d3.select("#triangle_up_" + cleanString)
-            .attr("y", y_top - 10);
+            .attr("y", y_top);
         d3.select("#triangle_down_" + cleanString)
-            .attr("y", y_bottom);
+            .attr("y", y_rect + rect_height);
 
         let dim = d.name;
         let max = parcoords.yScales[dim].domain()[1];
@@ -311,27 +313,22 @@ export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales:
             else {
                 value = 240 / max * (max - d[dim]) + 80;
             }
-            let check = d3.select("." + data).text();
-            let checkcolor = d3.select("." + data).style("stroke");
             
-            if ((value < event.y || value > event.y + rect_height)) {
+            if (value < y_top || value > y_top + rect_height) {
                 d3.select("." + data).style("pointer-events", "none")
                     .style("fill", "none")
                     .style("stroke", "lightgrey")
                     .style("stroke-opacity", "0.4")
-                    //.text(cleanString);
+                    .text(cleanString);
             }
-            else {//if (check === cleanString) {
+            else {
                 d3.select("." + data).style("opacity", "0.7")
                     .style("pointer-events", "stroke")
                     .style("stroke", "rgb(0, 129, 175)")
                     .style("stroke-width", "0.1rem")
                     .style("fill", "none")
-                    //.text("");
+                    .text("");
             }
-            /*else {
-                //do nothing
-            }*/
         });
     }
     else {

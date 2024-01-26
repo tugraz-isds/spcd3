@@ -427,6 +427,7 @@ export default class SteerableParcoords {
                     }))
                 });
        
+        let deltaY;
         featureAxisG
             .each(function (d) {
                 let cleanDimension = d.name.replace(/ /g, '_');
@@ -441,7 +442,14 @@ export default class SteerableParcoords {
                     .attr('x', -6)
                     .attr('y', 80)
                     .attr('fill',  'rgb(255, 255, 0, 0.4)')
-                    .call(d3.drag().on('drag', (event, d) => {brush.dragAndBrush(d, svg, event, parcoords, active);}))
+                    .call(d3.drag()
+                        .on('drag', (event, d) => {
+                            brush.dragAndBrush(d, svg, event, parcoords, active, currentPosOfDims, deltaY);
+                        })
+                        .on('start', (event, d) => {
+                            var current = d3.select("#rect_" + cleanDimension);
+                            deltaY = current.attr("y") - event.y;
+                        }))
                 });
 
         let tooltip_dim = d3.select('#parallelcoords')
