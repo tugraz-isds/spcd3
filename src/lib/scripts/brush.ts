@@ -266,11 +266,10 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
     return currentPosOfDims;
 }
 
-export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, currentPosOfDims: any, deltaY) {
+export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, deltaY: any) {
     let cleanString = d.name.replace(/ /g, "_");
     cleanString = cleanString.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
     var rect_height = svg.select("#rect_" + cleanString).node().getBoundingClientRect().height;
-
 
     let y_top;
     let y_rect;
