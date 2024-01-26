@@ -444,7 +444,7 @@ export default class SteerableParcoords {
                     .attr('fill',  'rgb(255, 255, 0, 0.4)')
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.dragAndBrush(d, svg, event, parcoords, active, deltaY);
+                            brush.dragAndBrush(cleanDimension, d, svg, event, parcoords, active, deltaY, currentPosOfDims);
                         })
                         .on('start', (event, d) => {
                             var current = d3.select("#rect_" + cleanDimension);
