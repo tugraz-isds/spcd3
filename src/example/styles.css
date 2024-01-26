@@ -84,7 +84,7 @@ div#parallelcoords {
   align-items: center;
 }
 
-div#checkboxHeader {
+div#showDimensionHeader {
   visibility: hidden;
   font-size: 1rem;
   font-weight: bold;
@@ -95,7 +95,7 @@ div#checkboxHeader {
   padding-top: 0.8rem;
 }
 
-div#invertContainerHeader {
+div#invertDimensionHeader {
   visibility: hidden;
   font-size: 1rem;
   font-weight: bold;
@@ -103,6 +103,32 @@ div#invertContainerHeader {
   padding-top: 0.8rem;
 }
 
-.checkboxContainer {
-  margin-right: 1.25rem;
+div#moveDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+span#moveDimensionContainer {
+  padding-top: 2rem;
+  margin-top: 2rem;
+}
+
+.arrow {
+  border: solid black;
+  border-width: 0 0.2rem 0.2rem 0;
+  display: inline-block;
+  padding: 0.2rem;
+}
+
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+.left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
 }

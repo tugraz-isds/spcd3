@@ -84,9 +84,69 @@ export default class SteerableParcoords {
 
     }
 
-    move(dimension, toRightOf, A)
-    {
+    move(dimension, direction, newData, newFeatures)
+    { 
+        let dataset = prepareData(newData, newFeatures);
+        let parcoords = {
+            xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
+            yScales : setupYScales(400, 80, dataset[0], dataset[1]),
+            dragging : {},
+            newFeatures : newFeatures,
+            features : dataset[0],
+            newDataset : dataset[1],
+            datasetForBrushing : dataset[1],
+        }
 
+        let inactive = d3.select('g.inactive').selectAll('path');
+        inactive.attr('visibility', 'hidden');
+        
+        let indexOfDimension = parcoords.newFeatures.indexOf(dimension);
+
+        let neighbour;
+        if (direction == 'right') {
+            neighbour = newFeatures[indexOfDimension-1];
+        }
+        else {
+            neighbour = newFeatures[indexOfDimension+1];
+        }
+        
+        let active = d3.select('g.active').selectAll('path');
+        let featureAxisG = d3.selectAll('#feature');
+        
+        let width = parcoords.newFeatures.length * 80;
+        let pos = parcoords.xScales(dimension);
+        let posNeighbour = parcoords.xScales(neighbour);
+
+        let distance = (width-80)/parcoords.newFeatures.length;
+
+        if (direction == 'right') {
+            parcoords.dragging[dimension] = pos + distance;
+            parcoords.dragging[neighbour] = posNeighbour - distance;
+        }
+        else {
+            parcoords.dragging[dimension] = pos - distance;
+            parcoords.dragging[neighbour] = posNeighbour + distance;
+        }
+            
+        if (direction == 'right') {
+            [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension-1]] = 
+            [parcoords.newFeatures[indexOfDimension-1], parcoords.newFeatures[indexOfDimension]];
+        }
+        else {
+            [parcoords.newFeatures[indexOfDimension+1], parcoords.newFeatures[indexOfDimension]] = 
+            [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension+1]];
+        }
+        
+        parcoords.xScales.domain(parcoords.newFeatures);
+
+        active.each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+        });
+
+        featureAxisG.attr('transform', (d) => {
+            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        })
     }
 
     getDimensionPositions()
@@ -136,12 +196,11 @@ export default class SteerableParcoords {
         {
             return function onDrag(d) {
                 parcoords.dragging[(d.subject).name] = Math.min(width-80, Math.max(80, this.__origin__ += d.x));
-        
+
                 active.each(function (d) {
                     d3.select(this)
                         .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-                })
-            
+                });  
                 parcoords.newFeatures.sort((a, b) => {
                     return position(b, parcoords.dragging, parcoords.xScales) - position(a, parcoords.dragging, parcoords.xScales) - 1;
                 });
@@ -181,7 +240,7 @@ export default class SteerableParcoords {
     }
 
     position(d, dragging, xScales) {
-        let v = dragging[d];    
+        let v = dragging[d];  
         return v == null ? xScales(d) : v;
     }
 
@@ -645,4 +704,4 @@ export default class SteerableParcoords {
 
 export const { invertD, setDimensions, generateSVG, select, position, onDragStartEventHandler, onDragEventHandler, transition, 
     onDragEndEventHandler, onInvert, prepareData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, 
-    doNotHighlight, createTooltipForPathLine, getAllPointerEventsData } = new SteerableParcoords();
+    doNotHighlight, createTooltipForPathLine, getAllPointerEventsData, move  } = new SteerableParcoords();
