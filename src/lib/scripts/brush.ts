@@ -273,21 +273,17 @@ export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales:
 
 
     let y_top;
-    let y_bottom;
     let y_rect;
     if (event.y + deltaY - 10 <= 70) {
         y_top = 70;
-        y_bottom = 80 + rect_height;
         y_rect = 80;
     }
     else if (event.y + deltaY + rect_height >= 320) {
         y_top = 320 - rect_height - 10;
-        y_bottom = 320;
         y_rect = 320 - rect_height;
     }
     else {
         y_top = event.y + deltaY - 10;
-        y_bottom = y_rect + rect_height;
         y_rect = y_top + 10;
     }
 
