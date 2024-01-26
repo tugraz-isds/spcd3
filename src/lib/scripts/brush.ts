@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as base64 from './base64Arrows'
 
-export function brushDown(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, test: any) {
+export function brushDown(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, currentPosOfDims: any) {
     let other_triangle = d3.select("#triangle_down_" + cleanString).attr("y");
     let new_y;
     if (event.y < 70) {
@@ -22,7 +22,7 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
     var key = "top";
     var new_obj = {};
     new_obj[key] = new_y;
-    const target = test.find((obj) => obj.key == d.name);
+    const target = currentPosOfDims.find((obj) => obj.key == d.name);
     Object.assign(target, new_obj);
 
     let rect_y;
@@ -74,7 +74,7 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
         }
         else if (check == dim && check != "") {
             let check_data = [];
-            test.forEach(function (arrayItem) {
+            currentPosOfDims.forEach(function (arrayItem) {
                 let value;
                 if (arrayItem.key != dim && arrayItem.top != 70) {
                     let max = parcoords.yScales[arrayItem.key].domain()[1];
@@ -98,7 +98,7 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
                             .text("");
                     }
                 }
-                else if(arrayItem.key != dim && arrayItem.bottom != 320) {
+                if(arrayItem.key != dim && arrayItem.bottom != 320) {
                     let max = parcoords.yScales[arrayItem.key].domain()[1];
                         
                     if (isNaN(max)) {
@@ -138,10 +138,10 @@ export function brushDown(cleanString: any, event: any, d: any, parcoords: { xSc
             // do nothing
         }
     });
-    return test;
+    return currentPosOfDims;
 }
 
-export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, test: any) {
+export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any, currentPosOfDims: any) {
     let other_triangle = d3.select("#triangle_up_" + cleanString).attr("y");
     let new_y;
     if (event.y < other_triangle) {
@@ -161,7 +161,7 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
     var key = "bottom";
     var new_obj = {};
     new_obj[key] = new_y;
-    const target = test.find((obj) => obj.key == d.name);
+    const target = currentPosOfDims.find((obj) => obj.key == d.name);
     Object.assign(target, new_obj);
 
     let height_bottom = 320 - new_y;
@@ -199,7 +199,7 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
         }
         else if (check == dim && check != "") {
             let check_data = [];
-            test.forEach(function (arrayItem) {
+            currentPosOfDims.forEach(function (arrayItem) {
                 let value;
                 if (arrayItem.key != dim && arrayItem.bottom != 320) {
                     let max = parcoords.yScales[arrayItem.key].domain()[1];
@@ -223,7 +223,7 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
                             .text("");
                     }
                 }
-                else if (arrayItem.key != dim && arrayItem.top != 70) {
+                if (arrayItem.key != dim && arrayItem.top != 70) {
                     let max = parcoords.yScales[arrayItem.key].domain()[1];
                         
                     if (isNaN(max)) {
@@ -263,7 +263,7 @@ export function brushUp(cleanString: any, event: any, d: any, parcoords: { xScal
             // do nothing
         }
     });
-    return test;
+    return currentPosOfDims;
 }
 
 export function dragAndBrush(d: any, svg: any, event: any, parcoords: { xScales: any; yScales: {}; dragging: {}; newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any) {

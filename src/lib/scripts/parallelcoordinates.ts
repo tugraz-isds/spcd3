@@ -277,7 +277,7 @@ export default class SteerableParcoords {
         let ids = [];
         let selected_path = null;
         let active = null;
-        let test = [];
+        let currentPosOfDims = [];
 
         let dataset = prepareData(content, newFeatures);
 
@@ -389,7 +389,7 @@ export default class SteerableParcoords {
             .each(function (d) {
                 let cleanDimension = d.name.replace(/ /g, '_');
                 cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-                test.push({key: d.name, top: 70, bottom: 320})
+                currentPosOfDims.push({key: d.name, top: 70, bottom: 320})
                 d3.select(this)
                     .append('g')
                         .attr('class', 'brush_' + cleanDimension)
@@ -403,7 +403,7 @@ export default class SteerableParcoords {
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomBase64()}') 8 8 , auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.brushDown(cleanDimension, event, d, parcoords, active, test);
+                            brush.brushDown(cleanDimension, event, d, parcoords, active, currentPosOfDims);
                         }))
                 });
 
@@ -423,7 +423,7 @@ export default class SteerableParcoords {
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopBase64()}') 8 8 , auto`)
                     .call(d3.drag().on('drag', (event, d) => {
-                        brush.brushUp(cleanDimension, event, d, parcoords, active, test);
+                        brush.brushUp(cleanDimension, event, d, parcoords, active, currentPosOfDims);
                     }))
                 });
        
