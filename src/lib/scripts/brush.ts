@@ -113,7 +113,7 @@ export function dragAndBrush(cleanString: any, d: any, svg: any, event: any, par
 
             let check = d3.select("." + data).text();
             
-            if (value < y_top || value > y_top + rect_height) {
+            if (value < y_rect || value > y_rect + rect_height) {
                 makeInactive(data, dim);
             }
             else if (check == dim && check != "") {
