@@ -4,7 +4,11 @@ let data;
 let newData;
 let newFeatures;
 let yAxis;
+let parcoords;
+let showDimensionData = [];
 let moveDimensionData;
+let invertDimensionData;
+let invertDimensionStatus = [];
 
 let inputButton = document.getElementById("input");
 inputButton.addEventListener("click", openFileDialog, false);
@@ -16,6 +20,10 @@ inputFile.addEventListener("click", (event) => {
 let downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", saveAsSvg, false);
 downloadButton.style.visibility = "hidden";
+
+let invertButton = document.getElementById("invertButton");
+invertButton.addEventListener("click", invertDimension, false);
+invertButton.style.visibility = "hidden";
 
 let moveRightButton = document.getElementById("moveRight");
 moveRightButton.addEventListener("click", moveDimensionRight, false);
@@ -42,10 +50,26 @@ function handleFileSelect(event) {
             selectDimensions();
             let selected_dimensions = getSelectedDimensions();
             newFeatures = setDimensions(selected_dimensions);
+            let dataset = prepareData(newData, newFeatures);
+            parcoords = {
+                xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
+                yScales : setupYScales(400, 80, dataset[0], dataset[1]),
+                dragging : {},
+                newFeatures : newFeatures,
+                features : dataset[0],
+                newDataset : dataset[1],
+                datasetForBrushing : dataset[1],
+            }
+            yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+            setShowDimensionDataInit(parcoords.newFeatures);
+            setInvertDimensionStatusInit(parcoords.newFeatures);
             generateDropdownForInvert();
             generateDropdownForMove();
+            generateDropdownForFilter();
             generateSVG(newData, newFeatures);
             downloadButton.style.visibility = "visible";
+            invertDimensionData = newFeatures[newFeatures.length-1];
+            invertButton.style.visibility = "visible";
             moveDimensionData = newFeatures[newFeatures.length-1];
             moveRightButton.style.visibility = "visible";
             moveLeftButton.style.visibility = "visible";
@@ -54,6 +78,36 @@ function handleFileSelect(event) {
         reader.readAsText(file);
     }
 }
+
+function setShowDimensionDataInit(newFeatures) {
+    for (let i = 0; i < newFeatures.length; i++) {
+        showDimensionData.push(newFeatures[i]);
+    }
+}
+
+/*function updateDimensions(dimension) {
+    let selected_dimensions = getSelectedDimensions(dimension);
+    let new_selected_dimensions = setDimensions(selected_dimensions);
+    generateSVG(newData, new_selected_dimensions);
+}
+
+Array.prototype.insert = function (index, ...items) {
+    this.splice( index, 0, ...items );
+};
+
+function getSelectedDimensions(dimension) {
+    let index = showDimensionData.indexOf(dimension);
+    if (index != -1) {
+        showDimensionData.splice(index);
+    }
+    else {
+        let tempArray = parcoords.newFeatures.slice();
+        let prevIndex = tempArray.reverse().indexOf(dimension);
+        showDimensionData.insert(prevIndex, dimension);
+    }
+    
+    return showDimensionData;
+}*/
 
 function updateDimensions() {
     let selected_dimensions = getSelectedDimensions();
@@ -67,7 +121,6 @@ function getSelectedDimensions() {
 }
 
 function selectDimensions() {
-
     let dimensions = newData["columns"];
 
     document.getElementById('showDimensionHeader').style.visibility = "visible";
@@ -88,20 +141,55 @@ function selectDimensions() {
     container.appendChild(dropdown);
 }
 
-function generateDropdownForInvert() {
-    let dataset = prepareData(newData, newFeatures);
 
-    let parcoords = {
-        xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
-        yScales : setupYScales(400, 80, dataset[0], dataset[1]),
-        dragging : {},
-        newFeatures : newFeatures,
-        features : dataset[0],
-        newDataset : dataset[1],
-        datasetForBrushing : dataset[1],
+/*function generateDropdownForShow() {
+
+    let dimensions = newData["columns"];
+    console.log(dimensions);
+
+    document.getElementById('showDimensionHeader').style.visibility = "visible";
+    const container = document.getElementById('showDimensionContainer');
+
+    const dropdown = document.createElement('select');
+    dropdown.onchange = () => {
+        updateDimensions(dropdown.value);
     }
-    yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
 
+    dimensions.forEach(function(dimension) {
+        let option = document.createElement("option");
+        option.textContent = dimension;
+        option.value = dimension;
+        option.selected = true;
+        dropdown.appendChild(option);
+    })
+    container.appendChild(dropdown);
+}*/
+
+function setInvertDimensionStatusInit(newFeatures) {
+    for (let i = 0; i < newFeatures.length; i++) {
+        invertDimensionStatus.push({key: newFeatures[i], invert: "up"});
+    }
+}
+
+function setInvertDimensionStatus(dimension) {
+    const dimensionStatus = invertDimensionStatus.find((obj) => obj.key == dimension);
+    
+    var new_status = {};
+    if(dimensionStatus.invert == "down") {
+        new_status["invert"] = "up";
+    }
+    else {
+        new_status["invert"] = "down";
+    }
+    Object.assign(dimensionStatus, new_status);
+}
+
+function getInvertDimensionStatus(dimension) {
+    const status = invertDimensionStatus.find((obj) => obj.key == dimension);
+    return status.invert;
+}
+
+function generateDropdownForInvert() {
     let dimensions = newData["columns"];
 
     document.getElementById('invertDimensionHeader').style.visibility = "visible";
@@ -109,7 +197,16 @@ function generateDropdownForInvert() {
     const container = document.getElementById('invertDimensionContainer');
 
     const dropdown = document.createElement('select');
-    dropdown.onchange = () => invertD(dropdown.value, newFeatures, parcoords, yAxis);
+    dropdown.onchange = () => {
+        invertDimensionData = dropdown.value;
+        let status = getInvertDimensionStatus(invertDimensionData);
+        if (status == "down") {
+            document.getElementById("arrow").className = "arrow down";
+        }
+        else {
+            document.getElementById("arrow").className = "arrow up";
+        }
+    }
 
     dimensions.forEach(function(dimension) {
         let option = document.createElement("option");
@@ -118,6 +215,18 @@ function generateDropdownForInvert() {
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
+}
+
+function invertDimension() {
+    invertD(invertDimensionData, newFeatures, parcoords, yAxis);
+    let className = document.getElementById("arrow");
+    if(className.className == "arrow down") {
+        document.getElementById("arrow").className = "arrow up";
+    }
+    else {
+        document.getElementById("arrow").className = "arrow down";
+    }
+    setInvertDimensionStatus(invertDimensionData);
 }
 
 function generateDropdownForMove() {
@@ -161,6 +270,25 @@ function moveDimensionLeft() {
 
 function moveDimensionRight() {
     move(moveDimensionData, 'right', newData, newFeatures);
+}
+
+function generateDropdownForFilter() {
+    let dimensions = newData["columns"];
+
+    document.getElementById('filterDimensionHeader').style.visibility = "visible";
+
+    const container = document.getElementById('filterDimensionContainer');
+
+    const dropdown = document.createElement('select');
+    //dropdown.onchange = () => invertD(dropdown.value, newFeatures, parcoords, yAxis);
+
+    dimensions.forEach(function(dimension) {
+        let option = document.createElement("option");
+        option.textContent = dimension;
+        option.value = dimension;
+        dropdown.appendChild(option);
+    })
+    container.appendChild(dropdown);
 }
 
 function clearPlot() {

@@ -111,6 +111,18 @@ div#moveDimensionHeader {
   padding-top: 0.8rem;
 }
 
+div#filterDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+span#filterDimensionContainer {
+  padding-right: 1rem;
+}
+
 span#moveDimensionContainer {
   padding-top: 2rem;
   margin-top: 2rem;
@@ -131,4 +143,21 @@ span#moveDimensionContainer {
 .left {
   transform: rotate(135deg);
   -webkit-transform: rotate(135deg);
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.sign {
+  border: solid black;
+  border-width: 0 0.2rem 0.2rem 0;
+  display: inline-block;
+  padding: 0.2rem;
 }
