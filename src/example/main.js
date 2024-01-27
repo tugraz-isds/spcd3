@@ -5,7 +5,8 @@ let newData;
 let newFeatures;
 let yAxis;
 let parcoords;
-let showDimensionData = [];
+let showDimensionData;
+let showDimensionStatus = [];
 let moveDimensionData;
 let invertDimensionData;
 let invertDimensionStatus = [];
@@ -20,6 +21,10 @@ inputFile.addEventListener("click", (event) => {
 let downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", saveAsSvg, false);
 downloadButton.style.visibility = "hidden";
+
+let showButton = document.getElementById("showButton");
+showButton.addEventListener("click", updateDimension, false);
+showButton.style.visibility = "hidden";
 
 let invertButton = document.getElementById("invertButton");
 invertButton.addEventListener("click", invertDimension, false);
@@ -47,9 +52,10 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
-            selectDimensions();
-            let selected_dimensions = getSelectedDimensions();
-            newFeatures = setDimensions(selected_dimensions);
+            generateDropdownForShow();
+            let selectedDimensions = getSelectedDimensions();
+            newFeatures = setDimensions(selectedDimensions);
+            showDimensionData = newFeatures[newFeatures.length-1];
             let dataset = prepareData(newData, newFeatures);
             parcoords = {
                 xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
@@ -68,6 +74,7 @@ function handleFileSelect(event) {
             generateDropdownForFilter();
             generateSVG(newData, newFeatures);
             downloadButton.style.visibility = "visible";
+            showButton.style.visibility = "visible";
             invertDimensionData = newFeatures[newFeatures.length-1];
             invertButton.style.visibility = "visible";
             moveDimensionData = newFeatures[newFeatures.length-1];
@@ -79,91 +86,88 @@ function handleFileSelect(event) {
     }
 }
 
+function getSelectedDimensions() {
+    var sel = document.getElementById("selectDim");
+    var opts = sel.options;
+    var array = new Array();
+    for(let i = 0; i < opts.length; i++)
+    {
+        array.push(opts[i].value);
+    }
+    return array;
+}
+
 function setShowDimensionDataInit(newFeatures) {
     for (let i = 0; i < newFeatures.length; i++) {
-        showDimensionData.push(newFeatures[i]);
+        showDimensionStatus.push({key: newFeatures[i], status: "in"});
     }
 }
 
-/*function updateDimensions(dimension) {
-    let selected_dimensions = getSelectedDimensions(dimension);
-    let new_selected_dimensions = setDimensions(selected_dimensions);
-    generateSVG(newData, new_selected_dimensions);
-}
-
-Array.prototype.insert = function (index, ...items) {
-    this.splice( index, 0, ...items );
-};
-
-function getSelectedDimensions(dimension) {
-    let index = showDimensionData.indexOf(dimension);
-    if (index != -1) {
-        showDimensionData.splice(index);
+function updateDimension() {
+    let className = document.getElementById("sign");
+    if(className.className == "sign in") {
+        document.getElementById("sign").className = "sign out";
     }
     else {
-        let tempArray = parcoords.newFeatures.slice();
-        let prevIndex = tempArray.reverse().indexOf(dimension);
-        showDimensionData.insert(prevIndex, dimension);
+        document.getElementById("sign").className = "sign in";
     }
+    setShowDimensionStatus(showDimensionData);
+    let selectedDimension = [];
     
-    return showDimensionData;
-}*/
-
-function updateDimensions() {
-    let selected_dimensions = getSelectedDimensions();
-    let new_selected_dimensions = setDimensions(selected_dimensions);
-    generateSVG(newData, new_selected_dimensions);
+    showDimensionStatus.forEach(function (item) {
+        if (item.status == "in") {
+            selectedDimension.push(item.key);
+        }
+    });
+    generateSVG(newData, selectedDimension);
 }
 
-function getSelectedDimensions() {
-    return Array.from(document.getElementById("selectDim").options)
-        .filter(option => option.selected).map(option => option.value);
+function setShowDimensionStatus(dimension) {
+    const dataStatus = showDimensionStatus.find((obj) => obj.key == dimension);
+
+    var new_status = {};
+    if(dataStatus.status == "in") {
+        new_status["status"] = "out";
+    }
+    else {
+        new_status["status"] = "in";
+    }
+    Object.assign(dataStatus, new_status);
 }
 
-function selectDimensions() {
+function getShowDimensionStatus(dimension) {
+    const data = showDimensionStatus.find((obj) => obj.key == dimension);
+    return data.status;
+}
+
+function generateDropdownForShow() {
+
     let dimensions = newData["columns"];
 
     document.getElementById('showDimensionHeader').style.visibility = "visible";
     const container = document.getElementById('showDimensionContainer');
 
     const dropdown = document.createElement('select');
-    dropdown.multiple = true;
     dropdown.id = "selectDim";
-    dropdown.addEventListener('change', updateDimensions);
-
-    dimensions.forEach(function(dimension) {
-        let option = document.createElement("option");
-        option.textContent = dimension;
-        option.value = dimension;
-        option.selected = true;
-        dropdown.appendChild(option);
-    })
-    container.appendChild(dropdown);
-}
-
-
-/*function generateDropdownForShow() {
-
-    let dimensions = newData["columns"];
-    console.log(dimensions);
-
-    document.getElementById('showDimensionHeader').style.visibility = "visible";
-    const container = document.getElementById('showDimensionContainer');
-
-    const dropdown = document.createElement('select');
     dropdown.onchange = () => {
-        updateDimensions(dropdown.value);
+        showDimensionData = dropdown.value;
+        let status = getShowDimensionStatus(showDimensionData);
+        if (status == "in") {
+            document.getElementById("sign").className = "sign in";
+        }
+        else {
+            document.getElementById("sign").className = "sign out";
+        }
     }
 
     dimensions.forEach(function(dimension) {
         let option = document.createElement("option");
         option.textContent = dimension;
         option.value = dimension;
-        option.selected = true;
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
-}*/
+}
 
 function setInvertDimensionStatusInit(newFeatures) {
     for (let i = 0; i < newFeatures.length; i++) {
