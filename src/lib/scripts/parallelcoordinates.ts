@@ -69,7 +69,7 @@ export default class SteerableParcoords {
         .transition()
         .delay(5)
         .duration(0)
-        .attr('visibility', null);      
+        .attr('visibility', 'hidden');      
     }
 
     onInvert(parcoords, yAxis) {
@@ -221,7 +221,7 @@ export default class SteerableParcoords {
                     .transition()
                     .delay(5)
                     .duration(0)
-                    .attr('visibility', null);
+                    .attr('visibility', 'hidden');
             };
         }
     }
