@@ -430,7 +430,7 @@ export default class SteerableParcoords {
                         .attr('width', 10)
                         .attr('height', 12)
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowBottomBase64())
-                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomBase64()}') 8 8 , auto`)
+                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
                             brush.brushDown(cleanDimension, event, d, parcoords, active, currentPosOfDims);
@@ -451,7 +451,7 @@ export default class SteerableParcoords {
                         .attr('width', 10)
                         .attr('height', 12)
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
-                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopBase64()}') 8 8 , auto`)
+                        .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag().on('drag', (event, d) => {
                         brush.brushUp(cleanDimension, event, d, parcoords, active, currentPosOfDims);
                     }))

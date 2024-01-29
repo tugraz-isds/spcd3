@@ -195,10 +195,10 @@ function generateDropdownForShow() {
         showDimensionData = dropdown.value;
         let status = getShowDimensionStatus(showDimensionData);
         if (status == "in") {
-            document.getElementById("sign").className = "sign in";
+            document.getElementById("sign").className = "sign out";
         }
         else {
-            document.getElementById("sign").className = "sign out";
+            document.getElementById("sign").className = "sign in";
         }
     }
 
@@ -279,7 +279,9 @@ function generateDropdownForMove() {
     const dropdown = document.createElement('select');
     dropdown.onchange = () => {
         moveDimensionData = dropdown.value;
+        
         let index = newFeatures.indexOf(moveDimensionData);
+
         if (index == 0) {
             document.getElementById("moveRight").disabled = true;
         }
@@ -302,14 +304,45 @@ function generateDropdownForMove() {
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
+    document.getElementById("moveLeft").disabled = true;
 }
 
 function moveDimensionLeft() {
     move(moveDimensionData, 'left', parcoords);
+    let index = newFeatures.indexOf(moveDimensionData);
+
+    if (index == 0) {
+        document.getElementById("moveRight").disabled = true;
+    }
+    else {
+        document.getElementById("moveRight").disabled = false;
+    }
+
+    if (index == newFeatures.length-1) {
+        document.getElementById("moveLeft").disabled = true;
+    }
+    else {
+        document.getElementById("moveLeft").disabled = false;
+    }
 }
 
 function moveDimensionRight() {
     move(moveDimensionData, 'right', parcoords);
+    let index = newFeatures.indexOf(moveDimensionData);
+
+    if (index == 0) {
+        document.getElementById("moveRight").disabled = true;
+    }
+    else {
+        document.getElementById("moveRight").disabled = false;
+    }
+
+    if (index == newFeatures.length-1) {
+        document.getElementById("moveLeft").disabled = true;
+    }
+    else {
+        document.getElementById("moveLeft").disabled = false;
+    }
 }
 
 function generateDropdownForFilter() {
