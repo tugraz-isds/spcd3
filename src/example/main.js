@@ -1,4 +1,4 @@
-import {loadCSV, initDataPrep, generateSVG, invertD, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg, move} from './lib/spcd3.js';
+import {loadCSV, initDataPrep, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg, move} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -258,7 +258,7 @@ function generateDropdownForInvert() {
 }
 
 function invertDimension() {
-    invertD(invertDimensionData, parcoords, yAxis);
+    invert(invertDimensionData, parcoords, yAxis);
     let className = document.getElementById("arrow");
     if(className.className == "arrow down") {
         document.getElementById("arrow").className = "arrow up";

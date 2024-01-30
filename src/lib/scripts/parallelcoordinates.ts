@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import * as base64 from './base64Arrows';
 import * as brush from './brush';
+import * as helper from './helper';
 
 export default class SteerableParcoords {
 
@@ -9,27 +10,25 @@ export default class SteerableParcoords {
         return newDimension.reverse();
     }
 
-    invertD(dimension, parcoords, yAxis) {
-        let cleanDimension = dimension.replace(/ /g,'_');
-        cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-        const invert_id = '#dimension_invert_' + cleanDimension;
-        const dimension_id = '#dimension_axis_' + cleanDimension;
-        const textElement = d3.select(invert_id);
-        const currentText = textElement.text();
-        const arrow = currentText === 'down' ? base64.getArrowUpBase64() : base64.getArrowDownBase64();
-        const arrowStyle = currentText === 'down' ? base64.getArrowDownBase64() : base64.getArrowUpBase64();
-        textElement.text(currentText === 'down' ? 'up' : 'down');
+    invert(dimension, parcoords, yAxis) {
+        const processedDimensionName = helper.cleanString(dimension);
+        const invertId = '#dimension_invert_' + processedDimensionName;
+        const dimensionId = '#dimension_axis_' + processedDimensionName;
+        const textElement = d3.select(invertId);
+        const currentArrowStatus = textElement.text();
+        const arrow = currentArrowStatus === 'down' ? base64.getArrowUpBase64() : base64.getArrowDownBase64();
+        const arrowStyle = currentArrowStatus === 'down' ? base64.getArrowDownBase64() : base64.getArrowUpBase64();
+        textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
         textElement.attr('href', 'data:image/svg+xml;base64,' + arrow)
         textElement.style('cursor', `url('data:image/svg+xml;base64,${arrowStyle}') 8 8 , auto`);
 
-        d3.select(dimension_id)
+        d3.select(dimensionId)
         .call(yAxis[dimension]
         .scale(parcoords.yScales[dimension]
         .domain(parcoords.yScales[dimension]
         .domain().reverse())))
         .transition();
 
-        // force update lines
         let active = d3.select('g.active')
             .selectAll('path')
             .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
@@ -38,28 +37,7 @@ export default class SteerableParcoords {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
-        let height = d3.select("#rect_" + dimension).node().getBoundingClientRect().height;
-        let y_top = d3.select("#rect_" + dimension).attr("y");
-        let y_bottom = Number(y_top) + Number(height);
-
-        if(y_top > 80 && y_bottom < 320) {
-            let distance_bottom = 320 - d3.select("#triangle_down_" + dimension).attr("y");
-            d3.select("#rect_" + dimension).attr("y", 80 + distance_bottom);
-            d3.select("#triangle_up_" + dimension).attr("y", 70 + distance_bottom);
-            d3.select("#triangle_down_" + dimension).attr("y", 80 + distance_bottom + Number(height));
-        }
-        else if (y_top > 80 && y_bottom >= 320) {
-            d3.select("#rect_" + dimension).attr("y", 80);
-            d3.select("#rect_" + dimension).attr("height", 240-(y_top-80));
-            d3.select("#triangle_up_" + dimension).attr("y", 70);
-            d3.select("#triangle_down_" + dimension).attr("y", 320-(y_top-80));
-        }
-        else if (y_top <= 80 && y_bottom < 320) {
-            d3.select("#rect_" + dimension).attr("y", 320-height);
-            d3.select("#rect_" + dimension).attr("height", 240 - (320 - y_bottom));
-            d3.select("#triangle_up_" + dimension).attr("y", 80 + (320 - y_bottom)-10);
-            d3.select("#triangle_down_" + dimension).attr("y", 320);
-        }
+        brush.addSettingsForBrushing(dimension, parcoords);
 
         d3.select('g.inactive')
         .selectAll('path')
@@ -75,14 +53,9 @@ export default class SteerableParcoords {
     onInvert(parcoords, yAxis) {
         {
             return function invertDim(event, d) {
-                invertD(d.name, parcoords, yAxis);
+                invert(d.name, parcoords, yAxis);
             };
         }
-    }
-
-    getInversionStatus(dimension)
-    {
-
     }
 
     move(dimension, direction, parcoords)
@@ -255,7 +228,6 @@ export default class SteerableParcoords {
         return v == null ? xScales(d) : v;
     }
 
-
     prepareData(data, newFeatures)
     {
         let newDataset = [];
@@ -341,7 +313,7 @@ export default class SteerableParcoords {
 
         resetSVG();
 
-        var { width, height, parcoords, active, ids, selected_path, yAxis, currentPosOfDims, padding } = initDataPrep(newFeatures, content);
+        var { width, height, parcoords, active, ids, selected_path, yAxis, padding } = initDataPrep(newFeatures, content);
 
         const svg = d3.select('#parallelcoords')
             .append('svg')
@@ -439,12 +411,12 @@ export default class SteerableParcoords {
             .each(function (d) {
                 let cleanDimension = d.name.replace(/ /g, '_');
                 cleanDimension = cleanDimension.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
-                currentPosOfDims.push({key: d.name, top: 70, bottom: 320})
+                parcoords.currentPosOfDims.push({key: d.name, top: 70, bottom: 320, isInverted: false})
                 d3.select(this)
                     .append('g')
                         .attr('class', 'brush_' + cleanDimension)
                     .append('svg:image')
-                        .attr('id', 'triangle_up_' + cleanDimension)
+                        .attr('id', 'triangle_down_' + cleanDimension)
                         .attr('y', 70)
                         .attr('x', -5)
                         .attr('width', 10)
@@ -453,7 +425,7 @@ export default class SteerableParcoords {
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.brushDown(cleanDimension, event, d, parcoords, active, currentPosOfDims);
+                            brush.brushDown(cleanDimension, event, d, parcoords, active);
                         }))
                 });
 
@@ -465,7 +437,7 @@ export default class SteerableParcoords {
                     .append('g')
                         .attr('class', 'brush_' + cleanDimension)
                     .append('svg:image')
-                        .attr('id', 'triangle_down_' + cleanDimension)
+                        .attr('id', 'triangle_up_' + cleanDimension)
                         .attr('y', 320)
                         .attr('x', -5)
                         .attr('width', 10)
@@ -473,7 +445,7 @@ export default class SteerableParcoords {
                         .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
                         .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag().on('drag', (event, d) => {
-                        brush.brushUp(cleanDimension, event, d, parcoords, active, currentPosOfDims);
+                        brush.brushUp(cleanDimension, event, d, parcoords, active);
                     }))
                 });
        
@@ -494,7 +466,7 @@ export default class SteerableParcoords {
                     .attr('fill',  'rgb(255, 255, 0, 0.4)')
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.dragAndBrush(cleanDimension, d, svg, event, parcoords, active, deltaY, currentPosOfDims);
+                            brush.dragAndBrush(cleanDimension, d, svg, event, parcoords, active, deltaY);
                         })
                         .on('start', (event, d) => {
                             var current = d3.select("#rect_" + cleanDimension);
@@ -592,7 +564,6 @@ export default class SteerableParcoords {
         let ids = [];
         let selected_path = null;
         let active = null;
-        let currentPosOfDims = [];
 
         let dataset = prepareData(content, newFeatures);
 
@@ -601,6 +572,7 @@ export default class SteerableParcoords {
             yScales: setupYScales(height, padding, dataset[0], dataset[1]),
             dragging: {},
             dragPosStart: {},
+            currentPosOfDims: [],
             newFeatures: newFeatures,
             features: dataset[0],
             newDataset: dataset[1],
@@ -608,7 +580,7 @@ export default class SteerableParcoords {
         };
 
         let yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
-        return { width, height, parcoords, active, ids, selected_path, yAxis, currentPosOfDims, padding };
+        return { width, height, parcoords, active, ids, selected_path, yAxis, padding };
     }
 
     linePath(d, newFeatures, parcoords) {
@@ -719,6 +691,6 @@ export default class SteerableParcoords {
     }
 }
 
-export const { invertD, setDimensions, generateSVG, select, position, onDragStartEventHandler, onDragEventHandler, transition, 
+export const { invert, setDimensions, generateSVG, select, position, onDragStartEventHandler, onDragEventHandler, transition, 
     onDragEndEventHandler, onInvert, prepareData, initDataPrep, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, 
-    doNotHighlight, createTooltipForPathLine, getAllPointerEventsData, move  } = new SteerableParcoords();
+    doNotHighlight, createTooltipForPathLine, getAllPointerEventsData, move } = new SteerableParcoords();
