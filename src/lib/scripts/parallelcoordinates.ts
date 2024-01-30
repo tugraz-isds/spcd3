@@ -137,6 +137,9 @@ export default class SteerableParcoords {
         featureAxisG.attr('transform', (d) => {
             return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         });
+
+        delete parcoords.dragging[dimension];
+        delete parcoords.dragging[neighbour];
     }
 
     getDimensionPositions()
@@ -177,6 +180,7 @@ export default class SteerableParcoords {
             {
                 this.__origin__ = parcoords.xScales((d.subject).name);
                 parcoords.dragging[(d.subject).name] = this.__origin__;
+                parcoords.dragPosStart[(d.subject).name] = this.__origin__;
                 inactive.attr('visibility', 'hidden');
             }
         }
@@ -205,12 +209,28 @@ export default class SteerableParcoords {
         }
     }
 
-    onDragEndEventHandler(parcoords, inactive, active) {
+    onDragEndEventHandler(parcoords, featureAxisG, inactive, active) {
         {
             return function onDragEnd(d) {
+                let width = parcoords.newFeatures.length * 80;
+                let distance = (width-80)/parcoords.newFeatures.length;
+                let init = parcoords.dragPosStart[(d.subject).name];
+
+                if (parcoords.dragPosStart[(d.subject).name] > parcoords.dragging[(d.subject).name]) {
+                    featureAxisG.attr('transform', (d) => {
+                        return 'translate(' + position(d.name, init-distance, parcoords.xScales) + ')';
+                    })
+                }
+                else {
+                    featureAxisG.attr('transform', (d) => {
+                        return 'translate(' + position(d.name, init+distance, parcoords.xScales) + ')';
+                    })
+                }
+
                 delete this.__origin__;
                 delete parcoords.dragging[(d.subject).name];
-                //transition(d3.select(this)).attr('transform', d => ('translate(' + xScales(d.name)  + ')'));
+                delete parcoords.dragPosStart[(d.subject).name];
+                
                 transition(active).each(function (d) {
                     d3.select(this)
                         .attr('d', linePath(d, parcoords.newFeatures, parcoords))
@@ -497,7 +517,7 @@ export default class SteerableParcoords {
             .call(d3.drag()
                 .on('start', onDragStartEventHandler(parcoords, inactive))
                 .on('drag', onDragEventHandler(parcoords, active, featureAxisG, width))
-                .on('end', onDragEndEventHandler(parcoords, inactive, active))
+                .on('end', onDragEndEventHandler(parcoords, featureAxisG, inactive, active))
             )
             .on('mouseover', function () {
                 return tooltip_dim.style('visibility', 'visible');
@@ -580,6 +600,7 @@ export default class SteerableParcoords {
             xScales: setupXScales(width, padding, dataset[0]),
             yScales: setupYScales(height, padding, dataset[0], dataset[1]),
             dragging: {},
+            dragPosStart: {},
             newFeatures: newFeatures,
             features: dataset[0],
             newDataset: dataset[1],
