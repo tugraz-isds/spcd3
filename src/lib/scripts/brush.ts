@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as base64 from './base64Arrows';
+import * as helper from './helper';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
@@ -27,8 +28,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     addPosition(yPosTop, parcoords.currentPosOfDims, d.name, "top");
     
     d3.select("#rect_" + cleanDimensionName)
-        .attr('cursor', `url('data:image/svg+xml;base64,
-        ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
+        .attr('cursor', `url('data:image/svg+xml;base64, ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
     
     d3.select("#triangle_down_" + cleanDimensionName).attr("y", yPosTop);
 
@@ -64,8 +64,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     addPosition(yPosBottom, parcoords.currentPosOfDims, d.name, "bottom");
 
     d3.select("#rect_" + cleanDimensionName)
-        .attr('cursor', `url('data:image/svg+xml;base64,
-        ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
+        .attr('cursor', `url('data:image/svg+xml;base64, ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
     
     d3.select("#triangle_up_" + cleanDimensionName).attr("y", yPosBottom);
 
@@ -280,31 +279,32 @@ function makeInactive(currentLineName: any, dimensionName: any) {
 }
 
 export function addSettingsForBrushing(dimensionName: any, parcoords: any) {
-    const rectHeight = d3.select("#rect_" + dimensionName).node().getBoundingClientRect().height;
-    const yPosRectTop = d3.select("#rect_" + dimensionName).attr("y");
+    const processedDimensionName = helper.cleanString(dimensionName);
+    const rectHeight = d3.select("#rect_" + processedDimensionName).node().getBoundingClientRect().height;
+    const yPosRectTop = d3.select("#rect_" + processedDimensionName).attr("y");
     const yPosRectBottom = Number(yPosRectTop) + rectHeight;
 
     if (yPosRectTop > 80 && yPosRectBottom < 320) {
-        const distanceBottom = 320 - d3.select("#triangle_up_" + dimensionName).attr("y");
-        d3.select("#rect_" + dimensionName).attr("y", 80 + distanceBottom);
-        d3.select("#triangle_down_" + dimensionName).attr("y", 70 + distanceBottom);
-        d3.select("#triangle_up_" + dimensionName).attr("y", 80 + distanceBottom + rectHeight);
+        const distanceBottom = 320 - d3.select("#triangle_up_" + processedDimensionName).attr("y");
+        d3.select("#rect_" + processedDimensionName).attr("y", 80 + distanceBottom);
+        d3.select("#triangle_down_" + processedDimensionName).attr("y", 70 + distanceBottom);
+        d3.select("#triangle_up_" + processedDimensionName).attr("y", 80 + distanceBottom + rectHeight);
         addPosition(70 + distanceBottom, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(80 + distanceBottom + rectHeight, parcoords.currentPosOfDims, dimensionName, "bottom");
     }
     else if (yPosRectTop > 80 && yPosRectBottom >= 320) {
-        d3.select("#rect_" + dimensionName).attr("y", 80);
-        d3.select("#rect_" + dimensionName).attr("height", 240 - (yPosRectTop - 80));
-        d3.select("#triangle_down_" + dimensionName).attr("y", 70);
-        d3.select("#triangle_up_" + dimensionName).attr("y", 320 - (yPosRectTop - 80));
+        d3.select("#rect_" + processedDimensionName).attr("y", 80);
+        d3.select("#rect_" + processedDimensionName).attr("height", 240 - (yPosRectTop - 80));
+        d3.select("#triangle_down_" + processedDimensionName).attr("y", 70);
+        d3.select("#triangle_up_" + processedDimensionName).attr("y", 320 - (yPosRectTop - 80));
         addPosition(70, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(320 - (yPosRectTop - 80), parcoords.currentPosOfDims, dimensionName, "bottom");
     }
     else if (yPosRectTop <= 80 && yPosRectBottom < 320) {
-        d3.select("#rect_" + dimensionName).attr("y", 320 - rectHeight);
-        d3.select("#rect_" + dimensionName).attr("height", 240 - (320 - yPosRectBottom));
-        d3.select("#triangle_down_" + dimensionName).attr("y", 80 + (320 - yPosRectBottom) - 10);
-        d3.select("#triangle_up_" + dimensionName).attr("y", 320);
+        d3.select("#rect_" + processedDimensionName).attr("y", 320 - rectHeight);
+        d3.select("#rect_" + processedDimensionName).attr("height", 240 - (320 - yPosRectBottom));
+        d3.select("#triangle_down_" + processedDimensionName).attr("y", 80 + (320 - yPosRectBottom) - 10);
+        d3.select("#triangle_up_" + processedDimensionName).attr("y", 320);
         addPosition(80 + (320 - yPosRectBottom) - 10, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(320, parcoords.currentPosOfDims, dimensionName, "bottom");
     }
