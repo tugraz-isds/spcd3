@@ -1,35 +1,35 @@
 import * as d3 from 'd3';
 import xmlFormat from 'xml-formatter';
 
-export function loadCSV(csv :string) {
-        let complete_arr = csv.split(/\r?\n/);
-        if (checkIfDuplicatesExists(complete_arr[0]))
+export function loadCSV(csv: string): any {
+        let completeArray = csv.split(/\r?\n/);
+        if (checkIfDuplicatesExists(completeArray[0]))
         {
             csv = removeDuplicateColumnNames(csv);
         }
-        let tmp_data = d3.csvParse(csv);
-        return tmp_data.sort((a,b) => a.Name > b.Name ? 1 : -1);
+        let tempData = d3.csvParse(csv);
+        return tempData.sort((a,b) => a.Name > b.Name ? 1 : -1);
 }
 
-export function removeDuplicateColumnNames(value :string) {
-    let complete_arr = value.split(/\r?\n/);
-    let column_string = d3.csvParse(complete_arr[0]);
+export function removeDuplicateColumnNames(value :string): any {
+    let completeArray = value.split(/\r?\n/);
+    let column_string = d3.csvParse(completeArray[0]);
     let n = 0;
     const unique = arr => arr.map((s => v => !s.has(v) && s.add(v) ? v : `${v}(${n+=1})`)(new Set));
-    complete_arr[0] = unique(column_string['columns']).toString();
-    return complete_arr.join('\r\n');
+    completeArray[0] = unique(column_string['columns']).toString();
+    return completeArray.join('\r\n');
 }
 
-export function checkIfDuplicatesExists(value :string) {
+export function checkIfDuplicatesExists(value :string): any {
     return new Set(value).size !== value.length
 }
 
-export function saveAsSvg() {
+export function saveAsSvg(): void {
     let svg = document.getElementById('pc_svg');
     saveSvg(svg, 'parcoords.svg');
 }
 
-export function saveSvg(data, name) {
+export function saveSvg(data: any, name: string): void {
     
     data.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     let svgData = data.outerHTML;

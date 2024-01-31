@@ -5,7 +5,7 @@ import * as helper from './helper';
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any) {
+    datasetForBrushing: any[]; }, active: any):void {
     
     const yPosBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
     
@@ -45,7 +45,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
 export function brushUp(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}, 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any) {
+    datasetForBrushing: any[]; }, active: any):void {
     
     const yPosTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     
@@ -80,7 +80,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any, delta: any) {
+    datasetForBrushing: any[]; }, active: any, delta: any):void {
     
     const rectHeight = svg.select("#rect_" + cleanDimensionName).node()
     .getBoundingClientRect().height;
@@ -154,13 +154,13 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
     }
 }
 
-function getLineName(d: any) {
+function getLineName(d: any):string {
     const keys = Object.keys(d);
     const key = keys[0];
-    return d[key].replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+    return helper.cleanLinePathString(d[key]);
 }
 
-export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: any, key: any) {
+export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: any, key: any):void {
     let newObject = {};
     newObject[key] = yPosTop;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
@@ -169,7 +169,7 @@ export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: 
 
 function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any, dimensionName: any, cleanDimensionName: any) {
+    datasetForBrushing: any[]; }, active: any, dimensionName: any, cleanDimensionName: any):void {
     
     const rangeTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     const rangeBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
@@ -220,7 +220,7 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
 function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
     features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, d: any, checkedLines: any[], 
-    currentLine: any) {
+    currentLine: any):void {
     
         if (positionItem.key != dimensionName && positionItem.top != 70) {
         
@@ -242,7 +242,7 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
 function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
     features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, d: any, checkedLines: any[], 
-    currentLine: any) {
+    currentLine: any):void {
     
     if (positionItem.key != dimensionName && positionItem.bottom != 320) {
         
@@ -261,7 +261,7 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
     }
 }
 
-function makeActive(currentLineName: any) {
+function makeActive(currentLineName: any):void {
     d3.select("." + currentLineName).style("opacity", "0.7")
         .style("pointer-events", "stroke")
         .style("stroke", "rgb(0, 129, 175)")
@@ -270,7 +270,7 @@ function makeActive(currentLineName: any) {
         .text("");
 }
 
-function makeInactive(currentLineName: any, dimensionName: any) {
+function makeInactive(currentLineName: any, dimensionName: any):void {
     d3.select("." + currentLineName).style("pointer-events", "none")
         .style("fill", "none")
         .style("stroke", "lightgrey")
@@ -278,7 +278,7 @@ function makeInactive(currentLineName: any, dimensionName: any) {
         .text(dimensionName);
 }
 
-export function addSettingsForBrushing(dimensionName: any, parcoords: any) {
+export function addSettingsForBrushing(dimensionName: any, parcoords: any):void {
     const processedDimensionName = helper.cleanString(dimensionName);
     const rectHeight = d3.select("#rect_" + processedDimensionName).node().getBoundingClientRect().height;
     const yPosRectTop = d3.select("#rect_" + processedDimensionName).attr("y");
@@ -317,12 +317,12 @@ export function addSettingsForBrushing(dimensionName: any, parcoords: any) {
     }
 }
 
-function getInvertStatus(key: any, currentPosOfDims: any) {
+function getInvertStatus(key: any, currentPosOfDims: any):boolean {
     const item = currentPosOfDims.find((object) => object.key == key);
     return item.isInverted;
 }
 
-function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any) {
+function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any):void {
     let newObject = {};
     newObject[key] = status;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
