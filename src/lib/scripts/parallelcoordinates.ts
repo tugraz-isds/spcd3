@@ -10,6 +10,12 @@ export default class SteerableParcoords {
     }
 
     invert(dimension: any, parcoords: any, yAxis: any): void {
+        if (parcoords.currentPosOfDims == undefined) {
+            parcoords.currentPosOfDims = [];
+            parcoords.newFeatures.forEach(function(item) {
+                parcoords.currentPosOfDims.push({ key: item, top: 70, bottom: 320, isInverted: false });
+            });
+        }
         const processedDimensionName = helper.cleanString(dimension);
         const invertId = '#dimension_invert_' + processedDimensionName;
         const dimensionId = '#dimension_axis_' + processedDimensionName;

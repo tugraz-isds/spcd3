@@ -1,4 +1,4 @@
-import {loadCSV, initDataPrep, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg, move} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg, move} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -30,14 +30,6 @@ let downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", saveAsSvg, false);
 downloadButton.style.visibility = "hidden";
 
-let showButton = document.getElementById("showButton");
-showButton.addEventListener("click", updateDimension, false);
-showButton.style.visibility = "hidden";
-
-let invertButton = document.getElementById("invertButton");
-invertButton.addEventListener("click", invertDimension, false);
-invertButton.style.visibility = "hidden";
-
 let moveRightButton = document.getElementById("moveRight");
 moveRightButton.addEventListener("click", moveDimensionRight, false);
 moveRightButton.style.visibility = "hidden";
@@ -60,7 +52,7 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
-            
+
             generateDropdownForShow();
             generateDropdownForInvert();
             generateDropdownForMove();
@@ -106,8 +98,6 @@ function initializeFunctionData() {
 
 function showButtons() {
     downloadButton.style.visibility = "visible";
-    showButton.style.visibility = "visible";
-    invertButton.style.visibility = "visible";
     moveRightButton.style.visibility = "visible";
     moveLeftButton.style.visibility = "visible";
 }
@@ -128,98 +118,95 @@ function prepareNewData(newFeatures, content) {
     yAxis = setupYAxis(features, yScales, newDataset);
 }
 
-function getSelectedDimensions() {
-    var select = document.getElementById("selectDim");
-    var options = select.options;
-    var dimensions = new Array();
-    for(let i = 0; i < options.length; i++)
-    {
-        dimensions.push(options[i].value);
-    }
-    return dimensions;
-}
-
 function setFunctionsDataInit(newFeatures) {
     for (let i = 0; i < newFeatures.length; i++) {
-        dimensionData.push({key: newFeatures[i], status: "in", invert: "up"});
+        dimensionData.push({key: newFeatures[i], status: "in", invert: false});
     }
 }
 
-function updateDimension() {
-    let className = document.getElementById("sign");
-    if(className.className == "sign in") {
-        document.getElementById("sign").className = "sign out";
-    }
-    else {
-        document.getElementById("sign").className = "sign in";
-    }
-    setShowDimensionStatus(showDimensionData);
-    let selectedDimension = [];
-    
-    dimensionData.forEach(function (item) {
-        if (item.status == "in") {
-            selectedDimension.push(item.key);
-        }
+function updateDimensions()
+{
+    let selectedDimensions = getSelectedDimensions();
+    let newSelectedDimensions = setDimensions(selectedDimensions);
+    generateSVG(newData, newSelectedDimensions);
+}
+
+function getSelectedDimensions()
+{
+    const checkboxes = document.querySelectorAll('input[name="dimension"]:checked');
+    const checkedDimensions = [];
+
+    checkboxes.forEach(function(checkbox) {
+        checkedDimensions.push(checkbox.value);
     });
-    generateSVG(newData, selectedDimension);
-}
 
-function setShowDimensionStatus(dimension) {
-    const dataStatus = dimensionData.find((obj) => obj.key == dimension);
-
-    var new_status = {};
-    if(dataStatus.status == "in") {
-        new_status["status"] = "out";
-    }
-    else {
-        new_status["status"] = "in";
-    }
-    Object.assign(dataStatus, new_status);
-}
-
-function getShowDimensionStatus(dimension) {
-    const data = dimensionData.find((obj) => obj.key == dimension);
-    return data.status;
+    return checkedDimensions;
 }
 
 function generateDropdownForShow() {
 
     let dimensions = newData["columns"];
-
+    
     document.getElementById('showDimensionHeader').style.visibility = "visible";
+
     const container = document.getElementById('showDimensionContainer');
 
-    const dropdown = document.createElement('select');
-    dropdown.id = "selectDim";
-    dropdown.onchange = () => {
-        showDimensionData = dropdown.value;
-        let status = getShowDimensionStatus(showDimensionData);
-        if (status == "in") {
-            document.getElementById("sign").className = "sign out";
-        }
-        else {
-            document.getElementById("sign").className = "sign in";
-        }
-    }
+    let selectButton = document.createElement('button');
+    selectButton.id = 'showButton';
+    //selectButton.textContent = 'Select Dimensions';
+    selectButton.addEventListener("click", (event) => {
+        showOptions('options');
+    });
+
+    let textElement = document.createElement('span');
+    textElement.textContent = 'Show Dimensions';
+    selectButton.appendChild(textElement);
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'options';
+    dimensionContainer.style.display = 'none';
+    dimensionContainer.style.border = '0.1rem lightgrey solid';
+    dimensionContainer.style.width = 'max-content';
+    dimensionContainer.style.borderRadius = '0.2rem';
+    dimensionContainer.name = 'options';
+    dimensionContainer.addEventListener("change", (event) => {
+        updateDimensions();
+    });
 
     dimensions.forEach(function(dimension) {
-        let option = document.createElement("option");
-        option.textContent = dimension;
-        option.value = dimension;
-        dropdown.appendChild(option);
+        let label = document.createElement('label');
+        let input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = dimension;
+        input.value = dimension;
+        input.name = 'dimension';
+        input.checked = true;
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(dimension));
+        dimensionContainer.appendChild(label);
     })
-    container.appendChild(dropdown);
+
+    container.appendChild(selectButton);
+    container.appendChild(dimensionContainer);
 }
+
+function showOptions(id) {
+    
+    let checkboxes =  document.getElementById(id);
+    
+    checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
+        checkboxes.style.display = 'none';
+  }
 
 function setInvertDimensionStatus(dimension) {
     const dimensionStatus = dimensionData.find((obj) => obj.key == dimension);
     
     var new_status = {};
-    if(dimensionStatus.invert == "down") {
-        new_status["invert"] = "up";
+    if(dimensionStatus.invert == false) {
+        new_status["invert"] = true;
     }
     else {
-        new_status["invert"] = "down";
+        new_status["invert"] = false;
     }
     Object.assign(dimensionStatus, new_status);
 }
@@ -231,42 +218,69 @@ function getInvertDimensionStatus(dimension) {
 
 function generateDropdownForInvert() {
     let dimensions = newData["columns"];
-
+    
     document.getElementById('invertDimensionHeader').style.visibility = "visible";
 
     const container = document.getElementById('invertDimensionContainer');
 
-    const dropdown = document.createElement('select');
-    dropdown.onchange = () => {
-        invertDimensionData = dropdown.value;
-        let status = getInvertDimensionStatus(invertDimensionData);
-        if (status == "down") {
-            document.getElementById("arrow").className = "arrow down";
-        }
-        else {
-            document.getElementById("arrow").className = "arrow up";
-        }
-    }
+    let selectButton = document.createElement('button');
+    selectButton.id = 'invertButton';
+    //selectButton.textContent = 'Select Dimensions';
+    selectButton.addEventListener("click", (event) => {
+        showOptions('invertOptions');
+    });
+
+    let textElement = document.createElement('span');
+    textElement.textContent = 'Invert Dimensions';
+    selectButton.appendChild(textElement);
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'invertOptions';
+    dimensionContainer.style.display = 'none';
+    dimensionContainer.style.border = '0.1rem lightgrey solid';
+    dimensionContainer.style.width = 'max-content';
+    dimensionContainer.style.borderRadius = '0.2rem';
+    dimensionContainer.name = 'invertOptions';
+    dimensionContainer.addEventListener("click", (event) => {
+        invertDimension();
+    });
 
     dimensions.forEach(function(dimension) {
-        let option = document.createElement("option");
-        option.textContent = dimension;
-        option.value = dimension;
-        dropdown.appendChild(option);
+        let label = document.createElement('label');
+        let input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = dimension;
+        input.value = dimension;
+        input.name = 'invertDimension';
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(dimension));
+        dimensionContainer.appendChild(label);
     })
-    container.appendChild(dropdown);
+
+    container.appendChild(selectButton);
+    container.appendChild(dimensionContainer);
 }
 
 function invertDimension() {
-    invert(invertDimensionData, parcoords, yAxis);
-    let className = document.getElementById("arrow");
-    if(className.className == "arrow down") {
-        document.getElementById("arrow").className = "arrow up";
-    }
-    else {
-        document.getElementById("arrow").className = "arrow down";
-    }
-    setInvertDimensionStatus(invertDimensionData);
+    const checkedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:checked');
+    const uncheckedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:not(:checked)');
+
+
+    checkedCheckboxes.forEach(function(checkbox) {
+        const isChecked = getInvertDimensionStatus(checkbox.value);
+        if(isChecked == false) {
+            invert(checkbox.value, parcoords, yAxis);
+            setInvertDimensionStatus(checkbox.value);
+        }   
+    });
+
+    uncheckedCheckboxes.forEach(function(checkbox) {
+        const isUnchecked = getInvertDimensionStatus(checkbox.value);
+        if(isUnchecked == true) {
+            invert(checkbox.value, parcoords, yAxis);
+            setInvertDimensionStatus(checkbox.value);
+        }
+    });
 }
 
 function generateDropdownForMove() {
