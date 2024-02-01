@@ -57,14 +57,17 @@ function handleFileSelect(event) {
             generateDropdownForInvert();
             generateDropdownForMove();
             generateDropdownForFilter();
+            
             let selectedDimensions = getSelectedDimensions();
             newFeatures = setDimensions(selectedDimensions);
+            
             for(let i = 0; i < newFeatures.length; i++) {
                 newFeaturesCopy[i] = newFeatures[i];
             }
             let dataset = prepareData(newData, newFeatures);
             newDatasetCopy = dataset[1];
             featuresCopy = dataset[0];
+            
             parcoords = {
                 xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
                 yScales : setupYScales(400, 80, dataset[0], dataset[1]),
@@ -75,47 +78,24 @@ function handleFileSelect(event) {
                 datasetForBrushing : dataset[1],
             }
             yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
-            initializeFunctionData();
-
-            prepareNewData(newFeatures, newData);
 
             setFunctionsDataInit(newFeatures);
-            
-            
             showButtons();
+
             generateSVG(newData, newFeatures);
         };
-
         reader.readAsText(file);
     }
-}
-
-function initializeFunctionData() {
-    showDimensionData = newFeatures[newFeatures.length - 1];
-    invertDimensionData = newFeatures[newFeatures.length - 1];
-    moveDimensionData = newFeatures[newFeatures.length - 1];
 }
 
 function showButtons() {
     downloadButton.style.visibility = "visible";
     moveRightButton.style.visibility = "visible";
     moveLeftButton.style.visibility = "visible";
-}
-
-function prepareNewData(newFeatures, content) {
-    const padding = 80;
-    const width = newFeatures.length * padding;
-    const height = 400;
-
-    let dataset = prepareData(content, newFeatures);
-
-    xScales = setupXScales(width, padding, dataset[0]),
-    yScales = setupYScales(height, padding, dataset[0], dataset[1]),
-    features = dataset[0],
-    newDataset = dataset[1],
-    datasetForBrushing = dataset[1]
-
-    yAxis = setupYAxis(features, yScales, newDataset);
+    moveRightButton.disabled = true;
+    moveRightButton.style.opacity = 0.5;
+    moveLeftButton.disabled = true;
+    moveLeftButton.style.opacity = 0.5;
 }
 
 function setFunctionsDataInit(newFeatures) {
@@ -143,6 +123,14 @@ function getSelectedDimensions()
     return checkedDimensions;
 }
 
+function showOptions(id) {
+    
+    let checkboxes =  document.getElementById(id);
+    
+    checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
+        checkboxes.style.display = 'none';
+}
+
 function generateDropdownForShow() {
 
     let dimensions = newData["columns"];
@@ -153,7 +141,6 @@ function generateDropdownForShow() {
 
     let selectButton = document.createElement('button');
     selectButton.id = 'showButton';
-    //selectButton.textContent = 'Select Dimensions';
     selectButton.addEventListener("click", (event) => {
         showOptions('options');
     });
@@ -190,14 +177,6 @@ function generateDropdownForShow() {
     container.appendChild(dimensionContainer);
 }
 
-function showOptions(id) {
-    
-    let checkboxes =  document.getElementById(id);
-    
-    checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
-        checkboxes.style.display = 'none';
-  }
-
 function setInvertDimensionStatus(dimension) {
     const dimensionStatus = dimensionData.find((obj) => obj.key == dimension);
     
@@ -225,7 +204,6 @@ function generateDropdownForInvert() {
 
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
-    //selectButton.textContent = 'Select Dimensions';
     selectButton.addEventListener("click", (event) => {
         showOptions('invertOptions');
     });
@@ -293,23 +271,13 @@ function generateDropdownForMove() {
     const dropdown = document.createElement('select');
     dropdown.onchange = () => {
         moveDimensionData = dropdown.value;
-        
-        let index = newFeatures.indexOf(moveDimensionData);
-
-        if (index == 0) {
-            document.getElementById("moveRight").disabled = true;
-        }
-        else {
-            document.getElementById("moveRight").disabled = false;
-        }
-
-        if (index == newFeatures.length-1) {
-            document.getElementById("moveLeft").disabled = true;
-        }
-        else {
-            document.getElementById("moveLeft").disabled = false;
-        }
+        disableLeftAndRightButton();
     }
+
+    const headline = document.createElement("option");
+    headline.selected = "disabled";
+    headline.textContent = "Move dimension";
+    dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
         let option = document.createElement("option");
@@ -321,41 +289,35 @@ function generateDropdownForMove() {
     document.getElementById("moveLeft").disabled = true;
 }
 
-function moveDimensionLeft() {
+function moveDimensionLeft() {  
     move(moveDimensionData, 'left', parcoords);
-    let index = newFeatures.indexOf(moveDimensionData);
-
-    if (index == 0) {
-        document.getElementById("moveRight").disabled = true;
-    }
-    else {
-        document.getElementById("moveRight").disabled = false;
-    }
-
-    if (index == newFeatures.length-1) {
-        document.getElementById("moveLeft").disabled = true;
-    }
-    else {
-        document.getElementById("moveLeft").disabled = false;
-    }
+    disableLeftAndRightButton();
 }
 
 function moveDimensionRight() {
     move(moveDimensionData, 'right', parcoords);
+    disableLeftAndRightButton();
+}
+
+function disableLeftAndRightButton() {
     let index = newFeatures.indexOf(moveDimensionData);
 
-    if (index == 0) {
+    if (index == 0 || index == -1) {
         document.getElementById("moveRight").disabled = true;
+        document.getElementById("moveRight").style.opacity = 0.5;
     }
     else {
         document.getElementById("moveRight").disabled = false;
+        document.getElementById("moveRight").style.opacity = 1;
     }
 
-    if (index == newFeatures.length-1) {
+    if (index == newFeatures.length - 1 || index == -1) {
         document.getElementById("moveLeft").disabled = true;
+        document.getElementById("moveLeft").style.opacity = 0.5;
     }
     else {
         document.getElementById("moveLeft").disabled = false;
+        document.getElementById("moveLeft").style.opacity = 1;
     }
 }
 
@@ -368,6 +330,11 @@ function generateDropdownForFilter() {
 
     const dropdown = document.createElement('select');
     //dropdown.onchange = () => invertD(dropdown.value, newFeatures, parcoords, yAxis);
+
+    const headline = document.createElement("option");
+    headline.selected = "disabled";
+    headline.textContent = "Filter dimension";
+    dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
         let option = document.createElement("option");
