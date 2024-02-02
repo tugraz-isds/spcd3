@@ -1,22 +1,10 @@
-import {loadCSV, generateSVG, invert, setDimensions, prepareData, setupYScales, setupXScales, setupYAxis, saveAsSvg, move} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move} from './lib/spcd3.js';
 
 let data;
 let newData;
 let newFeatures = [];
-let showDimensionData;
 let dimensionData = [];
 let moveDimensionData;
-let invertDimensionData;
-let yScales;
-let xScales;
-let features;
-let featuresCopy;
-let newDataset;
-let newDatasetCopy = [];
-let newFeaturesCopy = [];
-let yAxis;
-let parcoords = {};
-let datasetForBrushing = [];
 
 let inputButton = document.getElementById("input");
 inputButton.addEventListener("click", openFileDialog, false);
@@ -60,24 +48,6 @@ function handleFileSelect(event) {
             
             let selectedDimensions = getSelectedDimensions();
             newFeatures = setDimensions(selectedDimensions);
-            
-            for(let i = 0; i < newFeatures.length; i++) {
-                newFeaturesCopy[i] = newFeatures[i];
-            }
-            let dataset = prepareData(newData, newFeatures);
-            newDatasetCopy = dataset[1];
-            featuresCopy = dataset[0];
-            
-            parcoords = {
-                xScales : setupXScales(newFeatures.length * 80, 80, dataset[0]),
-                yScales : setupYScales(400, 80, dataset[0], dataset[1]),
-                dragging : {},
-                newFeatures : newFeatures,
-                features : dataset[0],
-                newDataset : dataset[1],
-                datasetForBrushing : dataset[1],
-            }
-            yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
 
             setFunctionsDataInit(newFeatures);
             showButtons();
@@ -177,16 +147,11 @@ function generateDropdownForShow() {
     container.appendChild(dimensionContainer);
 }
 
-function setInvertDimensionStatus(dimension) {
+function setInvertDimensionStatus(dimension, invertStatus) {
     const dimensionStatus = dimensionData.find((obj) => obj.key == dimension);
     
     var new_status = {};
-    if(dimensionStatus.invert == false) {
-        new_status["invert"] = true;
-    }
-    else {
-        new_status["invert"] = false;
-    }
+    new_status["invert"] = invertStatus;
     Object.assign(dimensionStatus, new_status);
 }
 
@@ -243,20 +208,19 @@ function invertDimension() {
     const checkedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:checked');
     const uncheckedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:not(:checked)');
 
-
     checkedCheckboxes.forEach(function(checkbox) {
         const isChecked = getInvertDimensionStatus(checkbox.value);
         if(isChecked == false) {
-            invert(checkbox.value, parcoords, yAxis);
-            setInvertDimensionStatus(checkbox.value);
+            invert(checkbox.value);
+            setInvertDimensionStatus(checkbox.value, true);
         }   
     });
 
     uncheckedCheckboxes.forEach(function(checkbox) {
         const isUnchecked = getInvertDimensionStatus(checkbox.value);
         if(isUnchecked == true) {
-            invert(checkbox.value, parcoords, yAxis);
-            setInvertDimensionStatus(checkbox.value);
+            invert(checkbox.value);
+            setInvertDimensionStatus(checkbox.value, false);
         }
     });
 }
@@ -290,12 +254,12 @@ function generateDropdownForMove() {
 }
 
 function moveDimensionLeft() {  
-    move(moveDimensionData, 'left', parcoords);
+    move(moveDimensionData, 'left');
     disableLeftAndRightButton();
 }
 
 function moveDimensionRight() {
-    move(moveDimensionData, 'right', parcoords);
+    move(moveDimensionData, 'right');
     disableLeftAndRightButton();
 }
 
