@@ -605,7 +605,7 @@ export default class SteerableParcoords {
         
         window.padding = 80;
         window.width = newFeatures.length * window.padding;
-        window.height = 420;
+        window.height = 400;
 
         let dataset = prepareData(data, newFeatures);
 
