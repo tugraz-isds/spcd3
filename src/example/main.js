@@ -208,7 +208,6 @@ function generateDropdownForInvert() {
 }
 
 function invertDimension(dimension) {
-    setFilter(dimension);
     invert(dimension);
 }
 
