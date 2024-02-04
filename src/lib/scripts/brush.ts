@@ -4,8 +4,8 @@ import * as helper from './helper';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any):void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
+    active: any):void {
     
     const yPosBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
     
@@ -44,8 +44,8 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
 
 export function brushUp(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}, 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any):void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
+    active: any):void {
     
     const yPosTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     
@@ -79,8 +79,8 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 
 export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any, delta: any):void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
+    active: any, delta: any):void {
     
     const rectHeight = svg.select("#rect_" + cleanDimensionName).node()
     .getBoundingClientRect().height;
@@ -154,6 +154,69 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
     }
 }
 
+export function filter(dimensionName: any, topValue: any, bottomValue: any, parcoords: 
+    { xScales: any; yScales: {}; currentPosOfDims: any[]; newFeatures: any;}): void {
+
+    const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
+    const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
+    parcoords.yScales[dimensionName].domain()[0];
+
+    let topPosition: any;
+        let bottomPosition: any;
+        if(invertStatus) {
+            topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
+            240 / maxValue * bottomValue + 80;
+            bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
+            240 / maxValue * topValue + 80;
+        }
+        else {
+            topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
+                240 / maxValue * (maxValue - topValue) + 80;
+            bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
+                240 / maxValue * (maxValue - bottomValue) + 80;
+        }
+
+    addPosition(topPosition, parcoords.currentPosOfDims, dimensionName, "top");
+    addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, "bottom");
+
+    const cleanDimensionName = helper.cleanString(dimensionName);
+    
+    let rectHeight = 240 - ((topPosition - 80) + (320 - bottomPosition));
+
+    d3.select("#rect_" + cleanDimensionName)
+        .attr("y", topPosition);
+    d3.select("#triangle_down_" + cleanDimensionName)
+        .attr("y", topPosition-10);
+    d3.select("#triangle_up_" + cleanDimensionName)
+        .attr("y", bottomPosition);
+    d3.select("#rect_" + cleanDimensionName)
+        .attr("height", rectHeight);
+        
+    let active = d3.select('g.active').selectAll('path');
+
+    active.each(function (d) {
+        const currentLine = getLineName(d);
+
+        let value : any;
+        if(invertStatus) {
+            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
+                240 / maxValue * d[dimensionName] + 80;
+        }
+        else {
+            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
+                240 / maxValue * (maxValue - d[dimensionName]) + 80;
+        }
+            
+        if (value < topPosition || value > bottomPosition) {
+            makeInactive(currentLine, dimensionName);
+        }
+        else {
+            // do nothing
+        }
+    });
+}
+
+
 function getLineName(d: any):string {
     const keys = Object.keys(d);
     const key = keys[0];
@@ -168,8 +231,8 @@ export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: 
 }
 
 function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-    datasetForBrushing: any[]; }, active: any, dimensionName: any, cleanDimensionName: any):void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
+    active: any, dimensionName: any, cleanDimensionName: any):void {
     
     const rangeTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     const rangeBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
@@ -219,7 +282,7 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
 
 function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, d: any, checkedLines: any[], 
+    features: any[]; newDataset: any[];}, d: any, checkedLines: any[], 
     currentLine: any):void {
     
         if (positionItem.key != dimensionName && positionItem.top != 70) {
@@ -241,7 +304,7 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
 
 function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, d: any, checkedLines: any[], 
+    features: any[]; newDataset: any[];}, d: any, checkedLines: any[], 
     currentLine: any):void {
     
     if (positionItem.key != dimensionName && positionItem.bottom != 320) {

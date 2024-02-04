@@ -18,8 +18,7 @@ declare global {
         newFeatures: any,
         features: any[],
         newDataset: any,
-        data: any,
-        datasetForBrushing: {},
+        data: any
     };
 }
 
@@ -358,8 +357,8 @@ export default class SteerableParcoords {
 
     setActivePathLines(svg: any, content: any, ids: any[], 
         parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-        datasetForBrushing: any[]; }): any {
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+        }): any {
 
         let selectedPath: any;
         
@@ -418,8 +417,8 @@ export default class SteerableParcoords {
 
     setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
         parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; 
-        datasetForBrushing: any[]; }, width: any, padding: any): void {
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; }, 
+        width: any, padding: any): void {
 
         let featureAxis = svg.selectAll('g.feature')
             .data(parcoords.features)
@@ -451,7 +450,7 @@ export default class SteerableParcoords {
 
     setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {};
         dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-        features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, yAxis: any): void {
+        features: any[]; newDataset: any[];}, yAxis: any): void {
         
         featureAxis
             .append('svg')
@@ -473,8 +472,7 @@ export default class SteerableParcoords {
 
     setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {}; 
         dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-        features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, inactive: any, 
-        active: any, width: any): void {
+        features: any[]; newDataset: any[]}, inactive: any, active: any, width: any): void {
         
         let tooltipFeatures = d3.select('#parallelcoords')
             .append('g')
@@ -531,7 +529,7 @@ export default class SteerableParcoords {
 
     setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yScales: {}; 
         dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-        features: any[]; newDataset: any[]; datasetForBrushing: any[]; }, active: any): void {
+        features: any[]; newDataset: any[]; }, active: any): void {
         
         let delta: any;
         featureAxis
@@ -560,7 +558,7 @@ export default class SteerableParcoords {
 
     setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
         dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-        newDataset: any[]; datasetForBrushing: any[]; }, active: any): void {
+        newDataset: any[];}, active: any): void {
         
         featureAxis
             .each(function (d) {
@@ -584,7 +582,7 @@ export default class SteerableParcoords {
 
     setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
         dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-        newDataset: any[]; datasetForBrushing: any[]; }, active: any): void {
+        newDataset: any[];}, active: any): void {
         
         featureAxisG
             .each(function (d) {
@@ -626,7 +624,6 @@ export default class SteerableParcoords {
         window.parcoords.features = dataset[0];
         window.parcoords.newDataset = dataset[1];
         window.parcoords.data = data;
-        window.parcoords.datasetForBrushing = dataset[1];
 
         window.yAxis = {};
         window.yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
@@ -634,7 +631,7 @@ export default class SteerableParcoords {
 
     setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
         yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
-        newFeatures: any; features: any[]; newDataset: any[]; datasetForBrushing: any[]; }): void {
+        newFeatures: any; features: any[]; newDataset: any[];}): void {
         
         return svg.append('g')
             .attr('class', 'inactive')
@@ -769,9 +766,9 @@ export default class SteerableParcoords {
 
     }
 
-    setFilter(dimension)
+    setFilter(dimension, topValue, bottomValue)
     {
-
+        brush.filter(dimension, topValue, bottomValue, parcoords);
     }
 
     getSelected()
@@ -784,4 +781,4 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter } = new SteerableParcoords();

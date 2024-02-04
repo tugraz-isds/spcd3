@@ -1,4 +1,5 @@
-import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, getInvertStatus, getDimensionPositions} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, 
+    getInvertStatus, getDimensionPositions, setFilter} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -128,6 +129,7 @@ function generateDropdownForShow() {
 
     dimensions.forEach(function(dimension) {
         let label = document.createElement('label');
+        label.id = "dropdownLabel";
         let input = document.createElement('input');
         input.type = 'checkbox';
         input.id = dimension;
@@ -190,6 +192,7 @@ function generateDropdownForInvert() {
 
     dimensions.forEach(function(dimension) {
         let label = document.createElement('label');
+        label.id = "dropdownLabel";
         let input = document.createElement('input');
         input.type = 'checkbox';
         input.id = 'invert_' + dimension;
@@ -205,6 +208,7 @@ function generateDropdownForInvert() {
 }
 
 function invertDimension(dimension) {
+    setFilter(dimension);
     invert(dimension);
 }
 
@@ -233,7 +237,7 @@ function generateDropdownForMove() {
 
     const headline = document.createElement("option");
     headline.selected = "disabled";
-    headline.textContent = "Move dimension";
+    headline.textContent = "Move Dimension";
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
@@ -286,11 +290,17 @@ function generateDropdownForFilter() {
     const container = document.getElementById('filterDimensionContainer');
 
     const dropdown = document.createElement('select');
-    //dropdown.onchange = () => invertD(dropdown.value, newFeatures, parcoords, yAxis);
+    dropdown.onchange = (event) => {
+        const container = document.getElementById("filterDimensionInputFields");
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        generateInputFieldsForSetRange(event.target.value);
+    }
 
     const headline = document.createElement("option");
     headline.selected = "disabled";
-    headline.textContent = "Filter dimension";
+    headline.textContent = "Set Range";
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
@@ -300,6 +310,45 @@ function generateDropdownForFilter() {
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
+}
+
+function generateInputFieldsForSetRange(dimension) {
+  const container = document.getElementById("filterDimensionInputFields");
+
+  const labelTop = document.createElement("label");
+  labelTop.for = "topRange";
+  labelTop.appendChild(document.createTextNode("First value:"));
+
+  const inputTextElementTop = document.createElement("input");
+  inputTextElementTop.type = "text";
+  inputTextElementTop.id = "topRange";
+  inputTextElementTop.name = "topRange";
+  inputTextElementTop.style.width = "1.5rem";
+
+  const labelBottom = document.createElement("label");
+  labelBottom.for = "bottomRange";
+  labelBottom.appendChild(document.createTextNode("Second value:"));
+
+  const inputTextElementBottom = document.createElement("input");
+  inputTextElementBottom.type = "text";
+  inputTextElementBottom.id = "bottomRange";
+  inputTextElementBottom.name = "bottomRange";
+  inputTextElementBottom.style.width = "1.5rem";
+
+  const filterButton = document.createElement("button");
+  filterButton.id = "filterButton";
+  filterButton.textContent = "Filter";
+  filterButton.addEventListener("click", () => {
+     let top = document.getElementById('topRange').value;
+     let bottom = document.getElementById('bottomRange').value;
+     setFilter(dimension, top, bottom);
+  });
+
+  container.appendChild(labelTop);
+  container.appendChild(inputTextElementTop);
+  container.appendChild(labelBottom);
+  container.appendChild(inputTextElementBottom);
+  container.appendChild(filterButton);
 }
 
 function clearPlot() {
