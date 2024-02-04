@@ -90,6 +90,13 @@ export default class SteerableParcoords {
         }
     }
 
+    getInvertStatus(dimension: any): boolean {
+        const invertId = '#dimension_invert_' + helper.cleanString(dimension);
+        const element = d3.select(invertId);
+        const arrowStatus = element.text();
+        return arrowStatus == 'up' ? true : false; 
+    }
+
     move(dimension: any, direction: any): void {
 
         let parcoords = window.parcoords;
@@ -777,4 +784,4 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus } = new SteerableParcoords();

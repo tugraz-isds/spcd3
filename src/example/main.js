@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, getInvertStatus} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -147,19 +147,6 @@ function generateDropdownForShow() {
     container.appendChild(dimensionContainer);
 }
 
-function setInvertDimensionStatus(dimension, invertStatus) {
-    const dimensionStatus = dimensionData.find((obj) => obj.key == dimension);
-    
-    var new_status = {};
-    new_status["invert"] = invertStatus;
-    Object.assign(dimensionStatus, new_status);
-}
-
-function getInvertDimensionStatus(dimension) {
-    const status = dimensionData.find((obj) => obj.key == dimension);
-    return status.invert;
-}
-
 function generateDropdownForInvert() {
     let dimensions = newData["columns"];
     
@@ -171,9 +158,20 @@ function generateDropdownForInvert() {
     selectButton.id = 'invertButton';
     selectButton.addEventListener("click", (event) => {
         showOptions('invertOptions');
+        for (let i = 0; i < newFeatures.length; i++) {
+            const isInverted = getInvertStatus(newFeatures[i]);
+            console.log(newFeatures[i] + ' ' + isInverted);
+            if (isInverted == true) {
+                document.getElementById('invert_' + newFeatures[i]).checked = true;
+            }
+            else {
+                document.getElementById('invert_' + newFeatures[i]).checked = false;
+            }
+        }
     });
 
     let textElement = document.createElement('span');
+    textElement.id = 'invertText';
     textElement.textContent = 'Invert Dimensions';
     selectButton.appendChild(textElement);
 
@@ -185,14 +183,18 @@ function generateDropdownForInvert() {
     dimensionContainer.style.borderRadius = '0.2rem';
     dimensionContainer.name = 'invertOptions';
     dimensionContainer.addEventListener("click", (event) => {
-        invertDimension();
+        invertDimension(event.target.value);
+        let checkboxes =  document.getElementById('invertOptions');
+        checkboxes.style.display = 'none';
+        //let label = document.getElementById('invertText');
+        //label.textContent = event.target.value;
     });
 
     dimensions.forEach(function(dimension) {
         let label = document.createElement('label');
         let input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = dimension;
+        input.id = 'invert_' + dimension;
         input.value = dimension;
         input.name = 'invertDimension';
         label.appendChild(input);
@@ -204,25 +206,8 @@ function generateDropdownForInvert() {
     container.appendChild(dimensionContainer);
 }
 
-function invertDimension() {
-    const checkedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:checked');
-    const uncheckedCheckboxes = document.querySelectorAll('input[name="invertDimension"]:not(:checked)');
-
-    checkedCheckboxes.forEach(function(checkbox) {
-        const isChecked = getInvertDimensionStatus(checkbox.value);
-        if(isChecked == false) {
-            invert(checkbox.value);
-            setInvertDimensionStatus(checkbox.value, true);
-        }   
-    });
-
-    uncheckedCheckboxes.forEach(function(checkbox) {
-        const isUnchecked = getInvertDimensionStatus(checkbox.value);
-        if(isUnchecked == true) {
-            invert(checkbox.value);
-            setInvertDimensionStatus(checkbox.value, false);
-        }
-    });
+function invertDimension(dimension) {
+    invert(dimension);
 }
 
 function generateDropdownForMove() {
