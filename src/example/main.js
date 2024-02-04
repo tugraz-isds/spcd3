@@ -1,9 +1,8 @@
-import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, getInvertStatus} from './lib/spcd3.js';
+import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, getInvertStatus, getDimensionPositions} from './lib/spcd3.js';
 
 let data;
 let newData;
 let newFeatures = [];
-let dimensionData = [];
 let moveDimensionData;
 
 let inputButton = document.getElementById("input");
@@ -49,7 +48,6 @@ function handleFileSelect(event) {
             let selectedDimensions = getSelectedDimensions();
             newFeatures = setDimensions(selectedDimensions);
 
-            setFunctionsDataInit(newFeatures);
             showButtons();
 
             generateSVG(newData, newFeatures);
@@ -66,12 +64,6 @@ function showButtons() {
     moveRightButton.style.opacity = 0.5;
     moveLeftButton.disabled = true;
     moveLeftButton.style.opacity = 0.5;
-}
-
-function setFunctionsDataInit(newFeatures) {
-    for (let i = 0; i < newFeatures.length; i++) {
-        dimensionData.push({key: newFeatures[i], status: "in", invert: false});
-    }
 }
 
 function updateDimensions()
@@ -128,6 +120,10 @@ function generateDropdownForShow() {
     dimensionContainer.name = 'options';
     dimensionContainer.addEventListener("change", (event) => {
         updateDimensions();
+        disableLeftAndRightButton();
+        disableCheckbox(event.target.value);
+        let checkboxes =  document.getElementById('options');
+        checkboxes.style.display = 'none';
     });
 
     dimensions.forEach(function(dimension) {
@@ -159,13 +155,15 @@ function generateDropdownForInvert() {
     selectButton.addEventListener("click", (event) => {
         showOptions('invertOptions');
         for (let i = 0; i < newFeatures.length; i++) {
-            const isInverted = getInvertStatus(newFeatures[i]);
-            console.log(newFeatures[i] + ' ' + isInverted);
-            if (isInverted == true) {
-                document.getElementById('invert_' + newFeatures[i]).checked = true;
-            }
-            else {
-                document.getElementById('invert_' + newFeatures[i]).checked = false;
+            const position = getDimensionPositions(newFeatures[i]);
+            if (position != -1) {
+                const isInverted = getInvertStatus(newFeatures[i]);
+                if (isInverted == true) {
+                    document.getElementById('invert_' + newFeatures[i]).checked = true;
+                }
+                else {
+                    document.getElementById('invert_' + newFeatures[i]).checked = false;
+                }
             }
         }
     });
@@ -182,7 +180,7 @@ function generateDropdownForInvert() {
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     dimensionContainer.name = 'invertOptions';
-    dimensionContainer.addEventListener("click", (event) => {
+    dimensionContainer.addEventListener("change", (event) => {
         invertDimension(event.target.value);
         let checkboxes =  document.getElementById('invertOptions');
         checkboxes.style.display = 'none';
@@ -208,6 +206,16 @@ function generateDropdownForInvert() {
 
 function invertDimension(dimension) {
     invert(dimension);
+}
+
+function disableCheckbox(dimension) {
+    let position = getDimensionPositions(dimension);
+    if (position != -1) {
+        document.getElementById('invert_' + dimension).disabled = false;
+    }
+    else {
+        document.getElementById('invert_' + dimension).disabled = true;
+    }
 }
 
 function generateDropdownForMove() {
@@ -249,9 +257,9 @@ function moveDimensionRight() {
 }
 
 function disableLeftAndRightButton() {
-    let index = newFeatures.indexOf(moveDimensionData);
-
-    if (index == 0 || index == -1) {
+    let position = getDimensionPositions(moveDimensionData);
+    
+    if (position == 0 || position == -1) {
         document.getElementById("moveRight").disabled = true;
         document.getElementById("moveRight").style.opacity = 0.5;
     }
@@ -260,7 +268,7 @@ function disableLeftAndRightButton() {
         document.getElementById("moveRight").style.opacity = 1;
     }
 
-    if (index == newFeatures.length - 1 || index == -1) {
+    if (position == newFeatures.length - 1 || position == -1) {
         document.getElementById("moveLeft").disabled = true;
         document.getElementById("moveLeft").style.opacity = 0.5;
     }

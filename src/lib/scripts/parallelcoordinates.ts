@@ -759,9 +759,9 @@ export default class SteerableParcoords {
         return data;
     }
 
-    getDimensionPositions()
+    getDimensionPositions(dimension)
     {
-
+        return parcoords.newFeatures.indexOf(dimension);
     }
 
     getFilter(dimension)
@@ -784,4 +784,4 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions } = new SteerableParcoords();
