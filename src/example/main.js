@@ -31,6 +31,9 @@ let filterButton = document.getElementById("filterButton");
 filterButton.addEventListener("click", filter, false);
 filterButton.style.visibility = "hidden";
 
+window.onclick = () => {
+    checkboxes.style.display = 'none' }
+
 function openFileDialog() {
     document.getElementById('fileInput').click();
 }
@@ -128,6 +131,7 @@ function generateDropdownForShow() {
         updateDimensions();
         disableLeftAndRightButton();
         disableCheckbox(event.target.value);
+        disableOptionForFiltering(event.target.value);
         let checkboxes =  document.getElementById('options');
         checkboxes.style.display = 'none';
     });
@@ -226,6 +230,16 @@ function disableCheckbox(dimension) {
     }
 }
 
+function disableOptionForFiltering(dimension) {
+    let position = getDimensionPositions(dimension);
+    if (position != -1) {
+        document.getElementById("option_" + dimension).disabled = false;
+    }
+    else {
+        document.getElementById("option_" + dimension).disabled = true;
+    }
+}
+
 function generateDropdownForMove() {
     let dimensions = newData["columns"];
 
@@ -308,6 +322,7 @@ function generateDropdownForFilter() {
         let option = document.createElement("option");
         option.textContent = dimension;
         option.value = dimension;
+        option.id = "option_" + dimension;
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
@@ -364,12 +379,12 @@ function filter() {
         
         if (!isNaN(topLimit)) {
             if (isNaN(top) || isNaN(bottom)) {
-                alert(`Attention: Value/s is/are not number/s! 
+                alert(`Attention: Values are not numbers! 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
             if (top > topLimit || bottom < bottomLimit) {
-                alert(`Attention: Value/s is/are out of range. 
+                alert(`Attention: Values are out of range. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
@@ -378,12 +393,12 @@ function filter() {
     else {
         if (!isNaN(topLimit)) {
             if (isNaN(top) || isNaN(bottom)) {
-                alert(`Attention: Value/s is/are not number/s! 
+                alert(`Attention: Values are not numbers! 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
             if (bottom < topLimit || top > bottomLimit) {
-                alert(`Attention: Value/s is/are out of range. 
+                alert(`Attention: Values are out of range. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
@@ -392,6 +407,8 @@ function filter() {
 
     if (isOk) {
         setFilter(filterDimensionData, top, bottom);
+        document.getElementById('filterDimensionInputFieldTop').value = "";
+        document.getElementById('filterDimensionInputFieldBottom').value = "";
     }
 }
 
@@ -405,7 +422,6 @@ function clearPlot() {
     const filterButton = document.getElementById("filterButton");
     const inputTextElementTop = document.getElementById("filterDimensionInputFieldTop");
     const inputTextElementBottom = document.getElementById("filterDimensionInputFieldBottom");
-
 
     while (parentElement.firstChild) {
         parentElement.removeChild(parentElement.firstChild);
@@ -422,11 +438,9 @@ function clearPlot() {
     while (filterContainer.firstChild) {
         filterContainer.removeChild(filterContainer.firstChild);
     }
+
     rangeContainer.style.visibility = "hidden";
     filterButton.style.visibility = "hidden";
-    inputTextElementTop.value = "";
-    inputTextElementBottom.value = "";
     inputTextElementTop.style.visibility = "hidden";
     inputTextElementBottom.style.visibility = "hidden";
 }
-

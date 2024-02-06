@@ -280,6 +280,7 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
                 checkAllPositionsBottom(item, dimensionName, parcoords, d, 
                     checkedLines, currentLine);
             });
+            console.log(checkedLines);
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
             }
@@ -297,19 +298,19 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
     
         if (positionItem.key != dimensionName && positionItem.top != 70) {
         
-        const maxValue = parcoords.yScales[positionItem.key].domain()[1];
+            const maxValue = parcoords.yScales[positionItem.key].domain()[1];
 
-        const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                240 / maxValue * (maxValue - d[positionItem.key]) + 80;
+            const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
+                    240 / maxValue * (maxValue - d[positionItem.key]) + 80;
 
-        if (value < positionItem.top) {
-            checkedLines.push(currentLine);
-            d3.select("." + currentLine).text(positionItem.key);
+            if (value < positionItem.top) {
+                checkedLines.push(currentLine);
+                d3.select("." + currentLine).text(positionItem.key);
+            }
+            else {
+                //makeActive(currentLine);
+            }
         }
-        else {
-            makeActive(currentLine);
-        }
-    }
 }
 
 function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
@@ -317,21 +318,21 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
     features: any[]; newDataset: any[];}, d: any, checkedLines: any[], 
     currentLine: any):void {
     
-    if (positionItem.key != dimensionName && positionItem.bottom != 320) {
-        
-        const maxValue = parcoords.yScales[positionItem.key].domain()[1];
+        if (positionItem.key != dimensionName && positionItem.bottom != 320) {
+            
+            const maxValue = parcoords.yScales[positionItem.key].domain()[1];
 
-        const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                240 / maxValue * (maxValue - d[positionItem.key]) + 80;
+            const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
+                    240 / maxValue * (maxValue - d[positionItem.key]) + 80;
 
-        if (value > positionItem.bottom) {
-            checkedLines.push(currentLine);
-            d3.select("." + currentLine).text(positionItem.key);
+            if (value > positionItem.bottom) {
+                checkedLines.push(currentLine);
+                d3.select("." + currentLine).text(positionItem.key);
+            }
+            else {
+                //makeActive(currentLine);
+            }
         }
-        else {
-            makeActive(currentLine);
-        }
-    }
 }
 
 function makeActive(currentLineName: any):void {
