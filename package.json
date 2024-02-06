@@ -9,7 +9,6 @@
     "/dist/library"
   ],
   "scripts": {
-    "test": "tsc -d",
     "clean": "npx gulp clean",
     "build": "npx gulp build",
     "serve": "npx gulp serve"
@@ -43,10 +42,10 @@
     "rollup-plugin-gzip": "^2.5.0",
     "browser-sync": "^2.27.5",
     "url": "^0.11.3",
-    "xml-formatter": "^3.6.2"
+    "xml-formatter": "^3.6.2",
+    "mini-svg-data-uri": "^1.4.4"
   },
   "dependencies": {
-    "d3": "^7.8.5",
-    "gulp-typescript": "^6.0.0-alpha.1"
+    "d3": "^7.8.5"
   }
 }

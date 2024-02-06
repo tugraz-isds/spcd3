@@ -2,6 +2,8 @@ import * as d3 from 'd3';
 import * as base64 from './base64Arrows';
 import * as brush from './brush';
 import * as helper from './helper';
+import * as icon from './icons';
+import * as svgToTinyDataUri from 'mini-svg-data-uri';
 
 declare global {
     let padding: any;
@@ -46,10 +48,10 @@ export default class SteerableParcoords {
         const dimensionId = '#dimension_axis_' + processedDimensionName;
         const textElement = d3.select(invertId);
         const currentArrowStatus = textElement.text();
-        const arrow = currentArrowStatus === 'down' ? base64.getArrowUpBase64() : base64.getArrowDownBase64();
+        const arrow = currentArrowStatus === 'down' ? icon.getArrowUp() : icon.getArrowDown();
         const arrowStyle = currentArrowStatus === 'down' ? base64.getArrowDownBase64() : base64.getArrowUpBase64();
         textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
-        textElement.attr('href', 'data:image/svg+xml;base64,' + arrow);
+        textElement.attr('href', svgToTinyDataUri.default(arrow));
         textElement.style('cursor', `url('data:image/svg+xml;base64,${arrowStyle}') 8 8 , auto`);
 
         d3.select(dimensionId)
@@ -459,7 +461,7 @@ export default class SteerableParcoords {
             .append('image')
             .attr('width', 12)
             .attr('height', 12)
-            .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowDownBase64())
+            .attr('href', svgToTinyDataUri.default(icon.getArrowDown()))
             .each(function (d) {
                 const processedDimensionName = helper.cleanString(d.name);
                 d3.select(this)
@@ -572,7 +574,7 @@ export default class SteerableParcoords {
                     .attr('x', -5)
                     .attr('width', 10)
                     .attr('height', 12)
-                    .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowTopBase64())
+                    .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
                     .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowTopCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag().on('drag', (event, d) => {
                         brush.brushUp(processedDimensionName, event, d, parcoords, active);
@@ -597,7 +599,7 @@ export default class SteerableParcoords {
                     .attr('x', -5)
                     .attr('width', 10)
                     .attr('height', 12)
-                    .attr('href', 'data:image/svg+xml;base64,' + base64.getArrowBottomBase64())
+                    .attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
                     .attr('cursor', `url('data:image/svg+xml;base64,${base64.getArrowBottomCursorBase64()}') 8 8 , auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
