@@ -150,6 +150,22 @@ span#moveDimensionContainer {
   width: max-content;
 }
 
+#filterDimensionContainer {
+  padding-bottom: 1rem;
+}
+
 label {
   font-size: smaller;
+}
+
+.filterLabel {
+  padding-top: 1rem;
+  font-size: smaller;
+}
+
+.filterInput {
+  visibility: hidden;
+  width: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }

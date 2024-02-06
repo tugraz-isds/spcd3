@@ -756,9 +756,13 @@ export default class SteerableParcoords {
         return data;
     }
 
-    getDimensionPositions(dimension)
+    getDimensionPositions(dimension: string):any
     {
         return parcoords.newFeatures.indexOf(dimension);
+    }
+
+    getDimensionRange(dimension: string):any {
+        return parcoords.yScales[dimension].domain();     
     }
 
     getFilter(dimension)
@@ -781,4 +785,4 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange } = new SteerableParcoords();

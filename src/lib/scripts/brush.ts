@@ -155,7 +155,8 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 }
 
 export function filter(dimensionName: any, topValue: any, bottomValue: any, parcoords: 
-    { xScales: any; yScales: {}; currentPosOfDims: any[]; newFeatures: any;}): void {
+    { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; 
+    newFeatures: any; features: any[]; newDataset: any[];}): void {
 
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
@@ -193,9 +194,10 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         .attr("height", rectHeight);
         
     let active = d3.select('g.active').selectAll('path');
-
+    const emptyString = "";
     active.each(function (d) {
         const currentLine = getLineName(d);
+        const dimNameToCheck = d3.select("." + currentLine).text();
 
         let value : any;
         if(invertStatus) {
@@ -210,8 +212,16 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         if (value < topPosition || value > bottomPosition) {
             makeInactive(currentLine, dimensionName);
         }
-        else {
-            // do nothing
+        else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
+            let checkedLines = [];
+            parcoords.currentPosOfDims.forEach(function (item) {
+                checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
+                checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
+                
+            });
+            if(!checkedLines.includes(currentLine)) {
+                makeActive(currentLine);
+            }
         }
     });
 }

@@ -1,10 +1,11 @@
 import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, 
-    getInvertStatus, getDimensionPositions, setFilter} from './lib/spcd3.js';
+    getInvertStatus, getDimensionPositions, setFilter, getDimensionRange} from './lib/spcd3.js';
 
 let data;
 let newData;
 let newFeatures = [];
 let moveDimensionData;
+let filterDimensionData;
 
 let inputButton = document.getElementById("input");
 inputButton.addEventListener("click", openFileDialog, false);
@@ -25,6 +26,10 @@ moveRightButton.style.visibility = "hidden";
 let moveLeftButton = document.getElementById("moveLeft");
 moveLeftButton.addEventListener("click", moveDimensionLeft, false);
 moveLeftButton.style.visibility = "hidden";
+
+let filterButton = document.getElementById("filterButton");
+filterButton.addEventListener("click", filter, false);
+filterButton.style.visibility = "hidden";
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -290,11 +295,8 @@ function generateDropdownForFilter() {
 
     const dropdown = document.createElement('select');
     dropdown.onchange = (event) => {
-        const container = document.getElementById("filterDimensionInputFields");
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-        generateInputFieldsForSetRange(event.target.value);
+        filterDimensionData = event.target.value;
+        generateInputFieldsForSetRange();
     }
 
     const headline = document.createElement("option");
@@ -311,37 +313,30 @@ function generateDropdownForFilter() {
     container.appendChild(dropdown);
 }
 
-function generateInputFieldsForSetRange(dimension) {
-  const container = document.getElementById("filterDimensionInputFields");
+function generateInputFieldsForSetRange() {
+  const container = document.getElementById("rangeContainer");
+  const filterButton = document.getElementById("filterButton");
+  const labelTop = document.getElementById("filterDimensionLabelTop");
+  const labelBottom = document.getElementById("filterDimensionLabelBottom");
+  const inputTextElementTop = document.getElementById("filterDimensionInputFieldTop");
+  const inputTextElementBottom = document.getElementById("filterDimensionInputFieldBottom");
 
-  const labelTop = document.createElement("label");
-  labelTop.for = "topRange";
-  labelTop.appendChild(document.createTextNode("First value:"));
+  container.style.visibility = "visible";
 
-  const inputTextElementTop = document.createElement("input");
-  inputTextElementTop.type = "text";
-  inputTextElementTop.id = "topRange";
+  inputTextElementTop.style.visibility = "visible";
   inputTextElementTop.name = "topRange";
-  inputTextElementTop.style.width = "1.5rem";
 
-  const labelBottom = document.createElement("label");
-  labelBottom.for = "bottomRange";
-  labelBottom.appendChild(document.createTextNode("Second value:"));
+  labelTop.for = "topRange";
+  labelTop.innerHTML = "First value:";
 
-  const inputTextElementBottom = document.createElement("input");
-  inputTextElementBottom.type = "text";
-  inputTextElementBottom.id = "bottomRange";
+  inputTextElementBottom.style.visibility = "visible";
   inputTextElementBottom.name = "bottomRange";
-  inputTextElementBottom.style.width = "1.5rem";
 
-  const filterButton = document.createElement("button");
-  filterButton.id = "filterButton";
+  labelBottom.for = "bottomRange";
+  labelBottom.innerHTML = "Second value:";
+
+  filterButton.style.visibility = "visible";
   filterButton.textContent = "Filter";
-  filterButton.addEventListener("click", () => {
-     let top = document.getElementById('topRange').value;
-     let bottom = document.getElementById('bottomRange').value;
-     setFilter(dimension, top, bottom);
-  });
 
   container.appendChild(labelTop);
   container.appendChild(inputTextElementTop);
@@ -350,12 +345,67 @@ function generateInputFieldsForSetRange(dimension) {
   container.appendChild(filterButton);
 }
 
+function filter() {
+    let top = document.getElementById('filterDimensionInputFieldTop').value;
+    let bottom = document.getElementById('filterDimensionInputFieldBottom').value;
+    const limit = getDimensionRange(filterDimensionData);
+
+    let topLimit = limit[1];
+    let bottomLimit = limit[0];
+
+    if (top < bottom) {
+        const temp = top;
+        top = bottom;
+        bottom = temp;
+    }
+    
+    let isOk = true;
+    if (topLimit > bottomLimit) {
+        
+        if (!isNaN(topLimit)) {
+            if (isNaN(top) || isNaN(bottom)) {
+                alert(`Attention: Value/s is/are not number/s! 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+            if (top > topLimit || bottom < bottomLimit) {
+                alert(`Attention: Value/s is/are out of range. 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+        }
+    }
+    else {
+        if (!isNaN(topLimit)) {
+            if (isNaN(top) || isNaN(bottom)) {
+                alert(`Attention: Value/s is/are not number/s! 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+            if (bottom < topLimit || top > bottomLimit) {
+                alert(`Attention: Value/s is/are out of range. 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+        }
+    }
+
+    if (isOk) {
+        setFilter(filterDimensionData, top, bottom);
+    }
+}
+
 function clearPlot() {
     const parentElement = document.getElementById('parallelcoords');
     const invertContainer = document.getElementById('invertDimensionContainer')
     const showContainer = document.getElementById('showDimensionContainer');
     const moveContainer = document.getElementById('moveDimensionContainer');
     const filterContainer = document.getElementById('filterDimensionContainer');
+    const rangeContainer = document.getElementById('rangeContainer');
+    const filterButton = document.getElementById("filterButton");
+    const inputTextElementTop = document.getElementById("filterDimensionInputFieldTop");
+    const inputTextElementBottom = document.getElementById("filterDimensionInputFieldBottom");
+
 
     while (parentElement.firstChild) {
         parentElement.removeChild(parentElement.firstChild);
@@ -372,5 +422,11 @@ function clearPlot() {
     while (filterContainer.firstChild) {
         filterContainer.removeChild(filterContainer.firstChild);
     }
+    rangeContainer.style.visibility = "hidden";
+    filterButton.style.visibility = "hidden";
+    inputTextElementTop.value = "";
+    inputTextElementBottom.value = "";
+    inputTextElementTop.style.visibility = "hidden";
+    inputTextElementBottom.style.visibility = "hidden";
 }
 
