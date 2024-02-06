@@ -280,7 +280,6 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
                 checkAllPositionsBottom(item, dimensionName, parcoords, d, 
                     checkedLines, currentLine);
             });
-            console.log(checkedLines);
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
             }

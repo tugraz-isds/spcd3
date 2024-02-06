@@ -31,9 +31,6 @@ let filterButton = document.getElementById("filterButton");
 filterButton.addEventListener("click", filter, false);
 filterButton.style.visibility = "hidden";
 
-window.onclick = () => {
-    checkboxes.style.display = 'none' }
-
 function openFileDialog() {
     document.getElementById('fileInput').click();
 }
