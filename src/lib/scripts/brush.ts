@@ -5,7 +5,7 @@ import * as helper from './helper';
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any):void {
+    active: any, tooltipValues: any):void {
     
     const yPosBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
     
@@ -39,13 +39,45 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         .attr("y", yPosRect)
         .attr("height", 240 - heightTopRect - heightBottomRect);
 
+    const range = parcoords.yScales[d.name].domain();
+
+    const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
+    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
+        100 - ((event.y - 70)/(240/(range[1]-range[0])));
+
+
+    if (!invertStatus) {
+        if (tooltipValue > range[1]) {
+            tooltipValue = range[1];
+        }
+        if (tooltipValue < range[0]) {
+            tooltipValue = range[0];
+        }
+    }
+    else {
+        if (tooltipValue > range[0]) {
+            tooltipValue = range[0];
+        }
+        if (tooltipValue < range[1]) {
+            tooltipValue = range[1];
+        }
+    }
+    
+    tooltipValues.text(Math.round(tooltipValue));
+    tooltipValues.style('visibility', 'visible');
+    tooltipValues.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+    tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }
 
 export function brushUp(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}, 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any):void {
+    active: any, tooltipValues: any):void {
     
     const yPosTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     
@@ -73,6 +105,38 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     
     d3.select("#rect_" + cleanDimensionName)
         .attr("height", 240 - heightTopRect - heightBottomRect);
+
+        const range = parcoords.yScales[d.name].domain();
+
+        const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
+        let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
+            100 - ((event.y - 70)/(240/(range[1]-range[0])));
+    
+    
+        if (!invertStatus) {
+            if (tooltipValue > range[1]) {
+                tooltipValue = range[1];
+            }
+            if (tooltipValue < range[0]) {
+                tooltipValue = range[0];
+            }
+        }
+        else {
+            if (tooltipValue > range[0]) {
+                tooltipValue = range[0];
+            }
+            if (tooltipValue < range[1]) {
+                tooltipValue = range[1];
+            }
+        }
+        
+        tooltipValues.text(Math.round(tooltipValue));
+        tooltipValues.style('visibility', 'visible');
+        tooltipValues.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+        tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }

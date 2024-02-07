@@ -437,9 +437,14 @@ export default class SteerableParcoords {
                     .call(yAxis[d.name])
             });
 
-        setBrushDown(featureAxis, parcoords, active);
+        let tooltipValues = d3.select('#parallelcoords')
+            .append('g')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
 
-        setBrushUp(featureAxis, parcoords, active);
+        setBrushDown(featureAxis, parcoords, active, tooltipValues);
+
+        setBrushUp(featureAxis, parcoords, active, tooltipValues);
        
         setRectToDrag(featureAxis, svg, parcoords, active);
 
@@ -553,7 +558,7 @@ export default class SteerableParcoords {
 
     setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
         dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-        newDataset: any[];}, active: any): void {
+        newDataset: any[];}, active: any, tooltipValues: any): void {
         
         featureAxis
             .each(function (d) {
@@ -570,14 +575,17 @@ export default class SteerableParcoords {
                     .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag().on('drag', (event, d) => {
-                        brush.brushUp(processedDimensionName, event, d, parcoords, active);
+                        brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues);
+                    })
+                    .on('end', () => {
+                        tooltipValues.style('visibility', 'hidden');
                     }));
             });
     }
 
     setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
         dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-        newDataset: any[];}, active: any): void {
+        newDataset: any[];}, active: any, tooltipValues: any): void {
         
         featureAxisG
             .each(function (d) {
@@ -596,7 +604,10 @@ export default class SteerableParcoords {
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.brushDown(processedDimensionName, event, d, parcoords, active);
+                            brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues);
+                        })
+                        .on('end', () => {
+                            tooltipValues.style('visibility', 'hidden');
                         }));
             });
     }
