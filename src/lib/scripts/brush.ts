@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as base64 from './base64Arrows';
+import * as icon from './icons';
 import * as helper from './helper';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
@@ -28,7 +28,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     addPosition(yPosTop, parcoords.currentPosOfDims, d.name, "top");
     
     d3.select("#rect_" + cleanDimensionName)
-        .attr('cursor', `url('data:image/svg+xml;base64, ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
+        .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
     
     d3.select("#triangle_down_" + cleanDimensionName).attr("y", yPosTop);
 
@@ -64,7 +64,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     addPosition(yPosBottom, parcoords.currentPosOfDims, d.name, "bottom");
 
     d3.select("#rect_" + cleanDimensionName)
-        .attr('cursor', `url('data:image/svg+xml;base64, ${base64.getArrowTopAndBottomBase64()}') 8 8 , auto`);
+        .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
     
     d3.select("#triangle_up_" + cleanDimensionName).attr("y", yPosBottom);
 
