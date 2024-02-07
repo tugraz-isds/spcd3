@@ -87,22 +87,18 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
     let yPosTop: number;
     let yPosRect: number;
-    let yPosBottom: number;
     
     if (event.y + delta - 10 <= 70) {
         yPosTop = 70;
         yPosRect = 80;
-        yPosBottom = yPosRect + rectHeight + 10;
     }
-    else if (event.y + delta + rectHeight >= 310) {
-        yPosTop = 320 - rectHeight - 20;
-        yPosRect = 320 - rectHeight - 10;
-        yPosBottom = 320;
+    else if (event.y + delta + rectHeight >= 320) {
+        yPosTop = 320 - rectHeight - 10;
+        yPosRect = 320 - rectHeight;
     }
     else {
         yPosTop = event.y + delta - 10;
         yPosRect = yPosTop + 10;
-        yPosBottom = yPosRect + rectHeight + 10;
     }
 
     addPosition(yPosTop, parcoords.currentPosOfDims, d.name, "top");
@@ -114,7 +110,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         d3.select("#triangle_down_" + cleanDimensionName)
             .attr("y", yPosTop);
         d3.select("#triangle_up_" + cleanDimensionName)
-            .attr("y", yPosBottom);
+            .attr("y", yPosRect + rectHeight);
 
         const dimensionName = d.name;
         const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
@@ -279,14 +275,15 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
                 240 / range * (maxValue - d[dimensionName]) + 80;
-        }      
+        }
 
         const currentLine = getLineName(d);
 
         const dimNameToCheck = d3.select("." + currentLine).text();
 
         const emptyString = "";
-        if (value < rangeTop || value > rangeBottom) {
+       
+        if (value <= rangeTop || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
             }

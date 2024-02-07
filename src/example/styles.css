@@ -80,7 +80,8 @@ div#parallelcoords {
 }
 
 #pc_svg {
-  height: 22rem;
+  height: 25rem;
+  align-items: center;
 }
 
 #border {
