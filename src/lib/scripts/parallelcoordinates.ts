@@ -495,15 +495,11 @@ export default class SteerableParcoords {
                 return tooltipFeatures.style('visibility', 'visible');
             })
             .on('mousemove', (event, d) => {
-                let screenwidth = width - 120;
-                if (screenwidth > screen.width) {
-                    screenwidth = screen.width - 130;
-                }
-                if (event.clientX > screenwidth) {
+                if (getDimensionPositions(d.name) == 0) {
                     featureAxis
                         .select('#dimension')
                         .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowRight(), 12)}') 8 8, auto`);
-                } else if (event.clientX <= 100) {
+                } else if (getDimensionPositions(d.name) == parcoords.newFeatures.length - 1) {
                     featureAxis
                         .select('#dimension')
                         .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowLeft(), 12)}') 8 8, auto`);
