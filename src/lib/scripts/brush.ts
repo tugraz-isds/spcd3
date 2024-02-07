@@ -117,17 +117,22 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
         parcoords.yScales[dimensionName].domain()[0];
 
+        const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
+        parcoords.yScales[dimensionName].domain()[1];
+
+        const range = maxValue - minValue;
+
         active.each(function (d) {
             const currentLine = getLineName(d);
 
             let value : any;
             if(invertStatus) {
                 value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / maxValue * d[dimensionName] + 80;
+                240 / range * d[dimensionName] + 80;
             }
             else {
                 value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                    240 / maxValue * (maxValue - d[dimensionName]) + 80;
+                    240 / range * (maxValue - d[dimensionName]) + 80;
             }
 
             const dimNameToCheck = d3.select("." + currentLine).text();
@@ -162,19 +167,24 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
     parcoords.yScales[dimensionName].domain()[0];
 
+    const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
+    parcoords.yScales[dimensionName].domain()[1];
+
+    const range = maxValue - minValue;
+
     let topPosition: any;
         let bottomPosition: any;
         if(invertStatus) {
             topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-            240 / maxValue * bottomValue + 80;
+            240 / range * bottomValue + 80;
             bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-            240 / maxValue * topValue + 80;
+            240 / range * topValue + 80;
         }
         else {
             topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-                240 / maxValue * (maxValue - topValue) + 80;
+                240 / range * (maxValue - topValue) + 80;
             bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-                240 / maxValue * (maxValue - bottomValue) + 80;
+                240 / range * (maxValue - bottomValue) + 80;
         }
 
     addPosition(topPosition, parcoords.currentPosOfDims, dimensionName, "top");
@@ -202,11 +212,11 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         let value : any;
         if(invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / maxValue * d[dimensionName] + 80;
+                240 / range * d[dimensionName] + 80;
         }
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / maxValue * (maxValue - d[dimensionName]) + 80;
+                240 / range * (maxValue - d[dimensionName]) + 80;
         }
             
         if (value < topPosition || value > bottomPosition) {
@@ -250,16 +260,21 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
         parcoords.yScales[dimensionName].domain()[0];
+
+    const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
+    parcoords.yScales[dimensionName].domain()[1];
+
+    const range = maxValue - minValue;
     
     active.each(function (d) {
         let value : any;
         if(invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-            240 / maxValue * d[dimensionName] + 80;
+            240 / range * d[dimensionName] + 80;
         }
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / maxValue * (maxValue - d[dimensionName]) + 80;
+                240 / range * (maxValue - d[dimensionName]) + 80;
         }      
 
         const currentLine = getLineName(d);
@@ -299,8 +314,12 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
         
             const maxValue = parcoords.yScales[positionItem.key].domain()[1];
 
+            const minValue = parcoords.yScales[positionItem.key].domain()[0];
+
+            const scale = maxValue - minValue;
+
             const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                    240 / maxValue * (maxValue - d[positionItem.key]) + 80;
+                    240 / scale * (maxValue - d[positionItem.key]) + 80;
 
             if (value < positionItem.top) {
                 checkedLines.push(currentLine);
@@ -321,8 +340,12 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
             
             const maxValue = parcoords.yScales[positionItem.key].domain()[1];
 
+            const minValue = parcoords.yScales[positionItem.key].domain()[0];
+
+            const scale = maxValue - minValue;
+
             const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                    240 / maxValue * (maxValue - d[positionItem.key]) + 80;
+                    240 / scale * (maxValue - d[positionItem.key]) + 80;
 
             if (value > positionItem.bottom) {
                 checkedLines.push(currentLine);

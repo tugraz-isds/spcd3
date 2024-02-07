@@ -271,7 +271,7 @@ export default class SteerableParcoords {
                 const max = Math.max(...newDataset.map(o => o[x.name]));
                 const min = Math.min(...newDataset.map(o => o[x.name]));
                 yScales[x.name] = d3.scaleLinear()
-                    .domain([0, max]).nice()
+                    .domain([min, max]).nice()
                     .range([height - padding, padding]);
             }
         });
@@ -332,8 +332,7 @@ export default class SteerableParcoords {
             .append('svg')
             .attr('id', 'pc_svg')
             .attr('viewBox', [0, 0, window.width, window.height])
-            .attr('width', window.width)
-            .attr('height', window.height)
+            .attr('overflow', 'auto')
             .attr('font-family', 'Verdana, sans-serif')
             .attr('preserveAspectRatio', 'none');
 
@@ -573,7 +572,7 @@ export default class SteerableParcoords {
                     .attr('width', 10)
                     .attr('height', 12)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 15)}') 8 8, auto`)
+                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag().on('drag', (event, d) => {
                         brush.brushUp(processedDimensionName, event, d, parcoords, active);
                     }));
@@ -598,7 +597,7 @@ export default class SteerableParcoords {
                     .attr('width', 10)
                     .attr('height', 12)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 15)}') 8 8, auto`)
+                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
                             brush.brushDown(processedDimensionName, event, d, parcoords, active);
@@ -609,7 +608,7 @@ export default class SteerableParcoords {
     prepareParcoordData(data: any, newFeatures: any): any {
         
         window.padding = 80;
-        window.width = newFeatures.length * window.padding;
+        window.width = newFeatures.length * 120;
         window.height = 400;
 
         let dataset = prepareData(data, newFeatures);

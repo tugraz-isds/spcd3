@@ -76,20 +76,23 @@ button#input {
 }
 
 div#parallelcoords {
-  width: 100%;
+  overflow-y: auto;
+}
+
+#pc_svg {
   height: 22rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin-bottom: 2rem;
-  align-items: center;
+}
+
+#border {
+  border-bottom: #0081af 0.4rem;
+  border-bottom-style: solid;
+  visibility: hidden;
 }
 
 div#showDimensionHeader {
   visibility: hidden;
   font-size: 1rem;
   font-weight: bold;
-  border-top: #0081af 0.4rem;
-  border-top-style: solid;
   margin-right: 2rem;
   padding-bottom: 0.8rem;
   padding-top: 0.8rem;

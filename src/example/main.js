@@ -57,6 +57,7 @@ function handleFileSelect(event) {
             showButtons();
 
             generateSVG(newData, newFeatures);
+            document.getElementById('border').style.visibility = 'visible';
         };
         reader.readAsText(file);
     }

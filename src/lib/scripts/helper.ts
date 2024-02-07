@@ -1,6 +1,6 @@
 export function cleanString(stringValue: string): string {
     let value = stringValue.replace(/ /g,'_');
-        return value.replace(/[.,*\-0123456789%&'\[{()}\]]/g, '');
+        return value.replace(/[.,*\-%&'\[{()}\]]/g, '');
 }
 
 export function cleanLinePathString(stringValue: string): string {
