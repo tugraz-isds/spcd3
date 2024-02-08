@@ -366,11 +366,12 @@ function filter() {
     let topLimit = limit[1];
     let bottomLimit = limit[0];
 
-    if (top < bottom) {
+    // TODO
+    /*if (top < bottom) {
         const temp = top;
         top = bottom;
         bottom = temp;
-    }
+    }*/
     
     let isOk = true;
     if (topLimit > bottomLimit) {

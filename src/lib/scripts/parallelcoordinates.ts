@@ -434,7 +434,7 @@ export default class SteerableParcoords {
                 const processedDimensionName = helper.cleanString(d.name);
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + processedDimensionName)
-                    .call(yAxis[d.name])
+                    .call(yAxis[d.name])        
             });
 
         let tooltipValues = d3.select('#parallelcoords')
@@ -569,13 +569,13 @@ export default class SteerableParcoords {
                     .append('svg:image')
                     .attr('id', 'triangle_up_' + processedDimensionName)
                     .attr('y', 320)
-                    .attr('x', -5)
-                    .attr('width', 10)
-                    .attr('height', 12)
+                    .attr('x', -7)
+                    .attr('width', 14)
+                    .attr('height', 10)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag().on('drag', (event, d) => {
-                        brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues);
+                        brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                     })
                     .on('end', () => {
                         tooltipValues.style('visibility', 'hidden');
@@ -597,14 +597,14 @@ export default class SteerableParcoords {
                     .append('svg:image')
                     .attr('id', 'triangle_down_' + processedDimensionName)
                     .attr('y', 70)
-                    .attr('x', -5)
-                    .attr('width', 10)
-                    .attr('height', 12)
+                    .attr('x', -7)
+                    .attr('width', 14)
+                    .attr('height', 10)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues);
+                            brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                         })
                         .on('end', () => {
                             tooltipValues.style('visibility', 'hidden');

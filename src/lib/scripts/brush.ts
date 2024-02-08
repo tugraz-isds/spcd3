@@ -5,7 +5,7 @@ import * as helper from './helper';
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, tooltipValues: any):void {
+    active: any, tooltipValues: any, window: any):void {
     
     const yPosBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
     
@@ -39,37 +39,9 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         .attr("y", yPosRect)
         .attr("height", 240 - heightTopRect - heightBottomRect);
 
-    const range = parcoords.yScales[d.name].domain();
-
-    const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
-    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
-        100 - ((event.y - 70)/(240/(range[1]-range[0])));
-
-
-    if (!invertStatus) {
-        if (tooltipValue > range[1]) {
-            tooltipValue = range[1];
-        }
-        if (tooltipValue < range[0]) {
-            tooltipValue = range[0];
-        }
+    if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
+    setToolTipBrush(tooltipValues, d, event, parcoords, window);
     }
-    else {
-        if (tooltipValue > range[0]) {
-            tooltipValue = range[0];
-        }
-        if (tooltipValue < range[1]) {
-            tooltipValue = range[1];
-        }
-    }
-    
-    tooltipValues.text(Math.round(tooltipValue));
-    tooltipValues.style('visibility', 'visible');
-    tooltipValues.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
-    tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }
@@ -77,7 +49,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
 export function brushUp(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}, 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, tooltipValues: any):void {
+    active: any, tooltipValues: any, window: any):void {
     
     const yPosTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
     
@@ -106,37 +78,9 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     d3.select("#rect_" + cleanDimensionName)
         .attr("height", 240 - heightTopRect - heightBottomRect);
 
-        const range = parcoords.yScales[d.name].domain();
-
-        const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
-        let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
-            100 - ((event.y - 70)/(240/(range[1]-range[0])));
-    
-    
-        if (!invertStatus) {
-            if (tooltipValue > range[1]) {
-                tooltipValue = range[1];
-            }
-            if (tooltipValue < range[0]) {
-                tooltipValue = range[0];
-            }
-        }
-        else {
-            if (tooltipValue > range[0]) {
-                tooltipValue = range[0];
-            }
-            if (tooltipValue < range[1]) {
-                tooltipValue = range[1];
-            }
-        }
-        
-        tooltipValues.text(Math.round(tooltipValue));
-        tooltipValues.style('visibility', 'visible');
-        tooltipValues.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
-        tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+    if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
+        setToolTipBrush(tooltipValues, d, event, parcoords, window);
+    }
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }
@@ -237,26 +181,26 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     const range = maxValue - minValue;
 
     let topPosition: any;
-        let bottomPosition: any;
-        if(invertStatus) {
-            topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-            240 / range * bottomValue + 80;
-            bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-            240 / range * topValue + 80;
-        }
-        else {
-            topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-                240 / range * (maxValue - topValue) + 80;
-            bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-                240 / range * (maxValue - bottomValue) + 80;
-        }
+    let bottomPosition: any;
+    if(invertStatus) {
+        topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
+        240 / range * bottomValue + 80;
+        bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
+        240 / range * topValue + 80;
+    }
+    else {
+        topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
+            240 / range * (maxValue - topValue) + 80;
+        bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
+            240 / range * (maxValue - bottomValue) + 80;
+    }
 
     addPosition(topPosition, parcoords.currentPosOfDims, dimensionName, "top");
     addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, "bottom");
 
     const cleanDimensionName = helper.cleanString(dimensionName);
     
-    let rectHeight = 240 - ((topPosition - 80) + (320 - bottomPosition));
+    let rectHeight = bottomPosition - topPosition;
 
     d3.select("#rect_" + cleanDimensionName)
         .attr("y", topPosition);
@@ -312,6 +256,42 @@ export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: 
     newObject[key] = yPosTop;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
     Object.assign(target, newObject);
+}
+
+function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
+    window: any): void {
+    
+    const range = parcoords.yScales[d.name].domain();
+
+    const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
+    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
+        range[1] - ((event.y - 70)/(240/(range[1]-range[0])));
+
+
+    if (!invertStatus) {
+        if (tooltipValue > range[1]) {
+            tooltipValue = range[1];
+        }
+        if (tooltipValue < range[0]) {
+            tooltipValue = range[0];
+        }
+    }
+    else {
+        if (tooltipValue > range[0]) {
+            tooltipValue = range[0];
+        }
+        if (tooltipValue < range[1]) {
+            tooltipValue = range[1];
+        }
+    }
+    
+    tooltipValues.text(Math.round(tooltipValue*10)/10);
+    tooltipValues.style('visibility', 'visible');
+    tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
+    tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
 }
 
 function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
@@ -377,9 +357,12 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
     
         if (positionItem.key != dimensionName && positionItem.top != 70) {
         
-            const maxValue = parcoords.yScales[positionItem.key].domain()[1];
+            const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
+            const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
+                parcoords.yScales[positionItem.key].domain()[0];
 
-            const minValue = parcoords.yScales[positionItem.key].domain()[0];
+            const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
+                parcoords.yScales[positionItem.key].domain()[1];
 
             const scale = maxValue - minValue;
 
@@ -403,9 +386,12 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
     
         if (positionItem.key != dimensionName && positionItem.bottom != 320) {
             
-            const maxValue = parcoords.yScales[positionItem.key].domain()[1];
+            const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
+            const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
+                parcoords.yScales[positionItem.key].domain()[0];
 
-            const minValue = parcoords.yScales[positionItem.key].domain()[0];
+            const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
+                parcoords.yScales[positionItem.key].domain()[1];
 
             const scale = maxValue - minValue;
 
