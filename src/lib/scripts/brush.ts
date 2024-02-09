@@ -264,7 +264,7 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
     const range = parcoords.yScales[d.name].domain();
 
     const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
-    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1]))) :
+    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1])) + range[1]) :
         range[1] - ((event.y - 70)/(240/(range[1]-range[0])));
 
 
@@ -314,7 +314,7 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         let value : any;
         if(invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-            240 / range * d[dimensionName] + 80;
+            240 / range * (d[dimensionName] - minValue) + 80;
         }
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
