@@ -24,7 +24,7 @@ export function checkIfDuplicatesExists(value :string): any {
     return new Set(value).size !== value.length
 }
 
-export function saveAsSvg(): void {
+export function saveAsSvg2(): void {
     let svg = document.getElementById('pc_svg');
     saveSvg(svg, 'parcoords.svg');
 }
@@ -48,4 +48,39 @@ export function saveSvg(data: any, name: string): void {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+}
+
+export function saveSvg2(data: any, name: string): void {
+    
+    let svgData = data;
+
+    svgData = svgData.replaceAll(/cursor="[^"]*"/g, '')
+    svgData = svgData.replace(/style="cursor:[^"]*"/g, '')
+
+    let processedData = xmlFormat(svgData);
+
+    let preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    let svgBlob = new Blob([preface, processedData], {type:'image/svg+xml;charset=utf-8'});
+    let svgUrl = URL.createObjectURL(svgBlob);
+    let downloadLink = document.createElement('a');
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+export function createSVG(active, inactive, featureAxis, size) {
+    const svgHead = createSVGInit(size);
+    let svgBody =  '<g class="active">' + active;
+    svgBody += '</g><g class="inactive">';
+    svgBody += inactive;
+    svgBody += '</g>';
+    svgBody += featureAxis.replace(" undefined", "");
+    svgBody += "</svg>";
+    return svgHead + svgBody;
+}
+
+export function createSVGInit(size: any): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" id="pc_svg" viewBox="0,0,${size},400" font-family="Verdana, sans-serif" preserveAspectRatio="none" style="overflow: auto;">`;
 }

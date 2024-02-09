@@ -3,6 +3,7 @@ import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from './icons';
 import * as svgToTinyDataUri from 'mini-svg-data-uri';
+import * as loader from './loader';
 
 declare global {
     let padding: any;
@@ -11,6 +12,9 @@ declare global {
     let dataset: any;
     let yAxis: {};
     let scrollXPos: any;
+    let activeSvg: any;
+    let inactiveSvg: any;
+    let featureAxisSvg: any;
     let parcoords: {
         xScales: any,
         yScales: {},
@@ -64,6 +68,8 @@ export default class SteerableParcoords {
         let active = d3.select('g.active')
             .selectAll('path')
             .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+
+        storeActivePaths(active);
 
         transition(active).each(function (d) {
             d3.select(this)
@@ -146,6 +152,9 @@ export default class SteerableParcoords {
             return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         });
 
+        storeActivePaths(active);
+        storeFeatureAxis(featureAxis);
+
         delete parcoords.dragging[dimension];
         delete parcoords.dragging[neighbour];
     }
@@ -204,6 +213,9 @@ export default class SteerableParcoords {
                 featureAxis.attr('transform', (d) => {
                     return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
                 });
+
+                storeActivePaths(active);
+                storeFeatureAxis(featureAxis);
             }
         }
     }
@@ -241,6 +253,8 @@ export default class SteerableParcoords {
                     .delay(5)
                     .duration(0)
                     .attr('visibility', 'hidden');
+
+                storeActivePaths(active);
             };
         }
     }
@@ -351,7 +365,11 @@ export default class SteerableParcoords {
 
         let active = setActivePathLines(svg, content, ids, window.parcoords);
 
-        setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
+        let featureAxis = setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
+
+        storeActivePaths(active);
+        storeInactivePaths(inactive);
+        storeFeatureAxis(featureAxis);
 
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
@@ -364,6 +382,41 @@ export default class SteerableParcoords {
                 }
             }
         }
+    }
+
+    saveAsSvg(): void {
+        let svg = loader.createSVG(window.activeSvg, window.inactiveSvg, window.featureAxisSvg, window.width);
+        loader.saveSvg2(svg, 'parcoords.svg');
+    }
+
+    storeActivePaths(active) {
+        window.activeSvg = "";
+        active.each(function (d) {
+            let test = d3.select(this);
+            let activeTest = (new XMLSerializer).serializeToString(test.node());
+            activeTest = activeTest.replace(`xmlns="http://www.w3.org/2000/svg"`, "");
+            window.activeSvg += activeTest;
+        });
+    }
+
+    storeInactivePaths(inactive) {
+        window.inactiveSvg = "";
+        inactive.each(function (d) {
+            let test = d3.select(this);
+            let inactiveTest = (new XMLSerializer).serializeToString(test.node());
+            inactiveTest = inactiveTest.replace(`xmlns="http://www.w3.org/2000/svg"`, "");
+            window.inactiveSvg += inactiveTest;
+        });
+    }
+
+    storeFeatureAxis(features) {
+        features.each(function (d) {
+            let test = d3.select(this);
+            let feature = (new XMLSerializer).serializeToString(test.node());
+            feature = feature.replace(`xmlns="http://www.w3.org/2000/svg"`, "");
+            //console.log(feature);
+            window.featureAxisSvg += feature;
+        });
     }
 
     setActivePathLines(svg: any, content: any, ids: any[], 
@@ -409,13 +462,16 @@ export default class SteerableParcoords {
                 const data = getAllPointerEventsData(event);
                 selectedPath = highlight(data);
                 createTooltipForPathLine(data, tooltipPath, event);
+                storeActivePaths(active);
             })
             .on('pointerleave', () => {
                 doNotHighlight(selectedPath);
+                storeActivePaths(active);
                 return tooltipPath.style('visibility', 'hidden');
             })
             .on('pointerout', () => {
                 doNotHighlight(selectedPath);
+                storeActivePaths(active);
                 return tooltipPath.style('visibility', 'hidden');
             })
             .on('click', (event, d) => {
@@ -429,7 +485,7 @@ export default class SteerableParcoords {
     setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
         parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; }, 
-        width: any, padding: any): void {
+        width: any, padding: any): any {
 
         let featureAxis = svg.selectAll('g.feature')
             .data(parcoords.features)
@@ -462,6 +518,8 @@ export default class SteerableParcoords {
         setAxisLabels(featureAxis, padding, parcoords, inactive, active, width);
 
         setInvertIcon(featureAxis, padding, parcoords, yAxis);
+
+        return featureAxis;
     }
 
     setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {};
@@ -802,4 +860,5 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, storeActivePaths,
+    storeInactivePaths, storeFeatureAxis, saveAsSvg } = new SteerableParcoords();
