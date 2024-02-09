@@ -10,6 +10,7 @@ declare global {
     let height: any;
     let dataset: any;
     let yAxis: {};
+    let scrollXPos: any;
     let parcoords: {
         xScales: any,
         yScales: {},
@@ -109,11 +110,11 @@ export default class SteerableParcoords {
         const neighbour = direction == 'right' ? parcoords.newFeatures[indexOfDimension-1] :
             parcoords.newFeatures[indexOfDimension+1];
         
-        const width = parcoords.newFeatures.length * 80;
+        const width = window.width;
         const pos = parcoords.xScales(dimension);
         const posNeighbour = parcoords.xScales(neighbour);
 
-        const distance = (width-80)/parcoords.newFeatures.length;
+        const distance = (width-120)/parcoords.newFeatures.length;
 
         parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
             pos - distance;
@@ -167,6 +168,8 @@ export default class SteerableParcoords {
                 parcoords.dragging[(d.subject).name] = this.__origin__;
                 parcoords.dragPosStart[(d.subject).name] = this.__origin__;
                 inactive.attr('visibility', 'hidden');
+                const element = document.getElementById("parallelcoords");
+                window.scrollXPos = element.scrollLeft;
             }
         }
     }
@@ -174,6 +177,15 @@ export default class SteerableParcoords {
     onDragEventHandler(parcoords: any, active: any, featureAxis: any, width: any): any {
         {
             return function onDrag(d) {
+                const element = document.getElementById("parallelcoords");
+                if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
+                    parcoords.dragging[(d.subject).name] + 50 > window.screen.width) {
+                    element.scrollLeft += 5;
+                }
+                else if (window.scrollXPos > parcoords.dragging[(d.subject).name] - 50) {
+                    element.scrollLeft -= 5;
+                }
+
                 parcoords.dragging[(d.subject).name] = Math.min(width-80, 
                     Math.max(80, this.__origin__ += d.x));
 
@@ -199,7 +211,7 @@ export default class SteerableParcoords {
     onDragEndEventHandler(parcoords: any, featureAxis: any, inactive: any, active: any): any {
         {
             return function onDragEnd(d) {
-                const width = parcoords.newFeatures.length * 80;
+                const width = window.width;
                 const distance = (width-80)/parcoords.newFeatures.length;
                 const init = parcoords.dragPosStart[(d.subject).name];
 
@@ -213,7 +225,6 @@ export default class SteerableParcoords {
                         return 'translate(' + position(d.name, init+distance, parcoords.xScales) + ')';
                     })
                 }
-
                 delete this.__origin__;
                 delete parcoords.dragging[(d.subject).name];
                 delete parcoords.dragPosStart[(d.subject).name];
@@ -332,7 +343,7 @@ export default class SteerableParcoords {
             .append('svg')
             .attr('id', 'pc_svg')
             .attr('viewBox', [0, 0, window.width, window.height])
-            .attr('overflow', 'auto')
+            .style('overflow', 'auto')
             .attr('font-family', 'Verdana, sans-serif')
             .attr('preserveAspectRatio', 'none');
 
