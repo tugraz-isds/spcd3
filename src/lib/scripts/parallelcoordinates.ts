@@ -69,15 +69,13 @@ export default class SteerableParcoords {
             .selectAll('path')
             .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
 
-        storeActivePaths(active);
-
         transition(active).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
         brush.addSettingsForBrushing(dimension, parcoords);
 
-        d3.select('g.inactive')
+        let inactive = d3.select('g.inactive')
             .selectAll('path')
             .each(function (d) {
             d3.select(this)
@@ -86,7 +84,13 @@ export default class SteerableParcoords {
             .transition()
             .delay(5)
             .duration(0)
-            .attr('visibility', 'hidden');      
+            .attr('visibility', 'hidden');
+
+        let featureAxis = d3.selectAll('#feature');
+        
+        storeInactivePaths(inactive);
+        storeActivePaths(active);
+        storeFeatureAxis(featureAxis);
     }
 
     onInvert(): any {
@@ -153,6 +157,7 @@ export default class SteerableParcoords {
         });
 
         storeActivePaths(active);
+        storeInactivePaths(inactive);
         storeFeatureAxis(featureAxis);
 
         delete parcoords.dragging[dimension];
@@ -254,7 +259,9 @@ export default class SteerableParcoords {
                     .duration(0)
                     .attr('visibility', 'hidden');
 
+                storeInactivePaths(inactive);
                 storeActivePaths(active);
+                storeFeatureAxis(featureAxis);
             };
         }
     }
@@ -410,11 +417,11 @@ export default class SteerableParcoords {
     }
 
     storeFeatureAxis(features) {
+        window.featureAxisSvg = "";
         features.each(function (d) {
             let test = d3.select(this);
             let feature = (new XMLSerializer).serializeToString(test.node());
             feature = feature.replace(`xmlns="http://www.w3.org/2000/svg"`, "");
-            //console.log(feature);
             window.featureAxisSvg += feature;
         });
     }
