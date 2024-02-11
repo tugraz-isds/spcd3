@@ -7,29 +7,63 @@ let newFeatures = [];
 let moveDimensionData;
 let filterDimensionData;
 
-let inputButton = document.getElementById("input");
-inputButton.addEventListener("click", openFileDialog, false);
+let inputButton = document.getElementById('input');
+inputButton.addEventListener('click', openFileDialog, false);
 let inputFile = document.getElementById('fileInput');
-inputFile.addEventListener("change", handleFileSelect, false);
-inputFile.addEventListener("click", (event) => {
+inputFile.addEventListener('change', handleFileSelect, false);
+inputFile.addEventListener('click', (event) => {
     event.target.value = null;
 })
 
-let downloadButton = document.getElementById("download");
-downloadButton.addEventListener("click", saveAsSvg, false);
-downloadButton.style.visibility = "hidden";
+let downloadButton = document.getElementById('download');
+downloadButton.addEventListener('click', saveAsSvg, false);
+downloadButton.style.visibility = 'hidden';
 
-let moveRightButton = document.getElementById("moveRight");
-moveRightButton.addEventListener("click", moveDimensionRight, false);
-moveRightButton.style.visibility = "hidden";
+let moveRightButton = document.getElementById('moveRight');
+moveRightButton.addEventListener('click', moveDimensionRight, false);
+moveRightButton.style.visibility = 'hidden';
 
-let moveLeftButton = document.getElementById("moveLeft");
-moveLeftButton.addEventListener("click", moveDimensionLeft, false);
-moveLeftButton.style.visibility = "hidden";
+let moveLeftButton = document.getElementById('moveLeft');
+moveLeftButton.addEventListener('click', moveDimensionLeft, false);
+moveLeftButton.style.visibility = 'hidden';
 
-let filterButton = document.getElementById("filterButton");
-filterButton.addEventListener("click", filter, false);
-filterButton.style.visibility = "hidden";
+let filterButton = document.getElementById('filterButton');
+filterButton.addEventListener('click', filter, false);
+filterButton.style.visibility = 'hidden';
+
+document.addEventListener('click', function(event) {
+    const showButton = document.getElementById('showButton');
+    if (showButton) {
+        const outsideClick = !showButton.contains(event.target);
+        if (outsideClick) {
+            const checkboxes = document.getElementById('options');
+            checkboxes.style.display = 'none';
+            showButton.style.backgroundColor = 'white';
+            showButton.style.color = 'black';
+        }
+    }
+    const invertButton = document.getElementById('invertButton');
+    if (invertButton) {
+        const outsideClick = !invertButton.contains(event.target);
+        if (outsideClick) {
+            const checkboxes = document.getElementById('invertOptions');
+            checkboxes.style.display = 'none';
+            invertButton.style.backgroundColor = 'white';
+            invertButton.style.color = 'black';
+        }
+    }
+    if (filterDimensionData) {
+        const isInverted = getInvertStatus(filterDimensionData);
+        if (isInverted == true) {
+            document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
+            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
+        }
+        else {
+            document.getElementById('filterDimensionLabelTop').innerHTML = 'Max Value:';
+            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Min Value:';    
+        }
+    }
+});
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -64,9 +98,9 @@ function handleFileSelect(event) {
 }
 
 function showButtons() {
-    downloadButton.style.visibility = "visible";
-    moveRightButton.style.visibility = "visible";
-    moveLeftButton.style.visibility = "visible";
+    downloadButton.style.visibility = 'visible';
+    moveRightButton.style.visibility = 'visible';
+    moveLeftButton.style.visibility = 'visible';
     moveRightButton.disabled = true;
     moveRightButton.style.opacity = 0.5;
     moveLeftButton.disabled = true;
@@ -92,26 +126,34 @@ function getSelectedDimensions()
     return checkedDimensions;
 }
 
-function showOptions(id) {
+function showOptions(id, buttonId) {
     
-    let checkboxes =  document.getElementById(id);
+    let checkboxes = document.getElementById(id);
     
     checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
         checkboxes.style.display = 'none';
+
+    let button = document.getElementById(buttonId);
+
+    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'grey' :
+        button.style.backgroundColor = 'white';
+    checkboxes.style.display == 'block' ? button.style.color = 'white' :
+        button.style.color = 'black'; 
 }
 
 function generateDropdownForShow() {
 
-    let dimensions = newData["columns"];
+    let dimensions = newData['columns'];
     
-    document.getElementById('showDimensionHeader').style.visibility = "visible";
+    document.getElementById('showDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('showDimensionContainer');
 
     let selectButton = document.createElement('button');
     selectButton.id = 'showButton';
-    selectButton.addEventListener("click", (event) => {
-        showOptions('options');
+    selectButton.className = 'ddButton';
+    selectButton.addEventListener('click', (event) => {
+        showOptions('options', 'showButton');
     });
 
     let textElement = document.createElement('span');
@@ -120,23 +162,25 @@ function generateDropdownForShow() {
 
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'options';
+    dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     dimensionContainer.name = 'options';
-    dimensionContainer.addEventListener("change", (event) => {
+    dimensionContainer.addEventListener('change', (event) => {
         updateDimensions();
-        disableLeftAndRightButton();
         disableCheckbox(event.target.value);
-        disableOptionForFiltering(event.target.value);
+        disableOptionInDropdown('filterOption_', event.target.value);
+        disableOptionInDropdown('moveOption_', event.target.value);
+        disableLeftAndRightButton();
         let checkboxes =  document.getElementById('options');
         checkboxes.style.display = 'none';
     });
 
     dimensions.forEach(function(dimension) {
         let label = document.createElement('label');
-        label.id = "dropdownLabel";
+        label.className = 'dropdownLabel';
         let input = document.createElement('input');
         input.type = 'checkbox';
         input.id = dimension;
@@ -153,16 +197,17 @@ function generateDropdownForShow() {
 }
 
 function generateDropdownForInvert() {
-    let dimensions = newData["columns"];
+    let dimensions = newData['columns'];
     
-    document.getElementById('invertDimensionHeader').style.visibility = "visible";
+    document.getElementById('invertDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('invertDimensionContainer');
 
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
-    selectButton.addEventListener("click", (event) => {
-        showOptions('invertOptions');
+    selectButton.className = 'ddButton';
+    selectButton.addEventListener('click', (event) => {
+        showOptions('invertOptions', 'invertButton');
         for (let i = 0; i < newFeatures.length; i++) {
             const position = getDimensionPositions(newFeatures[i]);
             if (position != -1) {
@@ -184,22 +229,31 @@ function generateDropdownForInvert() {
 
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'invertOptions';
+    dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     dimensionContainer.name = 'invertOptions';
-    dimensionContainer.addEventListener("change", (event) => {
+    dimensionContainer.addEventListener('change', (event) => {
         invertDimension(event.target.value);
         let checkboxes =  document.getElementById('invertOptions');
         checkboxes.style.display = 'none';
-        //let label = document.getElementById('invertText');
-        //label.textContent = event.target.value;
+        const isInverted = getInvertStatus(filterDimensionData);
+        if (isInverted == true) {
+            document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
+            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
+        }
+        else {
+            document.getElementById('filterDimensionLabelTop').innerHTML = 'Max Value:';
+            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Min Value:';    
+        }
     });
 
     dimensions.forEach(function(dimension) {
         let label = document.createElement('label');
-        label.id = "dropdownLabel";
+        label.className = 'dropdownLabel';
+        label.id = 'invertLabel_' + dimension;
         let input = document.createElement('input');
         input.type = 'checkbox';
         input.id = 'invert_' + dimension;
@@ -222,26 +276,29 @@ function disableCheckbox(dimension) {
     let position = getDimensionPositions(dimension);
     if (position != -1) {
         document.getElementById('invert_' + dimension).disabled = false;
+        document.getElementById('invertLabel_' + dimension).style.opacity = 1;
     }
     else {
         document.getElementById('invert_' + dimension).disabled = true;
+        document.getElementById('invertLabel_' + dimension).style.opacity = 0.5;
     }
 }
 
-function disableOptionForFiltering(dimension) {
-    let position = getDimensionPositions(dimension);
+function disableOptionInDropdown(prefixId, dimension) {
+    const value = prefixId.concat(dimension);
+    const position = getDimensionPositions(value);
     if (position != -1) {
-        document.getElementById("option_" + dimension).disabled = false;
+        document.getElementById(value).disabled = false;
     }
     else {
-        document.getElementById("option_" + dimension).disabled = true;
+        document.getElementById(value).disabled = true;
     }
 }
 
 function generateDropdownForMove() {
-    let dimensions = newData["columns"];
+    let dimensions = newData['columns'];
 
-    document.getElementById('moveDimensionHeader').style.visibility = "visible";
+    document.getElementById('moveDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('moveDimensionContainer');
 
@@ -251,19 +308,20 @@ function generateDropdownForMove() {
         disableLeftAndRightButton();
     }
 
-    const headline = document.createElement("option");
-    headline.selected = "disabled";
-    headline.textContent = "Move Dimension";
+    const headline = document.createElement('option');
+    headline.selected = 'disabled';
+    headline.textContent = 'Move Dimension';
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
-        let option = document.createElement("option");
+        let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
+        option.id = 'moveOption_' + dimension;
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
-    document.getElementById("moveLeft").disabled = true;
+    document.getElementById('moveLeft').disabled = true;
 }
 
 function moveDimensionLeft() {  
@@ -280,28 +338,28 @@ function disableLeftAndRightButton() {
     let position = getDimensionPositions(moveDimensionData);
     
     if (position == 0 || position == -1) {
-        document.getElementById("moveRight").disabled = true;
-        document.getElementById("moveRight").style.opacity = 0.5;
+        document.getElementById('moveRight').disabled = true;
+        document.getElementById('moveRight').style.opacity = 0.5;
     }
     else {
-        document.getElementById("moveRight").disabled = false;
-        document.getElementById("moveRight").style.opacity = 1;
+        document.getElementById('moveRight').disabled = false;
+        document.getElementById('moveRight').style.opacity = 1;
     }
 
     if (position == newFeatures.length - 1 || position == -1) {
-        document.getElementById("moveLeft").disabled = true;
-        document.getElementById("moveLeft").style.opacity = 0.5;
+        document.getElementById('moveLeft').disabled = true;
+        document.getElementById('moveLeft').style.opacity = 0.5;
     }
     else {
-        document.getElementById("moveLeft").disabled = false;
-        document.getElementById("moveLeft").style.opacity = 1;
+        document.getElementById('moveLeft').disabled = false;
+        document.getElementById('moveLeft').style.opacity = 1;
     }
 }
 
 function generateDropdownForFilter() {
-    let dimensions = newData["columns"];
+    let dimensions = newData['columns'];
 
-    document.getElementById('filterDimensionHeader').style.visibility = "visible";
+    document.getElementById('filterDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('filterDimensionContainer');
 
@@ -311,45 +369,56 @@ function generateDropdownForFilter() {
         generateInputFieldsForSetRange();
     }
 
-    const headline = document.createElement("option");
-    headline.selected = "disabled";
-    headline.textContent = "Set Range";
+    const headline = document.createElement('option');
+    headline.selected = 'disabled';
+    headline.textContent = 'Set Range';
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
-        let option = document.createElement("option");
+        let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
-        option.id = "option_" + dimension;
+        option.id = 'filterOption_' + dimension;
         dropdown.appendChild(option);
     })
     container.appendChild(dropdown);
 }
 
 function generateInputFieldsForSetRange() {
-  const container = document.getElementById("rangeContainer");
-  const filterButton = document.getElementById("filterButton");
-  const labelTop = document.getElementById("filterDimensionLabelTop");
-  const labelBottom = document.getElementById("filterDimensionLabelBottom");
-  const inputTextElementTop = document.getElementById("filterDimensionInputFieldTop");
-  const inputTextElementBottom = document.getElementById("filterDimensionInputFieldBottom");
+  const container = document.getElementById('rangeContainer');
+  const filterButton = document.getElementById('filterButton');
+  const labelTop = document.getElementById('filterDimensionLabelTop');
+  const labelBottom = document.getElementById('filterDimensionLabelBottom');
+  const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
+  const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
 
-  container.style.visibility = "visible";
+  container.style.visibility = 'visible';
 
-  inputTextElementTop.style.visibility = "visible";
-  inputTextElementTop.name = "topRange";
+  inputTextElementTop.style.visibility = 'visible';
+  inputTextElementTop.name = 'topRange';
 
-  labelTop.for = "topRange";
-  labelTop.innerHTML = "First value:";
+  labelTop.for = 'topRange';
+  const isInverted = getInvertStatus(filterDimensionData);
+  if (isInverted == true) {
+    labelTop.innerHTML = 'Min Value:';
+  }
+  else {
+    labelTop.innerHTML = 'Max Value:';
+  }
 
-  inputTextElementBottom.style.visibility = "visible";
-  inputTextElementBottom.name = "bottomRange";
+  inputTextElementBottom.style.visibility = 'visible';
+  inputTextElementBottom.name = 'bottomRange';
 
-  labelBottom.for = "bottomRange";
-  labelBottom.innerHTML = "Second value:";
+  labelBottom.for = 'bottomRange';
+  if (isInverted == true) {
+    labelBottom.innerHTML = 'Max Value:';
+  }
+  else {
+    labelBottom.innerHTML = 'Min Value:';
+  }
 
-  filterButton.style.visibility = "visible";
-  filterButton.textContent = "Filter";
+  filterButton.style.visibility = 'visible';
+  filterButton.textContent = 'Filter';
 
   container.appendChild(labelTop);
   container.appendChild(inputTextElementTop);
@@ -366,23 +435,17 @@ function filter() {
     let topLimit = limit[1];
     let bottomLimit = limit[0];
 
-    // TODO
-    /*if (top < bottom) {
-        const temp = top;
-        top = bottom;
-        bottom = temp;
-    }*/
+    const isInverted = getInvertStatus(filterDimensionData);
     
     let isOk = true;
-    if (topLimit > bottomLimit) {
-        
+    if (isInverted) { 
         if (!isNaN(topLimit)) {
             if (isNaN(top) || isNaN(bottom)) {
                 alert(`Attention: Values are not numbers! 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
-            if (top > topLimit || bottom < bottomLimit) {
+            if (top > bottomLimit || bottom < topLimit) {
                 alert(`Attention: Values are out of range. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
@@ -396,7 +459,7 @@ function filter() {
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
-            if (bottom < topLimit || top > bottomLimit) {
+            if (top > topLimit || bottom < bottomLimit) {
                 alert(`Attention: Values are out of range. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
@@ -406,8 +469,13 @@ function filter() {
 
     if (isOk) {
         setFilter(filterDimensionData, top, bottom);
-        document.getElementById('filterDimensionInputFieldTop').value = "";
-        document.getElementById('filterDimensionInputFieldBottom').value = "";
+        document.getElementById('filterDimensionInputFieldTop').value = '';
+        document.getElementById('filterDimensionInputFieldBottom').value = '';
+
+        /*document.getElementById('filterButton').style.visibility = 'hidden';
+        document.getElementById('rangeContainer').style.visibility = 'hidden';
+        document.getElementById('filterDimensionInputFieldTop').style.visibility = 'hidden';
+        document.getElementById('filterDimensionInputFieldBottom').style.visibility = 'hidden';*/
     }
 }
 
@@ -418,9 +486,9 @@ function clearPlot() {
     const moveContainer = document.getElementById('moveDimensionContainer');
     const filterContainer = document.getElementById('filterDimensionContainer');
     const rangeContainer = document.getElementById('rangeContainer');
-    const filterButton = document.getElementById("filterButton");
-    const inputTextElementTop = document.getElementById("filterDimensionInputFieldTop");
-    const inputTextElementBottom = document.getElementById("filterDimensionInputFieldBottom");
+    const filterButton = document.getElementById('filterButton');
+    const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
+    const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
 
     while (parentElement.firstChild) {
         parentElement.removeChild(parentElement.firstChild);
@@ -438,8 +506,8 @@ function clearPlot() {
         filterContainer.removeChild(filterContainer.firstChild);
     }
 
-    rangeContainer.style.visibility = "hidden";
-    filterButton.style.visibility = "hidden";
-    inputTextElementTop.style.visibility = "hidden";
-    inputTextElementBottom.style.visibility = "hidden";
+    rangeContainer.style.visibility = 'hidden';
+    filterButton.style.visibility = 'hidden';
+    inputTextElementTop.style.visibility = 'hidden';
+    inputTextElementBottom.style.visibility = 'hidden';
 }

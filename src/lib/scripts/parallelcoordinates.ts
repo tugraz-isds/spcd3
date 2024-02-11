@@ -95,7 +95,7 @@ export default class SteerableParcoords {
         const invertId = '#dimension_invert_' + helper.cleanString(dimension);
         const element = d3.select(invertId);
         const arrowStatus = element.text();
-        return arrowStatus == 'up' ? true : false; 
+        return arrowStatus == 'up' ? true : false;
     }
 
     move(dimension: any, direction: any): void {
@@ -114,7 +114,7 @@ export default class SteerableParcoords {
         const pos = parcoords.xScales(dimension);
         const posNeighbour = parcoords.xScales(neighbour);
 
-        const distance = (width-120)/parcoords.newFeatures.length;
+        const distance = (width-80)/parcoords.newFeatures.length;
 
         parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
             pos - distance;
@@ -626,7 +626,7 @@ export default class SteerableParcoords {
     prepareParcoordData(data: any, newFeatures: any): any {
         
         window.padding = 80;
-        window.width = newFeatures.length * 120;
+        window.width = newFeatures.length * 80;
         window.height = 400;
 
         let dataset = prepareData(data, newFeatures);
