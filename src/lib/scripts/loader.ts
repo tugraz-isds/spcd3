@@ -35,9 +35,10 @@ export function saveSvg(data: any, name: string): void {
     let svgData = data.outerHTML;
 
     svgData = svgData.replaceAll(/cursor="[^"]*"/g, '')
-    svgData = svgData.replace(/style="cursor:[^"]*"/g, '')
+    svgData = svgData.replaceAll(/style="cursor:[^"]*"/g, '')
 
     let processedData = xmlFormat(svgData);
+    processedData = processedData.replace(/    /g, '  ');
 
     let preface = '<?xml version="1.0" standalone="no"?>\r\n';
     let svgBlob = new Blob([preface, processedData], {type:'image/svg+xml;charset=utf-8'});

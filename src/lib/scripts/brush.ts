@@ -383,8 +383,14 @@ function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: 
 
             const scale = maxValue - minValue;
 
-            const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                    240 / scale * (maxValue - d[positionItem.key]) + 80;
+            let value: any;
+            if (!isNaN(maxValue)) {
+            value = invertStatus == false ? 240 / scale * (maxValue - d[positionItem.key]) + 80 :
+                240 / scale * (d[positionItem.key] - minValue) + 80;
+            }
+            else {
+                value = parcoords.yScales[positionItem.key](d[positionItem.key])
+            }
 
             if (value < positionItem.top) {
                 checkedLines.push(currentLine);
@@ -412,8 +418,14 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
 
             const scale = maxValue - minValue;
 
-            const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
-                    240 / scale * (maxValue - d[positionItem.key]) + 80;
+            let value: any;
+            if (!isNaN(maxValue)) {
+            value = invertStatus == false ? 240 / scale * (maxValue - d[positionItem.key]) + 80 :
+                240 / scale * (d[positionItem.key] - minValue) + 80;
+            }
+            else {
+                value = parcoords.yScales[positionItem.key](d[positionItem.key])
+            }
 
             if (value >= positionItem.bottom) {
                 checkedLines.push(currentLine);
