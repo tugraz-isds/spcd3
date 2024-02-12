@@ -44,7 +44,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         .attr("height", 240 - heightTopRect - heightBottomRect);
 
     if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-    setToolTipBrush(tooltipValues, d, event, parcoords, window);
+    setToolTipBrush(tooltipValues, d, event, parcoords, window, true);
     }
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
@@ -86,7 +86,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
         .attr("height", 240 - heightTopRect - heightBottomRect);
 
     if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-        setToolTipBrush(tooltipValues, d, event, parcoords, window);
+        setToolTipBrush(tooltipValues, d, event, parcoords, window, false);
     }
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
@@ -266,14 +266,24 @@ export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: 
 }
 
 function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
-    window: any): void {
+    window: any, direction: any): void {
     
     const range = parcoords.yScales[d.name].domain();
-
     const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
-    let tooltipValue = invertStatus == true ? ((event.y - 70)/(240/(range[0]-range[1])) + range[1]) :
-        range[1] - ((event.y - 70)/(240/(range[1]-range[0])));
+    const maxValue = invertStatus == false ? range[1] : range[0];
+    const minValue = invertStatus == false ? range[0] : range[1];
 
+    const scale = maxValue - minValue;
+
+    let tooltipValue: any;
+    if (invertStatus) {
+        tooltipValue = direction == true ? ((event.y - 70)/(240/(scale)) - minValue) :
+        ((event.y - 80)/(240/(scale)) - minValue);
+    }
+    else {
+        tooltipValue = direction == true ? maxValue - ((event.y - 70)/(240/(scale))) :
+            maxValue - ((event.y - 80)/(240/(scale)));
+    }
 
     if (!invertStatus) {
         if (tooltipValue > range[1]) {
