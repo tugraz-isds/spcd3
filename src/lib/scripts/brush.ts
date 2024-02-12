@@ -7,7 +7,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
     active: any, tooltipValues: any, window: any):void {
     
-    const yPosBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
+    const yPosBottom = Number(d3.select("#triangle_up_" + cleanDimensionName).attr("y"));
     
     let yPosTop: number;
     let yPosRect: number;
@@ -16,9 +16,13 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         yPosTop = 70;
         yPosRect = 80;
     }
-    else if (event.y > yPosBottom) {
-        yPosTop = yPosBottom;
+    else if (event.y > yPosBottom -10 ) {
+        yPosTop = yPosBottom - 10;
         yPosRect = 320;
+    }
+    else if (event.y == yPosBottom - 10) {
+        yPosTop = yPosBottom - 10;
+        yPosRect = yPosTop + 10;
     }
     else {
         yPosTop = event.y;
@@ -51,15 +55,18 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
     active: any, tooltipValues: any, window: any):void {
     
-    const yPosTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
+    const yPosTop = Number(d3.select("#triangle_down_" + cleanDimensionName).attr("y"));
     
     let yPosBottom: number;
     
-    if (event.y < yPosTop) {
-        yPosBottom = yPosTop;
+    if (event.y < yPosTop + 10) {
+        yPosBottom = yPosTop + 10;
     }
     else if (event.y > 320) {
         yPosBottom = 320;
+    }
+    else if (event.y == yPosTop + 10) {
+        yPosBottom = yPosTop;
     }
     else {
         yPosBottom = event.y;
@@ -184,9 +191,9 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     let bottomPosition: any;
     if(invertStatus) {
         topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-        240 / range * bottomValue + 80;
+        240 / range * (topValue - minValue) + 80;
         bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-        240 / range * topValue + 80;
+        240 / range * (bottomValue - minValue) + 80;
     }
     else {
         topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
@@ -220,7 +227,7 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         let value : any;
         if(invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / range * d[dimensionName] + 80;
+                240 / range * (d[dimensionName] - minValue) + 80;
         }
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
@@ -284,7 +291,7 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
             tooltipValue = range[1];
         }
     }
-    
+
     tooltipValues.text(Math.round(tooltipValue*10)/10);
     tooltipValues.style('visibility', 'visible');
     tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');

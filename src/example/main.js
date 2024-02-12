@@ -1,5 +1,6 @@
 import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, 
-    getInvertStatus, getDimensionPositions, setFilter, getDimensionRange} from './lib/spcd3.js';
+    getInvertStatus, getDimensionPositions, setFilter, getDimensionRange,
+    getNumberOfDimensions} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -286,7 +287,7 @@ function disableCheckbox(dimension) {
 
 function disableOptionInDropdown(prefixId, dimension) {
     const value = prefixId.concat(dimension);
-    const position = getDimensionPositions(value);
+    const position = getDimensionPositions(dimension);
     if (position != -1) {
         document.getElementById(value).disabled = false;
     }
@@ -335,7 +336,8 @@ function moveDimensionRight() {
 }
 
 function disableLeftAndRightButton() {
-    let position = getDimensionPositions(moveDimensionData);
+    const position = getDimensionPositions(moveDimensionData);
+    const numberOfDimensions = getNumberOfDimensions();
     
     if (position == 0 || position == -1) {
         document.getElementById('moveRight').disabled = true;
@@ -346,7 +348,7 @@ function disableLeftAndRightButton() {
         document.getElementById('moveRight').style.opacity = 1;
     }
 
-    if (position == newFeatures.length - 1 || position == -1) {
+    if (position == numberOfDimensions - 1 || position == -1) {
         document.getElementById('moveLeft').disabled = true;
         document.getElementById('moveLeft').style.opacity = 0.5;
     }
@@ -428,8 +430,8 @@ function generateInputFieldsForSetRange() {
 }
 
 function filter() {
-    let top = document.getElementById('filterDimensionInputFieldTop').value;
-    let bottom = document.getElementById('filterDimensionInputFieldBottom').value;
+    let top = Number(document.getElementById('filterDimensionInputFieldTop').value);
+    let bottom = Number(document.getElementById('filterDimensionInputFieldBottom').value);
     const limit = getDimensionRange(filterDimensionData);
 
     let topLimit = limit[1];
@@ -445,8 +447,13 @@ function filter() {
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
-            if (top > bottomLimit || bottom < topLimit) {
+            if (top < topLimit || bottom > bottomLimit) {
                 alert(`Attention: Values are out of range. 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+            if (top > bottom) {
+                alert(`Attention: Min value ${top} is bigger than max value ${bottom}. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
@@ -461,6 +468,11 @@ function filter() {
             }
             if (top > topLimit || bottom < bottomLimit) {
                 alert(`Attention: Values are out of range. 
+                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                isOk = false;
+            }
+            if (top < bottom) {
+                alert(`Attention: Min value is bigger than max value. 
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }

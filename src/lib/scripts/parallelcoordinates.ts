@@ -358,7 +358,8 @@ export default class SteerableParcoords {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
                         if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
-                            d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175, 0.7)').style('pointer-events', 'stroke')
+                            d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175)')
+                            .style('pointer-events', 'stroke').style('opacity', '0.7');
                         }
                     }
                 }
@@ -782,6 +783,10 @@ export default class SteerableParcoords {
         return parcoords.yScales[dimension].domain();     
     }
 
+    getNumberOfDimensions():any {
+        return parcoords.newFeatures.length;
+    }
+
     getFilter(dimension)
     {
 
@@ -802,4 +807,5 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange } = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions }
+    = new SteerableParcoords();
