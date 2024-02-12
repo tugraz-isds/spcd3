@@ -34,8 +34,8 @@ export function saveSvg(data: any, name: string): void {
     data.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     let svgData = data.outerHTML;
 
-    svgData = svgData.replaceAll(/cursor="[^"]*"/g, '')
-    svgData = svgData.replaceAll(/style="cursor:[^"]*"/g, '')
+    svgData = svgData.replaceAll(/cursor: url\([^)]*\) 8 8, auto;/g, '');
+    svgData = svgData.replaceAll(/style="cursor:[^"]*"/g, '');
 
     let processedData = xmlFormat(svgData);
     processedData = processedData.replace(/    /g, '  ');

@@ -2,7 +2,7 @@
 
 SPC in D3 is primarily a library for generating parallel coordinates with interaction.
 This project contains the library and an already implemented example
-that the library is using.
+that the library is using. In addition, the project, but also the example, uses D3v7.
 
 A live version of the `main` branch can be found at
 [spcd3.netlify.app](https://spcd3.netlify.app/).
