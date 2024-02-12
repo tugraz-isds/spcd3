@@ -143,7 +143,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
             let value : any;
             if(invertStatus) {
                 value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / range * d[dimensionName] + 80;
+                    240 / range * (d[dimensionName] - minValue) + 80;
             }
             else {
                 value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
@@ -305,8 +305,8 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
     active: any, dimensionName: any, cleanDimensionName: any):void {
     
-    const rangeTop = d3.select("#triangle_down_" + cleanDimensionName).attr("y");
-    const rangeBottom = d3.select("#triangle_up_" + cleanDimensionName).attr("y");
+    const rangeTop = Number(d3.select("#triangle_down_" + cleanDimensionName).attr("y"));
+    const rangeBottom = Number(d3.select("#triangle_up_" + cleanDimensionName).attr("y"));
 
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
@@ -334,7 +334,17 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
 
         const emptyString = "";
        
-        if (value <= rangeTop || value > rangeBottom) {
+        if (value < rangeTop + 10 || value > rangeBottom) {
+            if (dimNameToCheck == emptyString) {
+                makeInactive(currentLine, dimensionName);
+            }
+        }
+        else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
+            if (dimNameToCheck == emptyString) {
+                makeInactive(currentLine, dimensionName);
+            }
+        }
+        else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
             }
@@ -405,7 +415,7 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
             const value = isNaN(maxValue) ? parcoords.yScales[positionItem.key](d[positionItem.key]) :
                     240 / scale * (maxValue - d[positionItem.key]) + 80;
 
-            if (value > positionItem.bottom) {
+            if (value >= positionItem.bottom) {
                 checkedLines.push(currentLine);
                 d3.select("." + currentLine).text(positionItem.key);
             }
@@ -434,9 +444,9 @@ function makeInactive(currentLineName: any, dimensionName: any):void {
 
 export function addSettingsForBrushing(dimensionName: any, parcoords: any):void {
     const processedDimensionName = helper.cleanString(dimensionName);
-    const rectHeight = d3.select("#rect_" + processedDimensionName).node().getBoundingClientRect().height;
-    const yPosRectTop = d3.select("#rect_" + processedDimensionName).attr("y");
-    const yPosRectBottom = Number(yPosRectTop) + rectHeight;
+    const rectHeight = Number(d3.select("#rect_" + processedDimensionName).node().getBoundingClientRect().height);
+    const yPosRectTop = Number(d3.select("#rect_" + processedDimensionName).attr("y"));
+    const yPosRectBottom = yPosRectTop + rectHeight;
 
     if (yPosRectTop > 80 && yPosRectBottom < 320) {
         const distanceBottom = 320 - d3.select("#triangle_up_" + processedDimensionName).attr("y");
