@@ -290,6 +290,23 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
             maxValue - ((event.y - 80)/(240/(scale)));
     }
 
+    if (!invertStatus) {
+        if (tooltipValue > range[1]) {
+            tooltipValue = range[1];
+        }
+        if (tooltipValue < range[0]) {
+            tooltipValue = range[0];
+        }
+    }
+    else {
+        if (tooltipValue > range[0]) {
+            tooltipValue = range[0];
+        }
+        if (tooltipValue < range[1]) {
+            tooltipValue = range[1];
+        }
+    }
+
     tooltipValues.text(Math.round(tooltipValue*10)/10);
     tooltipValues.style('visibility', 'visible');
     tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
