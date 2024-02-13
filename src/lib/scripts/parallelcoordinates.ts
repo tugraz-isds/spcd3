@@ -179,11 +179,11 @@ export default class SteerableParcoords {
             return function onDrag(d) {
                 const element = document.getElementById("parallelcoords");
                 if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-                    parcoords.dragging[(d.subject).name] + 50 > window.screen.width) {
-                    element.scrollLeft += 5;
+                    parcoords.dragging[(d.subject).name] + 50 > window.innerWidth) {
+                    element.scrollLeft += 10;
                 }
                 else if (window.scrollXPos > parcoords.dragging[(d.subject).name] - 50) {
-                    element.scrollLeft -= 5;
+                    element.scrollLeft -= 10;
                 }
 
                 parcoords.dragging[(d.subject).name] = Math.min(width-80, 
