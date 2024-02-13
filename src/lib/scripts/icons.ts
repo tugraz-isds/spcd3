@@ -23,7 +23,7 @@ export function getArrowRight(): string {
 }
 
 export function getArrowTopAndBottom(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 12"><path fill="white" stroke="black" stroke-width="0.5" d="M 0 5.5 L 3 1 L 6 5.5 z"/><path fill="none" stroke="black" stroke-width="0.5" d="M 0 6.5 L 3 11 L 6 6.5 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 12"><path fill="white" stroke="black" stroke-width="0.5" d="M 0 5.5 L 3 1 L 6 5.5 z"/><path fill="white" stroke="black" stroke-width="0.5" d="M 0 6.5 L 3 11 L 6 6.5 z"/></svg>';
 }
 
 export function getArrowTopCursor(): string {

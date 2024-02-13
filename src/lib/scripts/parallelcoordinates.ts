@@ -454,11 +454,21 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('visibility', 'hidden');
 
+        let tooltipValuesTop = d3.select('#parallelcoords')
+            .append('g')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
+
+        let tooltipValuesDown = d3.select('#parallelcoords')
+            .append('g')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
+
         setBrushDown(featureAxis, parcoords, active, tooltipValues);
 
         setBrushUp(featureAxis, parcoords, active, tooltipValues);
        
-        setRectToDrag(featureAxis, svg, parcoords, active);
+        setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
 
         setAxisLabels(featureAxis, padding, parcoords, inactive, active, width);
 
@@ -541,7 +551,8 @@ export default class SteerableParcoords {
 
     setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yScales: {}; 
         dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-        features: any[]; newDataset: any[]; }, active: any): void {
+        features: any[]; newDataset: any[]; }, active: any, tooltipValuesTop: any,
+        tooltipValuesDown: any): void {
         
         let delta: any;
         featureAxis
@@ -559,11 +570,16 @@ export default class SteerableParcoords {
                     .attr('fill', 'rgb(255, 255, 0, 0.4)')
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta);
+                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                                tooltipValuesTop, tooltipValuesDown, window);
                         })
                         .on('start', (event, d) => {
                             let current = d3.select("#rect_" + processedDimensionName);
                             delta = current.attr("y") - event.y;
+                        })
+                        .on('end', () => {
+                            tooltipValuesTop.style('visibility', 'hidden');
+                            tooltipValuesDown.style('visibility', 'hidden');
                         }));
             });
     }

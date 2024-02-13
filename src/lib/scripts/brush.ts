@@ -95,7 +95,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, delta: any):void {
+    active: any, delta: any,  tooltipValuesTop: any, tooltipValuesDown: any, window: any):void {
     
     const rectHeight = svg.select("#rect_" + cleanDimensionName).node()
     .getBoundingClientRect().height;
@@ -136,6 +136,11 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         parcoords.yScales[dimensionName].domain()[1];
 
         const range = maxValue - minValue;
+
+        if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
+            setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window, 
+                true, yPosTop, yPosRect + rectHeight);
+        }
 
         active.each(function (d) {
             const currentLine = getLineName(d);
@@ -285,23 +290,6 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
             maxValue - ((event.y - 80)/(240/(scale)));
     }
 
-    if (!invertStatus) {
-        if (tooltipValue > range[1]) {
-            tooltipValue = range[1];
-        }
-        if (tooltipValue < range[0]) {
-            tooltipValue = range[0];
-        }
-    }
-    else {
-        if (tooltipValue > range[0]) {
-            tooltipValue = range[0];
-        }
-        if (tooltipValue < range[1]) {
-            tooltipValue = range[1];
-        }
-    }
-
     tooltipValues.text(Math.round(tooltipValue*10)/10);
     tooltipValues.style('visibility', 'visible');
     tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
@@ -309,6 +297,58 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
         .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+}
+
+function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d: any, parcoords: any,
+    window: any, direction: any, yPosTop, yPosBottom): void {
+    
+    const range = parcoords.yScales[d.name].domain();
+    const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
+    const maxValue = invertStatus == false ? range[1] : range[0];
+    const minValue = invertStatus == false ? range[0] : range[1];
+
+    const scale = maxValue - minValue;
+
+    let tooltipValueTop: any;
+    let tooltipValueBottom: any;
+    if (invertStatus) {
+        tooltipValueTop = direction == true ? ((yPosTop - 70)/(240/(scale)) + minValue) :
+        ((yPosTop - 80)/(240/(scale)) + minValue);
+        tooltipValueBottom = direction == true ? ((yPosBottom - 80)/(240/(scale)) + minValue) :
+        ((yPosBottom - 70)/(240/(scale)) + minValue);
+    }
+    else {
+        tooltipValueTop = direction == true ? maxValue - ((yPosTop - 70)/(240/(scale))) :
+            maxValue - ((yPosTop - 80)/(240/(scale)));
+        tooltipValueBottom = direction == true ? maxValue - ((yPosBottom - 80)/(240/(scale))) :
+            maxValue - ((yPosBottom - 70)/(240/(scale)));
+    }
+
+    if ((!invertStatus && tooltipValueTop == maxValue) || (invertStatus && tooltipValueTop == minValue)) {
+        tooltipValuesTop.style('visibility', 'hidden');
+    }
+    else {
+    tooltipValuesTop.text(Math.round(tooltipValueTop));
+    tooltipValuesTop.style('visibility', 'visible');
+    tooltipValuesTop.style('top', Number(yPosTop+150) + 'px').style('left', window.event.clientX + 'px');
+    tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+    }
+
+    if ((!invertStatus && tooltipValueBottom == minValue) || (invertStatus && tooltipValueBottom == maxValue)) {
+        tooltipValuesDown.style('visibility', 'hidden');
+    }
+    else {
+    tooltipValuesDown.text(Math.round(tooltipValueBottom));
+    tooltipValuesDown.style('visibility', 'visible');
+    tooltipValuesDown.style('top', Number(yPosBottom+155) + 'px').style('left', window.event.clientX + 'px');
+    tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+    }
 }
 
 function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
