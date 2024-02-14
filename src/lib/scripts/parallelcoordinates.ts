@@ -335,18 +335,10 @@ export default class SteerableParcoords {
             .attr('viewBox', [0, 0, window.width, window.height])
             .style('overflow', 'auto')
             .attr('font-family', 'Verdana, sans-serif')
-            .attr('preserveAspectRatio', 'none');
-
-        let inactive = setInactivePathLines(svg, content, window.parcoords);
-
-        let active = setActivePathLines(svg, content, ids, window.parcoords);
-
-        setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
-
-        window.onclick = (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
-                if (!(event.target.id.includes('dimension_invert_'))) {
-                    if(event.target.id.includes('#parallelcoords')) {
+            .attr('preserveAspectRatio', 'none')
+            .on('click', (event) => {
+                if (!(event.ctrlKey || event.metaKey)) {
+                    if (!(event.target.id.includes('dimension_invert_'))) {
                         for (let i = 0; i < ids.length; i++) {
                             if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
                                 d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175)')
@@ -355,8 +347,13 @@ export default class SteerableParcoords {
                         }
                     }
                 }
-            }
-        }
+            });
+
+        let inactive = setInactivePathLines(svg, content, window.parcoords);
+
+        let active = setActivePathLines(svg, content, ids, window.parcoords);
+
+        setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
     }
 
     setActivePathLines(svg: any, content: any, ids: any[], 
