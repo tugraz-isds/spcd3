@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, 
+import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions} from './lib/spcd3.js';
 
@@ -326,12 +326,12 @@ function generateDropdownForMove() {
 }
 
 function moveDimensionLeft() {  
-    move(moveDimensionData, 'left');
+    moveByOne(moveDimensionData, 'left');
     disableLeftAndRightButton();
 }
 
 function moveDimensionRight() {
-    move(moveDimensionData, 'right');
+    moveByOne(moveDimensionData, 'right');
     disableLeftAndRightButton();
 }
 

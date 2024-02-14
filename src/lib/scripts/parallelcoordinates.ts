@@ -136,7 +136,7 @@ export default class SteerableParcoords {
         return arrowStatus == 'up' ? true : false;
     }
 
-    move(dimension: any, direction: any): void {
+    moveByOne(dimension: any, direction: any): void {
 
         let parcoords = window.parcoords;
         
@@ -186,6 +186,80 @@ export default class SteerableParcoords {
 
         delete parcoords.dragging[dimension];
         delete parcoords.dragging[neighbour];
+    }
+
+    move(dimensionA, toRightOf, dimensionB) {
+        let parcoords = window.parcoords;
+            
+        const indexOfDimensionA = getDimensionPositions(dimensionA);
+        const indexOfDimensionB = getDimensionPositions(dimensionB);
+
+        if (toRightOf == 'toRightOf') {
+            if (indexOfDimensionA > indexOfDimensionB) {
+                for(let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                    if (i != indexOfDimensionB-1) {
+                        swap(parcoords.newFeatures[i], parcoords.newFeatures[i-1]);
+                    }
+                }
+            }
+            else {
+                for(let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                    if (i != indexOfDimensionB-1) {
+                        swap(parcoords.newFeatures[i], parcoords.newFeatures[i+1]);
+                    }
+                }
+            }
+        }
+        else {
+            if (indexOfDimensionA > indexOfDimensionB) {
+                for(let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                    if (i != indexOfDimensionB+1) {
+                        swap(parcoords.newFeatures[i], parcoords.newFeatures[i-1]);
+                    }
+                }
+            }
+            else {
+                for(let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i+1]);
+                }
+            }
+        }
+    }
+
+    swap(dimensionA, dimensionB) {
+        let parcoords = window.parcoords;
+            
+        const positionA = parcoords.xScales(dimensionA);
+        const positionB = parcoords.xScales(dimensionB);
+
+        parcoords.dragging[dimensionA] = positionB;
+        parcoords.dragging[dimensionB] = positionA;
+
+        const indexOfDimensionA = parcoords.newFeatures.indexOf(dimensionA);
+        const indexOfDimensionB = parcoords.newFeatures.indexOf(dimensionB);
+
+        [parcoords.newFeatures[indexOfDimensionA], parcoords.newFeatures[indexOfDimensionB]] = 
+        [parcoords.newFeatures[indexOfDimensionB], parcoords.newFeatures[indexOfDimensionA]];
+   
+        parcoords.xScales.domain(parcoords.newFeatures);
+
+        let inactive = d3.select('g.inactive').selectAll('path');
+        inactive.attr('visibility', 'hidden');
+
+        let active = d3.select('g.active').selectAll('path');
+        let featureAxis = d3.selectAll('#feature');
+
+        active.each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+        });
+
+        featureAxis.attr('transform', (d) => {
+            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        });
+
+        delete parcoords.dragging[dimensionA];
+        delete parcoords.dragging[dimensionB];
     }
 
     onDragStartEventHandler(parcoords: any, inactive: any): any {
@@ -817,8 +891,23 @@ export default class SteerableParcoords {
         return data;
     }
 
+    getAllDimensions(): any {
+        let listOfDimensions = parcoords.newFeatures.slice();
+        return listOfDimensions.reverse();
+    }
+
+    getNumberOfDimensions(): any {
+        return parcoords.newFeatures.length;
+    }
+
     getDimensionPositions(dimension: string): any {
         return parcoords.newFeatures.indexOf(dimension);
+    }
+
+    getDimensionPosition(dimension: string): number {
+        let listOfDimensions = parcoords.newFeatures.slice();
+        let reverseListOfDimension = listOfDimensions.reverse();
+        return reverseListOfDimension.indexOf(dimension);
     }
 
     getDimensionRange(dimension: string): any {
@@ -851,10 +940,6 @@ export default class SteerableParcoords {
             .delay(5)
             .duration(0)
             .attr('visibility', 'hidden');     
-    }
-
-    getNumberOfDimensions():any {
-        return parcoords.newFeatures.length;
     }
 
     getFilter(dimension)
@@ -954,7 +1039,7 @@ export default class SteerableParcoords {
 export const { invert, isInverted, setDimensions, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
-    createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
+    createTooltipForPathLine, getAllPointerEventsData, moveByOne, move, swap, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
     setInvertIcon, getInversionStatus, setInversionStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
-    setDimensionRange, getFilter, getSelected, setSelection, isSelected, toggleSelection, setSelected,  setUnselected } 
-    = new SteerableParcoords();
+    setDimensionRange, getFilter, getSelected, setSelection, isSelected, toggleSelection, setSelected,  setUnselected, getAllDimensions, 
+    getDimensionPosition } = new SteerableParcoords();
