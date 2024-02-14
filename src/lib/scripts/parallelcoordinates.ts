@@ -34,15 +34,6 @@ export default class SteerableParcoords {
 
     invert(dimension: any): void {
 
-        let parcoords = window.parcoords;
-        let yAxis = window.yAxis;
-        if (parcoords.currentPosOfDims == undefined) {
-            parcoords.currentPosOfDims = [];
-            parcoords.newFeatures.forEach(function(item) {
-                parcoords.currentPosOfDims.push({ key: item, top: 70, bottom: 320, isInverted: false });
-            });
-        }
-
         const processedDimensionName = helper.cleanString(dimension);
         const invertId = '#dimension_invert_' + processedDimensionName;
         const dimensionId = '#dimension_axis_' + processedDimensionName;
@@ -91,7 +82,54 @@ export default class SteerableParcoords {
         }
     }
 
-    getInvertStatus(dimension: any): boolean {
+    getInversionStatus(dimension: any): string {
+        const invertId = '#dimension_invert_' + helper.cleanString(dimension);
+        const element = d3.select(invertId);
+        const arrowStatus = element.text();
+        return arrowStatus == 'up' ? 'ascending' : 'descending';
+    }
+
+    setInversionStatus(dimension: any, mode: string): void {
+        const processedDimensionName = helper.cleanString(dimension);
+        const invertId = '#dimension_invert_' + processedDimensionName;
+        const dimensionId = '#dimension_axis_' + processedDimensionName;
+        const textElement = d3.select(invertId);
+        const arrow = mode === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
+        const arrowStyle = mode === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+        textElement.text(mode === 'ascending' ? 'up' : 'down');
+        textElement.attr('href', svgToTinyDataUri.default(arrow));
+        textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
+
+        d3.select(dimensionId)
+            .call(yAxis[dimension]
+            .scale(parcoords.yScales[dimension]
+            .domain(parcoords.yScales[dimension]
+            .domain().reverse())))
+            .transition();
+
+        let active = d3.select('g.active')
+            .selectAll('path')
+            .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+
+        transition(active).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
+
+        brush.addSettingsForBrushing(dimension, parcoords);
+
+        d3.select('g.inactive')
+            .selectAll('path')
+            .each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+            })
+            .transition()
+            .delay(5)
+            .duration(0)
+            .attr('visibility', 'hidden'); 
+    }
+
+    isInverted(dimension: any): boolean {
         const invertId = '#dimension_invert_' + helper.cleanString(dimension);
         const element = d3.select(invertId);
         const arrowStatus = element.text();
@@ -821,7 +859,7 @@ export default class SteerableParcoords {
 
     getFilter(dimension)
     {
-        const invertStatus = getInvertStatus(dimension);
+        const invertStatus = isInverted(dimension);
         const dimensionRange = getDimensionRange(dimension);
         const maxValue = invertStatus == false ? dimensionRange[1] : dimensionRange[0];
         const minValue = invertStatus == false ? dimensionRange[0] : dimensionRange[1];
@@ -913,10 +951,10 @@ export default class SteerableParcoords {
     }
 }
 
-export const { invert, setDimensions, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
+export const { invert, isInverted, setDimensions, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
+    setInvertIcon, getInversionStatus, setInversionStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
     setDimensionRange, getFilter, getSelected, setSelection, isSelected, toggleSelection, setSelected,  setUnselected } 
     = new SteerableParcoords();

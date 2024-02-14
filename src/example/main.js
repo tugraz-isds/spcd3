@@ -1,5 +1,5 @@
 import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, move, 
-    getInvertStatus, getDimensionPositions, setFilter, getDimensionRange,
+    isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions} from './lib/spcd3.js';
 
 let data;
@@ -54,8 +54,8 @@ document.addEventListener('click', function(event) {
         }
     }
     if (filterDimensionData) {
-        const isInverted = getInvertStatus(filterDimensionData);
-        if (isInverted == true) {
+        const inverted = isInverted(filterDimensionData);
+        if (inverted == true) {
             document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
             document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
         }
@@ -212,8 +212,8 @@ function generateDropdownForInvert() {
         for (let i = 0; i < newFeatures.length; i++) {
             const position = getDimensionPositions(newFeatures[i]);
             if (position != -1) {
-                const isInverted = getInvertStatus(newFeatures[i]);
-                if (isInverted == true) {
+                const inverted = isInverted(newFeatures[i]);
+                if (inverted == true) {
                     document.getElementById('invert_' + newFeatures[i]).checked = true;
                 }
                 else {
@@ -240,8 +240,8 @@ function generateDropdownForInvert() {
         invertDimension(event.target.value);
         let checkboxes =  document.getElementById('invertOptions');
         checkboxes.style.display = 'none';
-        const isInverted = getInvertStatus(filterDimensionData);
-        if (isInverted == true) {
+        const inverted = isInverted(filterDimensionData);
+        if (inverted == true) {
             document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
             document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
         }
@@ -400,8 +400,8 @@ function generateInputFieldsForSetRange() {
   inputTextElementTop.name = 'topRange';
 
   labelTop.for = 'topRange';
-  const isInverted = getInvertStatus(filterDimensionData);
-  if (isInverted == true) {
+  const inverted = isInverted(filterDimensionData);
+  if (inverted == true) {
     labelTop.innerHTML = 'Min Value:';
   }
   else {
@@ -412,7 +412,7 @@ function generateInputFieldsForSetRange() {
   inputTextElementBottom.name = 'bottomRange';
 
   labelBottom.for = 'bottomRange';
-  if (isInverted == true) {
+  if (inverted == true) {
     labelBottom.innerHTML = 'Max Value:';
   }
   else {
@@ -437,10 +437,10 @@ function filter() {
     let topLimit = limit[1];
     let bottomLimit = limit[0];
 
-    const isInverted = getInvertStatus(filterDimensionData);
+    const inverted = isInverted(filterDimensionData);
     
     let isOk = true;
-    if (isInverted) { 
+    if (inverted) { 
         if (!isNaN(topLimit)) {
             if (isNaN(top) || isNaN(bottom)) {
                 alert(`Attention: Values are not numbers! 
