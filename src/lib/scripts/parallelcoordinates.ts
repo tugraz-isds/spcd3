@@ -446,7 +446,7 @@ export default class SteerableParcoords {
                 const processedDimensionName = helper.cleanString(d.name);
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + processedDimensionName)
-                    .call(yAxis[d.name])        
+                    .call(yAxis[d.name])       
             });
 
         let tooltipValues = d3.select('#parallelcoords')
@@ -799,13 +799,52 @@ export default class SteerableParcoords {
         return parcoords.yScales[dimension].domain();     
     }
 
+    setDimensionRange(dimension: string, min: number, max: number) {
+        parcoords.yScales[dimension].domain([min, max]).nice();
+        yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+        
+        // draw active lines
+        d3.select('#dimension_axis_' + helper.cleanString(dimension))
+            .call(yAxis[dimension]);
+        let active = d3.select('g.active')
+            .selectAll('path')
+            .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+        transition(active).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+            }
+        );
+
+        // draw inactive lines
+        d3.select('g.inactive')
+            .selectAll('path')
+            .each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+            }).transition()
+            .delay(5)
+            .duration(0)
+            .attr('visibility', 'hidden');     
+    }
+
     getNumberOfDimensions():any {
         return parcoords.newFeatures.length;
     }
 
     getFilter(dimension)
     {
+        const invertStatus = getInvertStatus(dimension);
+        const dimensionRange = getDimensionRange(dimension);
+        const maxValue = invertStatus == false ? dimensionRange[1] : dimensionRange[0];
+        const minValue = invertStatus == false ? dimensionRange[0] : dimensionRange[1];
+        const range = maxValue - minValue;
 
+        const dimensionSettings = window.parcoords.currentPosOfDims.find((obj) => obj.key == dimension);
+        const top =  invertStatus == false ? maxValue - (dimensionSettings.top - 80) / (240/range) :
+                    (dimensionSettings.top - 80) / (240/range) + minValue;
+        const bottom = invertStatus == false ? maxValue - (dimensionSettings.bottom - 80) / (240/range) :
+                    (dimensionSettings.bottom - 80) / (240/range) + minValue;
+        return [top, bottom];
     }
 
     setFilter(dimension, topValue, bottomValue)
@@ -823,5 +862,5 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
-    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions }
-    = new SteerableParcoords();
+    setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
+    setDimensionRange, getFilter } = new SteerableParcoords();
