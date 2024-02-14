@@ -150,16 +150,6 @@ export default class SteerableParcoords {
         delete parcoords.dragging[neighbour];
     }
 
-    select(linePaths: any): void {
-        for(let i = 0; i < linePaths.length; i++) {
-            let selectedLine = helper.cleanLinePathString(linePaths[i]);
-            d3.select('.' + selectedLine)
-                .transition()
-                .style('stroke', 'rgb(255, 165, 0)')
-                .style('opacity', '1');
-        }
-    }
-
     onDragStartEventHandler(parcoords: any, inactive: any): any {
         {
             return function onDragStart (d)
@@ -356,10 +346,12 @@ export default class SteerableParcoords {
         window.onclick = (event) => {
             if (!(event.ctrlKey || event.metaKey)) {
                 if (!(event.target.id.includes('dimension_invert_'))) {
-                    for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
-                            d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175)')
-                            .style('pointer-events', 'stroke').style('opacity', '0.7');
+                    if(event.target.id.includes('#parallelcoords')) {
+                        for (let i = 0; i < ids.length; i++) {
+                            if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
+                                d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175)')
+                                .style('pointer-events', 'stroke').style('opacity', '0.7');
+                            }
                         }
                     }
                 }
@@ -790,16 +782,15 @@ export default class SteerableParcoords {
         return data;
     }
 
-    getDimensionPositions(dimension: string):any
-    {
+    getDimensionPositions(dimension: string): any {
         return parcoords.newFeatures.indexOf(dimension);
     }
 
-    getDimensionRange(dimension: string):any {
+    getDimensionRange(dimension: string): any {
         return parcoords.yScales[dimension].domain();     
     }
 
-    setDimensionRange(dimension: string, min: number, max: number) {
+    setDimensionRange(dimension: string, min: number, max: number): any {
         parcoords.yScales[dimension].domain([min, max]).nice();
         yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
         
@@ -852,9 +843,76 @@ export default class SteerableParcoords {
         brush.filter(dimension, topValue, bottomValue, parcoords);
     }
 
-    getSelected()
-    {
+    select(linePaths: any): void {
+        for(let i = 0; i < linePaths.length; i++) {
+            let selectedLine = helper.cleanLinePathString(linePaths[i]);
+            d3.select('.' + selectedLine)
+                .transition()
+                .style('stroke', 'rgb(255, 165, 0)')
+                .style('opacity', '1');
+        }
+    }
 
+    getSelected(): any {
+        let selected = [];
+        d3.select('g.active').selectAll('path')
+            .each(function(d) {
+                const isSeletedLine = d3.select(this).style('stroke');
+                if (isSeletedLine == 'rgb(255, 165, 0)') {
+                    const keys = Object.keys(d);
+                    const first_key = keys[0];
+                    selected.push(d[first_key]);
+                }
+        });
+        return selected;
+    }
+
+    setSelection(records: any): void {
+        for(let i = 0; i < records.length; i++) {
+            let selectedLine = helper.cleanLinePathString(records[i]);
+            d3.select('.' + selectedLine)
+                .transition()
+                .style('stroke', 'rgb(255, 165, 0)')
+                .style('opacity', '1');
+        }
+    }
+
+    isSelected(record: any): boolean {
+        let cleanedRecord = helper.cleanLinePathString(record);
+        const path = d3.select('.' + cleanedRecord).style('stroke');
+        if (path == 'rgb(255, 165, 0)') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    toggleSelection(record: any): void {
+        const selected = isSelected(record);
+        if (selected) {
+            setUnselected(record);
+        }
+        else {
+            setSelected(record);
+        }
+    }
+
+    setSelected(record: any): void {
+        const path = helper.cleanLinePathString(record);
+        d3.select('.' + path)
+            .transition()
+            .style('stroke', 'rgb(255, 165, 0)')
+            .style('opacity', '1');
+    }
+
+    setUnselected(record: any): void {
+        const path = helper.cleanLinePathString(record);
+        d3.select('.' + path)
+            .transition()
+            .style('stroke', 'rgb(0, 129, 175)')
+            .style('pointer-events', 'stroke')
+            .style('opacity', '0.7');
     }
 }
 
@@ -863,4 +921,5 @@ export const { invert, setDimensions, generateSVG, setInactivePathLines, setActi
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, move, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
     setInvertIcon, getInvertStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
-    setDimensionRange, getFilter } = new SteerableParcoords();
+    setDimensionRange, getFilter, getSelected, setSelection, isSelected, toggleSelection, setSelected,  setUnselected } 
+    = new SteerableParcoords();
