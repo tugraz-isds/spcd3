@@ -3,6 +3,7 @@ import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from './icons';
 import * as svgToTinyDataUri from 'mini-svg-data-uri';
+import { features } from 'process';
 
 declare global {
     let padding: any;
@@ -16,7 +17,7 @@ declare global {
         yScales: {},
         dragging: {},
         dragPosStart: {},
-        currentPosOfDims: [],
+        currentPosOfDims: any,
         newFeatures: any,
         features: any[],
         newDataset: any,
@@ -30,6 +31,64 @@ export default class SteerableParcoords {
 
     setDimensions(newDimension: any): void {
         return newDimension.reverse();
+    }
+
+    getIndex(key: any, currentPosOfDims: any):boolean {
+        const item = currentPosOfDims.find((object) => object.key == key);
+        return item.index;
+    }
+
+    show(dimension: string): any {
+        const tempFeatures = parcoords.newFeatures.slice();
+        const isShown = getHiddenStatus(dimension);
+        const temp = parcoords.currentPosOfDims;
+        const index = getIndex(dimension, parcoords.currentPosOfDims);
+        if (isShown == "hidden") {
+            tempFeatures.splice(index, 0, dimension);
+            generateSVG(parcoords.data, tempFeatures);
+
+            window.parcoords.currentPosOfDims = temp;
+
+             window.parcoords.currentPosOfDims.forEach(function (item) {
+                if (item.isInverted) {
+                    invert(item.key);
+                }
+                if (item.top != 80 || item.bottom != 320) {
+                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                }
+            });
+        }  
+    }
+
+    hide(dimension: string): any {
+        const tempFeatures = parcoords.newFeatures.slice();
+        const isShown = getHiddenStatus(dimension);
+        const temp = parcoords.currentPosOfDims;
+        if (isShown == "shown") {
+            tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
+            generateSVG(parcoords.data, tempFeatures);
+
+            window.parcoords.currentPosOfDims = temp;
+        
+            window.parcoords.currentPosOfDims.forEach(function (item) {
+                if (item.isInverted) {
+                    invert(item.key);
+                }
+                if (item.top != 80 || item.bottom != 320) {
+                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                }
+            });
+        }
+    }
+
+    getHiddenStatus(dimension: string): string {
+        const index = parcoords.newFeatures.indexOf(dimension);
+        if (index != -1) {
+            return "shown";
+        }
+        else {
+            return "hidden";
+        }
     }
 
     invert(dimension: any): void {
@@ -145,8 +204,10 @@ export default class SteerableParcoords {
         
         const indexOfDimension = parcoords.newFeatures.indexOf(dimension);
 
-        const neighbour = direction == 'right' ? parcoords.newFeatures[indexOfDimension-1] :
-            parcoords.newFeatures[indexOfDimension+1];
+        const indexOfNeighbor = direction == 'right' ? indexOfDimension - 1 
+                : indexOfDimension + 1;
+
+        const neighbour = parcoords.newFeatures[indexOfNeighbor];
         
         const width = window.width;
         const pos = parcoords.xScales(dimension);
@@ -719,7 +780,6 @@ export default class SteerableParcoords {
         featureAxisG
             .each(function (d) {
                 const processedDimensionName = helper.cleanString(d.name);
-                parcoords.currentPosOfDims.push({ key: d.name, top: 70, bottom: 320, isInverted: false });
                 d3.select(this)
                     .append('g')
                     .attr('class', 'brush_' + processedDimensionName)
@@ -759,6 +819,12 @@ export default class SteerableParcoords {
         window.parcoords.features = dataset[0];
         window.parcoords.newDataset = dataset[1];
         window.parcoords.data = data;
+
+        for(let i = 0; i < newFeatures.length; i++) {
+            window.parcoords.currentPosOfDims.push(
+                { key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i }
+            );
+        }
 
         window.yAxis = {};
         window.yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
@@ -910,6 +976,20 @@ export default class SteerableParcoords {
         return reverseListOfDimension.indexOf(dimension);
     }
 
+    setDimensionPosition(dimension: string, position: number): any {
+        const dimensionListCopy = parcoords.newFeatures.slice();
+        const dimensionListInOrder = dimensionListCopy.reverse();
+        const dimensionToMove = dimensionListInOrder[position];
+        const dimensionPositionA = getDimensionPositions(dimension);
+        const dimensionPositionB = getDimensionPositions(dimensionToMove);
+        if (dimensionPositionA > dimensionPositionB) {
+            move(dimension, 'toRightOf', dimensionToMove);
+        }
+        else {
+            move(dimension, 'toLeftOf', dimensionToMove);
+        }
+    }
+
     getDimensionRange(dimension: string): any {
         return parcoords.yScales[dimension].domain();     
     }
@@ -1042,4 +1122,4 @@ export const { invert, isInverted, setDimensions, generateSVG, setInactivePathLi
     createTooltipForPathLine, getAllPointerEventsData, moveByOne, move, swap, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
     setInvertIcon, getInversionStatus, setInversionStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,
     setDimensionRange, getFilter, getSelected, setSelection, isSelected, toggleSelection, setSelected,  setUnselected, getAllDimensions, 
-    getDimensionPosition } = new SteerableParcoords();
+    getDimensionPosition, setDimensionPosition, getHiddenStatus, show, hide, getIndex } = new SteerableParcoords();

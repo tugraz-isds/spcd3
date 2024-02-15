@@ -256,6 +256,66 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     });
 }
 
+export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, dimension) {
+    addPosition(topPosition, currentPosOfDims, dimension, "top");
+    addPosition(bottomPosition, currentPosOfDims, dimension, "bottom");
+
+    const cleanDimensionName = helper.cleanString(dimension);
+    
+    let rectHeight = bottomPosition - topPosition;
+
+    d3.select("#rect_" + cleanDimensionName)
+        .attr("y", topPosition);
+    d3.select("#triangle_down_" + cleanDimensionName)
+        .attr("y", topPosition-10);
+    d3.select("#triangle_up_" + cleanDimensionName)
+        .attr("y", bottomPosition);
+    d3.select("#rect_" + cleanDimensionName)
+        .attr("height", rectHeight);
+        
+
+    const invertStatus = getInvertStatus(dimension, parcoords.currentPosOfDims);
+    const maxValue = invertStatus == false ? parcoords.yScales[dimension].domain()[1] :
+    parcoords.yScales[dimension].domain()[0];
+    
+    const minValue = invertStatus == false ? parcoords.yScales[dimension].domain()[0] :
+    parcoords.yScales[dimension].domain()[1];
+    
+    const range = maxValue - minValue;
+
+    let active = d3.select('g.active').selectAll('path');
+    const emptyString = "";
+    active.each(function (d) {
+        const currentLine = getLineName(d);
+        const dimNameToCheck = d3.select("." + currentLine).text();
+
+        let value : any;
+        if(invertStatus) {
+            value = isNaN(maxValue) ? parcoords.yScales[dimension](d[dimension]) :
+                240 / range * (d[dimension] - minValue) + 80;
+        }
+        else {
+            value = isNaN(maxValue) ? parcoords.yScales[dimension](d[dimension]) :
+                240 / range * (maxValue - d[dimension]) + 80;
+        }
+            
+        if (value < topPosition || value > bottomPosition) {
+            makeInactive(currentLine, dimension);
+        }
+        else if (dimNameToCheck == dimension && dimNameToCheck != emptyString) {
+            let checkedLines = [];
+            parcoords.currentPosOfDims.forEach(function (item) {
+                checkAllPositionsTop(item, dimension, parcoords, d, checkedLines, currentLine);
+                checkAllPositionsBottom(item, dimension, parcoords, d, checkedLines, currentLine);
+                
+            });
+            if(!checkedLines.includes(currentLine)) {
+                makeActive(currentLine);
+            }
+        }
+    });
+}
+
 
 function getLineName(d: any):string {
     const keys = Object.keys(d);
