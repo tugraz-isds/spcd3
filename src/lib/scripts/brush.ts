@@ -342,8 +342,8 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
 
     let tooltipValue: any;
     if (invertStatus) {
-        tooltipValue = direction == true ? ((event.y - 70)/(240/(scale)) - minValue) :
-        ((event.y - 80)/(240/(scale)) - minValue);
+        tooltipValue = direction == true ? ((event.y - 70)/(240/(scale)) + minValue) :
+        ((event.y - 80)/(240/(scale)) + minValue);
     }
     else {
         tooltipValue = direction == true ? maxValue - ((event.y - 70)/(240/(scale))) :
