@@ -732,8 +732,15 @@ export default class SteerableParcoords {
                     .attr('fill', 'rgb(255, 255, 0, 0.4)')
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
-                                tooltipValuesTop, tooltipValuesDown, window);
+                            if (parcoords.newFeatures.length > 25) {
+                                helper.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                                    tooltipValuesTop, tooltipValuesDown, window);
+                            }
+                            else {
+                                brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                                    tooltipValuesTop, tooltipValuesDown, window);
+                            }
+                            
                         })
                         .on('start', (event, d) => {
                             let current = d3.select("#rect_" + processedDimensionName);
@@ -765,7 +772,12 @@ export default class SteerableParcoords {
                     .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag().on('drag', (event, d) => {
-                        brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                        if (parcoords.newFeatures.length > 25) {
+                            helper.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                        }
+                        else {
+                            brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                        }
                     })
                     .on('end', () => {
                         tooltipValues.style('visibility', 'hidden');
@@ -793,7 +805,12 @@ export default class SteerableParcoords {
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag()
                         .on('drag', (event, d) => {
-                            brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            if (parcoords.newFeatures.length > 25) {
+                                helper.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            }
+                            else {
+                                brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            }
                         })
                         .on('end', () => {
                             tooltipValues.style('visibility', 'hidden');
