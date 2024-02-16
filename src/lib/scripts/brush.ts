@@ -164,9 +164,10 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
             else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
                 let checkedLines = [];
                 parcoords.currentPosOfDims.forEach(function (item) {
-                    checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                    checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                    
+                    if (item.top != 80 && item.bottom != 320) {
+                        checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
+                        checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
+                    }
                 });
                 if(!checkedLines.includes(currentLine)) {
                     makeActive(currentLine);
@@ -479,10 +480,12 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
             let checkedLines = [];
             parcoords.currentPosOfDims.forEach(function (item) {
-                checkAllPositionsTop(item, dimensionName, parcoords, d, 
-                    checkedLines, currentLine);
-                checkAllPositionsBottom(item, dimensionName, parcoords, d, 
-                    checkedLines, currentLine);
+                if(item.top != 80 || item.bottom != 320) {
+                    checkAllPositionsTop(item, dimensionName, parcoords, d, 
+                        checkedLines, currentLine);
+                    checkAllPositionsBottom(item, dimensionName, parcoords, d, 
+                        checkedLines, currentLine);
+                }
             });
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
