@@ -839,12 +839,32 @@ export default class SteerableParcoords {
 
         for(let i = 0; i < newFeatures.length; i++) {
             window.parcoords.currentPosOfDims.push(
-                { key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i }
+                { key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i , sigDig: 0 }
             );
         }
 
         window.yAxis = {};
         window.yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+
+        window.parcoords.features.map(x => {
+            let numberOfDigs = 0
+            let values = window.parcoords.newDataset.map(o => o[x.name]);
+            for (let i = 0; i < values.length; i++) {
+                if(!isNaN(values[i])){
+                    const tempNumberOfDigs = helper.digits(Number(values[i]));
+                    if (tempNumberOfDigs > numberOfDigs)
+                    {
+                        numberOfDigs = tempNumberOfDigs;
+                    }
+                }
+                else {
+                    continue;
+                }
+            }
+            helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
+        });
+
+        console.log(window.parcoords.currentPosOfDims);
     }
 
     setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 

@@ -35,3 +35,18 @@ const delay = 50;
 export const throttleBrushDown = throttle(brush.brushDown, delay);
 export const throttleBrushUp = throttle(brush.brushUp, delay);
 export const throttleDragAndBrush = throttle(brush.dragAndBrush, delay);
+
+//source: https://stackoverflow.com/questions/22884720/what-is-the-fastest-way-to-count-the-number-of-significant-digits-of-a-number
+export function digits (value) {
+    return value
+        .toExponential()
+        .replace(/^([0-9]+)\.?([0-9]+)?e[\+\-0-9]*$/g, "$1$2")
+        .length
+};
+
+export function addNumberOfDigs(number: any, currentPosOfDims: any, dimensionName: any, key: any):void {
+    let newObject = {};
+    newObject[key] = number;
+    const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
+    Object.assign(target, newObject);
+}

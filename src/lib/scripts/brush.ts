@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import * as icon from './icons';
 import * as helper from './helper';
+import { getDimensionRange } from './parallelcoordinates';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
@@ -367,8 +368,9 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
             tooltipValue = range[1];
         }
     }
-
-    tooltipValues.text(Math.round(tooltipValue*10)/10);
+    
+    const digs = getSigDig(d.name, parcoords.currentPosOfDims);
+    tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB')*10)/10);
     tooltipValues.style('visibility', 'visible');
     tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
     tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
@@ -626,6 +628,11 @@ export function addSettingsForBrushing(dimensionName: any, parcoords: any):void 
 function getInvertStatus(key: any, currentPosOfDims: any):boolean {
     const item = currentPosOfDims.find((object) => object.key == key);
     return item.isInverted;
+}
+
+function getSigDig(key: any, currentPosOfDims: any): number {
+    const item = currentPosOfDims.find((object) => object.key == key);
+    return item.sigDig;
 }
 
 function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any):void {
