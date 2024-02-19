@@ -520,6 +520,7 @@ export default class SteerableParcoords {
                         }
                     }
                 }
+                d3.select('#contextmenu').style('display', 'none');
             });
 
         let inactive = setInactivePathLines(svg, content, window.parcoords);
@@ -608,7 +609,7 @@ export default class SteerableParcoords {
                 const processedDimensionName = helper.cleanString(d.name);
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + processedDimensionName)
-                    .call(yAxis[d.name])       
+                    .call(yAxis[d.name]);
             });
 
         let tooltipValues = d3.select('#parallelcoords')
@@ -668,6 +669,28 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('visibility', 'hidden');
 
+        let contextMenu = d3.select('#parallelcoords')
+            .append('g')
+            .attr('id', 'contextmenu')
+            .style('position', 'absolute')
+            .style('display', 'none');
+        
+        contextMenu.append('div')
+            .attr('id', 'hideMenu')
+            .text('Hide');
+        contextMenu.append('div')
+            .attr('id', 'invertMenu')
+            .text('Invert');
+        contextMenu.append('div')
+            .attr('id', 'rangeMenu')
+            .text('Set Range');
+        contextMenu.append('div')
+            .attr('id', 'filterMenu')
+            .text('Set Filter');
+        contextMenu.append('div')
+            .attr('id', 'resetfilterMenu')
+            .text('Reset Filter')
+        
         featureAxis
             .append('text')
             .attr('id', 'dimension')
@@ -703,11 +726,56 @@ export default class SteerableParcoords {
                 tooltipFeatures.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
                     .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
                     .style('padding', 0.12 + 'rem')
-                    .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+                    .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
                 return tooltipFeatures;
             })
             .on('mouseout', function () {
                 return tooltipFeatures.style('visibility', 'hidden');
+            })
+            .on('contextmenu', function (event, d) {
+                const dimension = d.name;
+                contextMenu.style('left', event.clientX + 'px')
+                .style('top', 13.6 + 'rem')
+                .style('display', 'block')
+                .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+                .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+                .style('padding', 0.12 + 'rem')
+                .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
+                .style('cursor', 'pointer')
+                .on('click', (event) => {
+                    event.stopPropagation();
+                });
+
+                d3.select('#hideMenu')
+                    .on('click', (event) => {
+                        hide(dimension);
+                        event.stopPropagation();
+                    });
+                d3.select('#invertMenu')
+                    .on('click', (event) => {
+                        invert(dimension);
+                        event.stopPropagation();
+                    });
+                
+                d3.select('#rangeMenu')
+                    .on('click', (event) => {
+                        setDimensionRange(dimension, 0, 100);
+                        event.stopPropagation();
+                    });
+                
+                d3.select('#filterMenu')
+                    .on('click', (event) => {
+                        setFilter(dimension, 90, 10);
+                        event.stopPropagation();
+                    });
+                
+                d3.select('#resetfilterMenu')
+                    .on('click', (event) => {
+                        const range = getDimensionRange(dimension);
+                        setFilter(dimension, range[1], range[0]);
+                        event.stopPropagation();
+                    });
+                event.preventDefault();
             });
     }
 
@@ -863,8 +931,6 @@ export default class SteerableParcoords {
             }
             helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
         });
-
-        console.log(window.parcoords.currentPosOfDims);
     }
 
     setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
@@ -976,7 +1042,7 @@ export default class SteerableParcoords {
             tooltipPath.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
                 .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-                .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+                .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
             return tooltipPath;
         }
     }
@@ -1032,18 +1098,19 @@ export default class SteerableParcoords {
     }
 
     setDimensionRange(dimension: string, min: number, max: number): any {
-        parcoords.yScales[dimension].domain([min, max]).nice();
-        yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+        window.parcoords.yScales[dimension].domain([min, max]).nice();
+        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+            window.parcoords.newDataset);
         
         // draw active lines
         d3.select('#dimension_axis_' + helper.cleanString(dimension))
             .call(yAxis[dimension]);
         let active = d3.select('g.active')
             .selectAll('path')
-            .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+            .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
         transition(active).each(function (d) {
             d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
             }
         );
 
@@ -1052,7 +1119,7 @@ export default class SteerableParcoords {
             .selectAll('path')
             .each(function (d) {
             d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords))
+                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
             }).transition()
             .delay(5)
             .duration(0)
