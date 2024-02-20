@@ -520,8 +520,11 @@ export default class SteerableParcoords {
                         }
                     }
                 }
-                d3.select('#contextmenu').style('display', 'none');
             });
+        
+        window.onclick = () => {
+            d3.select('#contextmenu').style('display', 'none');
+        }
 
         let inactive = setInactivePathLines(svg, content, window.parcoords);
 
@@ -677,18 +680,23 @@ export default class SteerableParcoords {
         
         contextMenu.append('div')
             .attr('id', 'hideMenu')
+            .attr('class', 'contextmenu')
             .text('Hide');
         contextMenu.append('div')
             .attr('id', 'invertMenu')
+            .attr('class', 'contextmenu')
             .text('Invert');
         contextMenu.append('div')
             .attr('id', 'rangeMenu')
+            .attr('class', 'contextmenu')
             .text('Set Range');
         contextMenu.append('div')
             .attr('id', 'filterMenu')
+            .attr('class', 'contextmenu')
             .text('Set Filter');
         contextMenu.append('div')
             .attr('id', 'resetfilterMenu')
+            .attr('class', 'contextmenu')
             .text('Reset Filter')
         
         featureAxis
@@ -739,7 +747,7 @@ export default class SteerableParcoords {
                 .style('display', 'block')
                 .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-                .style('padding', 0.12 + 'rem')
+                .style('padding', 0.35 + 'rem')
                 .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
                 .style('cursor', 'pointer')
                 .on('click', (event) => {
@@ -751,20 +759,36 @@ export default class SteerableParcoords {
                         hide(dimension);
                         event.stopPropagation();
                     });
+                
                 d3.select('#invertMenu')
                     .on('click', (event) => {
                         invert(dimension);
                         event.stopPropagation();
                     });
                 
+                const windowFeatures = "top=300,left=300,width=300,height=300";
                 d3.select('#rangeMenu')
+                    .style('border-top', '0.08rem lightgrey solid')
                     .on('click', (event) => {
-                        setDimensionRange(dimension, 0, 100);
+                        let test = window.open('', 'test', windowFeatures);
+                        test.document.writeln('<header> Set Axis Range </header>');
+                        test.document.writeln('<input type="text" id="test1" padding-bottom=0.5rem>');
+                        test.document.writeln('<input type="text" id="test2" padding-bottom=0.5rem>');
+                        test.document.writeln('<input type=BUTTON value="Save"');
+                        test.document.writeln('onClick="window.close()">');
+                        setDimensionRange(dimension, 110, 0);
                         event.stopPropagation();
                     });
                 
                 d3.select('#filterMenu')
+                    .style('border-top', '0.08rem lightgrey solid')
                     .on('click', (event) => {
+                        let test = window.open('', 'test', windowFeatures);
+                        test.document.writeln('<header> Set Filter </header>');
+                        test.document.writeln('<input type="text" id="test1" padding-bottom=0.5rem>');
+                        test.document.writeln('<input type="text" id="test2" padding-bottom=0.5rem>');
+                        test.document.writeln('<input type=BUTTON value="Save"');
+                        test.document.writeln('onClick="window.close()">');
                         setFilter(dimension, 90, 10);
                         event.stopPropagation();
                     });
@@ -775,6 +799,8 @@ export default class SteerableParcoords {
                         setFilter(dimension, range[1], range[0]);
                         event.stopPropagation();
                     });
+                
+                d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
                 event.preventDefault();
             });
     }
