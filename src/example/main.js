@@ -1,6 +1,6 @@
 import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
-    getNumberOfDimensions} from './lib/spcd3.js';
+    getNumberOfDimensions, hide, show, getHiddenStatus} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -31,40 +31,6 @@ moveLeftButton.style.visibility = 'hidden';
 let filterButton = document.getElementById('filterButton');
 filterButton.addEventListener('click', filter, false);
 filterButton.style.visibility = 'hidden';
-
-document.addEventListener('click', function(event) {
-    const showButton = document.getElementById('showButton');
-    if (showButton) {
-        const outsideClick = !showButton.contains(event.target);
-        if (outsideClick) {
-            const checkboxes = document.getElementById('options');
-            checkboxes.style.display = 'none';
-            showButton.style.backgroundColor = 'white';
-            showButton.style.color = 'black';
-        }
-    }
-    const invertButton = document.getElementById('invertButton');
-    if (invertButton) {
-        const outsideClick = !invertButton.contains(event.target);
-        if (outsideClick) {
-            const checkboxes = document.getElementById('invertOptions');
-            checkboxes.style.display = 'none';
-            invertButton.style.backgroundColor = 'white';
-            invertButton.style.color = 'black';
-        }
-    }
-    if (filterDimensionData) {
-        const inverted = isInverted(filterDimensionData);
-        if (inverted == true) {
-            document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
-            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
-        }
-        else {
-            document.getElementById('filterDimensionLabelTop').innerHTML = 'Max Value:';
-            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Min Value:';    
-        }
-    }
-});
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -108,11 +74,14 @@ function showButtons() {
     moveLeftButton.style.opacity = 0.5;
 }
 
-function updateDimensions()
+function updateDimensions(dimension)
 {
-    let selectedDimensions = getSelectedDimensions();
-    let newSelectedDimensions = setDimensions(selectedDimensions);
-    generateSVG(newData, newSelectedDimensions);
+    if(getHiddenStatus(dimension) == 'shown') {
+        hide(dimension);
+    }
+    else {
+        show(dimension);
+    }
 }
 
 function getSelectedDimensions()
@@ -170,13 +139,11 @@ function generateDropdownForShow() {
     dimensionContainer.style.borderRadius = '0.2rem';
     dimensionContainer.name = 'options';
     dimensionContainer.addEventListener('change', (event) => {
-        updateDimensions();
+        updateDimensions(event.target.value);
         disableCheckbox(event.target.value);
         disableOptionInDropdown('filterOption_', event.target.value);
         disableOptionInDropdown('moveOption_', event.target.value);
         disableLeftAndRightButton();
-        let checkboxes =  document.getElementById('options');
-        checkboxes.style.display = 'none';
     });
 
     dimensions.forEach(function(dimension) {
@@ -238,17 +205,6 @@ function generateDropdownForInvert() {
     dimensionContainer.name = 'invertOptions';
     dimensionContainer.addEventListener('change', (event) => {
         invertDimension(event.target.value);
-        let checkboxes =  document.getElementById('invertOptions');
-        checkboxes.style.display = 'none';
-        const inverted = isInverted(filterDimensionData);
-        if (inverted == true) {
-            document.getElementById('filterDimensionLabelTop').innerHTML = 'Min Value:';
-            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Max Value:';
-        }
-        else {
-            document.getElementById('filterDimensionLabelTop').innerHTML = 'Max Value:';
-            document.getElementById('filterDimensionLabelBottom').innerHTML = 'Min Value:';    
-        }
     });
 
     dimensions.forEach(function(dimension) {
@@ -373,7 +329,7 @@ function generateDropdownForFilter() {
 
     const headline = document.createElement('option');
     headline.selected = 'disabled';
-    headline.textContent = 'Set Range';
+    headline.textContent = 'Set Filter';
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
@@ -400,24 +356,13 @@ function generateInputFieldsForSetRange() {
   inputTextElementTop.name = 'topRange';
 
   labelTop.for = 'topRange';
-  const inverted = isInverted(filterDimensionData);
-  if (inverted == true) {
-    labelTop.innerHTML = 'Min Value:';
-  }
-  else {
-    labelTop.innerHTML = 'Max Value:';
-  }
+  labelTop.innerHTML = 'Min Value:';
 
   inputTextElementBottom.style.visibility = 'visible';
   inputTextElementBottom.name = 'bottomRange';
 
   labelBottom.for = 'bottomRange';
-  if (inverted == true) {
-    labelBottom.innerHTML = 'Max Value:';
-  }
-  else {
-    labelBottom.innerHTML = 'Min Value:';
-  }
+  labelBottom.innerHTML = 'Max Value:';
 
   filterButton.style.visibility = 'visible';
   filterButton.textContent = 'Filter';
@@ -447,10 +392,11 @@ function filter() {
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
-            if (top < topLimit || bottom > bottomLimit) {
-                alert(`Attention: Values are out of range. 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
-                isOk = false;
+            if (top < topLimit) {
+                top = topLimit;
+            }
+            if (bottom > bottomLimit) {
+                bottom = bottomLimit;
             }
             if (top > bottom) {
                 alert(`Attention: Min value ${top} is bigger than max value ${bottom}. 
@@ -466,21 +412,28 @@ function filter() {
                     Please enter values between ${topLimit} and ${bottomLimit}.`);
                 isOk = false;
             }
-            if (top > topLimit || bottom < bottomLimit) {
-                alert(`Attention: Values are out of range. 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
-                isOk = false;
+            if (top < bottomLimit) {
+                top = bottomLimit;
             }
-            if (top < bottom) {
+            if (bottom > topLimit) {
+                bottom = topLimit;
+            }
+            if (top > bottom) {
                 alert(`Attention: Min value is bigger than max value. 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                    Please enter values between ${bottomLimit} and ${topLimit}.`);
                 isOk = false;
             }
         }
     }
 
     if (isOk) {
-        setFilter(filterDimensionData, top, bottom);
+        if (inverted) {
+            setFilter(filterDimensionData, top, bottom);
+        }
+        else {
+            setFilter(filterDimensionData, bottom, top);
+        }
+        
         document.getElementById('filterDimensionInputFieldTop').value = '';
         document.getElementById('filterDimensionInputFieldBottom').value = '';
 
