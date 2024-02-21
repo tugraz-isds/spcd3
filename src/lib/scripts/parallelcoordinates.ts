@@ -524,8 +524,6 @@ export default class SteerableParcoords {
         
         window.onclick = () => {
             d3.select('#contextmenu').style('display', 'none');
-            d3.select('#popupRange').style('display', 'none');
-            d3.select('#popupFilter').style('display', 'none');
         }
 
         let inactive = setInactivePathLines(svg, content, window.parcoords);
@@ -686,12 +684,16 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('display', 'none');
 
-        popupWindowRange.append('h2').text('Set Range');
-        popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
+        popupWindowRange.append('h3').text('Set Range').style('padding-left', 0.5 + 'rem');
+        let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
+        .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
+        .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
+        popupWindowRange.append('label').text('Min Value').style('padding', 0.5 + 'rem');
         popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2 + 'rem');
-        popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
+        popupWindowRange.append('label').text('Max Value').style('padding', 0.5 + 'rem');
         popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
-        let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem');
+        let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
+        .style('width', 14 + 'rem').style('margin-top', 1 + 'rem');
         
         let popupWindowFilter = d3.select('#parallelcoords')
             .append('div')
@@ -699,12 +701,16 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('display', 'none')
 
-        popupWindowFilter.append('h2').text('Set Filter');
-        popupWindowFilter.append('label').text('Min').style('padding', 0.5 + 'rem');
+        popupWindowFilter.append('h3').text('Set Filter').style('padding-left', 0.5 + 'rem');
+        let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
+        .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
+        .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
+        popupWindowFilter.append('label').text('Min Value').style('padding', 0.5 + 'rem');
         popupWindowFilter.append('input').attr('id', 'minFilterValue').style('width', 2 + 'rem');
-        popupWindowFilter.append('label').text('Max').style('padding', 0.5 + 'rem');
+        popupWindowFilter.append('label').text('Max Value').style('padding', 0.5 + 'rem');
         popupWindowFilter.append('input').attr('id', 'maxFilterValue').style('width', 2 + 'rem');
-        let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem');
+        let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem')
+        .style('width', 14 + 'rem').style('margin-top', 1 + 'rem');
         
         contextMenu.append('div')
             .attr('id', 'hideMenu')
@@ -799,7 +805,7 @@ export default class SteerableParcoords {
                     .on('click', (event) => {
                         popupWindowRange.style('display', 'block')
                                 .style('width', 15 + 'rem')
-                                .style('height', 10 + 'rem')
+                                .style('height', 9 + 'rem')
                                 .style('background', 'white')
                                 .style('border', '1px solid black')
                                 .style('border-radius', 0.25 + 'rem')
@@ -815,7 +821,10 @@ export default class SteerableParcoords {
                             let max = d3.select('#maxRangeValue').node().value;
                             setDimensionRange(dimension, min, max);
                             popupWindowRange.style('display', 'none');
-                        }); 
+                        });
+                        closeButtonRange.on('click', () => {
+                            popupWindowRange.style('display', 'none');
+                        });
                         event.stopPropagation();
                     });
                 
@@ -824,7 +833,7 @@ export default class SteerableParcoords {
                     .on('click', (event) => {
                         popupWindowFilter.style('display', 'block')
                                 .style('width', 15 + 'rem')
-                                .style('height', 10 + 'rem')
+                                .style('height', 9 + 'rem')
                                 .style('background', 'white')
                                 .style('border', '1px solid black')
                                 .style('border-radius', 0.25 + 'rem')
@@ -839,16 +848,29 @@ export default class SteerableParcoords {
                         filterButton.on('click', () => {
                             let min = d3.select('#minFilterValue').node().value;
                             let max = d3.select('#maxFilterValue').node().value;
-                            setFilter(dimension, max, min);
+                            if (getInversionStatus(dimension)) {
+                                setFilter(dimension, min, max);
+                            }
+                            else {
+                                setFilter(dimension, max, min);
+                            }
                             popupWindowFilter.style('display', 'none');
-                        }); 
+                        });
+                        closeButtonFilter.on('click', () => {
+                            popupWindowFilter.style('display', 'none');
+                        });
                         event.stopPropagation();
                     });
                 
                 d3.select('#resetfilterMenu')
                     .on('click', (event) => {
                         const range = getDimensionRange(dimension);
-                        setFilter(dimension, range[1], range[0]);
+                        if (getInversionStatus(dimension)) {
+                            setFilter(dimension, range[0], range[1]);
+                        }
+                        else {
+                            setFilter(dimension, range[1], range[0]);
+                        }
                         event.stopPropagation();
                     });
                 
