@@ -524,6 +524,8 @@ export default class SteerableParcoords {
         
         window.onclick = () => {
             d3.select('#contextmenu').style('display', 'none');
+            d3.select('#popupRange').style('display', 'none');
+            d3.select('#popupFilter').style('display', 'none');
         }
 
         let inactive = setInactivePathLines(svg, content, window.parcoords);
@@ -677,6 +679,32 @@ export default class SteerableParcoords {
             .attr('id', 'contextmenu')
             .style('position', 'absolute')
             .style('display', 'none');
+
+        let popupWindowRange = d3.select('#parallelcoords')
+            .append('div')
+            .attr('id', 'popupRange')
+            .style('position', 'absolute')
+            .style('display', 'none');
+
+        popupWindowRange.append('h2').text('Set Range');
+        popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
+        popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2 + 'rem');
+        popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
+        popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
+        let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem');
+        
+        let popupWindowFilter = d3.select('#parallelcoords')
+            .append('div')
+            .attr('id', 'popupFilter')
+            .style('position', 'absolute')
+            .style('display', 'none')
+
+        popupWindowFilter.append('h2').text('Set Filter');
+        popupWindowFilter.append('label').text('Min').style('padding', 0.5 + 'rem');
+        popupWindowFilter.append('input').attr('id', 'minFilterValue').style('width', 2 + 'rem');
+        popupWindowFilter.append('label').text('Max').style('padding', 0.5 + 'rem');
+        popupWindowFilter.append('input').attr('id', 'maxFilterValue').style('width', 2 + 'rem');
+        let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem');
         
         contextMenu.append('div')
             .attr('id', 'hideMenu')
@@ -766,30 +794,54 @@ export default class SteerableParcoords {
                         event.stopPropagation();
                     });
                 
-                const windowFeatures = "top=300,left=300,width=300,height=300";
                 d3.select('#rangeMenu')
                     .style('border-top', '0.08rem lightgrey solid')
                     .on('click', (event) => {
-                        let test = window.open('', 'test', windowFeatures);
-                        test.document.writeln('<header> Set Axis Range </header>');
-                        test.document.writeln('<input type="text" id="test1" padding-bottom=0.5rem>');
-                        test.document.writeln('<input type="text" id="test2" padding-bottom=0.5rem>');
-                        test.document.writeln('<input type=BUTTON value="Save"');
-                        test.document.writeln('onClick="window.close()">');
-                        setDimensionRange(dimension, 110, 0);
+                        popupWindowRange.style('display', 'block')
+                                .style('width', 15 + 'rem')
+                                .style('height', 10 + 'rem')
+                                .style('background', 'white')
+                                .style('border', '1px solid black')
+                                .style('border-radius', 0.25 + 'rem')
+                                .style('padding', 1 + 'rem')
+                                .style('margin', 'auto')
+                                .style('top', 0)
+                                .style('right', 0)
+                                .style('bottom', 0)
+                                .style('left', 0)
+                                .style('z-index', 10);
+                        rangeButton.on('click', () => {
+                            let min = d3.select('#minRangeValue').node().value;
+                            let max = d3.select('#maxRangeValue').node().value;
+                            setDimensionRange(dimension, min, max);
+                            popupWindowRange.style('display', 'none');
+                        }); 
                         event.stopPropagation();
                     });
                 
                 d3.select('#filterMenu')
                     .style('border-top', '0.08rem lightgrey solid')
                     .on('click', (event) => {
-                        let test = window.open('', 'test', windowFeatures);
-                        test.document.writeln('<header> Set Filter </header>');
-                        test.document.writeln('<input type="text" id="test1" padding-bottom=0.5rem>');
-                        test.document.writeln('<input type="text" id="test2" padding-bottom=0.5rem>');
-                        test.document.writeln('<input type=BUTTON value="Save"');
-                        test.document.writeln('onClick="window.close()">');
-                        setFilter(dimension, 90, 10);
+                        popupWindowFilter.style('display', 'block')
+                                .style('width', 15 + 'rem')
+                                .style('height', 10 + 'rem')
+                                .style('background', 'white')
+                                .style('border', '1px solid black')
+                                .style('border-radius', 0.25 + 'rem')
+                                .style('padding', 1 + 'rem')
+                                .style('margin', 'auto')
+                                .style('top', 0)
+                                .style('right', 0)
+                                .style('bottom', 0)
+                                .style('left', 0)
+                                .style('z-index', 10);
+                        
+                        filterButton.on('click', () => {
+                            let min = d3.select('#minFilterValue').node().value;
+                            let max = d3.select('#maxFilterValue').node().value;
+                            setFilter(dimension, max, min);
+                            popupWindowFilter.style('display', 'none');
+                        }); 
                         event.stopPropagation();
                     });
                 
