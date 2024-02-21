@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import {csvParse} from 'd3';
 import xmlFormat from 'xml-formatter';
 
 export function loadCSV(csv: string): any {
@@ -7,13 +7,13 @@ export function loadCSV(csv: string): any {
         {
             csv = removeDuplicateColumnNames(csv);
         }
-        let tempData = d3.csvParse(csv);
+        let tempData = csvParse(csv);
         return tempData.sort((a,b) => a.Name > b.Name ? 1 : -1);
 }
 
 export function removeDuplicateColumnNames(value :string): any {
     let completeArray = value.split(/\r?\n/);
-    let column_string = d3.csvParse(completeArray[0]);
+    let column_string = csvParse(completeArray[0]);
     let n = 0;
     const unique = arr => arr.map((s => v => !s.has(v) && s.add(v) ? v : `${v}(${n+=1})`)(new Set));
     completeArray[0] = unique(column_string['columns']).toString();

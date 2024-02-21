@@ -901,7 +901,7 @@ export default class SteerableParcoords {
                     .call(d3.drag()
                         .on('drag', (event, d) => {
                             if (parcoords.newFeatures.length > 25) {
-                                helper.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                                brush.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
                                     tooltipValuesTop, tooltipValuesDown, window);
                             }
                             else {
@@ -941,7 +941,7 @@ export default class SteerableParcoords {
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                     .call(d3.drag().on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
-                            helper.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                         }
                         else {
                             brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
@@ -974,7 +974,7 @@ export default class SteerableParcoords {
                     .call(d3.drag()
                         .on('drag', (event, d) => {
                             if (parcoords.newFeatures.length > 25) {
-                                helper.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                                brush.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                             }
                             else {
                                 brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);

@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import * as icon from './icons';
 import * as helper from './helper';
-import { getDimensionRange } from './parallelcoordinates';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
@@ -641,3 +640,9 @@ function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any,
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
     Object.assign(target, newObject);
 }
+
+const delay = 50;
+export const throttleBrushDown = helper.throttle(brushDown, delay);
+export const throttleBrushUp = helper.throttle(brushUp, delay);
+export const throttleDragAndBrush = helper.throttle(dragAndBrush, delay);
+

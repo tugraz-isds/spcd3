@@ -55,7 +55,7 @@ async function bundleJS() {
       format,
       name: 'spcd3',
       plugins: c.plugins,
-      sourcemap: false,
+      sourcemap: true,
     }).then(() => {
       const fileData = fs.readFileSync(`${location}/spcd3.${c.extension}`, 'utf8');
       const formatString = format === 'iife' ? 'IIFE' :

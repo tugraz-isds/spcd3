@@ -1,5 +1,3 @@
-import * as brush from './brush';
-
 export function cleanString(stringValue: string): string {
     let value = stringValue.replace(/ /g,'_');
         return value.replace(/[.,*\-%&'\[{()}\]]/g, '');
@@ -31,10 +29,6 @@ export function throttle<Params extends any[]>(func: (...args: Params) => any,
             }
         };
 }
-const delay = 50;
-export const throttleBrushDown = throttle(brush.brushDown, delay);
-export const throttleBrushUp = throttle(brush.brushUp, delay);
-export const throttleDragAndBrush = throttle(brush.dragAndBrush, delay);
 
 //source: https://stackoverflow.com/questions/22884720/what-is-the-fastest-way-to-count-the-number-of-significant-digits-of-a-number
 export function digits (value) {
