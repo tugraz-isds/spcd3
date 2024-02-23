@@ -109,6 +109,16 @@ function showOptions(id, buttonId) {
         button.style.backgroundColor = 'white';
     checkboxes.style.display == 'block' ? button.style.color = 'white' :
         button.style.color = 'black'; 
+
+    newFeatures.forEach(function (feature) {
+        if(getHiddenStatus(feature) == 'hidden') {
+            document.getElementById('show_' + feature).checked = false;
+        }
+        disableCheckbox(feature);
+        disableOptionInDropdown('filterOption_', feature);
+        disableOptionInDropdown('moveOption_', feature);
+        disableLeftAndRightButton(feature);
+    });
 }
 
 function generateDropdownForShow() {
@@ -143,7 +153,7 @@ function generateDropdownForShow() {
         disableCheckbox(event.target.value);
         disableOptionInDropdown('filterOption_', event.target.value);
         disableOptionInDropdown('moveOption_', event.target.value);
-        disableLeftAndRightButton();
+        disableLeftAndRightButton(event.target.value);
     });
 
     dimensions.forEach(function(dimension) {
@@ -151,7 +161,7 @@ function generateDropdownForShow() {
         label.className = 'dropdownLabel';
         let input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = dimension;
+        input.id = 'show_' + dimension;
         input.value = dimension;
         input.name = 'dimension';
         input.checked = true;
@@ -262,7 +272,7 @@ function generateDropdownForMove() {
     const dropdown = document.createElement('select');
     dropdown.onchange = () => {
         moveDimensionData = dropdown.value;
-        disableLeftAndRightButton();
+        disableLeftAndRightButton(moveDimensionData);
     }
 
     const headline = document.createElement('option');
@@ -283,16 +293,16 @@ function generateDropdownForMove() {
 
 function moveDimensionLeft() {  
     moveByOne(moveDimensionData, 'left');
-    disableLeftAndRightButton();
+    disableLeftAndRightButton(moveDimensionData);
 }
 
 function moveDimensionRight() {
     moveByOne(moveDimensionData, 'right');
-    disableLeftAndRightButton();
+    disableLeftAndRightButton(moveDimensionData);
 }
 
-function disableLeftAndRightButton() {
-    const position = getDimensionPositions(moveDimensionData);
+function disableLeftAndRightButton(dimension) {
+    const position = getDimensionPositions(dimension);
     const numberOfDimensions = getNumberOfDimensions();
     
     if (position == 0 || position == -1) {

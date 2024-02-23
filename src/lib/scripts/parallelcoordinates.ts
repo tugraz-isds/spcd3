@@ -12,6 +12,7 @@ declare global {
     let dataset: any;
     let yAxis: {};
     let scrollXPos: any;
+    let selected: [];
     let parcoords: {
         xScales: any,
         yScales: {},
@@ -43,13 +44,14 @@ export default class SteerableParcoords {
         const isShown = getHiddenStatus(dimension);
         const temp = parcoords.currentPosOfDims;
         const index = getIndex(dimension, parcoords.currentPosOfDims);
+        window.selected = getSelected();
         if (isShown == "hidden") {
             tempFeatures.splice(index, 0, dimension);
             generateSVG(parcoords.data, tempFeatures);
 
             window.parcoords.currentPosOfDims = temp;
 
-             window.parcoords.currentPosOfDims.forEach(function (item) {
+            window.parcoords.currentPosOfDims.forEach(function (item) {
                 if (item.isInverted) {
                     invert(item.key);
                 }
@@ -57,6 +59,8 @@ export default class SteerableParcoords {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
                 }
             });
+
+            setSelection(window.selected);
         }  
     }
 
@@ -64,6 +68,7 @@ export default class SteerableParcoords {
         const tempFeatures = parcoords.newFeatures.slice();
         const isShown = getHiddenStatus(dimension);
         const temp = parcoords.currentPosOfDims;
+        window.selected = getSelected();
         if (isShown == "shown") {
             tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
             generateSVG(parcoords.data, tempFeatures);
@@ -78,6 +83,8 @@ export default class SteerableParcoords {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
                 }
             });
+
+            setSelection(window.selected);
         }
     }
 
