@@ -3,7 +3,6 @@ import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from './icons';
 import * as svgToTinyDataUri from 'mini-svg-data-uri';
-import { features } from 'process';
 
 declare global {
     let padding: any;
@@ -430,7 +429,7 @@ export default class SteerableParcoords {
             let newdata = {};
             newFeatures.forEach(feature => {
                 newdata[feature] = obj[feature];
-            })
+            });
             newDataset.push(newdata);
         })
         let features = [];
@@ -442,9 +441,13 @@ export default class SteerableParcoords {
         let yScales = {};
         features.map(x => {
             const values = newDataset.map(o => o[x.name]);
+            let labels = [];
             if (isNaN(values[0]) !== false) {
+                values.forEach(function(element) {
+                    labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
+                });
                 yScales[x.name] = d3.scalePoint()
-                    .domain(newDataset.map(o => o[x.name]))
+                    .domain(labels)
                     .range([padding, height -  padding])
                     .padding(0.2);
             }
@@ -474,21 +477,25 @@ export default class SteerableParcoords {
         Object.entries(yScales).map(key => {
             let tempFeatures = Array.from(features.values()).map(c => c.name);
             let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
+            let labels = [];
+            tempValues.forEach(function(element) {
+                labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
+            });
             counter = counter + 1;
 
-            if(isNaN(tempValues[0])) {
-                let uniqueArray = tempValues.filter(function(item, index, self) {
+            if(isNaN(labels[0])) {
+                let uniqueArray = labels.filter(function(item, index, self) {
                     return index === self.indexOf(item);
                 })
                 if(uniqueArray.length > limit)
                 {
-                    let filteredArray = tempValues.filter(function(value, index, array) {
+                    let filteredArray = labels.filter(function(value, index, array) {
                         return index % 3 == 0;
                     });
                     yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(filteredArray);
                 }
                 else {
-                    yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(tempValues);
+                    yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(labels);
                 }
             }
             else {
@@ -613,13 +620,30 @@ export default class SteerableParcoords {
             .attr('id', 'feature')
             .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
+        let tooltipValuesLabel = d3.select('#parallelcoords')
+            .append('g')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
+
         featureAxis
             .append('g')
             .each(function (d) {
                 const processedDimensionName = helper.cleanString(d.name);
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + processedDimensionName)
-                    .call(yAxis[d.name]);
+                    .call(yAxis[d.name])
+                    .on('mouseover', function (event, d) {
+                        tooltipValuesLabel.text('');
+                        tooltipValuesLabel.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+                        tooltipValuesLabel.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+                        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+                        .style('padding', 0.12 + 'rem')
+                        .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
+                        return tooltipValuesLabel.style('visibility', 'hidden');
+                    })
+                    .on('mouseout', function () {
+                        return tooltipValuesLabel.style('visibility', 'hidden');
+                    });
             });
 
         let tooltipValues = d3.select('#parallelcoords')

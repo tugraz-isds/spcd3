@@ -3,11 +3,11 @@
 const rollup = require("rollup");
 const rollupCommonJs = require("@rollup/plugin-commonjs");
 const rollupTypescript = require("@rollup/plugin-typescript");
+const {vanillaExtractPlugin} = require("@vanilla-extract/rollup-plugin");
 const {default: rollupNodeResolve} = require("@rollup/plugin-node-resolve");
 const {terser: rollupTerser} = require("rollup-plugin-terser");
 const {default: rollupGzip} = require("rollup-plugin-gzip");
 const fs = require("fs");
-
 
 async function bundleJS() {
   const bundle = await rollup.rollup({
@@ -15,8 +15,15 @@ async function bundleJS() {
     plugins: [
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
-      rollupTypescript({ tsconfig: './tsconfig.json' })
-    ]
+      rollupTypescript({ tsconfig: './tsconfig.json' }),
+      vanillaExtractPlugin()
+    ],
+    output: {
+      preserveModules: true,
+      assetFileNames({ name }) {
+        return name?.replace(/^src\//, '') ?? '';
+      }
+    }
   });
 
   const minPlugins = [rollupTerser()];
