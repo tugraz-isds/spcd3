@@ -594,17 +594,17 @@ export function addSettingsForBrushing(dimensionName: any, parcoords: any):void 
     if (yPosRectTop > 80 && yPosRectBottom < 320) {
         const distanceBottom = 320 - d3.select("#triangle_up_" + processedDimensionName).attr("y");
         d3.select("#rect_" + processedDimensionName).attr("y", 80 + distanceBottom);
-        d3.select("#triangle_down_" + processedDimensionName).attr("y", 70 + distanceBottom);
+        d3.select("#triangle_down_" + processedDimensionName).attr("y", 80 + distanceBottom);
         d3.select("#triangle_up_" + processedDimensionName).attr("y", 80 + distanceBottom + rectHeight);
-        addPosition(70 + distanceBottom, parcoords.currentPosOfDims, dimensionName, "top");
+        addPosition(80 + distanceBottom, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(80 + distanceBottom + rectHeight, parcoords.currentPosOfDims, dimensionName, "bottom");
     }
     else if (yPosRectTop > 80 && yPosRectBottom >= 320) {
         d3.select("#rect_" + processedDimensionName).attr("y", 80);
         d3.select("#rect_" + processedDimensionName).attr("height", 240 - (yPosRectTop - 80));
-        d3.select("#triangle_down_" + processedDimensionName).attr("y", 70);
+        d3.select("#triangle_down_" + processedDimensionName).attr("y", 80);
         d3.select("#triangle_up_" + processedDimensionName).attr("y", 320 - (yPosRectTop - 80));
-        addPosition(70, parcoords.currentPosOfDims, dimensionName, "top");
+        addPosition(80, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(320 - (yPosRectTop - 80), parcoords.currentPosOfDims, dimensionName, "bottom");
     }
     else if (yPosRectTop <= 80 && yPosRectBottom < 320) {

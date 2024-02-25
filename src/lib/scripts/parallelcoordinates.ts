@@ -953,7 +953,7 @@ export default class SteerableParcoords {
                 d3.select('#resetfilterMenu')
                     .on('click', (event) => {
                         const range = getDimensionRange(dimension);
-                        if (getInversionStatus(dimension)) {
+                        if (isInverted(dimension)) {
                             setFilter(dimension, range[0], range[1]);
                         }
                         else {
