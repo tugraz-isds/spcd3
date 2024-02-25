@@ -64,6 +64,7 @@ export default class SteerableParcoords {
     }
 
     hide(dimension: string): any {
+        d3.select('#contextmenu').style('display', 'none');
         const tempFeatures = parcoords.newFeatures.slice();
         const isShown = getHiddenStatus(dimension);
         const temp = parcoords.currentPosOfDims;
@@ -507,6 +508,9 @@ export default class SteerableParcoords {
 
     resetSVG(): void {
         d3.select('#pc_svg').remove();
+        d3.select('#contextmenu').remove();
+        d3.select('#popupFilter').remove();
+        d3.select('#popupRange').remove();
     }
 
     generateSVG(content: any, newFeatures: any): void {
@@ -715,7 +719,7 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('display', 'none');
 
-        popupWindowRange.append('h3').text('Set Range').style('padding-left', 0.5 + 'rem');
+        let headerRange = popupWindowRange.append('h3').style('padding-left', 0.5 + 'rem');
         let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
         .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
         .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
@@ -725,6 +729,11 @@ export default class SteerableParcoords {
         popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
         let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
         .style('width', 14 + 'rem').style('margin-top', 1 + 'rem');
+
+        let popupWindowRangeError = popupWindowRange
+            .append('div')
+            .style('position', 'absolute')
+            .style('display', 'none');
         
         let popupWindowFilter = d3.select('#parallelcoords')
             .append('div')
@@ -732,7 +741,7 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('display', 'none')
 
-        popupWindowFilter.append('h3').text('Set Filter').style('padding-left', 0.5 + 'rem');
+        let headerFilter = popupWindowFilter.append('h3').style('padding-left', 0.5 + 'rem');
         let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
         .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
         .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
@@ -847,11 +856,36 @@ export default class SteerableParcoords {
                                 .style('bottom', 0)
                                 .style('left', 0)
                                 .style('z-index', 10);
+                        headerRange.text('Set range for ' + dimension);
                         rangeButton.on('click', () => {
                             let min = d3.select('#minRangeValue').node().value;
                             let max = d3.select('#maxRangeValue').node().value;
-                            setDimensionRange(dimension, min, max);
-                            popupWindowRange.style('display', 'none');
+                            const ranges = getDimensionRange(dimension);
+                            const inverted = isInverted(dimension);
+                            let isOk = true;
+                            
+                            if (inverted) {
+                                if (max < ranges[0] || min > ranges[1]) {
+                                    popupWindowRangeError.text(`The range has to be bigger than ${ranges[1]} and ${ranges[0]}.`)
+                                    .style('display', 'block')
+                                    .style('color', 'red');
+                                    isOk = false;
+                                }
+                            }
+                            else {
+                                if (min > ranges[0] || max < ranges[1]) {
+                                    popupWindowRangeError.text(`The range has to be bigger than ${ranges[0]} and ${ranges[1]}.`)
+                                    .style('display', 'block')
+                                    .style('color', 'red');
+                                    isOk = false;
+                                }
+                            }
+                            if (isOk) {
+                                popupWindowRangeError.style('display', 'none');
+                                setDimensionRange(dimension, min, max);
+                                popupWindowRange.style('display', 'none');
+                            }
+                            
                         });
                         closeButtonRange.on('click', () => {
                             popupWindowRange.style('display', 'none');
@@ -875,15 +909,38 @@ export default class SteerableParcoords {
                                 .style('bottom', 0)
                                 .style('left', 0)
                                 .style('z-index', 10);
-                        
+                        headerFilter.text('Set Filter for ' + dimension);
                         filterButton.on('click', () => {
                             let min = d3.select('#minFilterValue').node().value;
                             let max = d3.select('#maxFilterValue').node().value;
-                            if (getInversionStatus(dimension)) {
-                                setFilter(dimension, min, max);
+                            const ranges = getDimensionRange(dimension);
+                            const inverted = isInverted(dimension);
+                            let isOk = true;
+                            
+                            if (inverted) {
+                                if (min < ranges[1]) {
+                                    min = ranges[1];
+                                }
+                                if (max > ranges[0]) {
+                                    max = ranges[0];
+                                }
                             }
                             else {
-                                setFilter(dimension, max, min);
+                                if (min < ranges[0]) {
+                                    min = ranges[0];
+                                }
+                                if (max > ranges[1]) {
+                                    max = ranges[1];
+                                }
+                            }
+                            
+                            if (isOk) {
+                                if (inverted) {
+                                    setFilter(dimension, min, max);
+                                }
+                                else {
+                                    setFilter(dimension, max, min);
+                                }
                             }
                             popupWindowFilter.style('display', 'none');
                         });
@@ -1229,10 +1286,18 @@ export default class SteerableParcoords {
     }
 
     setDimensionRange(dimension: string, min: number, max: number): any {
-        window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
-            window.parcoords.newDataset);
-        
+        const inverted = isInverted(dimension);
+        if (inverted) {
+            window.parcoords.yScales[dimension].domain([max, min]).nice();
+            window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+                window.parcoords.newDataset);
+        }
+        else {
+            window.parcoords.yScales[dimension].domain([min, max]).nice();
+            window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+                window.parcoords.newDataset);
+        }
+       
         // draw active lines
         d3.select('#dimension_axis_' + helper.cleanString(dimension))
             .call(yAxis[dimension]);
