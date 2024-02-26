@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from 'd3-selection';
 import * as icon from './icons';
 import * as helper from './helper';
 

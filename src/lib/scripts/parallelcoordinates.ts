@@ -1,4 +1,9 @@
-import * as d3 from 'd3';
+import 'd3-transition';
+import * as d3 from 'd3-selection';
+import * as drag from 'd3-drag';
+import * as path from 'd3-shape';
+import * as axis from 'd3-axis';
+import * as scale from 'd3-scale';
 import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from './icons';
@@ -122,7 +127,7 @@ export default class SteerableParcoords {
             .selectAll('path')
             .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
 
-        transition(active).each(function (d) {
+        trans(active).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
@@ -177,7 +182,7 @@ export default class SteerableParcoords {
             .selectAll('path')
             .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
 
-        transition(active).each(function (d) {
+        trans(active).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
@@ -399,7 +404,7 @@ export default class SteerableParcoords {
                 delete parcoords.dragging[(d.subject).name];
                 delete parcoords.dragPosStart[(d.subject).name];
                 
-                transition(active).each(function (d) {
+                trans(active).each(function (d) {
                     d3.select(this)
                         .attr('d', linePath(d, parcoords.newFeatures, parcoords))
                 });
@@ -415,7 +420,7 @@ export default class SteerableParcoords {
         }
     }
 
-    transition(g: any): any {
+    trans(g: any): any {
         return g.transition().duration(50);
     }
 
@@ -447,7 +452,7 @@ export default class SteerableParcoords {
                 values.forEach(function(element) {
                     labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
                 });
-                yScales[x.name] = d3.scalePoint()
+                yScales[x.name] = scale.scalePoint()
                     .domain(labels)
                     .range([padding, height -  padding])
                     .padding(0.2);
@@ -455,7 +460,7 @@ export default class SteerableParcoords {
             else {
                 const max = Math.max(...newDataset.map(o => o[x.name]));
                 const min = Math.min(...newDataset.map(o => o[x.name]));
-                yScales[x.name] = d3.scaleLinear()
+                yScales[x.name] = scale.scaleLinear()
                     .domain([min, max]).nice()
                     .range([height - padding, padding]);
             }
@@ -464,7 +469,7 @@ export default class SteerableParcoords {
     }
 
     setupXScales(width: any, padding: any, features: any): any {
-        return d3.scalePoint()
+        return scale.scalePoint()
             .domain(features.map(x => x.name))
             .range([width - padding, padding]);
     }
@@ -493,14 +498,14 @@ export default class SteerableParcoords {
                     let filteredArray = labels.filter(function(value, index, array) {
                         return index % 3 == 0;
                     });
-                    yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(filteredArray);
+                    yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
                 }
                 else {
-                    yAxis[key[0]] = d3.axisLeft(key[1]).tickValues(labels);
+                    yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(labels);
                 }
             }
             else {
-                yAxis[key[0]] = d3.axisLeft(key[1]);
+                yAxis[key[0]] = axis.axisLeft(key[1]);
             }
         });
         return yAxis;
@@ -780,7 +785,7 @@ export default class SteerableParcoords {
             .attr('y', padding / 1.7)
             .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
             .style('font-size', '0.7rem')
-            .call(d3.drag()
+            .call(drag.drag()
                 .on('start', onDragStartEventHandler(parcoords, inactive))
                 .on('drag', onDragEventHandler(parcoords, active, featureAxis, width))
                 .on('end', onDragEndEventHandler(parcoords, featureAxis, inactive, active))
@@ -986,7 +991,7 @@ export default class SteerableParcoords {
                     .attr('x', -6)
                     .attr('y', 80)
                     .attr('fill', 'rgb(255, 255, 0, 0.4)')
-                    .call(d3.drag()
+                    .call(drag.drag()
                         .on('drag', (event, d) => {
                             if (parcoords.newFeatures.length > 25) {
                                 brush.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
@@ -1027,7 +1032,7 @@ export default class SteerableParcoords {
                     .attr('height', 10)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
-                    .call(d3.drag().on('drag', (event, d) => {
+                    .call(drag.drag().on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
                             brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                         }
@@ -1059,7 +1064,7 @@ export default class SteerableParcoords {
                     .attr('height', 10)
                     .attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
-                    .call(d3.drag()
+                    .call(drag.drag()
                         .on('drag', (event, d) => {
                             if (parcoords.newFeatures.length > 25) {
                                 brush.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
@@ -1142,7 +1147,7 @@ export default class SteerableParcoords {
     }
 
     linePath(d: any, newFeatures: any, parcoords: any): any {
-        let lineGenerator = d3.line();
+        let lineGenerator = path.line();
         const tempdata = Object.entries(d).filter(x => x[0]);
         let points = [];
 
@@ -1300,11 +1305,11 @@ export default class SteerableParcoords {
        
         // draw active lines
         d3.select('#dimension_axis_' + helper.cleanString(dimension))
-            .call(yAxis[dimension]);
+            .call(yAxis[dimension]).transition();
         let active = d3.select('g.active')
             .selectAll('path')
             .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-        transition(active).each(function (d) {
+        trans(active).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
             }
@@ -1417,7 +1422,7 @@ export default class SteerableParcoords {
 }
 
 export const { invert, isInverted, setDimensions, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
-    position, onDragStartEventHandler, onDragEventHandler, transition, onDragEndEventHandler, onInvert, prepareData, 
+    position, onDragStartEventHandler, onDragEventHandler, trans, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, moveByOne, move, swap, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 
     setInvertIcon, getInversionStatus, setInversionStatus, getDimensionPositions, setFilter, getDimensionRange, getNumberOfDimensions,

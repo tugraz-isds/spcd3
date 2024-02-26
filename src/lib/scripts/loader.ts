@@ -1,4 +1,4 @@
-import {csvParse} from 'd3';
+import {csvParse} from 'd3-dsv';
 import xmlFormat from 'xml-formatter';
 
 export function loadCSV(csv: string): any {
