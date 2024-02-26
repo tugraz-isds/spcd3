@@ -529,9 +529,7 @@ export default class SteerableParcoords {
             .append('svg')
             .attr('id', 'pc_svg')
             .attr('viewBox', [0, 0, window.width, window.height])
-            .style('overflow', 'auto')
             .attr('font-family', 'Verdana, sans-serif')
-            .attr('preserveAspectRatio', 'none')
             .on('click', (event) => {
                 if (!(event.ctrlKey || event.metaKey)) {
                     if (!(event.target.id.includes('dimension_invert_'))) {
