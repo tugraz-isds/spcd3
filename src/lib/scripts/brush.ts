@@ -11,25 +11,30 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     
     let yPosTop: number;
     let yPosRect: number;
+    let topToAdd: number;
     
     if (event.y < 70) {
         yPosTop = 70;
         yPosRect = 80;
+        topToAdd = 80;
     }
-    else if (event.y > yPosBottom -10 ) {
+    else if (event.y > yPosBottom - 10 ) {
         yPosTop = yPosBottom - 10;
+        topToAdd = yPosBottom - 10;
         yPosRect = 320;
     }
     else if (event.y == yPosBottom - 10) {
         yPosTop = yPosBottom - 10;
+        topToAdd = yPosBottom - 10;
         yPosRect = yPosTop + 10;
     }
     else {
         yPosTop = event.y;
+        topToAdd = event.y;
         yPosRect = event.y + 10;
     }
 
-    addPosition(yPosTop, parcoords.currentPosOfDims, d.name, "top");
+    addPosition(topToAdd, parcoords.currentPosOfDims, d.name, "top");
     
     d3.select("#rect_" + cleanDimensionName)
         .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
@@ -102,21 +107,25 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
     let yPosTop: number;
     let yPosRect: number;
+    let topToAdd: number;
     
     if (event.y + delta - 10 <= 70) {
         yPosTop = 70;
+        topToAdd = 80;
         yPosRect = 80;
     }
     else if (event.y + delta + rectHeight >= 320) {
         yPosTop = 320 - rectHeight - 10;
+        topToAdd = 320 - rectHeight - 10;
         yPosRect = 320 - rectHeight;
     }
     else {
         yPosTop = event.y + delta - 10;
+        topToAdd = event.y + delta - 10;
         yPosRect = yPosTop + 10;
     }
 
-    addPosition(yPosTop, parcoords.currentPosOfDims, d.name, "top");
+    addPosition(topToAdd, parcoords.currentPosOfDims, d.name, "top");
     addPosition(yPosRect + rectHeight, parcoords.currentPosOfDims, d.name, "bottom");
 
     if (rectHeight < 240) {
