@@ -30,11 +30,9 @@ export function throttle<Params extends any[]>(func: (...args: Params) => any,
         };
 }
 
-//source: https://stackoverflow.com/questions/22884720/what-is-the-fastest-way-to-count-the-number-of-significant-digits-of-a-number
 export function digits (value) {
     return value
-        .toExponential()
-        .replace(/^([0-9]+)\.?([0-9]+)?e[\+\-0-9]*$/g, "$1$2")
+        .toString()
         .length
 };
 
