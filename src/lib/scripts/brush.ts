@@ -624,13 +624,6 @@ export function addSettingsForBrushing(dimensionName: any, parcoords: any):void 
         addPosition(80 + (320 - yPosRectBottom) - 10, parcoords.currentPosOfDims, dimensionName, "top");
         addPosition(320, parcoords.currentPosOfDims, dimensionName, "bottom");
     }
-
-    if (getInvertStatus(dimensionName, parcoords.currentPosOfDims)) {
-        addInvertStatus(false, parcoords.currentPosOfDims, dimensionName, "isInverted");
-    }
-    else {
-        addInvertStatus(true, parcoords.currentPosOfDims, dimensionName, "isInverted");
-    }
 }
 
 function getInvertStatus(key: any, currentPosOfDims: any):boolean {
@@ -643,7 +636,7 @@ function getSigDig(key: any, currentPosOfDims: any): number {
     return item.sigDig;
 }
 
-function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any):void {
+export function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any):void {
     let newObject = {};
     newObject[key] = status;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);

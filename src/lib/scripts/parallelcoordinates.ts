@@ -46,21 +46,23 @@ export default class SteerableParcoords {
     show(dimension: string): any {
         const tempFeatures = parcoords.newFeatures.slice();
         const isShown = getHiddenStatus(dimension);
-        const temp = parcoords.currentPosOfDims;
+        const temp = parcoords.currentPosOfDims.slice();
         const index = getIndex(dimension, parcoords.currentPosOfDims);
         window.selected = getSelected();
         if (isShown == "hidden") {
             tempFeatures.splice(index, 0, dimension);
             generateSVG(parcoords.data, tempFeatures);
 
-            window.parcoords.currentPosOfDims = temp;
+            window.parcoords.currentPosOfDims = temp.slice();
 
             window.parcoords.currentPosOfDims.forEach(function (item) {
-                if (item.isInverted) {
-                    invert(item.key);
-                }
-                if (item.top != 80 || item.bottom != 320) {
-                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                if (getHiddenStatus(item.key) != 'hidden') {
+                    if (item.isInverted) {
+                        invert(item.key);
+                    }
+                    if (item.top != 80 || item.bottom != 320) {
+                        brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                    }
                 }
             });
 
@@ -72,20 +74,21 @@ export default class SteerableParcoords {
         d3.select('#contextmenu').style('display', 'none');
         const tempFeatures = parcoords.newFeatures.slice();
         const isShown = getHiddenStatus(dimension);
-        const temp = parcoords.currentPosOfDims;
+        const temp = window.parcoords.currentPosOfDims.slice();
         window.selected = getSelected();
         if (isShown == "shown") {
             tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
             generateSVG(parcoords.data, tempFeatures);
 
-            window.parcoords.currentPosOfDims = temp;
-        
+            window.parcoords.currentPosOfDims = temp.slice();
             window.parcoords.currentPosOfDims.forEach(function (item) {
-                if (item.isInverted) {
-                    invert(item.key);
-                }
-                if (item.top != 80 || item.bottom != 320) {
-                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                if (getHiddenStatus(item.key) != 'hidden') {
+                    if (item.isInverted) {
+                        invert(item.key);
+                    }
+                    if (item.top != 80 || item.bottom != 320) {
+                        brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                    }
                 }
             });
 
@@ -132,6 +135,12 @@ export default class SteerableParcoords {
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
         brush.addSettingsForBrushing(dimension, parcoords);
+        if (isInverted(dimension)) {
+            brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
+        }
+        else {
+            brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
+        }
 
         d3.select('g.inactive')
             .selectAll('path')
@@ -187,6 +196,12 @@ export default class SteerableParcoords {
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
 
         brush.addSettingsForBrushing(dimension, parcoords);
+        if (isInverted(dimension)) {
+            brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
+        }
+        else {
+            brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
+        }
 
         d3.select('g.inactive')
             .selectAll('path')
