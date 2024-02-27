@@ -355,10 +355,10 @@ export default class SteerableParcoords {
                 const element = document.getElementById("parallelcoords");
                 if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
                     parcoords.dragging[(d.subject).name] + 50 > window.innerWidth) {
-                    element.scrollLeft += 10;
+                    element.scrollLeft += 100;
                 }
                 else if (window.scrollXPos > parcoords.dragging[(d.subject).name] - 50) {
-                    element.scrollLeft -= 10;
+                    element.scrollLeft -= 100;
                 }
 
                 parcoords.dragging[(d.subject).name] = Math.min(width-80, 
@@ -749,8 +749,8 @@ export default class SteerableParcoords {
             .style('position', 'absolute')
             .style('display', 'none')
 
-        popupWindowFilter.append('h3').text('Set Filter for ').style('padding-left', 0.5 + 'rem');
-        let headerDimensionFilter = popupWindowFilter.append('h4').style('padding-left', 0.5 + 'rem');
+        popupWindowFilter.append('div').text('Set Filter for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');;
+        let headerDimensionFilter = popupWindowFilter.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large');;
         let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
         .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
         .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
@@ -759,7 +759,12 @@ export default class SteerableParcoords {
         popupWindowFilter.append('label').text('Max').style('padding', 0.5 + 'rem');
         let inputMaxFilter = popupWindowFilter.append('input').attr('id', 'maxFilterValue').style('width', 2 + 'rem');
         let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem')
-        .style('width', 4 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'filterButton');
+        .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'filterButton');
+
+        let popupWindowFilterError = popupWindowFilter
+            .append('div')
+            .style('position', 'absolute')
+            .style('display', 'none');
         
         contextMenu.append('div')
             .attr('id', 'hideMenu')
@@ -936,8 +941,8 @@ export default class SteerableParcoords {
                     .style('border-top', '0.08rem lightgrey solid')
                     .on('click', (event) => {
                         popupWindowFilter.style('display', 'block')
-                                .style('width', 16 + 'rem')
-                                .style('height', 14 + 'rem')
+                                .style('width', 17 + 'rem')
+                                .style('height', 8 + 'rem')
                                 .style('background', 'white')
                                 .style('border', '1px solid black')
                                 .style('border-radius', 0.25 + 'rem')
@@ -959,29 +964,61 @@ export default class SteerableParcoords {
                             if (inverted) {
                                 if (min < ranges[1]) {
                                     min = ranges[1];
+                                    popupWindowFilterError.text(`Min value is smaller than 
+                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to min.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
                                 }
                                 if (max > ranges[0]) {
                                     max = ranges[0];
+                                    popupWindowFilterError.text(`Max value is bigger than 
+                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to max.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
                                 }
                             }
                             else {
                                 if (min < ranges[0]) {
                                     min = ranges[0];
+                                    popupWindowFilterError.text(`Min value is smaller than 
+                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to min.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
                                 }
                                 if (max > ranges[1]) {
                                     max = ranges[1];
+                                    popupWindowFilterError.text(`Max value is bigger than 
+                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to max.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
                                 }
                             }
-                            
+                            if (inverted) {
+                                setFilter(dimension, min, max);
+                            }
+                            else {
+                                setFilter(dimension, max, min);
+                            }
                             if (isOk) {
-                                if (inverted) {
-                                    setFilter(dimension, min, max);
-                                }
-                                else {
-                                    setFilter(dimension, max, min);
-                                }
+                                popupWindowFilterError.style('display', 'none');
+                                popupWindowFilter.style('display', 'none');
                             }
-                            popupWindowFilter.style('display', 'none');
                         });
                         inputMaxFilter.on('keypress', (event) => {
                             if (event.key === "Enter") {
@@ -997,6 +1034,7 @@ export default class SteerableParcoords {
                         });
                         closeButtonFilter.on('click', () => {
                             popupWindowFilter.style('display', 'none');
+                            popupWindowFilterError.style('display', 'none');
                         });
                         event.stopPropagation();
                     });
@@ -1355,12 +1393,18 @@ export default class SteerableParcoords {
             window.parcoords.yScales[dimension].domain([max, min]);
             window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
                 window.parcoords.newDataset);
+            setFilter(dimension, getMinRange(dimension, window.parcoords.currentPosOfDims),
+                getMaxRange(dimension, window.parcoords.currentPosOfDims));
         }
         else {
             window.parcoords.yScales[dimension].domain([min, max]);
             window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
                 window.parcoords.newDataset);
+            setFilter(dimension, getMaxRange(dimension, window.parcoords.currentPosOfDims),
+                getMinRange(dimension, window.parcoords.currentPosOfDims));
         }
+
+        
        
         // draw active lines
         d3.select('#dimension_axis_' + helper.cleanString(dimension))
