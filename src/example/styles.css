@@ -123,8 +123,12 @@ div#filterDimensionHeader {
   padding-top: 0.8rem;
 }
 
-div#filterDimensionContainer {
-  padding-right: 1rem;
+div#rangeDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
 }
 
 span#moveDimensionContainer {
@@ -167,6 +171,12 @@ span#moveDimensionContainer {
 
 #filterDimensionContainer {
   padding-bottom: 1rem;
+  padding-right: 1rem;
+}
+
+#rangeDimensionContainer {
+  padding-bottom: 1rem;
+  padding-right: 1rem;
 }
 
 label {
@@ -180,6 +190,18 @@ label {
 }
 
 .filterInput {
+  visibility: hidden;
+  width: 2rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.rangeLabel {
+  padding-top: 1rem;
+  font-size: smaller;
+}
+
+.rangeInput {
   visibility: hidden;
   width: 2rem;
   margin-left: 0.5rem;

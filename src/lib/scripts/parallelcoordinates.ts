@@ -887,20 +887,20 @@ export default class SteerableParcoords {
                                 .style('z-index', 10);
                         headerDimensionRange.text(dimension);
                         infoRange.text('The original range of ' + dimension + ' is between ' + 
-                        getMinRange(dimension, window.parcoords.currentPosOfDims) + ' and ' + 
-                        getMaxRange(dimension, window.parcoords.currentPosOfDims) + '.');
+                        getMinRange(dimension) + ' and ' + 
+                        getMaxRange(dimension) + '.');
                         rangeButton.on('click', () => {
                             let min = d3.select('#minRangeValue').node().value;
                             let max = d3.select('#maxRangeValue').node().value;
-                            const ranges = getDimensionRange(dimension);
                             const inverted = isInverted(dimension);
                             let isOk = true;
                             
                             if (inverted) {
-                                if (max < ranges[0] || min > ranges[1]) {
+                                if (max < getMinRange(dimension) || 
+                                    min > getMaxRange(dimension)) {
                                     popupWindowRangeError.text(`The range has to be bigger than 
-                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)} and 
-                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}.`)
+                                    ${getMinRange(dimension)} and 
+                                    ${getMaxRange(dimension)}.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -910,10 +910,11 @@ export default class SteerableParcoords {
                                 }
                             }
                             else {
-                                if (min > ranges[0] || max < ranges[1]) {
+                                if (min > getMinRange(dimension) || 
+                                    max < getMaxRange(dimension)) {
                                     popupWindowRangeError.text(`The range has to be bigger than 
-                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)} and 
-                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}.`)
+                                    ${getMinRange(dimension)} and 
+                                    ${getMaxRange(dimension)}.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -942,8 +943,7 @@ export default class SteerableParcoords {
                             }
                         });
                         resetRangeButton.on('click', () => {
-                            setDimensionRange(dimension, getMinRange(dimension, window.parcoords.currentPosOfDims), 
-                            getMaxRange(dimension, window.parcoords.currentPosOfDims));
+                            setDimensionRange(dimension, getMinRange(dimension), getMaxRange(dimension));
                             popupWindowRange.style('display', 'none');
                         });
                         closeButtonRange.on('click', () => {
@@ -980,7 +980,7 @@ export default class SteerableParcoords {
                                 if (min < ranges[1]) {
                                     min = ranges[1];
                                     popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to min.`)
+                                    ${getMinRange(dimension)}, filter is set to min.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -991,7 +991,7 @@ export default class SteerableParcoords {
                                 if (max > ranges[0]) {
                                     max = ranges[0];
                                     popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to max.`)
+                                    ${getMaxRange(dimension)}, filter is set to max.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1004,7 +1004,7 @@ export default class SteerableParcoords {
                                 if (min < ranges[0]) {
                                     min = ranges[0];
                                     popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to min.`)
+                                    ${getMinRange(dimension)}, filter is set to min.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1015,7 +1015,7 @@ export default class SteerableParcoords {
                                 if (max > ranges[1]) {
                                     max = ranges[1];
                                     popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxRange(dimension, window.parcoords.currentPosOfDims)}, filter is set to max.`)
+                                    ${getMaxRange(dimension)}, filter is set to max.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1113,13 +1113,13 @@ export default class SteerableParcoords {
             });
     }
 
-    getMinRange(key: any, currentPosOfDims: any): number {
-        const item = currentPosOfDims.find((object) => object.key == key);
+    getMinRange(key: any): number {
+        const item = window.parcoords.currentPosOfDims.find((object) => object.key == key);
         return item.min;
     }
 
-    getMaxRange(key: any, currentPosOfDims: any): number {
-        const item = currentPosOfDims.find((object) => object.key == key);
+    getMaxRange(key: any): number {
+        const item = window.parcoords.currentPosOfDims.find((object) => object.key == key);
         return item.max;
     }
 
@@ -1408,15 +1408,13 @@ export default class SteerableParcoords {
             window.parcoords.yScales[dimension].domain([max, min]);
             window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
                 window.parcoords.newDataset);
-            setFilter(dimension, getMinRange(dimension, window.parcoords.currentPosOfDims),
-                getMaxRange(dimension, window.parcoords.currentPosOfDims));
+            setFilter(dimension, getMinRange(dimension), getMaxRange(dimension));
         }
         else {
             window.parcoords.yScales[dimension].domain([min, max]);
             window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
                 window.parcoords.newDataset);
-            setFilter(dimension, getMaxRange(dimension, window.parcoords.currentPosOfDims),
-                getMinRange(dimension, window.parcoords.currentPosOfDims));
+            setFilter(dimension, getMaxRange(dimension), getMinRange(dimension));
         }
 
         

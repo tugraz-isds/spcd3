@@ -1,12 +1,14 @@
 import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
-    getNumberOfDimensions, hide, show, getHiddenStatus} from './lib/spcd3.js';
+    getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
+    setDimensionRange} from './lib/spcd3.js';
 
 let data;
 let newData;
 let newFeatures = [];
 let moveDimensionData;
 let filterDimensionData;
+let rangeDimensionData;
 
 let inputButton = document.getElementById('input');
 inputButton.addEventListener('click', openFileDialog, false);
@@ -32,6 +34,10 @@ let filterButton = document.getElementById('filterButton');
 filterButton.addEventListener('click', filter, false);
 filterButton.style.visibility = 'hidden';
 
+let rangeButton = document.getElementById('rangeButton');
+rangeButton.addEventListener('click', setRange, false);
+rangeButton.style.visibility = 'hidden';
+
 function openFileDialog() {
     document.getElementById('fileInput').click();
 }
@@ -51,6 +57,7 @@ function handleFileSelect(event) {
             generateDropdownForInvert();
             generateDropdownForMove();
             generateDropdownForFilter();
+            generateDropdownForRange();
             
             let selectedDimensions = getSelectedDimensions();
             newFeatures = setDimensions(selectedDimensions);
@@ -116,6 +123,7 @@ function showOptions(id, buttonId) {
         }
         disableCheckbox(feature);
         disableOptionInDropdown('filterOption_', feature);
+        disableOptionInDropdown('rangeOption', feature);
         disableOptionInDropdown('moveOption_', feature);
         disableLeftAndRightButton(feature);
     });
@@ -152,6 +160,7 @@ function generateDropdownForShow() {
         updateDimensions(event.target.value);
         disableCheckbox(event.target.value);
         disableOptionInDropdown('filterOption_', event.target.value);
+        disableOptionInDropdown('rangeOption_', event.target.value);
         disableOptionInDropdown('moveOption_', event.target.value);
         disableLeftAndRightButton(event.target.value);
     });
@@ -334,7 +343,7 @@ function generateDropdownForFilter() {
     const dropdown = document.createElement('select');
     dropdown.onchange = (event) => {
         filterDimensionData = event.target.value;
-        generateInputFieldsForSetRange();
+        generateInputFieldsForSetFilter();
     }
 
     const headline = document.createElement('option');
@@ -352,9 +361,8 @@ function generateDropdownForFilter() {
     container.appendChild(dropdown);
 }
 
-function generateInputFieldsForSetRange() {
-  const container = document.getElementById('rangeContainer');
-  const filterButton = document.getElementById('filterButton');
+function generateInputFieldsForSetFilter() {
+  const container = document.getElementById('filterContainer');
   const labelTop = document.getElementById('filterDimensionLabelTop');
   const labelBottom = document.getElementById('filterDimensionLabelBottom');
   const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
@@ -454,16 +462,124 @@ function filter() {
     }
 }
 
+function generateDropdownForRange() {
+    let dimensions = newData['columns'];
+
+    document.getElementById('rangeDimensionHeader').style.visibility = 'visible';
+
+    const container = document.getElementById('rangeDimensionContainer');
+
+    const dropdown = document.createElement('select');
+    dropdown.onchange = (event) => {
+        rangeDimensionData = event.target.value;
+        generateInputFieldsForSetRange();
+    }
+
+    const headline = document.createElement('option');
+    headline.selected = 'disabled';
+    headline.textContent = 'Set Range';
+    dropdown.appendChild(headline);
+
+    dimensions.forEach(function(dimension) {
+        let option = document.createElement('option');
+        option.textContent = dimension;
+        option.value = dimension;
+        option.id = 'rangeOption_' + dimension;
+        dropdown.appendChild(option);
+    })
+    container.appendChild(dropdown);
+}
+
+function generateInputFieldsForSetRange() {
+    const container = document.getElementById('rangeContainer');
+    const labelTop = document.getElementById('rangeDimensionLabelTop');
+    const labelBottom = document.getElementById('rangeDimensionLabelBottom');
+    const inputTextElementTop = document.getElementById('rangeDimensionInputFieldTop');
+    const inputTextElementBottom = document.getElementById('rangeDimensionInputFieldBottom');
+  
+    container.style.visibility = 'visible';
+  
+    inputTextElementTop.style.visibility = 'visible';
+    inputTextElementTop.name = 'minRange';
+  
+    labelTop.for = 'minRange';
+    labelTop.innerHTML = 'Min';
+  
+    inputTextElementBottom.style.visibility = 'visible';
+    inputTextElementBottom.name = 'maxRange';
+  
+    labelBottom.for = 'maxRange';
+    labelBottom.innerHTML = 'Max';
+  
+    rangeButton.style.visibility = 'visible';
+    rangeButton.textContent = 'Save';
+  
+    container.appendChild(labelTop);
+    container.appendChild(inputTextElementTop);
+    container.appendChild(labelBottom);
+    container.appendChild(inputTextElementBottom);
+    container.appendChild(rangeButton);
+}
+
+function setRange() {
+    let min = Number(document.getElementById('rangeDimensionInputFieldTop').value);
+    let max = Number(document.getElementById('rangeDimensionInputFieldBottom').value);
+   
+    const inverted = isInverted(rangeDimensionData);
+    
+    let isOk = true;
+    if (inverted) { 
+        if (!isNaN(getMinRange(rangeDimensionData))) {
+            
+            if (isNaN(min) || isNaN(max)) {
+                alert(`Attention: Values are not numbers!`);
+                isOk = false;
+            }
+            if (max < getMinRange(rangeDimensionData) || 
+                min > getMaxRange(rangeDimensionData)) {
+                    alert(`The range has to be bigger than 
+                    ${getMinRange(rangeDimensionData)} and 
+                    ${getMaxRange(rangeDimensionData)}.`);
+                    isOk = false;
+            }
+        }
+    }
+    else {
+        if (!isNaN(getMinRange(rangeDimensionData))) {
+            if (isNaN(min) || isNaN(max)) {
+                alert(`Attention: Values are not numbers!`);
+                isOk = false;
+            }
+            if (min > getMinRange(rangeDimensionData) || 
+                max < getMaxRange(rangeDimensionData)) {
+                    alert(`The range has to be bigger than 
+                    ${getMinRange(rangeDimensionData)} and 
+                    ${getMaxRange(rangeDimensionData)}.`);
+                    isOk = false;
+            }
+        }
+    }
+
+    if (isOk) {
+        setDimensionRange(rangeDimensionData, min, max);
+    }
+    document.getElementById('rangeDimensionInputFieldTop').value = '';
+    document.getElementById('rangeDimensionInputFieldBottom').value = '';
+}
+
 function clearPlot() {
     const parentElement = document.getElementById('parallelcoords');
     const invertContainer = document.getElementById('invertDimensionContainer')
     const showContainer = document.getElementById('showDimensionContainer');
     const moveContainer = document.getElementById('moveDimensionContainer');
-    const filterContainer = document.getElementById('filterDimensionContainer');
-    const rangeContainer = document.getElementById('rangeContainer');
-    const filterButton = document.getElementById('filterButton');
+    const filterDimensionContainer = document.getElementById('filterDimensionContainer');
+    const filterContainer = document.getElementById('filterContainer');
     const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
     const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
+    const rangeDimensionContainer = document.getElementById('rangeDimensionContainer');
+    const rangeContainer = document.getElementById('rangeContainer');
+    const inputTextElementMin = document.getElementById('rangeDimensionInputFieldTop');
+    const inputTextElementMax = document.getElementById('rangeDimensionInputFieldBottom');
 
     while (parentElement.firstChild) {
         parentElement.removeChild(parentElement.firstChild);
@@ -477,12 +593,20 @@ function clearPlot() {
     while (moveContainer.firstChild) {
         moveContainer.removeChild(moveContainer.firstChild);
     }
-    while (filterContainer.firstChild) {
-        filterContainer.removeChild(filterContainer.firstChild);
+    while (filterDimensionContainer.firstChild) {
+        filterDimensionContainer.removeChild(filterDimensionContainer.firstChild);
+    }
+    while (rangeDimensionContainer.firstChild) {
+        rangeDimensionContainer.removeChild(rangeDimensionContainer.firstChild);
     }
 
-    rangeContainer.style.visibility = 'hidden';
+    filterContainer.style.visibility = 'hidden';
     filterButton.style.visibility = 'hidden';
     inputTextElementTop.style.visibility = 'hidden';
     inputTextElementBottom.style.visibility = 'hidden';
+
+    rangeContainer.style.visibility = 'hidden';
+    rangeButton.style.visibility = 'hidden';
+    inputTextElementMin.style.visibility = 'hidden';
+    inputTextElementMax.style.visibility = 'hidden';
 }
