@@ -155,6 +155,9 @@ function generateDropdownForShow() {
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
+    }
     dimensionContainer.name = 'options';
     dimensionContainer.addEventListener('change', (event) => {
         updateDimensions(event.target.value);
@@ -221,6 +224,10 @@ function generateDropdownForInvert() {
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
+    dimensionContainer.style.marginLeft = '14.8rem';
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
+    }
     dimensionContainer.name = 'invertOptions';
     dimensionContainer.addEventListener('change', (event) => {
         invertDimension(event.target.value);

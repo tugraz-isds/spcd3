@@ -88,6 +88,7 @@ div#parallelcoords {
   border-bottom: #0081af 0.4rem;
   border-bottom-style: solid;
   visibility: hidden;
+  margin-bottom: 2rem;
 }
 
 div#showDimensionHeader {
@@ -136,6 +137,10 @@ span#moveDimensionContainer {
   margin-top: 2rem;
 }
 
+.invertDimensionContainer {
+  margin-left: 7rem;
+}
+
 .arrow {
   display: inline-block;
   padding: 0.3rem 0.4rem 0.4rem 0.3rem;
@@ -165,7 +170,6 @@ span#moveDimensionContainer {
   background-color: grey;
   color: #ffffff;
   padding-right: 1rem;
-  height: 5.2rem;
   overflow-y: auto;
 }
 

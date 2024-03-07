@@ -32,11 +32,11 @@ declare global {
 
 declare const window: any;
 
-export default class SteerableParcoords {
+export function setDimensions(newDimension: any): void {
+    return newDimension.reverse();
+}
 
-    setDimensions(newDimension: any): void {
-        return newDimension.reverse();
-    }
+export default class SteerableParcoords {
 
     getIndex(key: any, currentPosOfDims: any):boolean {
         const item = currentPosOfDims.find((object) => object.key == key);
@@ -511,7 +511,7 @@ export default class SteerableParcoords {
                 if(uniqueArray.length > limit)
                 {
                     let filteredArray = labels.filter(function(value, index, array) {
-                        return index % 3 == 0;
+                        return index % 4 == 0;
                     });
                     yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
                 }
@@ -1089,7 +1089,8 @@ export default class SteerableParcoords {
                     .attr('height', 240)
                     .attr('x', -6)
                     .attr('y', 80)
-                    .attr('fill', 'rgb(255, 255, 0, 0.4)')
+                    .attr('fill', 'rgb(255, 255, 0)')
+                    .attr('opacity', '0.4')
                     .call(drag.drag()
                         .on('drag', (event, d) => {
                             if (parcoords.newFeatures.length > 25) {
@@ -1537,7 +1538,7 @@ export default class SteerableParcoords {
     }
 }
 
-export const { invert, isInverted, setDimensions, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
+export const { invert, isInverted, generateSVG, setInactivePathLines, setActivePathLines, setFeatureAxis, select, 
     position, onDragStartEventHandler, onDragEventHandler, trans, onDragEndEventHandler, onInvert, prepareData, 
     prepareParcoordData, setupYScales, setupXScales, setupYAxis, resetSVG, linePath, highlight, doNotHighlight, 
     createTooltipForPathLine, getAllPointerEventsData, moveByOne, move, swap, setBrushDown, setBrushUp, setRectToDrag, setAxisLabels, 

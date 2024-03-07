@@ -3,7 +3,7 @@ export function getArrowBottomCursor(): string {
 }
 
 export function getArrowBottom(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="rgb(255, 255, 0, 0.4)" stroke="black" stroke-width="0.5" d="M 0 0 L 6 0 L 3 5 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="yellow" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 0 L 6 0 L 3 5 z"/></svg>';
 }
 
 export function getArrowDown(): string {
@@ -31,7 +31,7 @@ export function getArrowTopCursor(): string {
 }
 
 export function getArrowTop(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="rgb(255, 255, 0, 0.4)" stroke="black" stroke-width="0.5" d="M 0 5 L 3 0 L 6 5 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="yellow" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 5 L 3 0 L 6 5 z"/></svg>';
 }
 
 export function getArrowUp(): string {
