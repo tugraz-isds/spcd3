@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invert, setDimensions, saveAsSvg, moveByOne, 
+import {loadCSV, generateSVG, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange} from './lib/spcd3.js';
@@ -60,7 +60,7 @@ function handleFileSelect(event) {
             generateDropdownForRange();
             
             let selectedDimensions = getSelectedDimensions();
-            newFeatures = setDimensions(selectedDimensions);
+            newFeatures = selectedDimensions.reverse();
 
             showButtons();
 
@@ -123,7 +123,7 @@ function showOptions(id, buttonId) {
         }
         disableCheckbox(feature);
         disableOptionInDropdown('filterOption_', feature);
-        disableOptionInDropdown('rangeOption', feature);
+        disableOptionInDropdown('rangeOption_', feature);
         disableOptionInDropdown('moveOption_', feature);
         disableLeftAndRightButton(feature);
     });
@@ -294,6 +294,7 @@ function generateDropdownForMove() {
     const headline = document.createElement('option');
     headline.selected = 'disabled';
     headline.textContent = 'Move Dimension';
+    headline.id = 'move_headline';
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
@@ -320,8 +321,9 @@ function moveDimensionRight() {
 function disableLeftAndRightButton(dimension) {
     const position = getDimensionPositions(dimension);
     const numberOfDimensions = getNumberOfDimensions();
+    const headline = document.getElementById('move_headline');
     
-    if (position == 0 || position == -1) {
+    if (position == 0 || position == -1 || headline.selected) {
         document.getElementById('moveRight').disabled = true;
         document.getElementById('moveRight').style.opacity = 0.5;
     }
