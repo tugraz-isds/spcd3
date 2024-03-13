@@ -21,6 +21,7 @@ h1 {
 
 section {
   margin-left: 2rem;
+  margin-bottom: 4rem;
 }
 
 .input-button {
@@ -139,6 +140,7 @@ span#moveDimensionContainer {
 
 .invertDimensionContainer {
   margin-left: 7rem;
+  margin-right: 6rem;
 }
 
 .arrow {
@@ -171,6 +173,7 @@ span#moveDimensionContainer {
   color: #ffffff;
   padding-right: 1rem;
   overflow-y: auto;
+  position: absolute;
 }
 
 #filterDimensionContainer {

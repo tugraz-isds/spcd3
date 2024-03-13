@@ -64,9 +64,9 @@ As a parameter, a string, namely the dimension, is required.
 
 `function getHiddenStatus(dimension: string): string`
 
-With getHiddenStatus, getting the status of a dimension regarding 'shown' or 'hidden' is possible.
+With getHiddenStatus, getting the status of a dimension regarding **shown** or **hidden** is possible.
 As a parameter, a string, namely the dimension, is required.
-The return type is a string, and the value can be 'shown' or 'hidden'.
+The return type is a string, and the value can be **shown** or **hidden**.
 
 ## Invert Dimension
 
@@ -81,7 +81,7 @@ As a parameter, a string, namely the dimension, is required.
 
 This function returns the inversion status of a dimension.
 As a parameter, a string, namely the dimension, is required.
-The return type is a string; the value can be 'ascending' or 'descending'.
+The return type is a string; the value can be **ascending** or **descending**.
 
 ## Set Inversion Status
 
@@ -89,7 +89,7 @@ The return type is a string; the value can be 'ascending' or 'descending'.
 
 This function allows changing the inversion status of a dimension.
 As parameters, the dimension and the status are required as strings.
-The status can either be 'ascending' or 'descending'.
+The status can either be **ascending** or **descending**.
 
 ## Move Dimension
 
@@ -109,7 +109,7 @@ The parameters are:
 
 A dimension can also be moved to the left or the right, independent of another dimension.
 Parameters are the dimensions string and the direction as a string.
-The direction can be either 'right' or 'left'.
+The direction can be either **right** or **left**.
 
 ## Swap Dimensions
 
@@ -230,4 +230,4 @@ As a parameter, a string is required, namely the record label.
 `function saveAsSvg()`
 
 This function allows to save the current plot as SVG.
-The plot is saved as 'parcoords.svg'.
+The plot is saved as **'parcoords.svg'**.

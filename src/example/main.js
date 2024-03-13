@@ -382,13 +382,13 @@ function generateInputFieldsForSetFilter() {
   inputTextElementTop.name = 'topRange';
 
   labelTop.for = 'topRange';
-  labelTop.innerHTML = 'Min Value:';
+  labelTop.innerHTML = 'Min';
 
   inputTextElementBottom.style.visibility = 'visible';
   inputTextElementBottom.name = 'bottomRange';
 
   labelBottom.for = 'bottomRange';
-  labelBottom.innerHTML = 'Max Value:';
+  labelBottom.innerHTML = 'Max';
 
   filterButton.style.visibility = 'visible';
   filterButton.textContent = 'Filter';
