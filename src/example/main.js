@@ -1,4 +1,4 @@
-import {loadCSV, generateSVG, invert, saveAsSvg, moveByOne, 
+import {loadCSV, getDimensions, generateSVG, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange} from './lib/spcd3.js';
@@ -59,8 +59,7 @@ function handleFileSelect(event) {
             generateDropdownForFilter();
             generateDropdownForRange();
             
-            let selectedDimensions = getSelectedDimensions();
-            newFeatures = selectedDimensions.reverse();
+            newFeatures = getDimensions(newData['columns']);
 
             showButtons();
 

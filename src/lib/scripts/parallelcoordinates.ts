@@ -32,7 +32,7 @@ declare global {
 
 declare const window: any;
 
-export function show(dimension: string): any {
+export function show(dimension: string): void {
     const tempFeatures = parcoords.newFeatures.slice();
     const isShown = getHiddenStatus(dimension);
     const temp = parcoords.currentPosOfDims.slice();
@@ -59,12 +59,12 @@ export function show(dimension: string): any {
     }  
 }
 
-function getIndex(key: any, currentPosOfDims: any):boolean {
+function getIndex(key: any, currentPosOfDims: any): boolean {
     const item = currentPosOfDims.find((object) => object.key == key);
     return item.index;
 }
 
-export function hide(dimension: string): any {
+export function hide(dimension: string): void {
     d3.select('#contextmenu').style('display', 'none');
     const tempFeatures = parcoords.newFeatures.slice();
     const isShown = getHiddenStatus(dimension);
@@ -100,7 +100,7 @@ export function getHiddenStatus(dimension: string): string {
     }
 }
 
-export function invert(dimension: any): void {
+export function invert(dimension: string): void {
     const processedDimensionName = helper.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
@@ -147,21 +147,21 @@ export function invert(dimension: any): void {
         .attr('visibility', 'hidden');      
 }
 
-export function getInversionStatus(dimension: any): string {
+export function getInversionStatus(dimension: string): string {
     const invertId = '#dimension_invert_' + helper.cleanString(dimension);
     const element = d3.select(invertId);
     const arrowStatus = element.text();
     return arrowStatus == 'up' ? 'ascending' : 'descending';
 }
 
-export function setInversionStatus(dimension: any, mode: string): void {
+export function setInversionStatus(dimension: string, status: string): void {
     const processedDimensionName = helper.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
-    const arrow = mode === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
-    const arrowStyle = mode === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
-    textElement.text(mode === 'ascending' ? 'up' : 'down');
+    const arrow = status === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
+    const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+    textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', svgToTinyDataUri.default(arrow));
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
@@ -200,14 +200,14 @@ export function setInversionStatus(dimension: any, mode: string): void {
         .attr('visibility', 'hidden'); 
 }
 
-export function isInverted(dimension: any): boolean {
+export function isInverted(dimension: string): boolean {
     const invertId = '#dimension_invert_' + helper.cleanString(dimension);
     const element = d3.select(invertId);
     const arrowStatus = element.text();
     return arrowStatus == 'up' ? true : false;
 }
 
-export function moveByOne(dimension: any, direction: any): void {
+export function moveByOne(dimension: string, direction: string): void {
 
     let parcoords = window.parcoords;
     
@@ -261,13 +261,13 @@ export function moveByOne(dimension: any, direction: any): void {
     delete parcoords.dragging[neighbour];
 }
 
-export function move(dimensionA, toRightOf, dimensionB) {
+export function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void {
     let parcoords = window.parcoords;
         
     const indexOfDimensionA = getDimensionPositions(dimensionA);
     const indexOfDimensionB = getDimensionPositions(dimensionB);
 
-    if (toRightOf == 'toRightOf') {
+    if (toRightOf) {
         if (indexOfDimensionA > indexOfDimensionB) {
             for(let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
                 if (i != indexOfDimensionB-1) {
@@ -299,7 +299,7 @@ export function move(dimensionA, toRightOf, dimensionB) {
     }
 }
 
-export function swap(dimensionA, dimensionB) {
+export function swap(dimensionA: string, dimensionB: string): void {
     let parcoords = window.parcoords;
         
     const positionA = parcoords.xScales(dimensionA);
@@ -335,16 +335,16 @@ export function swap(dimensionA, dimensionB) {
     delete parcoords.dragging[dimensionB];
 }
 
-export function getAllDimensions(): any {
+export function getAllDimensions(): string[] {
     let listOfDimensions = parcoords.newFeatures.slice();
     return listOfDimensions.reverse();
 }
 
-export function getNumberOfDimensions(): any {
+export function getNumberOfDimensions(): number {
     return parcoords.newFeatures.length;
 }
 
-export function getDimensionPositions(dimension: string): any {
+export function getDimensionPositions(dimension: string): number {
     return parcoords.newFeatures.indexOf(dimension);
 }
 
@@ -354,25 +354,25 @@ export function getDimensionPosition(dimension: string): number {
     return reverseListOfDimension.indexOf(dimension);
 }
 
-export function setDimensionPosition(dimension: string, position: number): any {
+export function setDimensionPosition(dimension: string, position: number): void {
     const dimensionListCopy = parcoords.newFeatures.slice();
     const dimensionListInOrder = dimensionListCopy.reverse();
     const dimensionToMove = dimensionListInOrder[position];
     const dimensionPositionA = getDimensionPositions(dimension);
     const dimensionPositionB = getDimensionPositions(dimensionToMove);
     if (dimensionPositionA > dimensionPositionB) {
-        move(dimension, 'toRightOf', dimensionToMove);
+        move(dimension, true, dimensionToMove);
     }
     else {
-        move(dimension, 'toLeftOf', dimensionToMove);
+        move(dimension, false, dimensionToMove);
     }
 }
 
 export function getDimensionRange(dimension: string): any {
-    return parcoords.yScales[dimension].domain();     
+    return parcoords.yScales[dimension].domain();
 }
 
-export function setDimensionRange(dimension: string, min: number, max: number): any {
+export function setDimensionRange(dimension: string, min: number, max: number): void {
     const inverted = isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
@@ -421,8 +421,7 @@ export function getMaxRange(dimension: any): number {
     return item.max;
 }
 
-export function getFilter(dimension)
-{
+export function getFilter(dimension): any {
     const invertStatus = isInverted(dimension);
     const dimensionRange = getDimensionRange(dimension);
     const maxValue = invertStatus == false ? dimensionRange[1] : dimensionRange[0];
@@ -437,9 +436,8 @@ export function getFilter(dimension)
     return [top, bottom];
 }
 
-export function setFilter(dimension, topValue, bottomValue)
-{
-    brush.filter(dimension, topValue, bottomValue, parcoords);
+export function setFilter(dimension: string, min: number, max: number): void {
+    brush.filter(dimension, min, max, parcoords);
 }
 
 export function select(linePaths: any): void {
@@ -452,7 +450,7 @@ export function select(linePaths: any): void {
     }
 }
 
-export function getSelected(): any {
+export function getSelected(): any[] {
     let selected = [];
     d3.select('g.active').selectAll('path')
         .each(function(d) {
@@ -466,7 +464,7 @@ export function getSelected(): any {
     return selected;
 }
 
-export function setSelection(records: any): void {
+export function setSelection(records: []): void {
     for(let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
         d3.select('.' + selectedLine)
@@ -476,7 +474,7 @@ export function setSelection(records: any): void {
     }
 }
 
-export function isSelected(record: any): boolean {
+export function isSelected(record: string): boolean {
     let cleanedRecord = helper.cleanLinePathString(record);
     const path = d3.select('.' + cleanedRecord).style('stroke');
     if (path == 'rgb(255, 165, 0)') {
@@ -487,7 +485,7 @@ export function isSelected(record: any): boolean {
     }
 }
 
-export function toggleSelection(record: any): void {
+export function toggleSelection(record: string): void {
     const selected = isSelected(record);
     if (selected) {
         setUnselected(record);
@@ -497,7 +495,7 @@ export function toggleSelection(record: any): void {
     }
 }
 
-export function setSelected(record: any): void {
+export function setSelected(record: string): void {
     const path = helper.cleanLinePathString(record);
     d3.select('.' + path)
         .transition()
@@ -505,7 +503,7 @@ export function setSelected(record: any): void {
         .style('opacity', '1');
 }
 
-export function setUnselected(record: any): void {
+export function setUnselected(record: string): void {
     const path = helper.cleanLinePathString(record);
     d3.select('.' + path)
         .transition()
@@ -519,6 +517,10 @@ export function resetSVG(): void {
     d3.select('#contextmenu').remove();
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
+}
+
+export function getDimensions(data: any): void {
+    return data.reverse();
 }
 
 export function generateSVG(content: any, newFeatures: any): void {

@@ -3,6 +3,8 @@ import xmlFormat from 'xml-formatter';
 
 export function loadCSV(csv: string): any {
         let completeArray = csv.split(/\r?\n/);
+        console.log(csv);
+        console.log(completeArray);
         if (checkIfDuplicatesExists(completeArray[0]))
         {
             csv = removeDuplicateColumnNames(csv);
