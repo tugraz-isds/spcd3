@@ -7,17 +7,36 @@ that the library is using. In addition, the project, but also the example, uses 
 A live version of the `main` branch can be found at
 [spcd3.netlify.app](https://spcd3.netlify.app/).
 
-## How to build the spcd3 library
+## Built With
 
-### Install dependencies
-- Open terminal and execute the following command to install all the dependencies:
+As mentioned, the library uses D3v7 but not the entire library; only some modules from [D3](https://d3js.org/) are used.
+
+The modules we are using are:
+ - d3-dsv
+ - d3-selection
+ - d3-drag
+ - d3-shape
+ - d3-axis
+ - d3-scale
+ - d3-transition
+
+ We are using [Mini SVG data: URI](https://github.com/tigt/mini-svg-data-uri#readme) to convert SVGs in data URIs and [xml-formatter](https://github.com/chrisbottin/xml-formatter#readme) to get a pretty downloaded SVG file of the parallel coordinate plot.
+
+ We are using [gulp](https://gulpjs.com/) and [rollup](https://rollupjs.org/) to bundle and build the library.
+
+
+## Getting Started
+
+### Prerequisites
+
+Open terminal and execute the following command to install all the dependencies:
 
 
 ``` 
 npm install 
 ```
 
-### Gulp Build And Development
+### Build And Development
 
 Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
 defines for now three public tasks:
@@ -45,3 +64,13 @@ npx gulp build
 npm run serve
 npx gulp serve
 ```
+
+## Usage
+
+As mentioned in the beginning, we implemented an example to show how the library works and what the parallel coordinate plot will look like in addition to the library.
+
+[Here](./src/lib/LIBRARY.md) is a listing of all available functions to give an overview of the API. Furthermore, we generated with the **student-marks** dataset, which can be found in the folder [data](./src/example/data/), a small explanation. The explanation can be found [here](./src/example/DESCRIPTION.md).
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.

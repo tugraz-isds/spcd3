@@ -4,7 +4,7 @@ An example is implemented to show how the library works. Not all functions are s
 
 ## Data-Handling
 
-A CSV file is required to visualise a dataset as a parallel coordinate plot. The CSV should be separated by a comma. Otherwise, there are no special requirements. The data can be of categorical or numerical origin. In the folder 'data,' three example datasets can be viewed. Other datasets should have the same structure.
+A CSV file is required to visualise a dataset as a parallel coordinate plot. The CSV should be separated by a comma. Otherwise, there are no special requirements. The data can be of categorical or numerical origin. In the folder [data](../example/data/), three example datasets can be viewed. Other datasets should have the same structure.
 
 
 ## Student Example
