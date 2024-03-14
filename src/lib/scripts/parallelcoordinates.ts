@@ -11,6 +11,7 @@ import * as svgToTinyDataUri from 'mini-svg-data-uri';
 
 declare global {
     let padding: any;
+    let paddingXaxis: any;
     let width: any;
     let height: any;
     let dataset: any;
@@ -225,7 +226,7 @@ export function moveByOne(dimension: string, direction: string): void {
     const pos = parcoords.xScales(dimension);
     const posNeighbour = parcoords.xScales(neighbour);
 
-    const distance = (width-80)/parcoords.newFeatures.length;
+    const distance = (width-window.paddingXaxis)/parcoords.newFeatures.length;
 
     parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
         pos - distance;
@@ -576,20 +577,36 @@ function prepareData(data: any, newFeatures: any): any {
 export function prepareParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
+    window.paddingXaxis = 80;
     window.width = newFeatures.length * 80;
     window.height = 400;
 
     let dataset = prepareData(data, newFeatures);
 
     window.parcoords = {};
-    window.parcoords.xScales = setupXScales(window.width, window.padding, dataset[0]);
+    window.parcoords.features = dataset[0];
+    window.parcoords.newDataset = dataset[1];
+
+    for(let i = 0; i < newFeatures.length; i++) {
+        let values = window.parcoords.newDataset.map(o => o[newFeatures[i]]);
+        if (isNaN(values[0])) {
+            values.forEach(item => {
+                if(item.length > 20) {
+                    window.width = newFeatures.length * 200;
+                    window.paddingXaxis = 200;
+                    return;
+                }
+            })
+        } 
+    }
+
+    window.parcoords.xScales = setupXScales(window.width, window.paddingXaxis, dataset[0]);
     window.parcoords.yScales = setupYScales(window.height, window.padding, dataset[0], dataset[1]);
     window.parcoords.dragging = {};
     window.parcoords.dragPosStart = {};
     window.parcoords.currentPosOfDims = [];
     window.parcoords.newFeatures = newFeatures;
-    window.parcoords.features = dataset[0];
-    window.parcoords.newDataset = dataset[1];
+
     window.parcoords.data = data;
 
     for(let i = 0; i < newFeatures.length; i++) {
@@ -674,11 +691,11 @@ export function setupYScales(height: any, padding: any, features: any, newDatase
         let labels = [];
         if (isNaN(values[0]) !== false) {
             values.forEach(function(element) {
-                labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
+                labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
             });
             yScales[x.name] = scale.scalePoint()
                 .domain(labels)
-                .range([padding, height -  padding])
+                .range([padding, height - padding])
                 .padding(0.2);
         }
         else {
@@ -709,7 +726,7 @@ export function setupYAxis(features :any[], yScales: any, newDataset: any): any 
         let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
         let labels = [];
         tempValues.forEach(function(element) {
-            labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
+            labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
         });
         counter = counter + 1;
 
@@ -720,7 +737,7 @@ export function setupYAxis(features :any[], yScales: any, newDataset: any): any 
             if(uniqueArray.length > limit)
             {
                 let filteredArray = labels.filter(function(value, index, array) {
-                    return index % 4 == 0;
+                    return index % 3 == 0;
                 });
                 yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
             }
@@ -914,11 +931,11 @@ function onDragEventHandler(parcoords: any, active: any, featureAxis: any, width
         return function onDrag(d) {
             const element = document.getElementById("parallelcoords");
             if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-                parcoords.dragging[(d.subject).name] + 50 > window.innerWidth) {
-                element.scrollLeft += 100;
+                parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
+                element.scrollLeft += 80;
             }
-            else if (window.scrollXPos > parcoords.dragging[(d.subject).name] - 50) {
-                element.scrollLeft -= 100;
+            else if (window.scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
+                element.scrollLeft -= 80;
             }
 
             parcoords.dragging[(d.subject).name] = Math.min(width-80, 
@@ -1196,6 +1213,8 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
         })
         .on('contextmenu', function (event, d) {
             const dimension = d.name;
+            const values = parcoords.newDataset.map(o => o[dimension]);
+            
             contextMenu.style('left', event.clientX + 'px')
             .style('top', 13.6 + 'rem')
             .style('display', 'block')
@@ -1220,8 +1239,10 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
                     event.stopPropagation();
                 });
             
+            if (!isNaN(values[0])) {
             d3.select('#rangeMenu')
                 .style('border-top', '0.08rem lightgrey solid')
+                .style('visibility', 'visible')
                 .on('click', (event) => {
                     popupWindowRange.style('display', 'block')
                             .style('width', 17 + 'rem')
@@ -1305,6 +1326,7 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
             
             d3.select('#filterMenu')
                 .style('border-top', '0.08rem lightgrey solid')
+                .style('visibility', 'visible')
                 .on('click', (event) => {
                     popupWindowFilter.style('display', 'block')
                             .style('width', 17 + 'rem')
@@ -1406,6 +1428,7 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
                 });
             
             d3.select('#resetfilterMenu')
+                .style('visibility', 'visible')
                 .on('click', (event) => {
                     const range = getDimensionRange(dimension);
                     if (isInverted(dimension)) {
@@ -1416,6 +1439,12 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
                     }
                     event.stopPropagation();
                 });
+            }
+            else {
+                d3.select('#rangeMenu').style('visibility', 'hidden');
+                d3.select('#filterMenu').style('visibility', 'hidden');
+                d3.select('#resetfilterMenu').style('visibility', 'hidden');
+            }
             
             d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
             event.preventDefault();
