@@ -441,7 +441,7 @@ export function setFilter(dimension: string, min: number, max: number): void {
     brush.filter(dimension, min, max, parcoords);
 }
 
-export function select(linePaths: any): void {
+function select(linePaths: any): void {
     for(let i = 0; i < linePaths.length; i++) {
         let selectedLine = helper.cleanLinePathString(linePaths[i]);
         d3.select('.' + selectedLine)
@@ -560,6 +560,14 @@ export function generateSVG(content: any, newFeatures: any): void {
     setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
 }
 
+export function isDimensionNaN(dimension: string): boolean {
+    let values = window.parcoords.newDataset.map(o => o[dimension]);
+    if (isNaN(values[0])) {
+        return true;
+    }
+    return false;
+}
+
 function prepareData(data: any, newFeatures: any): any {
     let newDataset = [];
     data.forEach(obj => {
@@ -574,7 +582,7 @@ function prepareData(data: any, newFeatures: any): any {
     return [features, newDataset];
 }
 
-export function prepareParcoordData(data: any, newFeatures: any): any {
+function prepareParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
     window.paddingXaxis = 80;
@@ -640,7 +648,7 @@ export function prepareParcoordData(data: any, newFeatures: any): any {
     });
 }
 
-export function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
+function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
     newFeatures: any; features: any[]; newDataset: any[];}): void {
     
@@ -660,16 +668,16 @@ export function setInactivePathLines(svg: any, content: any, parcoords: { xScale
         });
 }
 
-export function trans(g: any): any {
+function trans(g: any): any {
     return g.transition().duration(50);
 }
 
-export function position(dimensionName: any, dragging: any, xScales: any): any {
+function position(dimensionName: any, dragging: any, xScales: any): any {
     const value = dragging[dimensionName];  
     return value == null ? xScales(dimensionName) : value;
 }
 
-export function linePath(d: any, newFeatures: any, parcoords: any): any {
+function linePath(d: any, newFeatures: any, parcoords: any): any {
     let lineGenerator = path.line();
     const tempdata = Object.entries(d).filter(x => x[0]);
     let points = [];
@@ -684,7 +692,7 @@ export function linePath(d: any, newFeatures: any, parcoords: any): any {
     return (lineGenerator(points));
 }
 
-export function setupYScales(height: any, padding: any, features: any, newDataset: any): any {
+function setupYScales(height: any, padding: any, features: any, newDataset: any): any {
     let yScales = {};
     features.map(x => {
         const values = newDataset.map(o => o[x.name]);
@@ -709,13 +717,13 @@ export function setupYScales(height: any, padding: any, features: any, newDatase
     return yScales;
 }
 
-export function setupXScales(width: any, padding: any, features: any): any {
+function setupXScales(width: any, padding: any, features: any): any {
     return scale.scalePoint()
         .domain(features.map(x => x.name))
         .range([width - padding, padding]);
 }
 
-export function setupYAxis(features :any[], yScales: any, newDataset: any): any {
+function setupYAxis(features :any[], yScales: any, newDataset: any): any {
     
     const limit = 30;
     let counter = 0;
@@ -752,7 +760,7 @@ export function setupYAxis(features :any[], yScales: any, newDataset: any): any 
     return yAxis;
 }
 
-export function setActivePathLines(svg: any, content: any, ids: any[], 
+function setActivePathLines(svg: any, content: any, ids: any[], 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
@@ -997,7 +1005,7 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, inactive: any, 
     }
 }
 
-export function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
+function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; }, 
     width: any, padding: any): void {

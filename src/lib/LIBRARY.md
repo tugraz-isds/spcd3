@@ -231,3 +231,11 @@ As a parameter, a string is required, namely the record label.
 
 This function allows to save the current plot as SVG.
 The plot is saved as **'parcoords.svg'**.
+
+## Check Dimension Data
+
+`function isDimensionNaN(dimension: string): boolean`
+
+This function checks if the data of a dimension is numerical or not.
+As a parameter, a string is required, namely the dimension name.
+This function returns true if it is numerical and false if not.

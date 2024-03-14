@@ -1,7 +1,7 @@
 import {loadCSV, getDimensions, generateSVG, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
-    setDimensionRange} from './lib/spcd3.js';
+    setDimensionRange, isDimensionNaN} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -401,6 +401,12 @@ function generateInputFieldsForSetFilter() {
 }
 
 function filter() {
+
+    if(isDimensionNaN(filterDimensionData)) {
+        alert(`Attention: Set Filter works only for numerical data!`);
+        return;
+    }
+
     let top = Number(document.getElementById('filterDimensionInputFieldTop').value);
     let bottom = Number(document.getElementById('filterDimensionInputFieldBottom').value);
     const limit = getDimensionRange(filterDimensionData);
@@ -530,6 +536,12 @@ function generateInputFieldsForSetRange() {
 }
 
 function setRange() {
+
+    if(isDimensionNaN(rangeDimensionData)) {
+        alert(`Attention: Set Range works only for numerical data!`);
+        return;
+    }
+
     let min = Number(document.getElementById('rangeDimensionInputFieldTop').value);
     let max = Number(document.getElementById('rangeDimensionInputFieldBottom').value);
    
