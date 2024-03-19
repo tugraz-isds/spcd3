@@ -39,7 +39,7 @@ The previously loaded columns of the data, e.g., data['columns'], are necessary 
 `function generateSVG(data: [], dimensions: [])`
 
 This function creates the plot of the previously loaded data.
-Parameters are the loaded data and the returned dimensions of getDimensions needed.
+Parameters are the loaded data and the returned dimensions of getDimensions.
 
 ## Reset Plot
 
