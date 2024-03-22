@@ -29,6 +29,7 @@ declare global {
         newDataset: any,
         data: any
     };
+    let timer: number;
 }
 
 declare const window: any;
@@ -934,20 +935,29 @@ function onDragStartEventHandler(parcoords: any, inactive: any): any {
     }
 }
 
+function scroll(parcoords, d) {
+    const element = document.getElementById("parallelcoords");
+    if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
+             parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
+                element.scrollLeft += 5;
+            }
+            else if (window.scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
+                element.scrollLeft -= 5;
+            }
+}
+
 function onDragEventHandler(parcoords: any, active: any, featureAxis: any, width: any): any {
     {
         return function onDrag(d) {
-            const element = document.getElementById("parallelcoords");
-            if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-                parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
-                element.scrollLeft += 80;
+            
+            if (window.timer !== null) {
+                clearInterval(window.timer);
+                window.timer = null;
             }
-            else if (window.scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
-                element.scrollLeft -= 80;
-            }
-
-            parcoords.dragging[(d.subject).name] = Math.min(width-80, 
-                Math.max(80, this.__origin__ += d.x));
+            window.timer = setInterval(() => {scroll(parcoords, d), 100});
+            
+            parcoords.dragging[(d.subject).name] = Math.min(width-window.paddingXaxis, 
+                Math.max(window.paddingXaxis, this.__origin__ += d.x));
 
             active.each(function (d) {
                 d3.select(this)
