@@ -39,10 +39,13 @@ npm install
 ### Build And Development
 
 Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
-defines for now three public tasks:
+defines for now four public tasks:
 
 - The `clean` task removes the existing `dist` directory in
   order to enable a clean rebuild of the project.
+
+- The `cleanAll` task removes the existing `dist` and `node_modules` directories. Besides
+  Furthermore the file `package.lock.json` will be deleted.
 
 - The `build` task creates a new build of the library and stores the generated .js file into
   `dist/library` folder. Additionally, the example folder is copied to the `dist/example` folder.
@@ -57,6 +60,9 @@ by running the equivalent scripts in package.json:
 ```
 npm run clean
 npx gulp clean
+
+npm run cleanAll
+npx gulp cleanAll
 
 npm run build
 npx gulp build
