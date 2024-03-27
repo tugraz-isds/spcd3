@@ -586,8 +586,8 @@ function prepareData(data: any, newFeatures: any): any {
 function prepareParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
-    window.paddingXaxis = 80;
-    window.width = newFeatures.length * 80;
+    window.paddingXaxis = 100;
+    window.width = newFeatures.length * 100;
     window.height = 400;
 
     let dataset = prepareData(data, newFeatures);
@@ -755,7 +755,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
             }
         }
         else {
-            yAxis[key[0]] = axis.axisLeft(key[1]);
+            yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(yScales[key[0]].ticks(6).concat(yScales[key[0]].domain()));
         }
     });
     return yAxis;
