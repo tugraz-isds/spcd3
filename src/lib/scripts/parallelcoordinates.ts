@@ -30,6 +30,7 @@ declare global {
         data: any
     };
     let timer: number;
+    let active: any;
 }
 
 declare const window: any;
@@ -556,9 +557,10 @@ export function generateSVG(content: any, newFeatures: any): void {
 
     let inactive = setInactivePathLines(svg, content, window.parcoords);
 
-    let active = setActivePathLines(svg, content, ids, window.parcoords);
+    window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
-    setFeatureAxis(svg, yAxis, active, inactive, window.parcoords, width, window.padding);
+    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
+    
 }
 
 export function isDimensionNaN(dimension: string): boolean {
@@ -1180,6 +1182,10 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
         .attr('class', 'contextmenu')
         .text('Set Range');
     contextMenu.append('div')
+        .attr('id', 'resetRangeMenu')
+        .attr('class', 'contextmenu')
+        .text('Reset Range');
+    contextMenu.append('div')
         .attr('id', 'filterMenu')
         .attr('class', 'contextmenu')
         .text('Set Filter');
@@ -1341,12 +1347,17 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
                     });
                     event.stopPropagation();
                 });
-            
-            d3.select('#filterMenu')
-                .style('border-top', '0.08rem lightgrey solid')
+                d3.select('#resetRangeMenu')
                 .style('visibility', 'visible')
                 .on('click', (event) => {
-                    popupWindowFilter.style('display', 'block')
+                    setDimensionRange(dimension, getMinRange(dimension), getMaxRange(dimension));
+                    event.stopPropagation();
+                });
+                d3.select('#filterMenu')
+                    .style('border-top', '0.08rem lightgrey solid')
+                    .style('visibility', 'visible')
+                    .on('click', (event) => {
+                        popupWindowFilter.style('display', 'block')
                             .style('width', 17 + 'rem')
                             .style('height', 8 + 'rem')
                             .style('background', 'white')
@@ -1359,72 +1370,72 @@ function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any
                             .style('bottom', 0)
                             .style('left', 0)
                             .style('z-index', 10);
-                    headerDimensionFilter.text(dimension);
-                    filterButton.on('click', () => {
-                        let min = d3.select('#minFilterValue').node().value;
-                        let max = d3.select('#maxFilterValue').node().value;
-                        const ranges = getDimensionRange(dimension);
-                        const inverted = isInverted(dimension);
-                        let isOk = true;
+                        headerDimensionFilter.text(dimension);
+                        filterButton.on('click', () => {
+                            let min = d3.select('#minFilterValue').node().value;
+                            let max = d3.select('#maxFilterValue').node().value;
+                            const ranges = getDimensionRange(dimension);
+                            const inverted = isInverted(dimension);
+                            let isOk = true;
                         
-                        if (inverted) {
-                            if (min < ranges[1]) {
-                                min = ranges[1];
-                                popupWindowFilterError.text(`Min value is smaller than 
-                                ${getMinRange(dimension)}, filter is set to min.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
+                            if (inverted) {
+                                if (min < ranges[1]) {
+                                    min = ranges[1];
+                                    popupWindowFilterError.text(`Min value is smaller than 
+                                    ${getMinRange(dimension)}, filter is set to min.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
+                                }
+                                if (max > ranges[0]) {
+                                    max = ranges[0];
+                                    popupWindowFilterError.text(`Max value is bigger than 
+                                    ${getMaxRange(dimension)}, filter is set to max.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
+                                }
                             }
-                            if (max > ranges[0]) {
-                                max = ranges[0];
-                                popupWindowFilterError.text(`Max value is bigger than 
-                                ${getMaxRange(dimension)}, filter is set to max.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
+                            else {
+                                if (min < ranges[0]) {
+                                    min = ranges[0];
+                                    popupWindowFilterError.text(`Min value is smaller than 
+                                    ${getMinRange(dimension)}, filter is set to min.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
+                                }
+                                if (max > ranges[1]) {
+                                    max = ranges[1];
+                                    popupWindowFilterError.text(`Max value is bigger than 
+                                    ${getMaxRange(dimension)}, filter is set to max.`)
+                                    .style('display', 'block')
+                                    .style('padding-left', 0.5 + 'rem')
+                                    .style('padding-top', 0.5 + 'rem')
+                                    .style('color', 'red')
+                                    .style('font-size', 'x-small');
+                                    isOk = false;
+                                }
                             }
-                        }
-                        else {
-                            if (min < ranges[0]) {
-                                min = ranges[0];
-                                popupWindowFilterError.text(`Min value is smaller than 
-                                ${getMinRange(dimension)}, filter is set to min.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
+                            if (inverted) {
+                                setFilter(dimension, min, max);
                             }
-                            if (max > ranges[1]) {
-                                max = ranges[1];
-                                popupWindowFilterError.text(`Max value is bigger than 
-                                ${getMaxRange(dimension)}, filter is set to max.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
+                            else {
+                                setFilter(dimension, max, min);
                             }
-                        }
-                        if (inverted) {
-                            setFilter(dimension, min, max);
-                        }
-                        else {
-                            setFilter(dimension, max, min);
-                        }
-                        if (isOk) {
-                            popupWindowFilterError.style('display', 'none');
-                            popupWindowFilter.style('display', 'none');
-                        }
+                            if (isOk) {
+                                popupWindowFilterError.style('display', 'none');
+                                popupWindowFilter.style('display', 'none');
+                            }
                     });
                     inputMaxFilter.on('keypress', (event) => {
                         if (event.key === "Enter") {

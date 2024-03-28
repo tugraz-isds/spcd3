@@ -75,7 +75,6 @@ function handleFileSelect(event) {
         reader.onload = function(e) {
             clearPlot();
             data = e.target.result;
-            console.log(data);
             newData = loadCSV(data);
 
             generateDropdownForShow();
@@ -153,8 +152,6 @@ function showOptions(id, buttonId) {
         disableOptionInDropdown('moveOption_', feature);
         disableLeftAndRightButton(feature);
     });
-
-    console.log(getAllDimensions());
 }
 
 function generateDropdownForShow() {
@@ -420,7 +417,7 @@ function generateInputFieldsForSetFilter() {
   labelBottom.innerHTML = 'Max';
 
   filterButton.style.visibility = 'visible';
-  filterButton.textContent = 'Filter';
+  filterButton.textContent = 'Set Filter';
 
   container.appendChild(labelTop);
   container.appendChild(inputTextElementTop);
@@ -539,6 +536,9 @@ function generateInputFieldsForSetRange() {
     const labelBottom = document.getElementById('rangeDimensionLabelBottom');
     const inputTextElementTop = document.getElementById('rangeDimensionInputFieldTop');
     const inputTextElementBottom = document.getElementById('rangeDimensionInputFieldBottom');
+    const rangeInfo = document.getElementById('rangeInfo');
+
+    const filterInput = document.getElementById('filterContainer');
   
     container.style.visibility = 'visible';
   
@@ -547,7 +547,10 @@ function generateInputFieldsForSetRange() {
   
     labelTop.for = 'minRange';
     labelTop.innerHTML = 'Min';
-  
+
+    const max = getMaxRange(rangeDimensionData);
+    const min = getMinRange(rangeDimensionData);
+
     inputTextElementBottom.style.visibility = 'visible';
     inputTextElementBottom.name = 'maxRange';
   
@@ -555,13 +558,19 @@ function generateInputFieldsForSetRange() {
     labelBottom.innerHTML = 'Max';
   
     rangeButton.style.visibility = 'visible';
-    rangeButton.textContent = 'Save';
-  
+    rangeButton.textContent = 'Set Range';
+
+    rangeInfo.style.visibility = 'visible';
+    rangeInfo.innerHTML = `The original range of ${rangeDimensionData} is between ${min} and ${max}.`;
+    rangeInfo.style.color = 'grey';
+    rangeInfo.style.fontSize = 'smaller';
+
     container.appendChild(labelTop);
     container.appendChild(inputTextElementTop);
     container.appendChild(labelBottom);
     container.appendChild(inputTextElementBottom);
     container.appendChild(rangeButton);
+    container.appendChild(rangeInfo);
 }
 
 function setRange() {
