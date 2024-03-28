@@ -1,7 +1,7 @@
 import {loadCSV, getDimensions, generateSVG, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
-    setDimensionRange, isDimensionNaN, getAllDimensions} from './lib/spcd3.js';
+    setDimensionRange, isDimensionNaN, getAllDimensions, getAllRecords} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -62,6 +62,34 @@ let rangeButton = document.getElementById('rangeButton');
 rangeButton.addEventListener('click', setRange, false);
 rangeButton.style.visibility = 'hidden';
 
+let topFilter = document.getElementById('filterDimensionInputFieldTop');
+topFilter.addEventListener('keyup', ({key}) => {
+    if (key === 'Enter') {
+        filter();
+    }
+});
+
+let bottomFilter = document.getElementById('filterDimensionInputFieldBottom');
+bottomFilter.addEventListener('keyup', ({key}) => {
+    if (key === 'Enter') {
+        filter();
+    }
+});
+
+let topRange = document.getElementById('rangeDimensionInputFieldTop');
+topRange.addEventListener('keyup', ({key}) => {
+    if (key === 'Enter') {
+        setRange();
+    }
+});
+
+let bottomRange = document.getElementById('rangeDimensionInputFieldBottom');
+bottomRange.addEventListener('keyup', ({key}) => {
+    if (key === 'Enter') {
+        setRange();
+    }
+});
+
 function openFileDialog() {
     document.getElementById('fileInput').click();
 }
@@ -76,6 +104,10 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
+            newFeatures = getDimensions(newData['columns']);
+            generateSVG(newData, newFeatures);
+
+            showButtons();
 
             generateDropdownForShow();
             generateDropdownForInvert();
@@ -83,11 +115,6 @@ function handleFileSelect(event) {
             generateDropdownForFilter();
             generateDropdownForRange();
             
-            newFeatures = getDimensions(newData['columns']);
-
-            showButtons();
-
-            generateSVG(newData, newFeatures);
             document.getElementById('border').style.visibility = 'visible';
         };
         reader.readAsText(file);
@@ -391,7 +418,7 @@ function generateDropdownForFilter() {
         option.value = dimension;
         option.id = 'filterOption_' + dimension;
         dropdown.appendChild(option);
-    })
+    });
     container.appendChild(dropdown);
 }
 
@@ -537,8 +564,6 @@ function generateInputFieldsForSetRange() {
     const inputTextElementTop = document.getElementById('rangeDimensionInputFieldTop');
     const inputTextElementBottom = document.getElementById('rangeDimensionInputFieldBottom');
     const rangeInfo = document.getElementById('rangeInfo');
-
-    const filterInput = document.getElementById('filterContainer');
   
     container.style.visibility = 'visible';
   

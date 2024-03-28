@@ -239,6 +239,14 @@ As a parameter, a string is required, namely the record label.
 With this function, a single record can be selected.
 As a parameter, a string is required, namely the record label.
 
+- getAllRecords
+
+`function getAllRecords(): any[]`
+
+This function returns all records (regardless of whether record is selected or not).
+This function returns an array with all records.
+A data record is identified by its name, for example the name.
+
 ## Save Function
 
 - saveAsSvg

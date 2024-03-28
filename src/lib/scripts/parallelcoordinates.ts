@@ -515,6 +515,21 @@ export function setUnselected(record: string): void {
         .style('opacity', '0.7');
 }
 
+export function getAllRecords(): any[] {
+
+    console.log(window.active);
+    const selection = window.active;
+    const object = selection._groups;
+    const data = [];
+    for (let i = 0; i < object[0].length; i++) {
+        const items = object.map(item => item[i]);
+        const keys = Object.keys(items);
+        const text = items[keys[0]].id;
+        data.push(text);
+    }
+    return data;
+}
+
 export function resetSVG(): void {
     d3.select('#pc_svg').remove();
     d3.select('#contextmenu').remove();
@@ -560,7 +575,6 @@ export function generateSVG(content: any, newFeatures: any): void {
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
-    
 }
 
 export function isDimensionNaN(dimension: string): boolean {
