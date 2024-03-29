@@ -133,6 +133,14 @@ div#rangeDimensionHeader {
   padding-top: 0.8rem;
 }
 
+div#selectRecordsHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
 span#moveDimensionContainer {
   padding-top: 2rem;
   margin-top: 2rem;

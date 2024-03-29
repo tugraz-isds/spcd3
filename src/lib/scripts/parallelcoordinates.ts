@@ -516,8 +516,6 @@ export function setUnselected(record: string): void {
 }
 
 export function getAllRecords(): any[] {
-
-    console.log(window.active);
     const selection = window.active;
     const object = selection._groups;
     const data = [];
