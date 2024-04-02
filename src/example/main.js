@@ -2,7 +2,7 @@ import {loadCSV, getDimensions, generateSVG, invert, saveAsSvg, moveByOne,
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange, isDimensionNaN, getAllDimensions, getAllRecords,
-    toggleSelection} from './lib/spcd3.js';
+    toggleSelection, isSelected} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -195,7 +195,15 @@ function showOptionsForRecords(id, buttonId) {
     checkboxes.style.display == 'block' ? button.style.backgroundColor = 'grey' :
         button.style.backgroundColor = 'white';
     checkboxes.style.display == 'block' ? button.style.color = 'white' :
-        button.style.color = 'black'; 
+        button.style.color = 'black';
+
+    let records = getAllRecords();
+    records.forEach(function (record) {
+        let selected = isSelected(record);
+        if (selected) {
+            document.getElementById('select_' + record).checked = true;
+        }
+    })
 }
 
 function generateDropdownForShow() {
@@ -453,6 +461,7 @@ function generateInputFieldsForSetFilter() {
 
   labelTop.for = 'topRange';
   labelTop.innerHTML = 'Min';
+  labelTop.style.paddingLeft = '2rem';
 
   inputTextElementBottom.style.visibility = 'visible';
   inputTextElementBottom.name = 'bottomRange';
@@ -589,6 +598,7 @@ function generateInputFieldsForSetRange() {
   
     labelTop.for = 'minRange';
     labelTop.innerHTML = 'Min';
+    labelTop.style.paddingLeft = '2rem';
 
     const max = getMaxRange(rangeDimensionData);
     const min = getMinRange(rangeDimensionData);
@@ -685,7 +695,6 @@ function resetAll() {
 function generateDropdownForSelectRecords() {
     
     let records = getAllRecords();
-    console.log(records);
     
     document.getElementById('selectRecordsHeader').style.visibility = 'visible';
 
@@ -718,7 +727,6 @@ function generateDropdownForSelectRecords() {
     });
 
     records.forEach(function(record) {
-        console.log(record);
         let label = document.createElement('label');
         label.className = 'dropdownLabel';
         let input = document.createElement('input');

@@ -31,6 +31,9 @@ declare global {
     };
     let timer: number;
     let active: any;
+    let key: string;
+    let svg: any;
+    let selectable: any;
 }
 
 declare const window: any;
@@ -446,41 +449,42 @@ export function setFilter(dimension: string, min: number, max: number): void {
 function select(linePaths: any): void {
     for(let i = 0; i < linePaths.length; i++) {
         let selectedLine = helper.cleanLinePathString(linePaths[i]);
+        d3.select('#select_' + selectedLine)
+            .style('visibility', 'visible');
         d3.select('.' + selectedLine)
             .transition()
-            .style('stroke', 'rgb(255, 165, 0)')
-            .style('opacity', '1');
+            .style('visibility', 'hidden');
     }
 }
 
 export function getSelected(): any[] {
     let selected = [];
-    d3.select('g.active').selectAll('path')
+    window.selectable.selectAll('path')
         .each(function(d) {
-            const isSeletedLine = d3.select(this).style('stroke');
-            if (isSeletedLine == 'rgb(255, 165, 0)') {
-                const keys = Object.keys(d);
-                const first_key = keys[0];
-                selected.push(d[first_key]);
+            const isSeletedLine = d3.select(this).style('visibility');
+            if (isSeletedLine == 'visible') {
+                selected.push(d[window.key]);
             }
-    });
+        }
+    );
     return selected;
 }
 
 export function setSelection(records: []): void {
     for(let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
+        d3.select('#select_' + selectedLine)
+            .style('visibility', 'visible');
         d3.select('.' + selectedLine)
             .transition()
-            .style('stroke', 'rgb(255, 165, 0)')
-            .style('opacity', '1');
+            .style('visibility', 'hidden');
     }
 }
 
 export function isSelected(record: string): boolean {
     let cleanedRecord = helper.cleanLinePathString(record);
-    const path = d3.select('.' + cleanedRecord).style('stroke');
-    if (path == 'rgb(255, 165, 0)') {
+    const path = d3.select('#select_' + cleanedRecord).style('visibility');
+    if (path == 'visible') {
         return true;
     }
     else {
@@ -500,19 +504,20 @@ export function toggleSelection(record: string): void {
 
 export function setSelected(record: string): void {
     const path = helper.cleanLinePathString(record);
+    d3.select('#select_' + path)
+            .style('visibility', 'visible');
     d3.select('.' + path)
-        .transition()
-        .style('stroke', 'rgb(255, 165, 0)')
-        .style('opacity', '1');
+            .transition()
+            .style('visibility', 'hidden');
 }
 
 export function setUnselected(record: string): void {
     const path = helper.cleanLinePathString(record);
+    d3.select('#select_' + path)
+            .style('visibility', 'hidden');
     d3.select('.' + path)
-        .transition()
-        .style('stroke', 'rgb(0, 129, 175)')
-        .style('pointer-events', 'stroke')
-        .style('opacity', '0.7');
+            .transition()
+            .style('visibility', 'visible');
 }
 
 export function getAllRecords(): any[] {
@@ -546,7 +551,7 @@ export function generateSVG(content: any, newFeatures: any): void {
 
     prepareParcoordData(content, newFeatures);
 
-    const svg = d3.select('#parallelcoords')
+    window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, window.width, window.height])
@@ -555,9 +560,9 @@ export function generateSVG(content: any, newFeatures: any): void {
             if (!(event.ctrlKey || event.metaKey)) {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style('stroke') !== 'lightgrey') {
-                            d3.select('.' + ids[i]).style('stroke', 'rgb(0, 129, 175)')
-                            .style('pointer-events', 'stroke').style('opacity', '0.7');
+                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
+                            d3.select('.' + ids[i]).style('visibility', 'visible');
+                            d3.select('#select_' + ids[i]).style('visibility', 'hidden');
                         }
                     }
                 }
@@ -571,6 +576,8 @@ export function generateSVG(content: any, newFeatures: any): void {
     let inactive = setInactivePathLines(svg, content, window.parcoords);
 
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
+
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
@@ -677,6 +684,31 @@ function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any;
         .style('fill', 'none')
         .style('stroke', 'lightgrey')
         .style('stroke-opacity', '0.4')
+        .each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+        });
+}
+
+function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any; 
+    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
+    newFeatures: any; features: any[]; newDataset: any[];}): void {
+    
+    return svg.append('g')
+        .attr('class', 'selectable')
+        .selectAll('path')
+        .data(content)
+        .enter()
+        .append('path')
+        .attr('id', (d) => {
+            const selected_value = helper.cleanLinePathString(d[window.key]);
+            return 'select_' + selected_value;
+        })
+        .style('pointer-events', 'none')
+        .style('fill', 'none')
+        .style('stroke', 'rgb(255, 165, 0)')
+        .style('opacity', '1')
+        .style('visibility', 'hidden')
         .each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
@@ -795,15 +827,13 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .append('path')
         .attr('class', (d) => {
             const keys = Object.keys(d);
-            const first_key = keys[0];
-            const selected_value = helper.cleanLinePathString(d[first_key]);
+            window.key = keys[0];
+            const selected_value = helper.cleanLinePathString(d[window.key]);
             ids.push(selected_value);
             return 'line ' + selected_value;
         })
         .attr('id', (d) => {
-            const keys = Object.keys(d);
-            const first_key = keys[0];
-            return d[first_key];
+            return d[window.key];
         })
         .each(function (d) {
             d3.select(this)

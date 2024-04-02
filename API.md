@@ -141,12 +141,6 @@ The function returns a number between 0 and n dimensions.
 It is also possible to set the position of a dimension.
 As parameters, only the dimension string and the desired position number are needed.
 
-- getAllDimensions
-
-`function getAllDimensions(): string[]`
-
-This function returns an array of all dimensions in order.
-
 ## Range Functions
 
 - getDimensionRange
@@ -239,14 +233,6 @@ As a parameter, a string is required, namely the record label.
 With this function, a single record can be selected.
 As a parameter, a string is required, namely the record label.
 
-- getAllRecords
-
-`function getAllRecords(): any[]`
-
-This function returns all records (regardless of whether record is selected or not).
-This function returns an array with all records.
-A data record is identified by its name, for example the name.
-
 ## Save Function
 
 - saveAsSvg
@@ -256,7 +242,21 @@ A data record is identified by its name, for example the name.
 This function allows to save the current plot as SVG.
 The plot is saved as **'parcoords.svg'**.
 
-## Helper
+## Helper Functions
+
+- getAllDimensions
+
+`function getAllDimensions(): string[]`
+
+This function returns an array of all dimensions in order.
+
+- getAllRecords
+
+`function getAllRecords(): any[]`
+
+This function returns all records (regardless of whether record is selected or not).
+This function returns an array with all records.
+A data record is identified by its name, for example the name.
 
 - isDimensionNaN
 
