@@ -438,11 +438,13 @@ function generateDropdownForFilter() {
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
+        if (!isDimensionNaN(dimension)) {
         let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
         option.id = 'filterOption_' + dimension;
         dropdown.appendChild(option);
+        }
     });
     container.appendChild(dropdown);
 }
@@ -574,12 +576,14 @@ function generateDropdownForRange() {
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
+        if (!isDimensionNaN(dimension)) {
         let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
         option.id = 'rangeOption_' + dimension;
         dropdown.appendChild(option);
-    })
+        }
+    });
     container.appendChild(dropdown);
 }
 
