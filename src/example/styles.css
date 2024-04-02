@@ -201,6 +201,14 @@ label {
   margin-right: 0.5rem;
 }
 
+#filterButton {
+  margin-bottom: 2rem;
+}
+
+#rangeButton {
+  margin-bottom: 0.5rem;
+}
+
 .rangeLabel {
   padding-top: 1rem;
   font-size: smaller;

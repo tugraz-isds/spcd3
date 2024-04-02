@@ -455,6 +455,7 @@ function generateInputFieldsForSetFilter() {
   const labelBottom = document.getElementById('filterDimensionLabelBottom');
   const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
   const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
+  const filterInfo = document.getElementById('filterInfo');
 
   container.style.visibility = 'visible';
 
@@ -473,6 +474,15 @@ function generateInputFieldsForSetFilter() {
 
   filterButton.style.visibility = 'visible';
   filterButton.textContent = 'Set Filter';
+  filterButton.style.marginBottom = '0.5rem';
+
+  let range = getDimensionRange(filterDimensionData);
+
+  filterInfo.style.visibility = 'visible';
+  filterInfo.innerHTML = `Filtering for dimension ${filterDimensionData} is possible between ${range[0]} and ${range[1]}.`;
+  filterInfo.style.color = 'grey';
+  filterInfo.style.fontSize = 'smaller';
+  filterInfo.style.marginBottom = '1.5rem';
 
   container.appendChild(labelTop);
   container.appendChild(inputTextElementTop);
