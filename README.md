@@ -44,7 +44,7 @@ defines for now four public tasks:
 - The `clean` task removes the existing `dist` directory in
   order to enable a clean rebuild of the project.
 
-- The `cleanAll` task removes the existing `dist` and `node_modules` directories. Besides
+- The `cleanAll` task removes the existing `dist` and `node_modules` directories.
   Furthermore the file `package.lock.json` will be deleted.
 
 - The `build` task creates a new build of the library and stores the generated .js file into

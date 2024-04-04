@@ -200,8 +200,12 @@ function showOptionsForRecords(id, buttonId) {
     let records = getAllRecords();
     records.forEach(function (record) {
         let selected = isSelected(record);
+        let checkbox = document.getElementById('sel_' + record);
         if (selected) {
-            document.getElementById('select_' + record).checked = true;
+            checkbox.checked = true;
+        }
+        else {
+            checkbox.checked = false;
         }
     })
 }
@@ -217,7 +221,42 @@ function generateDropdownForShow() {
     let selectButton = document.createElement('button');
     selectButton.id = 'showButton';
     selectButton.className = 'ddButton';
-    selectButton.addEventListener('click', (event) => {
+    selectButton.addEventListener('click', () => {
+        dimensionContainer.innerHTML = '';
+        const newDimensionsOrder = getAllDimensions();
+        const oldDimensions = dimensions.slice();
+        newDimensionsOrder.forEach(function(dimension) {
+            let index = oldDimensions.indexOf(dimension);
+            if (index !== -1) {
+                oldDimensions.splice(index,1);
+            }
+            let label = document.createElement('label');
+            label.className = 'dropdownLabel';
+            let input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = 'show_' + dimension;
+            input.value = dimension;
+            input.name = 'dimension';
+            input.checked = true;
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(dimension));
+            dimensionContainer.appendChild(label);
+        });
+        if(oldDimensions.length !== 0) {
+            oldDimensions.forEach(function(dimension) {
+                let label = document.createElement('label');
+                label.className = 'dropdownLabel';
+                let input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = 'show_' + dimension;
+                input.value = dimension;
+                input.name = 'dimension';
+                input.checked = false;
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(dimension));
+                dimensionContainer.appendChild(label);
+            });
+        }
         showOptions('options', 'showButton');
     });
 
@@ -273,7 +312,22 @@ function generateDropdownForInvert() {
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
     selectButton.className = 'ddButton';
-    selectButton.addEventListener('click', (event) => {
+    selectButton.addEventListener('click', () => {
+        dimensionContainer.innerHTML = '';
+        const dimensions = getAllDimensions();
+        dimensions.forEach(function(dimension) {
+            let label = document.createElement('label');
+            label.className = 'dropdownLabel';
+            let input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = 'show_' + dimension;
+            input.value = dimension;
+            input.name = 'dimension';
+            input.checked = true;
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(dimension));
+            dimensionContainer.appendChild(label);
+        });
         showOptions('invertOptions', 'invertButton');
         for (let i = 0; i < newFeatures.length; i++) {
             const position = getDimensionPositions(newFeatures[i]);
@@ -367,6 +421,19 @@ function generateDropdownForMove() {
         moveDimensionData = dropdown.value;
         disableLeftAndRightButton(moveDimensionData);
     }
+    dropdown.onfocus = () => {
+        dropdown.innerHTML = "";
+        dropdown.appendChild(headline);
+        let dimensions = getAllDimensions();
+        dimensions.forEach(function(dimension) {
+            let option = document.createElement('option');
+            option.textContent = dimension;
+            option.value = dimension;
+            option.id = 'moveOption_' + dimension;
+            dropdown.appendChild(option);
+        });
+        disableLeftAndRightButton(dimensions[0]);
+    }
 
     const headline = document.createElement('option');
     headline.selected = 'disabled';
@@ -380,7 +447,7 @@ function generateDropdownForMove() {
         option.value = dimension;
         option.id = 'moveOption_' + dimension;
         dropdown.appendChild(option);
-    })
+    });
     container.appendChild(dropdown);
     document.getElementById('moveLeft').disabled = true;
 }
@@ -391,11 +458,12 @@ function moveDimensionLeft() {
 }
 
 function moveDimensionRight() {
-    moveByOne(moveDimensionData, 'right');
+    moveByOne(moveDimensionData, 'right');  
     disableLeftAndRightButton(moveDimensionData);
 }
 
 function disableLeftAndRightButton(dimension) {
+    console.log(dimension);
     const position = getDimensionPositions(dimension);
     const numberOfDimensions = getNumberOfDimensions();
     const headline = document.getElementById('move_headline');
@@ -431,6 +499,20 @@ function generateDropdownForFilter() {
         filterDimensionData = event.target.value;
         generateInputFieldsForSetFilter();
     }
+    dropdown.onfocus = () => {
+        dropdown.innerHTML = "";
+        dropdown.appendChild(headline);
+        let dimensions = getAllDimensions();
+        dimensions.forEach(function(dimension) {
+            if (!isDimensionNaN(dimension)) {
+                let option = document.createElement('option');
+                option.textContent = dimension;
+                option.value = dimension;
+                option.id = 'filterOption_' + dimension;
+                dropdown.appendChild(option);
+            }
+        });
+    }
 
     const headline = document.createElement('option');
     headline.selected = 'disabled';
@@ -457,38 +539,49 @@ function generateInputFieldsForSetFilter() {
   const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
   const filterInfo = document.getElementById('filterInfo');
 
-  container.style.visibility = 'visible';
+  if (filterDimensionData === 'Set Filter') {
+        container.style.visibility = 'hidden';
+        labelTop.style.visibility = 'hidden';
+        labelBottom.style.visibility = 'hidden';
+        inputTextElementTop.style.visibility = 'hidden';
+        inputTextElementBottom.style.visibility = 'hidden';
+        filterInfo.style.visibility = 'hidden';
+        filterButton.style.visibility = 'hidden';
+  }
+  else {
+        container.style.visibility = 'visible';
 
-  inputTextElementTop.style.visibility = 'visible';
-  inputTextElementTop.name = 'topRange';
+        inputTextElementTop.style.visibility = 'visible';
+        inputTextElementTop.name = 'topRange';
 
-  labelTop.for = 'topRange';
-  labelTop.innerHTML = 'Min';
-  labelTop.style.paddingLeft = '2rem';
+        labelTop.for = 'topRange';
+        labelTop.innerHTML = 'Min';
+        labelTop.style.paddingLeft = '2rem';
 
-  inputTextElementBottom.style.visibility = 'visible';
-  inputTextElementBottom.name = 'bottomRange';
+        inputTextElementBottom.style.visibility = 'visible';
+        inputTextElementBottom.name = 'bottomRange';
 
-  labelBottom.for = 'bottomRange';
-  labelBottom.innerHTML = 'Max';
+        labelBottom.for = 'bottomRange';
+        labelBottom.innerHTML = 'Max';
 
-  filterButton.style.visibility = 'visible';
-  filterButton.textContent = 'Set Filter';
-  filterButton.style.marginBottom = '0.5rem';
+        filterButton.style.visibility = 'visible';
+        filterButton.textContent = 'Set Filter';
+        filterButton.style.marginBottom = '0.5rem';
 
-  let range = getDimensionRange(filterDimensionData);
+        let range = getDimensionRange(filterDimensionData);
 
-  filterInfo.style.visibility = 'visible';
-  filterInfo.innerHTML = `Filtering for dimension ${filterDimensionData} is possible between ${range[0]} and ${range[1]}.`;
-  filterInfo.style.color = 'grey';
-  filterInfo.style.fontSize = 'smaller';
-  filterInfo.style.marginBottom = '1.5rem';
+        filterInfo.style.visibility = 'visible';
+        filterInfo.innerHTML = `Filtering for dimension ${filterDimensionData} is possible between ${range[0]} and ${range[1]}.`;
+        filterInfo.style.color = 'grey';
+        filterInfo.style.fontSize = 'smaller';
+        filterInfo.style.marginBottom = '1.5rem';
 
-  container.appendChild(labelTop);
-  container.appendChild(inputTextElementTop);
-  container.appendChild(labelBottom);
-  container.appendChild(inputTextElementBottom);
-  container.appendChild(filterButton);
+        container.appendChild(labelTop);
+        container.appendChild(inputTextElementTop);
+        container.appendChild(labelBottom);
+        container.appendChild(inputTextElementBottom);
+        container.appendChild(filterButton);
+  }
 }
 
 function filter() {
@@ -532,7 +625,7 @@ function filter() {
         if (!isNaN(topLimit)) {
             if (isNaN(top) || isNaN(bottom)) {
                 alert(`Attention: Values are not numbers! 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
+                    Please enter values between ${bottomLimit} and ${topLimit}.`);
                 isOk = false;
             }
             if (top < bottomLimit) {
@@ -579,6 +672,20 @@ function generateDropdownForRange() {
         rangeDimensionData = event.target.value;
         generateInputFieldsForSetRange();
     }
+    dropdown.onfocus = () => {
+        dropdown.innerHTML = "";
+        dropdown.appendChild(headline);
+        let dimensions = getAllDimensions();
+        dimensions.forEach(function(dimension) {
+            if (!isDimensionNaN(dimension)) {
+                let option = document.createElement('option');
+                option.textContent = dimension;
+                option.value = dimension;
+                option.id = 'rangeOption_' + dimension;
+                dropdown.appendChild(option);
+            }
+        });
+    }
 
     const headline = document.createElement('option');
     headline.selected = 'disabled';
@@ -604,39 +711,50 @@ function generateInputFieldsForSetRange() {
     const inputTextElementTop = document.getElementById('rangeDimensionInputFieldTop');
     const inputTextElementBottom = document.getElementById('rangeDimensionInputFieldBottom');
     const rangeInfo = document.getElementById('rangeInfo');
-  
-    container.style.visibility = 'visible';
-  
-    inputTextElementTop.style.visibility = 'visible';
-    inputTextElementTop.name = 'minRange';
-  
-    labelTop.for = 'minRange';
-    labelTop.innerHTML = 'Min';
-    labelTop.style.paddingLeft = '2rem';
 
-    const max = getMaxRange(rangeDimensionData);
-    const min = getMinRange(rangeDimensionData);
+    if (rangeDimensionData === 'Set Range') {
+        container.style.visibility = 'hidden';
+        labelTop.style.visibility = 'hidden';
+        labelBottom.style.visibility = 'hidden';
+        inputTextElementTop.style.visibility = 'hidden';
+        inputTextElementBottom.style.visibility = 'hidden';
+        rangeInfo.style.visibility = 'hidden';
+        rangeButton.style.visibility = 'hidden';
+    }
+    else {
+        container.style.visibility = 'visible';
+    
+        inputTextElementTop.style.visibility = 'visible';
+        inputTextElementTop.name = 'minRange';
+    
+        labelTop.for = 'minRange';
+        labelTop.innerHTML = 'Min';
+        labelTop.style.paddingLeft = '2rem';
 
-    inputTextElementBottom.style.visibility = 'visible';
-    inputTextElementBottom.name = 'maxRange';
-  
-    labelBottom.for = 'maxRange';
-    labelBottom.innerHTML = 'Max';
-  
-    rangeButton.style.visibility = 'visible';
-    rangeButton.textContent = 'Set Range';
+        const max = getMaxRange(rangeDimensionData);
+        const min = getMinRange(rangeDimensionData);
 
-    rangeInfo.style.visibility = 'visible';
-    rangeInfo.innerHTML = `The original range of ${rangeDimensionData} is between ${min} and ${max}.`;
-    rangeInfo.style.color = 'grey';
-    rangeInfo.style.fontSize = 'smaller';
+        inputTextElementBottom.style.visibility = 'visible';
+        inputTextElementBottom.name = 'maxRange';
+    
+        labelBottom.for = 'maxRange';
+        labelBottom.innerHTML = 'Max';
+    
+        rangeButton.style.visibility = 'visible';
+        rangeButton.textContent = 'Set Range';
 
-    container.appendChild(labelTop);
-    container.appendChild(inputTextElementTop);
-    container.appendChild(labelBottom);
-    container.appendChild(inputTextElementBottom);
-    container.appendChild(rangeButton);
-    container.appendChild(rangeInfo);
+        rangeInfo.style.visibility = 'visible';
+        rangeInfo.innerHTML = `The original range of ${rangeDimensionData} is between ${min} and ${max}.`;
+        rangeInfo.style.color = 'grey';
+        rangeInfo.style.fontSize = 'smaller';
+
+        container.appendChild(labelTop);
+        container.appendChild(inputTextElementTop);
+        container.appendChild(labelBottom);
+        container.appendChild(inputTextElementBottom);
+        container.appendChild(rangeButton);
+        container.appendChild(rangeInfo);
+    }
 }
 
 function setRange() {
@@ -661,9 +779,7 @@ function setRange() {
             }
             if (max < getMinRange(rangeDimensionData) || 
                 min > getMaxRange(rangeDimensionData)) {
-                    alert(`The range has to be bigger than 
-                    ${getMinRange(rangeDimensionData)} and 
-                    ${getMaxRange(rangeDimensionData)}.`);
+                    alert(`The range has to be bigger than ${getMinRange(rangeDimensionData)} and ${getMaxRange(rangeDimensionData)}.`);
                     isOk = false;
             }
         }
@@ -676,9 +792,7 @@ function setRange() {
             }
             if (min > getMinRange(rangeDimensionData) || 
                 max < getMaxRange(rangeDimensionData)) {
-                    alert(`The range has to be bigger than 
-                    ${getMinRange(rangeDimensionData)} and 
-                    ${getMaxRange(rangeDimensionData)}.`);
+                    alert(`The range has to be bigger than ${getMinRange(rangeDimensionData)} and ${getMaxRange(rangeDimensionData)}.`);
                     isOk = false;
             }
         }
@@ -717,7 +831,7 @@ function generateDropdownForSelectRecords() {
     let selectButton = document.createElement('button');
     selectButton.id = 'selectButtonR';
     selectButton.className = 'ddButton';
-    selectButton.addEventListener('click', (event) => {
+    selectButton.addEventListener('click', () => {
         showOptionsForRecords('options_r', 'selectButtonR');
     });
 
@@ -745,7 +859,7 @@ function generateDropdownForSelectRecords() {
         label.className = 'dropdownLabel';
         let input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = 'select_' + record;
+        input.id = 'sel_' + record;
         input.value = record;
         input.name = 'record';
         input.checked = false;

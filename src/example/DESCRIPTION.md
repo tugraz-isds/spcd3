@@ -1,6 +1,6 @@
-# Example Implementation of the Library 'Steerable Parallel Coordinates in D3'
+# Example Application of the Library 'Steerable Parallel Coordinates in D3'
 
-An example is implemented to show how the library works. Not all functions are shown, but most of them. We use the 'student-marks.csv' dataset to provide an overview of the library.
+An example application is implemented to show how the library works. Not all functions are shown, but most of them. We use the 'student-marks.csv' dataset to provide an overview of the library.
 
 ## Data-Handling
 
@@ -11,19 +11,15 @@ A CSV file is required to visualise a dataset as a parallel coordinate plot. The
 
 The student dataset shows several implemented functions. It consists of 9 dimensions and 30 data records. Each record represents one student and their assessment in 8 different subjects.
 
-By launching the example, which is also deployed on [spcd3.netlify.app](https://spcd3.netlify.app/), the start screen appears, where a button is shown to upload a CSV file.
+By launching the example, which is also deployed on [spcd3.netlify.app](https://spcd3.netlify.app/), the start screen appears, where a parallel coordinate plot is generated of the student dataset.
 
-![screenshot](screenshots/loadFile.png)
-
-After uploading the file, the parallel coordinates plot is generated.
-
-![screenshot](screenshots/loadedPlot.png)
+![screenshot](screenshots/startScreen.png)
 
 Now, the user can download the plot, interact with it, and use the functionalities at the bottom, where the plot can also be modified.
 
 ## Interactivity within the Plot
 
-Within the plot, a user can perform several actions. The user can invert a dimension, move a dimension, filter a dimension, hide a dimension, or set the range of a dimension.
+Within the plot, a user can perform several actions. The user can invert a dimension, move a dimension, filter a dimension, hide a dimension, set the range of a dimension, hover over record(s), or select record(s).
 
 ### Invert a Dimension
 

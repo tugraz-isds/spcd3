@@ -34,6 +34,8 @@ declare global {
     let key: string;
     let svg: any;
     let selectable: any;
+    let min: number;
+    let max: number;
 }
 
 declare const window: any;
@@ -561,8 +563,7 @@ export function generateSVG(content: any, newFeatures: any): void {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
                         if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
-                            d3.select('.' + ids[i]).style('visibility', 'visible');
-                            d3.select('#select_' + ids[i]).style('visibility', 'hidden');
+                            setUnselected(ids[i]);
                         }
                     }
                 }
@@ -746,7 +747,7 @@ function setupYScales(height: any, padding: any, features: any, newDataset: any)
         let labels = [];
         if (isNaN(values[0]) !== false) {
             values.forEach(function(element) {
-                labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
+                labels.push(element.length > 10 ? element : element);
             });
             yScales[x.name] = scale.scalePoint()
                 .domain(labels)
@@ -756,6 +757,8 @@ function setupYScales(height: any, padding: any, features: any, newDataset: any)
         else {
             const max = Math.max(...newDataset.map(o => o[x.name]));
             const min = Math.min(...newDataset.map(o => o[x.name]));
+            window.max = max;
+            window.min = min;
             yScales[x.name] = scale.scaleLinear()
                 .domain([min, max]).nice()
                 .range([height - padding, padding]);
@@ -781,7 +784,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
         let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
         let labels = [];
         tempValues.forEach(function(element) {
-            labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
+            labels.push(element.length > 10 ? element : element);
         });
         counter = counter + 1;
 
@@ -801,7 +804,16 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
             }
         }
         else {
-            yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(yScales[key[0]].ticks(6).concat(yScales[key[0]].domain()));
+            let ranges = yScales[key[0]].ticks(5).concat(yScales[key[0]].domain());
+            let sortRanges = ranges.sort(function(a,b){return a-b});
+            let uniqueRanges = [...new Set(sortRanges)];
+            if (Number(uniqueRanges[1]) - 5 < Number(uniqueRanges[0])) {
+                uniqueRanges.splice(1,1);
+            }
+            if (Number(uniqueRanges[uniqueRanges.length-1]) - 5 < Number(uniqueRanges[uniqueRanges.length-2])) {
+                uniqueRanges.splice(uniqueRanges.length-2,1);
+            }
+            yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(uniqueRanges);
         }
     });
     return yAxis;

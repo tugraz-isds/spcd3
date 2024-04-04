@@ -1,6 +1,9 @@
 import * as d3 from 'd3-selection';
 import * as icon from './icons';
 import * as helper from './helper';
+import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
+
+let selectionArray = [];
 
 export function brushDown(cleanDimensionName: any, event: any, d: any, 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
@@ -475,16 +478,31 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
+                if(isSelected(currentLine))
+                {
+                    setUnselected(currentLine);
+                    selectionArray.push(currentLine);
+                } 
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
+                if(isSelected(currentLine))
+                {
+                    setUnselected(currentLine);
+                    selectionArray.push(currentLine);
+                } 
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
+                if(isSelected(currentLine))
+                {
+                    setUnselected(currentLine);
+                    selectionArray.push(currentLine);
+                } 
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -499,6 +517,12 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
             });
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
+                const index = selectionArray.indexOf(currentLine);
+                if (index != -1)
+                {
+                    setSelected(currentLine);
+                    selectionArray.splice(index,1);
+                }
             }
         }
         else {
