@@ -92,7 +92,7 @@ bottomRange.addEventListener('keyup', ({key}) => {
 });
 
 function openFileDialog() {
-    document.getElementById('fileInput').click();
+    document.getElementById('fileInput').click(file);
 }
 
 function handleFileSelect(event) {
@@ -463,7 +463,6 @@ function moveDimensionRight() {
 }
 
 function disableLeftAndRightButton(dimension) {
-    console.log(dimension);
     const position = getDimensionPositions(dimension);
     const numberOfDimensions = getNumberOfDimensions();
     const headline = document.getElementById('move_headline');

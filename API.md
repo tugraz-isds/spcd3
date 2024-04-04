@@ -38,14 +38,14 @@ The previously loaded columns of the data, e.g., data['columns'], are necessary 
 
 - generateSVG
 
-`function generateSVG(data: [], dimensions: [])`
+`function generateSVG(data: [], dimensions: []): void`
 
 This function creates the plot of the previously loaded data.
 Parameters are the loaded data and the returned dimensions of getDimensions.
 
 - resetSVG
 
-`function resetSVG()`
+`function resetSVG(): void`
 
 The complete plot can be deleted with the resetSVG function.
 
@@ -53,13 +53,13 @@ The complete plot can be deleted with the resetSVG function.
 
 - show
 
-`function show(dimension: string)`
+`function show(dimension: string): void`
 
 The show function can make a hidden dimension visible. As a parameter, a string is required, namely the dimension (e.g., 'PE' of the example CSV data).
 
 - hide
 
-`function hide(dimension: string)`
+`function hide(dimension: string): void`
 
 All visible dimensions can also be invisible, but individually, with the function hide.
 As a parameter, a string, namely the dimension, is required.
@@ -76,7 +76,7 @@ The return type is a string, and the value can be **shown** or **hidden**.
 
 - invert
 
-`function invert(dimension: string)`
+`function invert(dimension: string): void`
 
 There is the possibility of inverting a dimension by using the invert function.
 As a parameter, a string, namely the dimension, is required.
@@ -91,7 +91,7 @@ The return type is a string; the value can be **ascending** or **descending**.
 
 - setInversionStatus
 
-`function setInversionStatus(dimension: string, status: string)`
+`function setInversionStatus(dimension: string, status: string): void`
 
 This function allows changing the inversion status of a dimension.
 As parameters, the dimension and the status are required as strings.
@@ -101,7 +101,7 @@ The status can either be **ascending** or **descending**.
 
 - move
 
-`function move(dimensionA: string, toRightOf: boolean, dimensionB: string)`
+`function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void`
 
 A dimension can be moved with the move function.
 There is the possibility to move dimension A next to dimension B.
@@ -113,7 +113,7 @@ The parameters are:
 
 - moveByOne
 
-`function moveByOne(dimension: string, direction: string)`
+`function moveByOne(dimension: string, direction: string): void`
 
 A dimension can also be moved to the left or the right, independent of another dimension.
 Parameters are the dimensions string and the direction as a string.
@@ -121,7 +121,7 @@ The direction can be either **right** or **left**.
 
 - swap
 
-`function swap(dimensionA: string, dimensionB: string)`
+`function swap(dimensionA: string, dimensionB: string): void`
 
 This function allows two dimensions to swap.
 There are only two dimensions needed as a string for the parameters.
@@ -136,7 +136,7 @@ The function returns a number between 0 and n dimensions.
 
 - setDimensionPosition
 
-`function setDimensionPosition(dimension: string, position: number)`
+`function setDimensionPosition(dimension: string, position: number): void`
 
 It is also possible to set the position of a dimension.
 As parameters, only the dimension string and the desired position number are needed.
@@ -145,14 +145,14 @@ As parameters, only the dimension string and the desired position number are nee
 
 - getDimensionRange
 
-`function getDimensionRange(dimension: string)`
+`function getDimensionRange(dimension: string): void`
 
 This function returns a dimension's current range (min, max).
 As a parameter, a string, namely the dimension, is required.
 
 - setDimensionRange
 
-`function setDimensionRange(dimension: string, min: number, max: number)`
+`function setDimensionRange(dimension: string, min: number, max: number): void`
 
 The range of a dimension can also be changed.
 Only the dimension string, min value and max value are required as parameters.
@@ -184,7 +184,7 @@ The function returns the minimum and the maximum value of the filter.
 
 - setFilter
 
-`function setFilter(dimension: string, min: number, max: number)`
+`function setFilter(dimension: string, min: number, max: number): void`
 
 The filter of a dimension can be set with this function by handing over the dimension string and the minimum and maximum values of the filter (in range coords).
 
@@ -200,14 +200,14 @@ A record is identified with its label, for example, the name.
 
 - setSelection
 
-`function setSelection(records: [])`
+`function setSelection(records: []): void`
 
 This function allows to select several records.
 An array of records is needed as a parameter, identified by the label.
 
 - toggleSelection
 
-`function toggleSelection(record: string)`
+`function toggleSelection(record: string): void`
 
 It is possible to toggle a record selection by handing the dimension string over as a parameter.
 
@@ -221,14 +221,14 @@ This function returns true if the record is selected or false if not.
 
 - setSelected
 
-`function setSelected(record: string)`
+`function setSelected(record: string): void`
 
 With this function, a single record can be selected.
 As a parameter, a string is required, namely the record label.
 
 - setUnselected
 
-`function setUnselected(record: string)`
+`function setUnselected(record: string): void`
 
 With this function, a single record can be selected.
 As a parameter, a string is required, namely the record label.
@@ -237,7 +237,7 @@ As a parameter, a string is required, namely the record label.
 
 - saveAsSvg
 
-`function saveAsSvg()`
+`function saveAsSvg(): void`
 
 This function allows to save the current plot as SVG.
 The plot is saved as **'parcoords.svg'**.
