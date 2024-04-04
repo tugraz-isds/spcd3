@@ -92,7 +92,7 @@ bottomRange.addEventListener('keyup', ({key}) => {
 });
 
 function openFileDialog() {
-    document.getElementById('fileInput').click(file);
+    document.getElementById('fileInput').click();
 }
 
 function handleFileSelect(event) {
