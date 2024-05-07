@@ -60,6 +60,9 @@ export function show(dimension: string): void {
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
                 }
+                if (!isDimensionNaN(item.key)) {
+                    setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
+                }
             }
         });
 
@@ -80,6 +83,7 @@ export function hide(dimension: string): void {
     window.selected = getSelected();
     if (isShown == "shown") {
         tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
+        console.log(getDimensionRange("PE"));
         generateSVG(parcoords.data, tempFeatures);
 
         window.parcoords.currentPosOfDims = temp.slice();
@@ -90,6 +94,9 @@ export function hide(dimension: string): void {
                 }
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
+                }
+                if (!isDimensionNaN(item.key)) {
+                    setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
                 }
             }
         });
@@ -380,20 +387,32 @@ export function getDimensionRange(dimension: string): any {
     return parcoords.yScales[dimension].domain();
 }
 
+function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any):void {
+    let newObject = {};
+    newObject[key] = Number(value);
+    const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
+    Object.assign(target, newObject);
+
+    console.log(currentPosOfDims);
+}
+
 export function setDimensionRange(dimension: string, min: number, max: number): void {
     const inverted = isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
         window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
-        setFilter(dimension, getMinRange(dimension), getMaxRange(dimension));
+        //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]);
         window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
-        setFilter(dimension, getMaxRange(dimension), getMinRange(dimension));
+        //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
     }
+
+    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     // draw active lines
     d3.select('#dimension_axis_' + helper.cleanString(dimension))
@@ -416,7 +435,67 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         }).transition()
         .delay(5)
         .duration(0)
-        .attr('visibility', 'hidden');     
+        .attr('visibility', 'hidden');
+        
+    // draw selectable lines
+    d3.select('#select_')
+      .selectAll('path')
+        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
+        trans(selectable).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+        }) 
+}
+
+export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
+    const inverted = isInverted(dimension);
+    if (inverted) {
+        window.parcoords.yScales[dimension].domain([max, min]).nice();
+        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+            window.parcoords.newDataset);
+        //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
+    }
+    else {
+        window.parcoords.yScales[dimension].domain([min, max]).nice();
+        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+            window.parcoords.newDataset);
+        //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
+    }
+
+    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
+
+    // draw active lines
+    d3.select('#dimension_axis_' + helper.cleanString(dimension))
+        .call(yAxis[dimension]).transition();
+    let active = d3.select('g.active')
+        .selectAll('path')
+        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
+        trans(active).each(function (d) {
+        d3.select(this)
+            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
+        }
+    );
+
+    // draw inactive lines
+    d3.select('g.inactive')
+        .selectAll('path')
+        .each(function (d) {
+        d3.select(this)
+            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
+        }).transition()
+        .delay(5)
+        .duration(0)
+        .attr('visibility', 'hidden');
+        
+    // draw selectable lines
+    d3.select('#select_')
+      .selectAll('path')
+        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
+        trans(selectable).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+        }) 
 }
 
 export function getMinRange(dimension: any): number {
@@ -427,6 +506,16 @@ export function getMinRange(dimension: any): number {
 export function getMaxRange(dimension: any): number {
     const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
     return item.max;
+}
+
+export function getCurrentMinRange(dimension: any): number {
+    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
+    return item.currentRangeBottom;
+}
+
+export function getCurrentMaxRange(dimension: any): number {
+    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
+    return item.currentRangeTop;
 }
 
 export function getFilter(dimension): any {
@@ -643,9 +732,10 @@ function prepareParcoordData(data: any, newFeatures: any): any {
     for(let i = 0; i < newFeatures.length; i++) {
         const max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
         const min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
+        const ranges = getDimensionRange(newFeatures[i]);
         window.parcoords.currentPosOfDims.push(
             { key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i ,
-                 min: min, max: max, sigDig: 0 }
+                 min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0] }
         );
     }
 
@@ -851,7 +941,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
-        .style('opacity', '0.7')
+        .style('opacity', '0.5')
         .style('pointer-events', 'stroke')
         .style('stroke', 'rgb(0, 129, 175)')
         .style('stroke-width', '0.1rem')

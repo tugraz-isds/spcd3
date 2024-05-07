@@ -171,6 +171,19 @@ As a parameter, a string, namely the dimension, is required.
 This function returns the maximum range of a dimension (in data coords).
 As a parameter, a string, namely the dimension, is required.
 
+- getCurrentMinRange
+
+`function getCurrentMinRange(dimension: any): number`
+
+This function returns the current minimum range of a dimension (in data coords).
+As a parameter, a string, namely the dimension, is required.
+
+- getCurrentMaxRange
+
+`function getCurrentMaxRange(dimension: any): number`
+
+This function returns the current maximum range of a dimension (in data coords).
+As a parameter, a string, namely the dimension, is required.
 
 ## Filter Functions
 
