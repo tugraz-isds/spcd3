@@ -21,9 +21,9 @@ Now, it is possible to download the plot or interact with it.
 
 Within the plot, it is possible to perform several actions.
 The actions are: 
-- Invert Dimension
-- Move Dimension
-- Hide Dimension
+- Invert Dimension(s)
+- Move Dimension(s)
+- Hide Dimension(s)
 - Set the Range of a Dimension
 - Filter Records
 - Hover over Record(s)

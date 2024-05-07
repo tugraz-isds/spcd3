@@ -157,6 +157,13 @@ As a parameter, a string, namely the dimension, is required.
 The range of a dimension can also be changed.
 Only the dimension string, min value and max value are required as parameters.
 
+- setDimensionRangeRounded
+
+`function setDimensionRangeRounded(dimension: string, min: number, max: number): void`
+
+This function set the minimum and maximum ranges to round values.
+Only the dimension string, min value and max value are required as parameters.
+
 - getMinRange
 
 `function getMinRange(dimension: any): number`
