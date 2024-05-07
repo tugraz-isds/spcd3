@@ -84,9 +84,9 @@ An essential part of our library is to interact with the plot from the outside. 
 - Set Range
 - Select Record(s)
 
-The complete list of all available functions can be found [here](../lib/LIBRARY.md).
+The complete list of all available functions can be found [here](../../API.md).
 
-Above the plot, four buttons exist. One button is for uploading a file. The second button allows to download the plot as SVG. The other two buttons allow to reset the ranges of all dimensions to their original range and reset the whole plot to its origin.
+Above the plot, five buttons exist. One button is for uploading a file. The second button allows to download the plot as SVG. The other two buttons allow to reset the ranges of all dimensions to their original range and rounded range and reset the whole plot to its origin.
 
 Six additional functionalities are implemented below the plot. By clicking on **Show Dimension**, a box with all dimensions opens, where one or several dimensions can be hidden or shown. By default, all dimensions are shown.
 

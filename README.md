@@ -75,7 +75,7 @@ npx gulp serve
 
 As mentioned in the beginning, we implemented an example to show how the library works and what the parallel coordinate plot will look like in addition to the library.
 
-[Here](./src/lib/LIBRARY.md) is a listing of all available functions to give an overview of the API. Furthermore, we generated with the **student-marks** dataset, which can be found in the folder [data](./src/example/data/), a small explanation. The explanation can be found [here](./src/example/DESCRIPTION.md).
+[Here](./API.md) is a listing of all available functions to give an overview of the API. Furthermore, we generated with the **student-marks** dataset, which can be found in the folder [data](./src/example/data/), a small explanation. The explanation can be found [here](./src/example/DESCRIPTION.md).
 
 ## License
 
