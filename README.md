@@ -1,6 +1,6 @@
-# Steerable Parallel Coordinates in D3
+# Steerable Parallel Coordinates in D3 (SPCD3)
 
-SPC in D3 is primarily a library for generating parallel coordinates with interaction.
+SPCD3 is primarily a library for generating parallel coordinates with interaction.
 This project contains the library and an already implemented example
 that the library is using. In addition, the project uses D3v7.
 
