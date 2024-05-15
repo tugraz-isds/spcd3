@@ -3,14 +3,14 @@
 SPC is a library that generates interactive parallel coordinate plots.
 The following sections explain all existing functions.
 
-## Load And Generate Plot Functions
+## I/O Functions
 
 - loadCSV
 
-`function loadCSV(csv: string)`
+`function loadCSV(csv: string): []`
 
 As the function name already states, using loadCSV loads the data and returns the data as an array.
-As a parameter, it is a string required of a CSV file.
+As a parameter a CSV file is required.
 An example CSV file separated with a comma:
 
 ```
@@ -32,8 +32,8 @@ Harper,69,9,97
 
 `function getDimensions(data: any): []`
 
-This function returns an array of dimensions.
-This is needed to generate the plot.
+This function returns an array of all dimensions.
+The dimensions are needed to generate the plot.
 The previously loaded columns of the data, e.g., data['columns'], are necessary as parameters.
 
 - generateSVG
@@ -49,28 +49,34 @@ Parameters are the loaded data and the returned dimensions of getDimensions.
 
 The complete plot can be deleted with the resetSVG function.
 
+- saveAsSvg
+
+`function saveAsSvg(): void`
+
+This function allows to save the current plot as SVG.
+The plot is saved as **'parcoords.svg'**.
+
 ## Show And Hide Functions
 
 - show
 
 `function show(dimension: string): void`
 
-The show function can make a hidden dimension visible. As a parameter, a string is required, namely the dimension (e.g., 'PE' of the example CSV data).
+The show function can make a hidden dimension visible by handing over the dimension name as a string (e.g., 'PE' of the example CSV data).
 
 - hide
 
 `function hide(dimension: string): void`
 
-All visible dimensions can also be invisible, but individually, with the function hide.
-As a parameter, a string, namely the dimension, is required.
+All visible dimensions can also be made invisible, but individually, with the function hide, where also the dimension name as string is required.
 
 - getHiddenStatus
 
 `function getHiddenStatus(dimension: string): string`
 
-With getHiddenStatus, getting the status of a dimension regarding **shown** or **hidden** is possible.
-As a parameter, a string, namely the dimension, is required.
-The return type is a string, and the value can be **shown** or **hidden**.
+With getHiddenStatus, the status of a dimension can be queried.
+As a parameter, the dimension name is required as a string.
+The return type is also a string, and the value can be **shown** or **hidden**.
 
 ## Invert Functions
 
@@ -78,8 +84,8 @@ The return type is a string, and the value can be **shown** or **hidden**.
 
 `function invert(dimension: string): void`
 
-There is the possibility of inverting a dimension by using the invert function.
-As a parameter, a string, namely the dimension, is required.
+With inverting, the scale of a dimension will be flipped.
+A string, namely the dimension name, is required as a parameter.
 
 - getInversionStatus
 
@@ -253,14 +259,6 @@ As a parameter, a string is required, namely the record label.
 With this function, a single record can be selected.
 As a parameter, a string is required, namely the record label.
 
-## Save Function
-
-- saveAsSvg
-
-`function saveAsSvg(): void`
-
-This function allows to save the current plot as SVG.
-The plot is saved as **'parcoords.svg'**.
 
 ## Helper Functions
 
@@ -276,7 +274,7 @@ This function returns an array of all dimensions in order.
 
 This function returns all records (regardless of whether record is selected or not).
 This function returns an array with all records.
-A data record is identified by its name, for example the name.
+A data record is identified by its label, for example the name.
 
 - isDimensionNaN
 
