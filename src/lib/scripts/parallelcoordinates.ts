@@ -7,7 +7,7 @@ import * as scale from 'd3-scale';
 import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from './icons';
-import * as svgToTinyDataUri from 'mini-svg-data-uri';
+import * as base64icon from './base64Arrows';
 
 declare global {
     let padding: any;
@@ -121,10 +121,12 @@ export function invert(dimension: string): void {
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
-    const arrow = currentArrowStatus === 'down' ? icon.getArrowUp() : icon.getArrowDown();
+    //const arrow = currentArrowStatus === 'down' ? icon.getArrowUp() : icon.getArrowDown();
+    const arrow = currentArrowStatus === 'down' ? base64icon.getArrowUpBase64() : base64icon.getArrowDownBase64();
     const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
-    textElement.attr('href', svgToTinyDataUri.default(arrow));
+    //textElement.attr('href', svgToTinyDataUri.default(arrow));
+    textElement.attr('href', 'data:image/svg+xml;base64,' + arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
@@ -159,7 +161,15 @@ export function invert(dimension: string): void {
         .transition()
         .delay(5)
         .duration(0)
-        .attr('visibility', 'hidden');      
+        .attr('visibility', 'hidden');
+        
+    d3.select('#select_')
+        .selectAll('path')
+          .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
+          trans(selectable).each(function (d) {
+              d3.select(this)
+                  .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+          }) 
 }
 
 export function getInversionStatus(dimension: string): string {
@@ -174,10 +184,12 @@ export function setInversionStatus(dimension: string, status: string): void {
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
-    const arrow = status === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
+    //const arrow = status === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
+    const arrow = status === 'ascending' ? base64icon.getArrowUpBase64() : base64icon.getArrowDownBase64();
     const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
-    textElement.attr('href', svgToTinyDataUri.default(arrow));
+    //textElement.attr('href', svgToTinyDataUri.default(arrow));
+    textElement.attr('href', 'data:image/svg+xml;base64,' + arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
@@ -212,7 +224,15 @@ export function setInversionStatus(dimension: string, status: string): void {
         .transition()
         .delay(5)
         .duration(0)
-        .attr('visibility', 'hidden'); 
+        .attr('visibility', 'hidden');
+    
+    d3.select('#select_')
+        .selectAll('path')
+          .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
+          trans(selectable).each(function (d) {
+              d3.select(this)
+                  .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+    }) 
 }
 
 export function isInverted(dimension: string): boolean {
@@ -271,6 +291,14 @@ export function moveByOne(dimension: string, direction: string): void {
     featureAxis.attr('transform', (d) => {
         return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
     });
+
+    d3.select('#select_')
+      .selectAll('path')
+        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+        trans(selectable).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+        }) 
 
     delete parcoords.dragging[dimension];
     delete parcoords.dragging[neighbour];
@@ -345,6 +373,14 @@ export function swap(dimensionA: string, dimensionB: string): void {
     featureAxis.attr('transform', (d) => {
         return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
     });
+
+    d3.select('#select_')
+      .selectAll('path')
+        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+        trans(selectable).each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+    }) 
 
     delete parcoords.dragging[dimensionA];
     delete parcoords.dragging[dimensionB];
@@ -662,12 +698,12 @@ export function generateSVG(content: any, newFeatures: any): void {
     window.onclick = () => {
         d3.select('#contextmenu').style('display', 'none');
     }
+    
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
 
     let inactive = setInactivePathLines(svg, content, window.parcoords);
 
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
-
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
@@ -792,6 +828,8 @@ function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any;
         .enter()
         .append('path')
         .attr('id', (d) => {
+            const keys = Object.keys(d);
+            window.key = keys[0];
             const selected_value = helper.cleanLinePathString(d[window.key]);
             return 'select_' + selected_value;
         })
@@ -928,8 +966,6 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .enter()
         .append('path')
         .attr('class', (d) => {
-            const keys = Object.keys(d);
-            window.key = keys[0];
             const selected_value = helper.cleanLinePathString(d[window.key]);
             ids.push(selected_value);
             return 'line ' + selected_value;
@@ -1237,7 +1273,8 @@ function setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any
         .append('image')
         .attr('width', 12)
         .attr('height', 12)
-        .attr('href', svgToTinyDataUri.default(icon.getArrowDown()))
+        //.attr('href', svgToTinyDataUri.default(icon.getArrowDown()))
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowDownBase64())
         .each(function (d) {
             const processedDimensionName = helper.cleanString(d.name);
             d3.select(this)
@@ -1683,7 +1720,8 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
                 .attr('x', -7)
                 .attr('width', 14)
                 .attr('height', 10)
-                .attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
+                //.attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
+                .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowTopBase64())
                 .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                 .call(drag.drag().on('drag', (event, d) => {
                     if (parcoords.newFeatures.length > 25) {
@@ -1715,7 +1753,8 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                 .attr('x', -7)
                 .attr('width', 14)
                 .attr('height', 10)
-                .attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
+                //.attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
+                .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowBottomBase64())
                 .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                 .call(drag.drag()
                     .on('drag', (event, d) => {
