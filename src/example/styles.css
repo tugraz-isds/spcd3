@@ -8,6 +8,12 @@ header {
   margin-bottom: 1.9rem;
 }
 
+div#link {
+  text-align: right;
+  font-size: smaller;
+  margin-right: 1.1rem;
+}
+
 body {
   font-family: Trebuchet MS, sans-serif;
   background-color: #f7f9f9;

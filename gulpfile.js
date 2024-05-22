@@ -1,8 +1,7 @@
 const {src, dest, series, parallel} = require('gulp');
 const del = require('del');
-const { bundleJS } = require("./gulp-tasks/bundleJS");
-const { bundleDeclaration } = require("./gulp-tasks/bundleDeclaration");
-const {watcher} = require("./gulp-tasks/watcher");
+const { bundle } = require("./gulp-tasks/bundle");
+const {watch} = require("./gulp-tasks/watch");
 
 function cleanDistFolder() {
     return del('dist', {force: true});
@@ -32,6 +31,6 @@ exports.clean = cleanDistFolder;
 
 exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock);
 
-exports.build = series(cleanDistFolder, copyExampleFolder, bundleJS, deleteTypesFolder, deleteSourceMap);
+exports.build = series(cleanDistFolder, copyExampleFolder, bundle, deleteTypesFolder, deleteSourceMap);
 
-exports.serve = series(exports.build, watcher);
+exports.serve = series(exports.build, watch);
