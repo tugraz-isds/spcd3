@@ -13,11 +13,6 @@ A CSV file is required to visualise a dataset as a parallel coordinate plot. The
 
 The example dataset is a fictitious dataset of student marks and was created by Drescher et al. [2023](https://courses.isds.tugraz.at/ivis/projects/ss2023/ivis-ss2023-g1-project-%20steerable-parcoords.pdf). It consists of a header row, 30 rows of data (records), and 9 columns (dimensions), including the name of the student. The dataset was deliberately curated to contain interesting patterns and relationships. Each row represents one student and their marks in 8 subjects. Each dimension, apart from the first, represents one subject.
 
-
-
-
-Now, it is possible to download the plot or interact with it.
-
 ## Interactivity Within the Plot
 
 Within the plot, it is possible to perform following actions.
