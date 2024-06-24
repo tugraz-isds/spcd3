@@ -1,7 +1,7 @@
-import {loadCSV, getDimensions, generateSVG, invert, saveAsSvg, moveByOne, 
+import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPositions, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
-    setDimensionRange, isDimensionNaN, getAllDimensions, getAllRecords,
+    setDimensionRange, isDimensionNaN, getAllDimensionNames, getAllRecords,
     toggleSelection, isSelected, setDimensionRangeRounded} from './lib/spcd3.js';
 
 let data;
@@ -17,9 +17,8 @@ let studentData = "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,9
 document.addEventListener('DOMContentLoaded', function() {
     data = studentData;
     newData = loadCSV(data);  
-    let features = getDimensions(newData['columns']);
     showButtons();
-    generateSVG(newData, features);
+    drawChart(newData);
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -112,7 +111,7 @@ function handleFileSelect(event) {
             data = e.target.result;
             newData = loadCSV(data);
             newFeatures = getDimensions(newData['columns']);
-            generateSVG(newData, newFeatures);
+            drawChart(newData, newFeatures);
 
             showButtons();
 
@@ -231,7 +230,7 @@ function generateDropdownForShow() {
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        const newDimensionsOrder = getAllDimensions();
+        const newDimensionsOrder = getAllDimensionNames();
         const oldDimensions = dimensions.slice();
         newDimensionsOrder.forEach(function(dimension) {
             let index = oldDimensions.indexOf(dimension);
@@ -322,7 +321,7 @@ function generateDropdownForInvert() {
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        const dimensions = getAllDimensions();
+        const dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
             let label = document.createElement('label');
             label.className = 'dropdownLabel';
@@ -437,7 +436,7 @@ function generateDropdownForMove() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensions();
+        let dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
             let option = document.createElement('option');
             option.textContent = dimension;
@@ -514,7 +513,7 @@ function generateDropdownForFilter() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensions();
+        let dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
             if (!isDimensionNaN(dimension)) {
                 let option = document.createElement('option');
@@ -687,7 +686,7 @@ function generateDropdownForRange() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensions();
+        let dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
             if (!isDimensionNaN(dimension)) {
                 let option = document.createElement('option');
@@ -818,7 +817,7 @@ function setRange() {
 }
 
 function resetToOriginalRange() {
-    let dimensions = getAllDimensions();
+    let dimensions = getAllDimensionNames();
     dimensions.forEach(function(dimension) {
         if (!isNaN(getMinRange(dimension))) {
             let min = getMinRange(dimension);
@@ -829,7 +828,7 @@ function resetToOriginalRange() {
 }
 
 function resetToRoundedRange() {
-    let dimensions = getAllDimensions();
+    let dimensions = getAllDimensionNames();
     dimensions.forEach(function(dimension) {
         if (!isNaN(getMinRange(dimension))) {
             let min = getMinRange(dimension);
@@ -842,7 +841,7 @@ function resetToRoundedRange() {
 function resetAll() {
     let reloadedData = loadCSV(data);
     initFeatures = getDimensions(reloadedData['columns']);
-    generateSVG(newData, initFeatures);
+    drawChart(newData, initFeatures);
 }
 
 function generateDropdownForSelectRecords() {

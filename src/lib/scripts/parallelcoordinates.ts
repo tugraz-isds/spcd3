@@ -48,7 +48,7 @@ export function show(dimension: string): void {
     window.selected = getSelected();
     if (isShown == "hidden") {
         tempFeatures.splice(index, 0, dimension);
-        generateSVG(parcoords.data, tempFeatures);
+        redrawChart(parcoords.data, tempFeatures);
 
         window.parcoords.currentPosOfDims = temp.slice();
 
@@ -84,7 +84,7 @@ export function hide(dimension: string): void {
     if (isShown == "shown") {
         tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
         console.log(getDimensionRange("PE"));
-        generateSVG(parcoords.data, tempFeatures);
+        redrawChart(parcoords.data, tempFeatures);
 
         window.parcoords.currentPosOfDims = temp.slice();
         window.parcoords.currentPosOfDims.forEach(function (item) {
@@ -386,7 +386,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
     delete parcoords.dragging[dimensionB];
 }
 
-export function getAllDimensions(): string[] {
+export function getAllDimensionNames(): string[] {
     let listOfDimensions = parcoords.newFeatures.slice();
     return listOfDimensions.reverse();
 }
@@ -660,21 +660,60 @@ export function getAllRecords(): any[] {
     return data;
 }
 
-export function resetSVG(): void {
+export function deleteChart(): void {
     d3.select('#pc_svg').remove();
     d3.select('#contextmenu').remove();
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
 }
 
-export function getDimensions(data: any): void {
+function getDimensions(data: any): void {
     return data.reverse();
 }
 
-export function generateSVG(content: any, newFeatures: any): void {
+export function drawChart(content: any): void {
     let ids = [];
 
-    resetSVG();
+    deleteChart();
+
+    let newFeatures = getDimensions(content['columns']);
+
+    prepareParcoordData(content, newFeatures);
+
+    window.svg = d3.select('#parallelcoords')
+        .append('svg')
+        .attr('id', 'pc_svg')
+        .attr('viewBox', [0, 0, window.width, window.height])
+        .attr('font-family', 'Verdana, sans-serif')
+        .on('click', (event) => {
+            if (!(event.ctrlKey || event.metaKey)) {
+                if (!(event.target.id.includes('dimension_invert_'))) {
+                    for (let i = 0; i < ids.length; i++) {
+                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
+                            setUnselected(ids[i]);
+                        }
+                    }
+                }
+            }
+        });
+    
+    window.onclick = () => {
+        d3.select('#contextmenu').style('display', 'none');
+    }
+    
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
+
+    let inactive = setInactivePathLines(svg, content, window.parcoords);
+
+    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+
+    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
+}
+
+function redrawChart(content: any, newFeatures: any): void {
+    let ids = [];
+
+    deleteChart();
 
     prepareParcoordData(content, newFeatures);
 
