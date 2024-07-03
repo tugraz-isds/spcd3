@@ -6,8 +6,8 @@ import * as axis from 'd3-axis';
 import * as scale from 'd3-scale';
 import * as brush from './brush';
 import * as helper from './helper';
-import * as icon from './icons';
-import * as base64icon from './base64Arrows';
+import * as icon from '../icons/icons';
+import * as base64icon from '../icons/iconsbase64';
 
 declare global {
     let padding: any;
