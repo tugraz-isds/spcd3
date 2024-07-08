@@ -40,11 +40,16 @@ declare global {
 
 declare const window: any;
 
+//******** API ********//
+
+//---------- Show and Hide Functions ----------
+
 export function show(dimension: string): void {
     const tempFeatures = parcoords.newFeatures.slice();
     const isShown = getHiddenStatus(dimension);
     const temp = parcoords.currentPosOfDims.slice();
-    const index = getIndex(dimension, parcoords.currentPosOfDims);
+    const item = parcoords.currentPosOfDims.find((object) => object.key == key);
+    const index = item.index;
     window.selected = getSelected();
     if (isShown == "hidden") {
         tempFeatures.splice(index, 0, dimension);
@@ -68,11 +73,6 @@ export function show(dimension: string): void {
 
         setSelection(window.selected);
     }  
-}
-
-function getIndex(key: any, currentPosOfDims: any): boolean {
-    const item = currentPosOfDims.find((object) => object.key == key);
-    return item.index;
 }
 
 export function hide(dimension: string): void {
@@ -114,6 +114,8 @@ export function getHiddenStatus(dimension: string): string {
         return "hidden";
     }
 }
+
+//---------- Invert Functions ----------
 
 export function invert(dimension: string): void {
     const processedDimensionName = helper.cleanString(dimension);
@@ -241,6 +243,9 @@ export function isInverted(dimension: string): boolean {
     const arrowStatus = element.text();
     return arrowStatus == 'up' ? true : false;
 }
+
+
+//---------- Move Functions ----------
 
 export function moveByOne(dimension: string, direction: string): void {
 
@@ -386,50 +391,10 @@ export function swap(dimensionA: string, dimensionB: string): void {
     delete parcoords.dragging[dimensionB];
 }
 
-export function getAllDimensionNames(): string[] {
-    let listOfDimensions = parcoords.newFeatures.slice();
-    return listOfDimensions.reverse();
-}
-
-export function getNumberOfDimensions(): number {
-    return parcoords.newFeatures.length;
-}
-
-export function getDimensionPositions(dimension: string): number {
-    return parcoords.newFeatures.indexOf(dimension);
-}
-
-export function getDimensionPosition(dimension: string): number {
-    let listOfDimensions = parcoords.newFeatures.slice();
-    let reverseListOfDimension = listOfDimensions.reverse();
-    return reverseListOfDimension.indexOf(dimension);
-}
-
-export function setDimensionPosition(dimension: string, position: number): void {
-    const dimensionListCopy = parcoords.newFeatures.slice();
-    const dimensionListInOrder = dimensionListCopy.reverse();
-    const dimensionToMove = dimensionListInOrder[position];
-    const dimensionPositionA = getDimensionPositions(dimension);
-    const dimensionPositionB = getDimensionPositions(dimensionToMove);
-    if (dimensionPositionA > dimensionPositionB) {
-        move(dimension, true, dimensionToMove);
-    }
-    else {
-        move(dimension, false, dimensionToMove);
-    }
-}
+//---------- Range Functions ----------
 
 export function getDimensionRange(dimension: string): any {
     return parcoords.yScales[dimension].domain();
-}
-
-function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any):void {
-    let newObject = {};
-    newObject[key] = Number(value);
-    const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
-    Object.assign(target, newObject);
-
-    console.log(currentPosOfDims);
 }
 
 export function setDimensionRange(dimension: string, min: number, max: number): void {
@@ -554,6 +519,16 @@ export function getCurrentMaxRange(dimension: any): number {
     return item.currentRangeTop;
 }
 
+function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any):void {
+    let newObject = {};
+    newObject[key] = Number(value);
+    const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
+    Object.assign(target, newObject);
+}
+
+
+//---------- Filter Functions ----------
+
 export function getFilter(dimension): any {
     const invertStatus = isInverted(dimension);
     const dimensionRange = getDimensionRange(dimension);
@@ -573,16 +548,7 @@ export function setFilter(dimension: string, min: number, max: number): void {
     brush.filter(dimension, min, max, parcoords);
 }
 
-function select(linePaths: any): void {
-    for(let i = 0; i < linePaths.length; i++) {
-        let selectedLine = helper.cleanLinePathString(linePaths[i]);
-        d3.select('#select_' + selectedLine)
-            .style('visibility', 'visible');
-        d3.select('.' + selectedLine)
-            .transition()
-            .style('visibility', 'hidden');
-    }
-}
+//---------- Selection Functions ----------
 
 export function getSelected(): any[] {
     let selected = [];
@@ -647,6 +613,57 @@ export function setUnselected(record: string): void {
             .style('visibility', 'visible');
 }
 
+
+//---------- IO Functions ----------
+
+export function drawChart(content: any): void {
+    let ids = [];
+
+    deleteChart();
+
+    let newFeatures = content['columns'].reverse();
+
+    prepareParcoordData(content, newFeatures);
+
+    window.svg = d3.select('#parallelcoords')
+        .append('svg')
+        .attr('id', 'pc_svg')
+        .attr('viewBox', [0, 0, window.width, window.height])
+        .attr('font-family', 'Verdana, sans-serif')
+        .on('click', (event) => {
+            if (!(event.ctrlKey || event.metaKey)) {
+                if (!(event.target.id.includes('dimension_invert_'))) {
+                    for (let i = 0; i < ids.length; i++) {
+                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
+                            setUnselected(ids[i]);
+                        }
+                    }
+                }
+            }
+        });
+    
+    window.onclick = () => {
+        d3.select('#contextmenu').style('display', 'none');
+    }
+    
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
+
+    let inactive = setInactivePathLines(svg, content, window.parcoords);
+
+    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+
+    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
+}
+
+export function deleteChart(): void {
+    d3.select('#pc_svg').remove();
+    d3.select('#contextmenu').remove();
+    d3.select('#popupFilter').remove();
+    d3.select('#popupRange').remove();
+}
+
+//---------- Helper Functions ----------
+
 export function getAllRecords(): any[] {
     const selection = window.active;
     const object = selection._groups;
@@ -660,91 +677,37 @@ export function getAllRecords(): any[] {
     return data;
 }
 
-export function deleteChart(): void {
-    d3.select('#pc_svg').remove();
-    d3.select('#contextmenu').remove();
-    d3.select('#popupFilter').remove();
-    d3.select('#popupRange').remove();
+export function getAllDimensionNames(): string[] {
+    let listOfDimensions = parcoords.newFeatures.slice();
+    return listOfDimensions.reverse();
 }
 
-function getDimensions(data: any): void {
-    return data.reverse();
+export function getNumberOfDimensions(): number {
+    return parcoords.newFeatures.length;
 }
 
-export function drawChart(content: any): void {
-    let ids = [];
+export function getDimensionPositions(dimension: string): number {
+    return parcoords.newFeatures.indexOf(dimension);
+}
 
-    deleteChart();
+export function getDimensionPosition(dimension: string): number {
+    let listOfDimensions = parcoords.newFeatures.slice();
+    let reverseListOfDimension = listOfDimensions.reverse();
+    return reverseListOfDimension.indexOf(dimension);
+}
 
-    let newFeatures = getDimensions(content['columns']);
-
-    prepareParcoordData(content, newFeatures);
-
-    window.svg = d3.select('#parallelcoords')
-        .append('svg')
-        .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, window.height])
-        .attr('font-family', 'Verdana, sans-serif')
-        .on('click', (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
-                if (!(event.target.id.includes('dimension_invert_'))) {
-                    for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
-                            setUnselected(ids[i]);
-                        }
-                    }
-                }
-            }
-        });
-    
-    window.onclick = () => {
-        d3.select('#contextmenu').style('display', 'none');
+export function setDimensionPosition(dimension: string, position: number): void {
+    const dimensionListCopy = parcoords.newFeatures.slice();
+    const dimensionListInOrder = dimensionListCopy.reverse();
+    const dimensionToMove = dimensionListInOrder[position];
+    const dimensionPositionA = getDimensionPositions(dimension);
+    const dimensionPositionB = getDimensionPositions(dimensionToMove);
+    if (dimensionPositionA > dimensionPositionB) {
+        move(dimension, true, dimensionToMove);
     }
-    
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
-
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
-
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
-}
-
-function redrawChart(content: any, newFeatures: any): void {
-    let ids = [];
-
-    deleteChart();
-
-    prepareParcoordData(content, newFeatures);
-
-    window.svg = d3.select('#parallelcoords')
-        .append('svg')
-        .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, window.height])
-        .attr('font-family', 'Verdana, sans-serif')
-        .on('click', (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
-                if (!(event.target.id.includes('dimension_invert_'))) {
-                    for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
-                            setUnselected(ids[i]);
-                        }
-                    }
-                }
-            }
-        });
-    
-    window.onclick = () => {
-        d3.select('#contextmenu').style('display', 'none');
+    else {
+        move(dimension, false, dimensionToMove);
     }
-    
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
-
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
-
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
 
 export function isDimensionNaN(dimension: string): boolean {
@@ -754,6 +717,9 @@ export function isDimensionNaN(dimension: string): boolean {
     }
     return false;
 }
+
+
+// ---------- Built-In Interactivity Functions ---------- //
 
 function prepareData(data: any, newFeatures: any): any {
     let newDataset = [];
@@ -834,6 +800,43 @@ function prepareParcoordData(data: any, newFeatures: any): any {
         }
         helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
     });
+}
+
+function redrawChart(content: any, newFeatures: any): void {
+    let ids = [];
+
+    deleteChart();
+
+    prepareParcoordData(content, newFeatures);
+
+    window.svg = d3.select('#parallelcoords')
+        .append('svg')
+        .attr('id', 'pc_svg')
+        .attr('viewBox', [0, 0, window.width, window.height])
+        .attr('font-family', 'Verdana, sans-serif')
+        .on('click', (event) => {
+            if (!(event.ctrlKey || event.metaKey)) {
+                if (!(event.target.id.includes('dimension_invert_'))) {
+                    for (let i = 0; i < ids.length; i++) {
+                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
+                            setUnselected(ids[i]);
+                        }
+                    }
+                }
+            }
+        });
+    
+    window.onclick = () => {
+        d3.select('#contextmenu').style('display', 'none');
+    }
+    
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
+
+    let inactive = setInactivePathLines(svg, content, window.parcoords);
+
+    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+
+    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
 
 function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
@@ -1106,6 +1109,17 @@ function doNotHighlight(selectedPath: any): void {
     }
 }
 
+function select(linePaths: any): void {
+    for(let i = 0; i < linePaths.length; i++) {
+        let selectedLine = helper.cleanLinePathString(linePaths[i]);
+        d3.select('#select_' + selectedLine)
+            .style('visibility', 'visible');
+        d3.select('.' + selectedLine)
+            .transition()
+            .style('visibility', 'hidden');
+    }
+}
+
 function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any): any {
     if (tooltipText.length !== 0) {
         let tempText = tooltipText.toString();
@@ -1324,6 +1338,7 @@ function setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any
         .on('click', onInvert());
 }
 
+//TODO: too much lines
 function setAxisLabels(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {}; 
     dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
     features: any[]; newDataset: any[]}, inactive: any, active: any, width: any): void {
