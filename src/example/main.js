@@ -2,7 +2,7 @@ import {loadCSV, drawChart, invert, saveAsSvg, moveByOne,
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange, isDimensionNaN, getAllDimensionNames, getAllRecords,
-    toggleSelection, isSelected, setDimensionRangeRounded} from './lib/spcd3.js';
+    toggleSelection, isSelected, setDimensionRangeRounded, getDimensionNames} from './lib/spcd3.js';
 
 let data;
 let newData;
