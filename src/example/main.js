@@ -2,7 +2,7 @@ import {loadCSV, drawChart, invert, saveAsSvg, moveByOne,
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange, isDimensionNaN, getAllDimensionNames, getAllRecords,
-    toggleSelection, isSelected, setDimensionRangeRounded, getDimensionNames} from './lib/spcd3.js';
+    toggleSelection, isSelected, setDimensionRangeRounded, resetChart} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -110,8 +110,8 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
-            newFeatures = getDimensionNames(newData['columns']);
-            drawChart(newData, newFeatures);
+            //newFeatures = getAllDimensionNames().reverse();
+            drawChart(newData);
 
             showButtons();
 
@@ -840,8 +840,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
     let reloadedData = loadCSV(data);
-    initFeatures = getDimensionNames(reloadedData['columns']);
-    drawChart(newData, initFeatures);
+    resetChart(reloadedData);
 }
 
 function generateDropdownForSelectRecords() {
