@@ -840,7 +840,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
     let reloadedData = loadCSV(data);
-    resetChart(reloadedData);
+    drawChart(reloadedData);
 }
 
 function generateDropdownForSelectRecords() {

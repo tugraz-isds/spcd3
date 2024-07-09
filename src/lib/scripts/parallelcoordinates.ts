@@ -654,45 +654,6 @@ export function drawChart(content: any): void {
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
 
-export function resetChart(content: any): void {
-    let ids = [];
-
-    deleteChart();
-
-    let newFeatures = content['columns'].reverse();
-
-    setUpParcoordData(content, newFeatures);
-
-    window.svg = d3.select('#parallelcoords')
-        .append('svg')
-        .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, window.height])
-        .attr('font-family', 'Verdana, sans-serif')
-        .on('click', (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
-                if (!(event.target.id.includes('dimension_invert_'))) {
-                    for (let i = 0; i < ids.length; i++) {
-                        if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
-                            setUnselected(ids[i]);
-                        }
-                    }
-                }
-            }
-        });
-    
-    window.onclick = () => {
-        d3.select('#contextmenu').style('display', 'none');
-    }
-    
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
-
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
-
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
-}
-
 export function deleteChart(): void {
     d3.select('#pc_svg').remove();
     d3.select('#contextmenu').remove();
@@ -913,7 +874,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
     return yAxis;
 }
 
-export function redrawChart(content: any, newFeatures: any): void {
+function redrawChart(content: any, newFeatures: any): void {
     let ids = [];
 
     deleteChart();
