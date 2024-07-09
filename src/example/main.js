@@ -110,7 +110,7 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
-            newFeatures = getDimensions(newData['columns']);
+            newFeatures = getDimensionNames(newData['columns']);
             drawChart(newData, newFeatures);
 
             showButtons();
@@ -840,7 +840,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
     let reloadedData = loadCSV(data);
-    initFeatures = getDimensions(reloadedData['columns']);
+    initFeatures = getDimensionNames(reloadedData['columns']);
     drawChart(newData, initFeatures);
 }
 
