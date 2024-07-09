@@ -1,5 +1,5 @@
 import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
-    isInverted, getDimensionPositions, setFilter, getDimensionRange,
+    isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
     setDimensionRange, isDimensionNaN, getAllDimensionNames, getAllRecords,
     toggleSelection, isSelected, setDimensionRangeRounded} from './lib/spcd3.js';
@@ -337,7 +337,7 @@ function generateDropdownForInvert() {
         });
         showOptions('invertOptions', 'invertButton');
         for (let i = 0; i < newFeatures.length; i++) {
-            const position = getDimensionPositions(newFeatures[i]);
+            const position = getDimensionPosition(newFeatures[i]);
             document.addEventListener("DOMContentLoaded", function(event) {
                 if (position != -1) {
                     const inverted = isInverted(newFeatures[i]);
@@ -396,7 +396,7 @@ function invertDimension(dimension) {
 }
 
 function disableCheckbox(dimension) {
-    let position = getDimensionPositions(dimension);
+    let position = getDimensionPosition(dimension);
     document.addEventListener("DOMContentLoaded", function(event) {
         if (position != -1) {
             document.getElementById('invert_' + dimension).disabled = false;
@@ -412,7 +412,7 @@ function disableCheckbox(dimension) {
 
 function disableOptionInDropdown(prefixId, dimension) {
     const value = prefixId.concat(dimension);
-    const position = getDimensionPositions(dimension);
+    const position = getDimensionPosition(dimension);
     if (position != -1) {
         document.getElementById(value).disabled = false;
     }
@@ -475,7 +475,7 @@ function moveDimensionRight() {
 }
 
 function disableLeftAndRightButton(dimension) {
-    const position = getDimensionPositions(dimension);
+    const position = getDimensionPosition(dimension);
     const numberOfDimensions = getNumberOfDimensions();
     const headline = document.getElementById('move_headline');
     
