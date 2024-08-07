@@ -36,6 +36,7 @@ declare global {
     let selectable: any;
     let min: number;
     let max: number;
+    let hoverdata: any[];
 }
 
 declare const window: any;
@@ -65,7 +66,7 @@ export function show(dimension: string): void {
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
                 }
-                if (!isDimensionNaN(item.key)) {
+                if (!isDimensionCategorical(item.key)) {
                     setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
                 }
             }
@@ -94,7 +95,7 @@ export function hide(dimension: string): void {
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
                 }
-                if (!isDimensionNaN(item.key)) {
+                if (!isDimensionCategorical(item.key)) {
                     setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
                 }
             }
@@ -498,12 +499,12 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         }) 
 }
 
-export function getMinRange(dimension: any): number {
+export function getMinValue(dimension: any): number {
     const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
     return item.min;
 }
 
-export function getMaxRange(dimension: any): number {
+export function getMaxValue(dimension: any): number {
     const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
     return item.max;
 }
@@ -703,7 +704,7 @@ export function setDimensionPosition(dimension: string, position: number): void 
     }
 }
 
-export function isDimensionNaN(dimension: string): boolean {
+export function isDimensionCategorical(dimension: string): boolean {
     let values = window.parcoords.newDataset.map(o => o[dimension]);
     if (isNaN(values[0])) {
         return true;
@@ -887,7 +888,7 @@ function redrawChart(content: any, newFeatures: any): void {
         .attr('viewBox', [0, 0, window.width, window.height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
+            if (!(event.shiftKey || event.metaKey)) {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
                         if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
@@ -996,6 +997,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('fill', 'none')
         .on('pointerenter', (event, d) => {
             const data = getAllPointerEventsData(event);
+            window.hoverdata = [];
+            window.hoverdata = data.slice();
             selectedPath = highlight(data);
             createTooltipForPathLine(data, tooltipPath, event);
         })
@@ -1008,8 +1011,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             return tooltipPath.style('visibility', 'hidden');
         })
         .on('click', (event, d) => {
-            const data = getAllPointerEventsData(event);
-            select(data);
+            //const data = getAllPointerEventsData(event);
+            select(window.hoverdata);
         });
 
     return active;
@@ -1428,8 +1431,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('z-index', 10);
                     headerDimensionRange.text(dimension);
                     infoRange.text('The original range of ' + dimension + ' is between ' + 
-                    getMinRange(dimension) + ' and ' + 
-                    getMaxRange(dimension) + '.');
+                    getMinValue(dimension) + ' and ' + 
+                    getMaxValue(dimension) + '.');
                     rangeButton.on('click', () => {
                         let min = d3.select('#minRangeValue').node().value;
                         let max = d3.select('#maxRangeValue').node().value;
@@ -1437,11 +1440,11 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                         let isOk = true;
                         
                         if (inverted) {
-                            if (max < getMinRange(dimension) || 
-                                min > getMaxRange(dimension)) {
+                            if (max < getMinValue(dimension) || 
+                                min > getMaxValue(dimension)) {
                                 popupWindowRangeError.text(`The range has to be bigger than 
-                                ${getMinRange(dimension)} and 
-                                ${getMaxRange(dimension)}.`)
+                                ${getMinValue(dimension)} and 
+                                ${getMaxValue(dimension)}.`)
                                 .style('display', 'block')
                                 .style('padding-left', 0.5 + 'rem')
                                 .style('padding-top', 0.5 + 'rem')
@@ -1451,11 +1454,11 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             }
                         }
                         else {
-                            if (min > getMinRange(dimension) || 
-                                max < getMaxRange(dimension)) {
+                            if (min > getMinValue(dimension) || 
+                                max < getMaxValue(dimension)) {
                                 popupWindowRangeError.text(`The range has to be bigger than 
-                                ${getMinRange(dimension)} and 
-                                ${getMaxRange(dimension)}.`)
+                                ${getMinValue(dimension)} and 
+                                ${getMaxValue(dimension)}.`)
                                 .style('display', 'block')
                                 .style('padding-left', 0.5 + 'rem')
                                 .style('padding-top', 0.5 + 'rem')
@@ -1484,7 +1487,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                         }
                     });
                     resetRangeButton.on('click', () => {
-                        setDimensionRange(dimension, getMinRange(dimension), getMaxRange(dimension));
+                        setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
                         popupWindowRange.style('display', 'none');
                     });
                     closeButtonRange.on('click', () => {
@@ -1495,7 +1498,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 d3.select('#resetRangeMenu')
                 .style('visibility', 'visible')
                 .on('click', (event) => {
-                    setDimensionRange(dimension, getMinRange(dimension), getMaxRange(dimension));
+                    setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
                     event.stopPropagation();
                 });
                 d3.select('#filterMenu')
@@ -1527,7 +1530,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                                 if (min < ranges[1]) {
                                     min = ranges[1];
                                     popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinRange(dimension)}, filter is set to min.`)
+                                    ${getMinValue(dimension)}, filter is set to min.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1538,7 +1541,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                                 if (max > ranges[0]) {
                                     max = ranges[0];
                                     popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxRange(dimension)}, filter is set to max.`)
+                                    ${getMaxValue(dimension)}, filter is set to max.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1551,7 +1554,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                                 if (min < ranges[0]) {
                                     min = ranges[0];
                                     popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinRange(dimension)}, filter is set to min.`)
+                                    ${getMinValue(dimension)}, filter is set to min.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')
@@ -1562,7 +1565,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                                 if (max > ranges[1]) {
                                     max = ranges[1];
                                     popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxRange(dimension)}, filter is set to max.`)
+                                    ${getMaxValue(dimension)}, filter is set to max.`)
                                     .style('display', 'block')
                                     .style('padding-left', 0.5 + 'rem')
                                     .style('padding-top', 0.5 + 'rem')

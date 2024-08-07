@@ -1,7 +1,7 @@
 import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
-    getNumberOfDimensions, hide, show, getHiddenStatus, getMinRange, getMaxRange,
-    setDimensionRange, isDimensionNaN, getAllDimensionNames, getAllRecords,
+    getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
+    setDimensionRange, isDimensionCategorical, getAllDimensionNames, getAllRecords,
     toggleSelection, isSelected, setDimensionRangeRounded} from './lib/spcd3.js';
 
 let data;
@@ -182,7 +182,7 @@ function showOptions(id, buttonId) {
             document.getElementById('show_' + feature).checked = false;
         }
         disableCheckbox(feature);
-        if (!isDimensionNaN(feature)){
+        if (!isDimensionCategorical(feature)){
             disableOptionInDropdown('filterOption_', feature);
             disableOptionInDropdown('rangeOption_', feature);
         }
@@ -515,7 +515,7 @@ function generateDropdownForFilter() {
         dropdown.appendChild(headline);
         let dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
-            if (!isDimensionNaN(dimension)) {
+            if (!isDimensionCategorical(dimension)) {
                 let option = document.createElement('option');
                 option.textContent = dimension;
                 option.value = dimension;
@@ -531,7 +531,7 @@ function generateDropdownForFilter() {
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
-        if (!isDimensionNaN(dimension)) {
+        if (!isDimensionCategorical(dimension)) {
         let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
@@ -597,7 +597,7 @@ function generateInputFieldsForSetFilter() {
 
 function filter() {
 
-    if(isDimensionNaN(filterDimensionData)) {
+    if(isDimensionCategorical(filterDimensionData)) {
         alert(`Attention: Set Filter works only for numerical data!`);
         return;
     }
@@ -688,7 +688,7 @@ function generateDropdownForRange() {
         dropdown.appendChild(headline);
         let dimensions = getAllDimensionNames();
         dimensions.forEach(function(dimension) {
-            if (!isDimensionNaN(dimension)) {
+            if (!isDimensionCategorical(dimension)) {
                 let option = document.createElement('option');
                 option.textContent = dimension;
                 option.value = dimension;
@@ -704,7 +704,7 @@ function generateDropdownForRange() {
     dropdown.appendChild(headline);
 
     dimensions.forEach(function(dimension) {
-        if (!isDimensionNaN(dimension)) {
+        if (!isDimensionCategorical(dimension)) {
         let option = document.createElement('option');
         option.textContent = dimension;
         option.value = dimension;
@@ -742,8 +742,8 @@ function generateInputFieldsForSetRange() {
         labelTop.innerHTML = 'Min';
         labelTop.style.paddingLeft = '2rem';
 
-        const max = getMaxRange(rangeDimensionData);
-        const min = getMinRange(rangeDimensionData);
+        const max = getMaxValue(rangeDimensionData);
+        const min = getMinValue(rangeDimensionData);
 
         inputTextElementBottom.style.visibility = 'visible';
         inputTextElementBottom.name = 'maxRange';
@@ -770,7 +770,7 @@ function generateInputFieldsForSetRange() {
 
 function setRange() {
 
-    if(isDimensionNaN(rangeDimensionData)) {
+    if(isDimensionCategorical(rangeDimensionData)) {
         alert(`Attention: Set Range works only for numerical data!`);
         return;
     }
@@ -782,28 +782,28 @@ function setRange() {
     
     let isOk = true;
     if (inverted) { 
-        if (!isNaN(getMinRange(rangeDimensionData))) {
+        if (!isNaN(getMinValue(rangeDimensionData))) {
             
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
             }
-            if (max < getMinRange(rangeDimensionData) || 
-                min > getMaxRange(rangeDimensionData)) {
-                    alert(`The range has to be bigger than ${getMinRange(rangeDimensionData)} and ${getMaxRange(rangeDimensionData)}.`);
+            if (max < getMinValue(rangeDimensionData) || 
+                min > getMaxValue(rangeDimensionData)) {
+                    alert(`The range has to be bigger than ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`);
                     isOk = false;
             }
         }
     }
     else {
-        if (!isNaN(getMinRange(rangeDimensionData))) {
+        if (!isNaN(getMinValue(rangeDimensionData))) {
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
             }
-            if (min > getMinRange(rangeDimensionData) || 
-                max < getMaxRange(rangeDimensionData)) {
-                    alert(`The range has to be bigger than ${getMinRange(rangeDimensionData)} and ${getMaxRange(rangeDimensionData)}.`);
+            if (min > getMinValue(rangeDimensionData) || 
+                max < getMaxValue(rangeDimensionData)) {
+                    alert(`The range has to be bigger than ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`);
                     isOk = false;
             }
         }
@@ -819,9 +819,9 @@ function setRange() {
 function resetToOriginalRange() {
     let dimensions = getAllDimensionNames();
     dimensions.forEach(function(dimension) {
-        if (!isNaN(getMinRange(dimension))) {
-            let min = getMinRange(dimension);
-            let max = getMaxRange(dimension);
+        if (!isNaN(getMinValue(dimension))) {
+            let min = getMinValue(dimension);
+            let max = getMaxValue(dimension);
             setDimensionRange(dimension, min, max);
         }
     });
@@ -830,9 +830,9 @@ function resetToOriginalRange() {
 function resetToRoundedRange() {
     let dimensions = getAllDimensionNames();
     dimensions.forEach(function(dimension) {
-        if (!isNaN(getMinRange(dimension))) {
-            let min = getMinRange(dimension);
-            let max = getMaxRange(dimension);
+        if (!isNaN(getMinValue(dimension))) {
+            let min = getMinValue(dimension);
+            let max = getMaxValue(dimension);
             setDimensionRangeRounded(dimension, min, max);
         }
     });

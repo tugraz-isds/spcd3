@@ -45,13 +45,14 @@ defines for now four public tasks:
   order to enable a clean rebuild of the project.
 
 - The `cleanAll` task removes the existing `dist` and `node_modules` directories.
-  Furthermore the file `package.lock.json` will be deleted.
+  Furthermore the file `package-lock.json` will be deleted.
 
-- The `build` task creates a new build of the library and stores the generated .js file into
-  `dist/library` folder. Additionally, the example folder is copied to the `dist/example` folder.
+- The `build` task creates a new build of the library in three formats (CJS, ESM, IIFE)
+and stores the generated library packages into the `dist/library/` folder. Additionally, the
+example folder is copied to `dist/example/`.
 
 - The `serve` task executes the build task, then additionally executes a private task called watcher which 
-is used to initialize a live server which serves the `dist/example` directory.
+is used to initialize a live server for the `dist/example/` directory.
 
 
 The public tasks can be invoked either by directly running gulp or
