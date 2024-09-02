@@ -37,6 +37,7 @@ declare global {
     let min: number;
     let max: number;
     let hoverdata: any[];
+    let hoverlabel: string;
 }
 
 declare const window: any;
@@ -563,7 +564,7 @@ export function getSelected(): any[] {
     return selected;
 }
 
-export function setSelection(records: []): void {
+export function setSelection(records: string[]): void {
     for(let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
         d3.select('#select_' + selectedLine)
@@ -572,6 +573,15 @@ export function setSelection(records: []): void {
             .transition()
             .style('visibility', 'hidden');
     }
+}
+
+export function setSelectionWithNumber(recordNumbers: []): void {
+    let records : string[] = [];
+    for (let i = 0; i < recordNumbers.length; i++) {
+        let record = getRecordWithNumber(recordNumbers[i]);
+        records.push(record);
+    }
+    setSelection(records);
 }
 
 export function isSelected(record: string): boolean {
@@ -583,6 +593,16 @@ export function isSelected(record: string): boolean {
     else {
         return false;
     }
+}
+
+export function isSelectedWithRecordNumber(recordNumber: number): boolean {
+    let record = getRecordWithNumber(recordNumber);
+    return isSelected(record);
+}
+
+function getRecordWithNumber(recordNumber: any): string {
+    const item = window.parcoords.currentPosOfDims.find((object) => object.recordNumber == recordNumber);
+    return item.key;
 }
 
 export function toggleSelection(record: string): void {
@@ -631,7 +651,7 @@ export function drawChart(content: any): void {
         .attr('viewBox', [0, 0, window.width, window.height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
-            if (!(event.ctrlKey || event.metaKey)) {
+            if (!(event.shiftKey || event.metaKey)) {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
                         if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
@@ -712,6 +732,10 @@ export function isDimensionCategorical(dimension: string): boolean {
     return false;
 }
 
+export function setDimensionForHovering(dimension: string): void {
+    window.hoverlabel = dimension;
+}
+
 
 // ---------- Needed for Built-In Interactivity Functions ---------- //
 
@@ -763,6 +787,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.yAxis = {};
     window.yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
 
+    let counter = 0;
     window.parcoords.features.map(x => {
         let numberOfDigs = 0
         let values = window.parcoords.newDataset.map(o => o[x.name]);
@@ -779,7 +804,11 @@ function setUpParcoordData(data: any, newFeatures: any): any {
             }
         }
         helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
+        helper.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordNumber');
+        counter = counter + 1;
     });
+
+    window.hoverlabel = getAllDimensionNames()[0];
 }
 
 function prepareData(data: any, newFeatures: any): any {
@@ -1063,8 +1092,9 @@ function getAllPointerEventsData(event: any): any {
     const data = [];
     for (let i = 0; i < object[0].length; i++) {
         const items = object.map(item => item[i]);
-        const keys = Object.keys(items);
-        const text = items[keys[0]].id;
+        const itemsdata = items[0].__data__;
+        const label = window.hoverlabel;
+        const text = itemsdata[label];
         data.push(text);
     }
     return data;
@@ -1201,7 +1231,6 @@ function doNotHighlight(selectedPath: any): void {
         }
     }
 }
-
 
 // Selecting
 

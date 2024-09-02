@@ -9,8 +9,7 @@ The following sections explain all existing functions.
 
 `function loadCSV(csv: string): []`
 
-As the function name already states, using loadCSV loads the data and returns the data as an array.
-As a parameter a CSV file is required.
+Loads a dataset from a CSV file.
 An example CSV file separated with a comma:
 
 ```
@@ -28,33 +27,24 @@ Grace,24,95,98
 Harper,69,9,97
 ```
 
-- getDimensions
+- drawChart
 
-`function getDimensions(data: any): []`
+`function drawChart(data: []): void`
 
-This function returns an array of all dimensions.
-The dimensions are needed to generate the plot.
-The previously loaded columns of the data, e.g., data['columns'], are necessary as parameters.
+Uses the given dataset to create a parallel coordinates chart, using D3 to dynamically create SVG
+elements in the DOM. This chart is considered to be the current chart.
 
-- generateSVG
+- deleteChart
 
-`function generateSVG(data: [], dimensions: []): void`
+`function deleteChart(): void`
 
-This function creates the plot of the previously loaded data.
-Parameters are the loaded data and the returned dimensions of getDimensions.
-
-- resetSVG
-
-`function resetSVG(): void`
-
-The complete plot can be deleted with the resetSVG function.
+Deletes the current parallel coordinates chart.
 
 - saveAsSvg
 
 `function saveAsSvg(): void`
 
-This function allows to save the current plot as SVG.
-The plot is saved as **'parcoords.svg'**.
+Saves the current parallel coordinates chart as an SVG file with a default name of **'parcoords.svg'**.
 
 ## Show And Hide Functions
 
@@ -62,21 +52,19 @@ The plot is saved as **'parcoords.svg'**.
 
 `function show(dimension: string): void`
 
-The show function can make a hidden dimension visible by handing over the dimension name as a string (e.g., 'PE' of the example CSV data).
+Makes a hidden dimension visible. The dimension is assigned the status **shown**.
 
 - hide
 
 `function hide(dimension: string): void`
 
-All visible dimensions can also be made invisible, but individually, with the function hide, where also the dimension name as string is required.
+Hides the given dimension. The dimension is assigned the status **hidden**.
 
 - getHiddenStatus
 
 `function getHiddenStatus(dimension: string): string`
 
-With getHiddenStatus, the status of a dimension can be queried.
-As a parameter, the dimension name is required as a string.
-The return type is also a string, and the value can be **shown** or **hidden**.
+Returns the visibility status of the dimension, which can be either **shown** or **hidden**.
 
 ## Invert Functions
 
@@ -84,24 +72,19 @@ The return type is also a string, and the value can be **shown** or **hidden**.
 
 `function invert(dimension: string): void`
 
-With inverting, the scale of a dimension will be flipped.
-A string, namely the dimension name, is required as a parameter.
+Inverts the given dimension.
 
 - getInversionStatus
 
 `function getInversionStatus(dimension: any): string`
 
-This function returns the inversion status of a dimension.
-As a parameter, a string, namely the dimension, is required.
-The return type is a string; the value can be **ascending** or **descending**.
+Returns the inversion status of a dimension, which can be either **ascending** or **descending**.
 
 - setInversionStatus
 
 `function setInversionStatus(dimension: string, status: string): void`
 
-This function allows changing the inversion status of a dimension.
-As parameters, the dimension and the status are required as strings.
-The status can either be **ascending** or **descending**.
+Sets the inversion status of the given dimension to one of **ascending** and **descending**.
 
 ## Move Functions
 
@@ -109,43 +92,31 @@ The status can either be **ascending** or **descending**.
 
 `function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void`
 
-A dimension can be moved with the move function.
-There is the possibility to move dimension A next to dimension B.
-With the toRightOf parameter, it is possible to decide if dimension A is placed on the left side of dimension B or the right side of dimension B.
-The parameters are:
-- dimensionA as a string (this dimension is moved),
-- toRightOf as a boolean (true means right of dimensionB, false means left of dimension B),
-- dimensionB as a string.
+Moves dimension A either to the left side of dimension B or to the right side of dimension B.
 
 - moveByOne
 
 `function moveByOne(dimension: string, direction: string): void`
 
-A dimension can also be moved to the left or the right, independent of another dimension.
-Parameters are the dimensions string and the direction as a string.
-The direction can be either **right** or **left**.
+Moves a dimension one position to the left or right, independent of other dimensions.
 
 - swap
 
 `function swap(dimensionA: string, dimensionB: string): void`
 
-This function allows two dimensions to swap.
-There are only two dimensions needed as a string for the parameters.
+Swaps the positions of the given dimensions.
 
 - getDimensionPosition
 
 `function getDimensionPosition(dimension: string): number`
 
-This function returns the position of a dimension (0...n).
-As a parameter, a string, namely the dimension, is required.
-The function returns a number between 0 and n dimensions.
+Returns the position of the given dimension (0...n).
 
 - setDimensionPosition
 
 `function setDimensionPosition(dimension: string, position: number): void`
 
-It is also possible to set the position of a dimension.
-As parameters, only the dimension string and the desired position number are needed.
+Sets the position of the given dimension (0...n).
 
 ## Range Functions
 
@@ -153,133 +124,142 @@ As parameters, only the dimension string and the desired position number are nee
 
 `function getDimensionRange(dimension: string): void`
 
-This function returns a dimension's current range (min, max).
-As a parameter, a string, namely the dimension, is required.
+Returns the given dimension’s current range (min, max).
 
 - setDimensionRange
 
 `function setDimensionRange(dimension: string, min: number, max: number): void`
 
-The range of a dimension can also be changed.
-Only the dimension string, min value and max value are required as parameters.
+Sets the range of the given dimension to specific values (min, max).
 
 - setDimensionRangeRounded
 
 `function setDimensionRangeRounded(dimension: string, min: number, max: number): void`
 
-This function set the minimum and maximum ranges to round values.
-Only the dimension string, min value and max value are required as parameters.
+Sets the range of the given dimension to rounded specific values (min, max).
 
-- getMinRange
+- getMinValue
 
-`function getMinRange(dimension: any): number`
+`function getMinValue(dimension: string): number`
 
-This function returns the minimum range of a dimension (in data coords).
-As a parameter, a string, namely the dimension, is required.
+Returns the minimum data value of a dimension.
 
-- getMaxRange
+- getMaxValue
 
-`function getMaxRange(dimension: any): number`
+`function getMaxValue(dimension: string): number`
 
-This function returns the maximum range of a dimension (in data coords).
-As a parameter, a string, namely the dimension, is required.
+Returns the maximum data value of a dimension.
 
 - getCurrentMinRange
 
-`function getCurrentMinRange(dimension: any): number`
+`function getCurrentMinRange(dimension: string): number`
 
-This function returns the current minimum range of a dimension (in data coords).
-As a parameter, a string, namely the dimension, is required.
+Returns the current minimum value of a dimension’s range (in data coordinates).
 
 - getCurrentMaxRange
 
-`function getCurrentMaxRange(dimension: any): number`
+`function getCurrentMaxRange(dimension: string): number`
 
-This function returns the current maximum range of a dimension (in data coords).
-As a parameter, a string, namely the dimension, is required.
+Returns the current maximum value of a dimension’s range (in data coordinates).
 
 ## Filter Functions
 
 - getFilter
 
-`function getFilter(dimension): any`
+`function getFilter(dimension: string): [min, max]`
 
-This function returns the filter of a dimension (in range coords).
-As a parameter, a string, namely the dimension, is required.
-The function returns the minimum and the maximum value of the filter.
+Returns the minimum and maximum values of the filter of a dimension.
 
 - setFilter
 
 `function setFilter(dimension: string, min: number, max: number): void`
 
-The filter of a dimension can be set with this function by handing over the dimension string and the minimum and maximum values of the filter (in range coords).
+Sets the filter for a dimension by specifying minimum and maximum values. If the minimum value lies below the current range, the filter minimum is set to the current range minimum. If the minimum value exceeds the current range, the filter maximum is set to the current range maximum.
 
 ## Select Functions
 
 - getSelected
 
-`function getSelected(): any[]`
+`function getSelected(): []`
 
-It is possible to get all the selected records in the plot with this function.
-This function returns an array with all selected records.
-A record is identified with its label, for example, the name.
+Returns all selected records in the chart as an array, where each record is identified with its label,
+taken by default from the first column of the dataset.
 
 - setSelection
 
 `function setSelection(records: []): void`
 
-This function allows to select several records.
-An array of records is needed as a parameter, identified by the label.
+Selects one or more records by handing over an array of labels.
 
 - toggleSelection
 
 `function toggleSelection(record: string): void`
 
-It is possible to toggle a record selection by handing the dimension string over as a parameter.
+Toggles the selection of a given record by specifying its label.
 
 - isSelected
 
 `function isSelected(record: string): boolean`
 
-This function checks whether a record is selected or not.
-As a parameter, a string is required, namely the record label.
-This function returns true if the record is selected or false if not.
+Returns a boolean for the selection status of a given record by specifying its label: true if the record is selected and false if not.
 
 - setSelected
 
 `function setSelected(record: string): void`
 
-With this function, a single record can be selected.
-As a parameter, a string is required, namely the record label.
+Selects a given record by specifying its label.
 
 - setUnselected
 
 `function setUnselected(record: string): void`
 
-With this function, a single record can be selected.
-As a parameter, a string is required, namely the record label.
+Deselects a given record by specifying its label.
 
 
 ## Helper Functions
 
-- getAllDimensions
+- getAllDimensionNames
 
-`function getAllDimensions(): string[]`
+`function getAllDimensionNames(): []`
 
-This function returns an array of all dimensions in order.
+Returns an array of all dimensions names in order.
 
 - getAllRecords
 
-`function getAllRecords(): any[]`
+`function getAllRecords(): []`
 
-This function returns all records (regardless of whether record is selected or not).
-This function returns an array with all records.
-A data record is identified by its label, for example the name.
+Returns all records as an array.
 
-- isDimensionNaN
+- getAllDimensionNames
 
-`function isDimensionNaN(dimension: string): boolean`
+`function getAllDimensionNames(): []`
 
-This function checks if the data of a dimension is numerical or not.
-As a parameter, a string is required, namely the dimension name.
-This function returns true if it is numerical and false if not.
+Returns an array of all dimensions names in order.
+
+- getNumberofDimensions
+
+`function getNumberOfDimensions(): number`
+Returns the number of dimensions.
+
+- getDimensionPosition
+
+`function getDimensionPosition(dimensionName: string): number`
+Returns the position of a dimension (0..𝑚 − 1).
+
+- setDimensionPosition
+
+`function setDimensionPosition(dimensionName: string, position: number): void`
+
+Sets the position of the given dimension to a specific position (0..𝑚 − 1).
+
+- isDimensionCategorical
+
+`function isDimensionCategorical(dimensionName: string): boolean`
+
+Returns true if a dimension is categorial and false if not (i.e. it is numerical).
+
+- setDimensionForHovering
+
+`function setDimensionForHovering(dimension: string): void`
+
+Sets the dimension as label for hovering.
