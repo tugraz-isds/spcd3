@@ -575,15 +575,6 @@ export function setSelection(records: string[]): void {
     }
 }
 
-export function setSelectionWithNumber(recordNumbers: []): void {
-    let records : string[] = [];
-    for (let i = 0; i < recordNumbers.length; i++) {
-        let record = getRecordWithNumber(recordNumbers[i]);
-        records.push(record);
-    }
-    setSelection(records);
-}
-
 export function isSelected(record: string): boolean {
     let cleanedRecord = helper.cleanLinePathString(record);
     const path = d3.select('#select_' + cleanedRecord).style('visibility');
@@ -593,16 +584,6 @@ export function isSelected(record: string): boolean {
     else {
         return false;
     }
-}
-
-export function isSelectedWithRecordNumber(recordNumber: number): boolean {
-    let record = getRecordWithNumber(recordNumber);
-    return isSelected(record);
-}
-
-function getRecordWithNumber(recordNumber: any): string {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.recordNumber == recordNumber);
-    return item.key;
 }
 
 export function toggleSelection(record: string): void {
@@ -631,6 +612,42 @@ export function setUnselected(record: string): void {
     d3.select('.' + path)
             .transition()
             .style('visibility', 'visible');
+}
+
+//---------- Selection Functions With IDs ----------
+
+export function setSelectionWithId(recordIds: []): void {
+    let records : string[] = [];
+    for (let i = 0; i < recordIds.length; i++) {
+        let record = getRecordWithId(recordIds[i]);
+        records.push(record);
+    }
+    setSelection(records);
+}
+
+export function isSelectedWithRecordId(recordId: number): boolean {
+    let record = getRecordWithId(recordId);
+    return isSelected(record);
+}
+
+export function getRecordWithId(recordId: any): string {
+    const item = window.parcoords.currentPosOfDims.find((object) => object.recordId == recordId);
+    return item.key;
+}
+
+export function toggleSelectionWithId(recordId: number): void {
+    const record = getRecordWithId(recordId);
+    toggleSelection(record);
+}
+
+export function setSelectedWithId(recordId: number): void {
+    const record = getRecordWithId(recordId);
+    setSelected(record);
+}
+
+export function setUnselectedWithId(recordId: number): void {
+    const record = getRecordWithId(recordId);
+    setUnselected(record);
 }
 
 
@@ -710,7 +727,7 @@ export function getDimensionPosition(dimension: string): number {
     return parcoords.newFeatures.indexOf(dimension);
 }
 
-export function setDimensionPosition(dimension: string, position: number): void {
+/*export function setDimensionPosition(dimension: string, position: number): void {
     const dimensionListCopy = parcoords.newFeatures.slice();
     const dimensionListInOrder = dimensionListCopy.reverse();
     const dimensionToMove = dimensionListInOrder[position];
@@ -722,7 +739,7 @@ export function setDimensionPosition(dimension: string, position: number): void 
     else {
         move(dimension, false, dimensionToMove);
     }
-}
+}*/
 
 export function isDimensionCategorical(dimension: string): boolean {
     let values = window.parcoords.newDataset.map(o => o[dimension]);
@@ -804,7 +821,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
             }
         }
         helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
-        helper.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordNumber');
+        helper.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordId');
         counter = counter + 1;
     });
 

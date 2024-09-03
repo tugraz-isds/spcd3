@@ -110,19 +110,19 @@ Swaps the positions of the given dimensions.
 
 `function getDimensionPosition(dimension: string): number`
 
-Returns the position of the given dimension (0...n).
+Returns the position of the given dimension (0...n-1).
 
 - setDimensionPosition
 
 `function setDimensionPosition(dimension: string, position: number): void`
 
-Sets the position of the given dimension (0...n).
+Sets the position of the given dimension (0...n-1).
 
 ## Range Functions
 
 - getDimensionRange
 
-`function getDimensionRange(dimension: string): void`
+`function getDimensionRange(dimension: string): [min, max]`
 
 Returns the given dimension’s current range (min, max).
 
@@ -176,7 +176,7 @@ Returns the minimum and maximum values of the filter of a dimension.
 
 Sets the filter for a dimension by specifying minimum and maximum values. If the minimum value lies below the current range, the filter minimum is set to the current range minimum. If the minimum value exceeds the current range, the filter maximum is set to the current range maximum.
 
-## Select Functions
+## Selection Functions
 
 - getSelected
 
@@ -215,6 +215,38 @@ Selects a given record by specifying its label.
 
 Deselects a given record by specifying its label.
 
+## Selection Functions with ID
+
+- setSelectionWithId
+
+`function setSelectionWithId(recordIds: []): void`
+
+Selects one or more records by handing over an array of IDs.
+
+- toggleSelectionWithId
+
+`function toggleSelectionWithId(recordId: number): void`
+
+Toggles the selection of a given record by specifying its ID.
+
+- isSelectedWithId
+
+`function isSelectedWithId(recordId: number): boolean`
+
+Returns a boolean for the selection status of a given record by specifying its ID: true if the record is selected and false if not.
+
+- setSelectedWithId
+
+`function setSelectedWithId(recordId: number): void`
+
+Selects a given record by specifying its ID.
+
+- setUnselectedWithId
+
+`function setUnselectedWithId(recordId: number): void`
+
+Deselects a given record by specifying its ID.
+
 
 ## Helper Functions
 
@@ -230,12 +262,6 @@ Returns an array of all dimensions names in order.
 
 Returns all records as an array.
 
-- getAllDimensionNames
-
-`function getAllDimensionNames(): []`
-
-Returns an array of all dimensions names in order.
-
 - getNumberofDimensions
 
 `function getNumberOfDimensions(): number`
@@ -244,13 +270,8 @@ Returns the number of dimensions.
 - getDimensionPosition
 
 `function getDimensionPosition(dimensionName: string): number`
+
 Returns the position of a dimension (0..𝑚 − 1).
-
-- setDimensionPosition
-
-`function setDimensionPosition(dimensionName: string, position: number): void`
-
-Sets the position of the given dimension to a specific position (0..𝑚 − 1).
 
 - isDimensionCategorical
 
@@ -263,3 +284,9 @@ Returns true if a dimension is categorial and false if not (i.e. it is numerical
 `function setDimensionForHovering(dimension: string): void`
 
 Sets the dimension as label for hovering.
+
+- getRecordWithId
+
+`function getRecordWithId(recordId: number): string`
+
+Returns the label of a record.
