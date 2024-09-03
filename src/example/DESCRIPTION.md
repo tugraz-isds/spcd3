@@ -20,7 +20,7 @@ The user can invert dimensions, move dimensions, hide dimensions,
 adjust dimension ranges, filter records, hover over records, and
 select records.
 
-### Inverting Dimension(s)
+### Inverting Dimensions
 
 By default, a dimension's axis places higher values at the top and
 lower values at the bottom. A dimension can be inverted either by
@@ -31,7 +31,7 @@ suspected correlation between adjacent dimensions.
 
 ![screenshot](screenshots/invertDimension.png)
 
-### Moving Dimension(s)
+### Moving Dimensions
 
 When looking for correlations between dimensions, meaningful
 relationships are only revealed between adjacent dimensions. Hence, it
@@ -73,7 +73,7 @@ context menu: \uiname{Set Filter} sets a filter to specific values and
 
 ![screenshot](screenshots/filterDimension.png)
 
-### Hovering over Record(s)
+### Hovering over Records
 
 If there are a large number of records, a parallel coordinates
 visualisation contains a large number of potentially crossing and
@@ -85,7 +85,7 @@ default, the label is taken from the first column of the dataset.
 
 ![screenshot](screenshots/hoverRecords.png)
 
-### Select Record(s)
+### Select Records
 
 It is helpful to be able to select one or more records in the dataset
 and to highlight them accordingly. Left-clicking one or more polylines
