@@ -1,0 +1,11 @@
+
+The cursor icons:
+
+arrow-curved-down.svg
+arrow-curved-up.svg
+
+were created by Ožbej Golob and are used under the terms
+of an MIT licence.
+
+https://github.com/tugraz-isds/mva
+

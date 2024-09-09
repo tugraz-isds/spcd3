@@ -41,37 +41,39 @@ npm install
 ### Build And Development
 
 Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
-defines for now four public tasks:
+defines four public tasks:
 
-- The `clean` task removes the existing `dist/` directory in
-  order to enable a clean rebuild of the project.
-
-- The `cleanAll` task restores the project folder to its virgin state, by deleting the existing `dist/` and `node_modules/` directories and the `package-lock.json` file.
-
-- The `build` task creates a new build of the library in three formats (CJS, ESM, IIFE)
-and stores the generated library packages into the `dist/library/` folder. Additionally, the
-example folder is copied to `dist/example/`.
-
-- The `serve` task executes the build task, then additionally executes a private task called watcher, which 
-is used to initialise a live server for the `dist/example/` folder.
-
-
-The public tasks can be invoked either by directly running gulp or
-by running the equivalent scripts in package.json:
-
+- `clean` removes the existing `dist/` directory in
+  order to enable a clean rebuild of the project:
 ```
-npm run clean
-npx gulp clean
-
-npm run cleanAll
-npx gulp cleanAll
-
-npm run build
-npx gulp build
-
-npm run serve
-npx gulp serve
+  npx gulp clean
 ```
+
+- `cleanAll` restores the project folder to its virgin state,
+  by deleting the existing `dist/` and `node_modules/` directories
+  and the `package-lock.json` file:
+```
+  npx gulp cleanAll
+```
+
+- `build` creates a new build of the library in three formats (CJS, ESM, IIFE)
+  and stores the generated library packages into the `dist/library/` folder.
+  Additionally, the example folder is copied to `dist/example/`:
+```
+  npx gulp build
+```
+
+- `serve` executes the build task, then additionally executes a private task
+  called watcher, which starts live web server in the `dist/example/` folder:
+```
+  npx gulp serve
+```
+
+Each of the public Gulp tasks can also be invoked by running the
+equivalent npm script defined in package.json.
+
+
+
 
 ## Usage
 
