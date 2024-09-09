@@ -1332,7 +1332,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
     let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
     .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'rangeButton');
-    let resetRangeButton = popupWindowRange.append('button').text('Reset to Original Range').style('margin-left', 0.5 + 'rem')
+    let resetRangeButton = popupWindowRange.append('button').text('Set Ranges from Data').style('margin-left', 0.5 + 'rem')
     .style('width', 16 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'resetRangeButton');
 
     let popupWindowRangeError = popupWindowRange
