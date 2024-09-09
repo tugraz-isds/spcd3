@@ -1285,13 +1285,13 @@ function setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any
         .attr('width', 12)
         .attr('height', 12)
         //.attr('href', svgToTinyDataUri.default(icon.getArrowDown()))
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowDownBase64())
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowUpBase64())
         .each(function (d) {
             const processedDimensionName = helper.cleanString(d.name);
             d3.select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
-                .text('down')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowUp(), 12)}') 8 8, auto`);
+                .text('up')
+                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowDown(), 12)}') 8 8, auto`);
         })
         .on('click', onInvert());
 }
