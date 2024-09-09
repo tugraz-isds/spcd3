@@ -1,12 +1,12 @@
 # Example Application of the Library 'Steerable Parallel Coordinates in D3'
 
-An example application, which is also deployed on [spcd3.netlify.app](https://spcd3.netlify.app/), with the most important functions was implemented to demonstrate most of the library’s functionality. The complete list of all available functions can be found [here](../../API.md). The example application provides an example plot showing an example dataset upon initial load so that the user can familiarise themselves with the library and its functionalities.
+An example application, which is also deployed on [spcd3.netlify.app](https://spcd3.netlify.app/), with the most important functions was implemented to demonstrate most of the library’s functionality. The complete list of all available functions can be found [here](./API.md). The example application provides an example plot showing an example dataset upon initial load so that the user can familiarise themselves with the library and its functionalities.
 
 ![screenshot](screenshots/startScreen.png)
 
 ## Data-Handling
 
-A CSV file is required to visualise a dataset as a parallel coordinate plot. The CSV should be separated by a comma. Otherwise, there are no special requirements. The data can be of categorical or numerical origin. In the folder [data](../example/data/), three example datasets can be viewed. Other datasets should have the same structure.
+A CSV file is required to visualise a dataset as a parallel coordinate plot. The CSV should be separated by a comma. Otherwise, there are no special requirements. The data can be of categorical or numerical origin. In the folder [data](./src/example/data/), three example datasets can be viewed. Other datasets should have the same structure.
 
 
 ## Student Marks Example

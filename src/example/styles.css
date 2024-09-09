@@ -3,7 +3,7 @@ header {
   justify-content: space-between;
   align-items: center;
   margin: 1rem 1rem 2rem 1rem;
-  background-color: #ccccee;
+  background-color: #88bbdd;
   border-radius:0.3rem;
   padding: 1rem;
 }
@@ -91,7 +91,7 @@ div#parallelcoords {
 }
 
 #border {
-  border-bottom: #0081af 0.4rem;
+  border-bottom: #88bbdd 0.4rem;
   border-bottom-style: solid;
   visibility: hidden;
   margin-bottom: 2rem;

@@ -11,15 +11,15 @@ export function getArrowDown(): string {
 }
 
 export function getArrowLeftAndRight(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path d="M 0 3 L 3 0 L 3 2 L 7 2 L 7 0 L 10 3 L 7 6 L 7 4 L 3 4 L 3 6 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path fill="white" stroke="black" stroke-width="1" d="M 0 3 L 3 0 L 3 2 L 7 2 L 7 0 L 10 3 L 7 6 L 7 4 L 3 4 L 3 6 z"/></svg>';
 }
 
 export function getArrowLeft(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path d="M 0 2 L 6 2 L 6 0 L 10 3 L 6 6 L 6 4 L 0 4 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path fill="white" stroke="black" stroke-width="1" d="M 0 2 L 6 2 L 6 0 L 10 3 L 6 6 L 6 4 L 0 4 z"/></svg>';
 }
 
 export function getArrowRight(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path d="M 0 3 L 4 0 L 4 2 L 10 2 L 10 4 L 4 4 L 4 6 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path fill="white" stroke="black" stroke-width="1" d="M 0 3 L 4 0 L 4 2 L 10 2 L 10 4 L 4 4 L 4 6 z"/></svg>';
 }
 
 export function getArrowTopAndBottom(): string {

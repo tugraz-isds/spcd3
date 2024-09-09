@@ -242,7 +242,7 @@ export function isInverted(dimension: string): boolean {
     const invertId = '#dimension_invert_' + helper.cleanString(dimension);
     const element = d3.select(invertId);
     const arrowStatus = element.text();
-    return arrowStatus == 'up' ? true : false;
+    return arrowStatus == 'down' ? true : false;
 }
 
 
@@ -714,9 +714,24 @@ export function getAllRecords(): any[] {
     return data;
 }
 
-export function getAllDimensionNames(): string[] {
+export function getAllVisibleDimensionNames(): string[] {
     let listOfDimensions = parcoords.newFeatures.slice();
     return listOfDimensions.reverse();
+}
+
+export function getAllDimensionNames(): string[] {
+    return window.parcoords.data['columns'];
+}
+
+export function getAllHiddenDimensionNames(): string[] {
+    const dimensions = getAllDimensionNames();
+    const hiddenDimensions = [];
+    for(let i = 0; i < dimensions.length; i++) {
+        if (getHiddenStatus(dimensions[i]) == 'hidden') {
+            hiddenDimensions.push(dimensions[i]);
+        }
+    }
+    return hiddenDimensions;
 }
 
 export function getNumberOfDimensions(): number {
@@ -1386,7 +1401,11 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     contextMenu.append('div')
         .attr('id', 'resetfilterMenu')
         .attr('class', 'contextmenu')
-        .text('Reset Filter')
+        .text('Reset Filter');
+    contextMenu.append('div')
+        .attr('id', 'showAllMenu')
+        .attr('class', 'contextmenu')
+        .text('Show All');
     
     featureAxis
         .append('text')
@@ -1659,6 +1678,19 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     }
                     else {
                         setFilter(dimension, range[1], range[0]);
+                    }
+                    event.stopPropagation();
+                });
+           
+            d3.select('#showAllMenu')
+                .style('visibility', 'visible')
+                .style('border-top', '0.08rem lightgrey solid')
+                .on('click', (event) => {
+                    const hiddenDimensions = getAllHiddenDimensionNames();
+                    console.log(hiddenDimensions);
+                    for(let i = 0; i < hiddenDimensions.length; i++) {
+                        console.log(hiddenDimensions[i]);
+                        show(hiddenDimensions[i]);
                     }
                     event.stopPropagation();
                 });
