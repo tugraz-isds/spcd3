@@ -268,7 +268,7 @@ function generateDropdownForShow() {
     });
 
     let textElement = document.createElement('span');
-    textElement.textContent = 'Show Dimensions';
+    textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
     selectButton.appendChild(textElement);
 
     let dimensionContainer = document.createElement('div');
@@ -326,10 +326,12 @@ function generateDropdownForInvert() {
             let label = document.createElement('label');
             label.className = 'dropdownLabel';
             let input = document.createElement('input');
-            input.type = 'checkbox';
+            input.type = 'image';
             input.id = 'show_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
+            input.src = './svg/arrow-up.svg';
+            input.style.height = '0.5rem'
             input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
@@ -354,7 +356,7 @@ function generateDropdownForInvert() {
 
     let textElement = document.createElement('span');
     textElement.id = 'invertText';
-    textElement.textContent = 'Invert Dimensions';
+    textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" />';
     selectButton.appendChild(textElement);
 
     let dimensionContainer = document.createElement('div');
@@ -859,7 +861,7 @@ function generateDropdownForSelectRecords() {
     });
 
     let textElement = document.createElement('span');
-    textElement.textContent = 'Select Records';
+    textElement.innerHTML = 'Select Records <img src="./svg/dropdown-symbol.svg" />';
     selectButton.appendChild(textElement);
 
     let recordsContainer = document.createElement('div');
