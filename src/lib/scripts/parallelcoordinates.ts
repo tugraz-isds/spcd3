@@ -119,6 +119,7 @@ export function getHiddenStatus(dimension: string): string {
 //---------- Invert Functions ----------
 
 export function invert(dimension: string): void {
+    console.log(dimension);
     const processedDimensionName = helper.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
@@ -840,7 +841,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         counter = counter + 1;
     });
 
-    window.hoverlabel = getAllDimensionNames()[0];
+    window.hoverlabel = getAllVisibleDimensionNames()[0];
 }
 
 function prepareData(data: any, newFeatures: any): any {
@@ -1687,9 +1688,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .style('border-top', '0.08rem lightgrey solid')
                 .on('click', (event) => {
                     const hiddenDimensions = getAllHiddenDimensionNames();
-                    console.log(hiddenDimensions);
                     for(let i = 0; i < hiddenDimensions.length; i++) {
-                        console.log(hiddenDimensions[i]);
                         show(hiddenDimensions[i]);
                     }
                     event.stopPropagation();

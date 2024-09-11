@@ -2,7 +2,7 @@ import {loadCSV, drawChart, invert, saveAsSvg, moveByOne,
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
     setDimensionRange, isDimensionCategorical, getAllDimensionNames, getAllRecords,
-    toggleSelection, isSelected, setDimensionRangeRounded} from './lib/spcd3.js';
+    toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -172,10 +172,10 @@ function showOptions(id, buttonId) {
 
     let button = document.getElementById(buttonId);
 
-    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'grey' :
+    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'white' :
         button.style.backgroundColor = 'white';
-    checkboxes.style.display == 'block' ? button.style.color = 'white' :
-        button.style.color = 'black'; 
+    checkboxes.style.display == 'block' ? button.style.color = 'black' :
+        button.style.color = 'black';
 
     newFeatures.forEach(function (feature) {
         if(getHiddenStatus(feature) == 'hidden') {
@@ -327,11 +327,11 @@ function generateDropdownForInvert() {
             label.className = 'dropdownLabel';
             let input = document.createElement('input');
             input.type = 'image';
-            input.id = 'show_' + dimension;
+            input.id = 'invert_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
             input.src = './svg/arrow-up.svg';
-            input.style.height = '0.5rem'
+            input.style.height = '0.7rem';
             input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
@@ -341,15 +341,12 @@ function generateDropdownForInvert() {
         for (let i = 0; i < newFeatures.length; i++) {
             const position = getDimensionPosition(newFeatures[i]);
             document.addEventListener("DOMContentLoaded", function(event) {
-                if (position != -1) {
-                    const inverted = isInverted(newFeatures[i]);
-                    if (inverted == true) {
-                        document.getElementById('invert_' + newFeatures[i]).checked = true;
-                    }
-                    else {
-                        document.getElementById('invert_' + newFeatures[i]).checked = false;
-                    }
-                }
+            if (getInversionStatus(newFeatures[i]) == "ascending") {
+                document.getElementById("invert_" + newFeatures[i]).src = './svg/arrow-up.svg';
+            }
+            else {
+                document.getElementById("invert_" + newFeatures[i]).src = './svg/arrow-down.svg';
+            }
             })
         }
     });
@@ -366,28 +363,22 @@ function generateDropdownForInvert() {
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
-    dimensionContainer.style.marginLeft = '14.8rem';
+    dimensionContainer.style.marginLeft = '15.5rem';
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
     dimensionContainer.name = 'invertOptions';
-    dimensionContainer.addEventListener('change', (event) => {
-        invertDimension(event.target.value);
+    dimensionContainer.addEventListener('click', (event) => {
+        if(event.target.value != undefined) {
+            invertDimension(event.target.value);
+            if (getInversionStatus(event.target.value) == "ascending") {
+                document.getElementById("invert_" + event.target.value).src = './svg/arrow-up.svg';
+            }
+            else {
+                document.getElementById("invert_" + event.target.value).src = './svg/arrow-down.svg';
+            }
+        }
     });
-
-    dimensions.forEach(function(dimension) {
-        let label = document.createElement('label');
-        label.className = 'dropdownLabel';
-        label.id = 'invertLabel_' + dimension;
-        let input = document.createElement('input');
-        input.type = 'checkbox';
-        input.id = 'invert_' + dimension;
-        input.value = dimension;
-        input.name = 'invertDimension';
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(dimension));
-        dimensionContainer.appendChild(label);
-    })
 
     container.appendChild(selectButton);
     container.appendChild(dimensionContainer);
