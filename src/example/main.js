@@ -200,10 +200,10 @@ function showOptionsForRecords(id, buttonId) {
 
     let button = document.getElementById(buttonId);
 
-    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'grey' :
+    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'white' :
         button.style.backgroundColor = 'white';
     checkboxes.style.display == 'block' ? button.style.color = 'white' :
-        button.style.color = 'black';
+        button.style.color = 'white';
 
     let records = getAllRecords();
     records.forEach(function (record) {

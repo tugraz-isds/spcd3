@@ -38,6 +38,7 @@ declare global {
     let max: number;
     let hoverdata: any[];
     let hoverlabel: string;
+    let longLabels: boolean;
 }
 
 declare const window: any;
@@ -663,10 +664,19 @@ export function drawChart(content: any): void {
 
     setUpParcoordData(content, newFeatures);
 
+    const height = 360;
+    let width = 0;
+    if (longLabels) {
+        width = newFeatures.length * 200-40;
+    }
+    else {
+        width = newFeatures.length * 100-40;
+    }
+
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, window.height])
+        .attr('viewBox', [0, 0, width, height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
             if (!(event.shiftKey || event.metaKey)) {
@@ -778,6 +788,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.paddingXaxis = 100;
     window.width = newFeatures.length * 100;
     window.height = 400;
+    window.longLabels = false;
 
     let dataset = prepareData(data, newFeatures);
 
@@ -792,6 +803,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
                 if(item.length > 20) {
                     window.width = newFeatures.length * 200;
                     window.paddingXaxis = 200;
+                    window.longLabels = true;
                     return;
                 }
             })
@@ -944,10 +956,19 @@ function redrawChart(content: any, newFeatures: any): void {
 
     setUpParcoordData(content, newFeatures);
 
+    const height = 360;
+    let width = 0;
+    if (longLabels) {
+        width = newFeatures.length * 200-40;
+    }
+    else {
+        width = newFeatures.length * 100-40;
+    }
+
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, window.height])
+        .attr('viewBox', [0, 0, width, height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
             if (!(event.shiftKey || event.metaKey)) {

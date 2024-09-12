@@ -24,47 +24,49 @@ An Example of <a href="https://github.com/tugraz-isds/spcd3">SPCD3</a>
 </div>
 </header>
 
-
+<div id="buttons">
 <input type="file" id="fileInput" style="display: none"/>
 <button class="input-button" id="input" title="Upload a CSV File">Upload File</button>
 <button class="input-button" id="download" title="Download Plot as SVG">Download SVG</button>
 <button class="input-button" id="resetRanges" title="Reset All Ranges to Original Range">Set Ranges from Data</button>
 <button class="input-button" id="resetRoundedRanges" title="Reset All Ranges to Inital Rounded Range">Round Ranges from Data</button>
 <button class="input-button" id="resetAll" title="Reset Plot to Origin">Reset</button>
-
+</div>
 
 <div id="parallelcoords"></div>
 <div id="border"></div>
 
 <section>
-  <span id="showDimensionHeader"></span>
-  <span id="showDimensionContainer" class="showDimensionContainer"></span>
-  <span id="invertDimensionHeader"></span>
-  <span id="invertDimensionContainer" class="invertDimensionContainer"></span>
+  <span id="showDimensionHeader" class="item1"></span>
+  <span id="showDimensionContainer" class="item1"></span>
+  <span id="invertDimensionHeader" class="item2"></span>
+  <span id="invertDimensionContainer" class="item2"></span>
+  <div class="item3">
   <span id="moveDimensionHeader"></span>
   <span><button id="moveLeft"><i class="arrow left"></i></button></span>
   <span id="moveDimensionContainer"></span>
   <span><button id="moveRight"><i class="arrow right"></i></button></span>
-  <div id="filterDimensionHeader"></div>
-  <span id="filterDimensionContainer"></span>
-  <span id="filterContainer"></span>
+  </div>
+  <div id="filterDimensionHeader" class="item4"></div>
+  <span id="filterDimensionContainer" class="item4"></span>
+  <span id="filterContainer" class="item5"></span>
   <span id="filterDimensionLabelTop" class="filterLabel"></span>
   <span><input id="filterDimensionInputFieldTop" class="filterInput" type="text"></input></span>
   <span id="filterDimensionLabelBottom" class="filterLabel"></span>
   <span><input id="filterDimensionInputFieldBottom" class="filterInput" type="text"></input></span>
   <span><button id="filterButton"></button></span>
   <div id="filterInfo"></div>
-  <span id="rangeDimensionHeader"></span>
-  <span id="rangeDimensionContainer"></span>
-  <span id="rangeContainer"></span>
+  <span id="rangeDimensionHeader" class="item6"></span>
+  <span id="rangeDimensionContainer" class="item6"></span>
+  <span id="rangeContainer" class="item7"></span>
   <span id="rangeDimensionLabelTop" class="rangeLabel"></span>
   <span><input id="rangeDimensionInputFieldTop" class="rangeInput" type="text"></input></span>
   <span id="rangeDimensionLabelBottom" class="rangeLabel"></span>
   <span><input id="rangeDimensionInputFieldBottom" class="rangeInput" type="text"></input></span>
   <span><button id="rangeButton"></button></span>
   <div id="rangeInfo"></div>
-  <div id="selectRecordsHeader"></div>
-  <span id="selectRecordsContainer"></span>
+  <div id="selectRecordsHeader" class="item8"></div>
+  <span id="selectRecordsContainer" class="item8"></span>
 </section>
 </body>
 
