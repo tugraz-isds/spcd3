@@ -152,10 +152,10 @@ section {
   background-color: #eeeeee;
   min-width: 10rem;
   box-shadow: 0rem 0.5rem 1rem 0rem rgba(0,0,0,0.2);
-  padding: 0.75rem 1rem;
   z-index: 1;
   border-radius: 0.5rem;
   color: #414141;
+  font-size: smaller;
 }
 
 div#showDimensionHeader {
@@ -182,7 +182,7 @@ div#invertDimensionHeader {
 
 img {
   width: 0.531rem;
-  aspect-ratio: 1;
+  aspect-ratio: 1
 }
 
 div#moveDimensionHeader {

@@ -202,8 +202,8 @@ function showOptionsForRecords(id, buttonId) {
 
     checkboxes.style.display == 'block' ? button.style.backgroundColor = 'white' :
         button.style.backgroundColor = 'white';
-    checkboxes.style.display == 'block' ? button.style.color = 'white' :
-        button.style.color = 'white';
+    checkboxes.style.display == 'block' ? button.style.color = 'black' :
+        button.style.color = 'black';
 
     let records = getAllRecords();
     records.forEach(function (record) {
@@ -244,6 +244,9 @@ function generateDropdownForShow() {
             input.id = 'show_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
+            input.style.marginTop = '0.5rem';
+            input.style.marginLeft = '0.5rem';
+            input.style.fontSize = 'smaller';
             input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
@@ -258,6 +261,9 @@ function generateDropdownForShow() {
                 input.id = 'show_' + dimension;
                 input.value = dimension;
                 input.name = 'dimension';
+                input.style.marginTop = '0.5rem';
+                input.style.marginLeft = '0.5rem';
+                input.style.fontSize = 'smaller';
                 input.checked = false;
                 label.appendChild(input);
                 label.appendChild(document.createTextNode(dimension));
@@ -332,6 +338,8 @@ function generateDropdownForInvert() {
             input.name = 'dimension';
             input.src = './svg/arrow-up.svg';
             input.style.height = '0.7rem';
+            input.style.paddingTop = '0.5rem';
+            input.style.paddingLeft = '0.5rem';
             input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
@@ -363,7 +371,6 @@ function generateDropdownForInvert() {
     dimensionContainer.style.border = '0.1rem lightgrey solid';
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
-    dimensionContainer.style.marginLeft = '15.5rem';
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
@@ -873,6 +880,8 @@ function generateDropdownForSelectRecords() {
         input.id = 'sel_' + record;
         input.value = record;
         input.name = 'record';
+        input.style.marginTop = '0.5rem';
+        input.style.marginLeft = '0.5rem';
         input.checked = false;
         label.appendChild(input);
         label.appendChild(document.createTextNode(record));

@@ -120,7 +120,6 @@ export function getHiddenStatus(dimension: string): string {
 //---------- Invert Functions ----------
 
 export function invert(dimension: string): void {
-    console.log(dimension);
     const processedDimensionName = helper.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
@@ -956,7 +955,6 @@ function redrawChart(content: any, newFeatures: any): void {
 
     setUpParcoordData(content, newFeatures);
 
-    const height = 360;
     let width = 0;
     if (longLabels) {
         width = newFeatures.length * 200-40;
@@ -968,7 +966,7 @@ function redrawChart(content: any, newFeatures: any): void {
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, width, height])
+        .attr('viewBox', [0, 0, width, window.height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
             if (!(event.shiftKey || event.metaKey)) {
@@ -1696,7 +1694,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .on('click', (event) => {
                     const range = getDimensionRange(dimension);
                     if (isInverted(dimension)) {
-                        setFilter(dimension, range[0], range[1]);
+                        setFilter(dimension, range[1], range[0]);
                     }
                     else {
                         setFilter(dimension, range[1], range[0]);

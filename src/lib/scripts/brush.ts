@@ -39,8 +39,14 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
 
     addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
     
-    d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+    if(yPosTop == 70 && yPosBottom == 320) {
+        d3.select('#rect_' + cleanDimensionName)
+        .style('cursor', 'pointer');
+    }
+    else {
+        d3.select('#rect_' + cleanDimensionName)
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+    }
     
     d3.select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
 
@@ -82,8 +88,14 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 
     addPosition(yPosBottom, parcoords.currentPosOfDims, d.name, 'bottom');
 
-    d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+    if(yPosTop == 70 && yPosBottom == 320) {
+        d3.select('#rect_' + cleanDimensionName)
+        .style('cursor', 'pointer');
+    }
+    else {
+        d3.select('#rect_' + cleanDimensionName)
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+    }
     
     d3.select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
 
@@ -130,6 +142,8 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
     addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
     addPosition(yPosRect + rectHeight, parcoords.currentPosOfDims, d.name, 'bottom');
+
+    console.log(rectHeight);
 
     if (rectHeight < 240) {
         d3.select('#rect_' + cleanDimensionName)
