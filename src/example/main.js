@@ -560,7 +560,6 @@ function generateInputFieldsForSetFilter() {
 
         labelTop.for = 'topRange';
         labelTop.innerHTML = 'Min';
-        labelTop.style.paddingLeft = '2rem';
 
         inputTextElementBottom.style.visibility = 'visible';
         inputTextElementBottom.name = 'bottomRange';
@@ -570,7 +569,6 @@ function generateInputFieldsForSetFilter() {
 
         filterButton.style.visibility = 'visible';
         filterButton.textContent = 'Set Filter';
-        filterButton.style.marginBottom = '0.5rem';
 
         let range = getDimensionRange(filterDimensionData);
 
@@ -578,7 +576,6 @@ function generateInputFieldsForSetFilter() {
         filterInfo.innerHTML = `Filtering for dimension ${filterDimensionData} is possible between ${range[0]} and ${range[1]}.`;
         filterInfo.style.color = 'grey';
         filterInfo.style.fontSize = 'smaller';
-        filterInfo.style.marginBottom = '1.5rem';
 
         container.appendChild(labelTop);
         container.appendChild(inputTextElementTop);
@@ -733,7 +730,6 @@ function generateInputFieldsForSetRange() {
     
         labelTop.for = 'minRange';
         labelTop.innerHTML = 'Min';
-        labelTop.style.paddingLeft = '2rem';
 
         const max = getMaxValue(rangeDimensionData);
         const min = getMinValue(rangeDimensionData);
@@ -757,7 +753,6 @@ function generateInputFieldsForSetRange() {
         container.appendChild(labelBottom);
         container.appendChild(inputTextElementBottom);
         container.appendChild(rangeButton);
-        container.appendChild(rangeInfo);
     }
 }
 

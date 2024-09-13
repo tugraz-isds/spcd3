@@ -24,60 +24,11 @@ body {
   margin-bottom: 0.1rem;
 }
 
-section {
-  margin-left: 2rem;
-  margin-bottom: 4rem;
-  display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: auto auto auto auto auto auto;
-}
-
-.item1 {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.item2 {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.item3 {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-.item4 {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.item5 {
-  grid-column: 1 / span 3 columns;
-  grid-row: 3;
-}
-
-.item6 {
-  grid-column: 1;
-  grid-row: 4;
-}
-
-.item7 {
-  grid-column: 1 / span 3 columns;
-  grid-row: 5;
-}
-
-.item8 {
-  grid-column: 1;
-  grid-row: 6;
-}
-
-
-
 #buttons {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  margin-left: 1rem;
 }
 
 .input-button {
@@ -103,10 +54,6 @@ section {
   transition-duration: 0.1s;
 }
 
-button#input {
-  margin-left: 1.1rem;
-}
-
 div#parallelcoords {
   overflow-y: auto;
 }
@@ -123,81 +70,67 @@ div#parallelcoords {
   margin-bottom: 2rem;
 }
 
-div#showDimensionHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-right: 2rem;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+section {
+  margin-left: 2rem;
+  margin-bottom: 4rem;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto auto auto;
 }
 
-img {
-  width: 0.531rem;
-  aspect-ratio: 1;
+.item1 {
+  grid-column: 1;
+  grid-row: 1;
+  margin-bottom: 1.5rem;
 }
 
-div#invertDimensionHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+.item2 {
+  grid-column: 2;
+  grid-row: 1;
+  margin-bottom: 1.5rem;
 }
 
-div#moveDimensionHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+.item3 {
+  grid-column: 3;
+  grid-row: 1;
+  margin-bottom: 1.5rem;
 }
 
-div#filterDimensionHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+.item4 {
+  grid-column: 1;
+  grid-row: 2;
 }
 
-div#rangeDimensionHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+.item5 {
+  grid-column: 1 / span 3 columns;
+  grid-row: 3;
 }
 
-div#selectRecordsHeader {
-  visibility: hidden;
-  font-size: 1rem;
-  font-weight: bold;
-  padding-bottom: 0.8rem;
-  padding-top: 0.8rem;
+.item6 {
+  grid-column: 1;
+  grid-row: 4;
+  margin-bottom: 1rem;
 }
 
-span#moveDimensionContainer {
-  padding-top: 2rem;
-  margin-top: 2rem;
+.item7 {
+  grid-column: 1;
+  grid-row: 5;
 }
 
-.invertDimensionContainer {
-  margin-left: 7rem;
-  margin-right: 6rem;
+.item8 {
+  grid-column: 1 / span 3 columns;
+  grid-row: 6;
 }
 
-.arrow {
-  display: inline-block;
-  padding: 0.3rem 0.4rem 0.4rem 0.3rem;
+.item9 {
+  grid-column: 1;
+  grid-row: 7;
+  margin-bottom: 1rem;
 }
 
-.left {
-  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCAxMCA2IgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgMyBMIDQgMCBMIDQgMiBMIDEwIDIgTCAxMCA0IEwgNCA0IEwgNCA2IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==') no-repeat center;
-}
-
-.right {
-  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDAgNCB6IiAvPgogICAgPC9nPgo8L3N2Zz4=') no-repeat center;
+.item10 {
+  grid-column: 1;
+  grid-row: 8;
 }
 
 .dropdownLabel {
@@ -225,13 +158,68 @@ span#moveDimensionContainer {
   color: #414141;
 }
 
-label {
-  font-size: smaller;
-  padding-left: 0.2rem;
+div#showDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 2rem;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+div#invertDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+.invertDimensionContainer {
+  margin-left: 7rem;
+  margin-right: 6rem;
+}
+
+img {
+  width: 0.531rem;
+  aspect-ratio: 1;
+}
+
+div#moveDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+span#moveDimensionContainer {
+  padding-top: 2rem;
+  margin-top: 2rem;
+}
+
+.arrow {
+  display: inline-block;
+  padding: 0.3rem 0.4rem 0.4rem 0.3rem;
+}
+
+.left {
+  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCAxMCA2IgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgMyBMIDQgMCBMIDQgMiBMIDEwIDIgTCAxMCA0IEwgNCA0IEwgNCA2IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==') no-repeat center;
+}
+
+.right {
+  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDAgNCB6IiAvPgogICAgPC9nPgo8L3N2Zz4=') no-repeat center;
+}
+
+div#filterDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
 }
 
 .filterLabel {
-  padding-top: 1rem;
   font-size: smaller;
 }
 
@@ -242,16 +230,15 @@ label {
   margin-right: 0.5rem;
 }
 
-#filterButton {
-  margin-bottom: 2rem;
-}
-
-#rangeButton {
-  margin-bottom: 0.5rem;
+div#rangeDimensionHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
 }
 
 .rangeLabel {
-  padding-top: 1rem;
   font-size: smaller;
 }
 
@@ -260,4 +247,12 @@ label {
   width: 2rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+}
+
+div#selectRecordsHeader {
+  visibility: hidden;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-bottom: 0.8rem;
+  padding-top: 0.8rem;
 }
