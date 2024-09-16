@@ -41,7 +41,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     
     if(yPosTop == 70 && yPosBottom == 320) {
         d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', 'pointer');
+        .style('cursor', 'default');
     }
     else {
         d3.select('#rect_' + cleanDimensionName)
@@ -90,7 +90,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 
     if(yPosTop == 70 && yPosBottom == 320) {
         d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', 'pointer');
+        .style('cursor', 'default');
     }
     else {
         d3.select('#rect_' + cleanDimensionName)
