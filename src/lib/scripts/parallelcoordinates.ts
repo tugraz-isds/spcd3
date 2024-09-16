@@ -663,7 +663,7 @@ export function drawChart(content: any): void {
 
     setUpParcoordData(content, newFeatures);
 
-    const height = 400;
+    const height = 360;
     let width = 0;
     if (longLabels) {
         width = newFeatures.length * 200-40;
@@ -889,7 +889,7 @@ function setupYScales(height: any, padding: any, features: any, newDataset: any)
             window.max = max;
             window.min = min;
             yScales[x.name] = scale.scaleLinear()
-                .domain([min, max]).nice()
+                .domain([min, max])
                 .range([height - padding, padding]);
         }
     });

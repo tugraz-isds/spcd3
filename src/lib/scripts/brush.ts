@@ -117,12 +117,17 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
     active: any, delta: any,  tooltipValuesTop: any, tooltipValuesDown: any, window: any):void {
     
-    const rectHeight = svg.select('#rect_' + cleanDimensionName).node()
-    .getBoundingClientRect().height;
-
     let yPosTop: number;
     let yPosRect: number;
     let topToAdd: number;
+
+    const yPosBottom = d3.select('#triangle_up_' + cleanDimensionName).attr('y');
+    const yPosTopNew = d3.select('#triangle_down_' + cleanDimensionName).attr('y');
+
+    const heightTopRect = yPosTopNew - 70;
+    const heightBottomRect = 320 - yPosBottom;
+    
+    const rectHeight =  240 - heightTopRect - heightBottomRect;
     
     if (event.y + delta - 10 <= 70) {
         yPosTop = 70;
@@ -142,8 +147,6 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
     addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
     addPosition(yPosRect + rectHeight, parcoords.currentPosOfDims, d.name, 'bottom');
-
-    console.log(rectHeight);
 
     if (rectHeight < 240) {
         d3.select('#rect_' + cleanDimensionName)
