@@ -663,7 +663,7 @@ export function drawChart(content: any): void {
 
     setUpParcoordData(content, newFeatures);
 
-    const height = 360;
+    const height = 400;
     let width = 0;
     if (longLabels) {
         width = newFeatures.length * 200-40;

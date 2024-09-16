@@ -7,7 +7,6 @@ import {loadCSV, drawChart, invert, saveAsSvg, moveByOne,
 let data;
 let newData;
 let newFeatures = [];
-let initFeatures = [];
 let moveDimensionData;
 let filterDimensionData;
 let rangeDimensionData;
@@ -224,6 +223,7 @@ function generateDropdownForShow() {
     document.getElementById('showDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('showDimensionContainer');
+    container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
     selectButton.id = 'showButton';
@@ -271,6 +271,18 @@ function generateDropdownForShow() {
             });
         }
         showOptions('options', 'showButton');
+        const dropdownHeight = dimensionContainer.clientHeight;
+        const windowHeight = window.innerHeight;
+        const dropdownTop = selectButton.getBoundingClientRect().top;
+
+        if (windowHeight - dropdownTop < dropdownHeight) {
+            dimensionContainer.style.bottom = '100%';
+            dimensionContainer.style.top = 'auto';
+        }
+        else {
+            dimensionContainer.style.bottom = 'auto';
+            dimensionContainer.style.top = '100%';
+        }
     });
 
     let textElement = document.createElement('span');
@@ -313,6 +325,8 @@ function generateDropdownForShow() {
 
     container.appendChild(selectButton);
     container.appendChild(dimensionContainer);
+
+    
 }
 
 function generateDropdownForInvert() {
@@ -321,6 +335,7 @@ function generateDropdownForInvert() {
     document.getElementById('invertDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('invertDimensionContainer');
+    container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
@@ -356,6 +371,18 @@ function generateDropdownForInvert() {
                 document.getElementById("invert_" + newFeatures[i]).src = './svg/arrow-down.svg';
             }
             })
+        }
+        const dropdownHeight = dimensionContainer.clientHeight;
+        const windowHeight = window.innerHeight;
+        const dropdownTop = selectButton.getBoundingClientRect().top;
+
+        if (windowHeight - dropdownTop < dropdownHeight) {
+            dimensionContainer.style.bottom = '100%';
+            dimensionContainer.style.top = 'auto';
+        }
+        else {
+            dimensionContainer.style.bottom = 'auto';
+            dimensionContainer.style.top = '100%';
         }
     });
 
@@ -845,12 +872,25 @@ function generateDropdownForSelectRecords() {
     document.getElementById('selectRecordsHeader').style.visibility = 'visible';
 
     const container = document.getElementById('selectRecordsContainer');
+    container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
     selectButton.id = 'selectButtonR';
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         showOptionsForRecords('options_r', 'selectButtonR');
+        const dropdownHeight = recordsContainer.clientHeight;
+        const windowHeight = window.innerHeight;
+        const dropdownTop = selectButton.getBoundingClientRect().top;
+
+        if (windowHeight - dropdownTop < dropdownHeight) {
+            recordsContainer.style.bottom = '100%';
+            recordsContainer.style.top = 'auto';
+        }
+        else {
+            recordsContainer.style.bottom = 'auto';
+            recordsContainer.style.top = '100%';
+        }
     });
 
     let textElement = document.createElement('span');
