@@ -94,6 +94,8 @@ section {
   grid-column: 3;
   grid-row: 1;
   margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .item4 {
@@ -191,11 +193,6 @@ div#moveDimensionHeader {
   font-weight: bold;
   padding-bottom: 0.8rem;
   padding-top: 0.8rem;
-}
-
-span#moveDimensionContainer {
-  padding-top: 2rem;
-  margin-top: 2rem;
 }
 
 .arrow {
