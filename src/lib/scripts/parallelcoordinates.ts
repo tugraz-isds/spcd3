@@ -785,7 +785,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
     window.paddingXaxis = 100;
-    window.width = newFeatures.length * 100;
+    window.width = newFeatures.length * 100-40;
     window.height = 400;
     window.longLabels = false;
 
@@ -800,7 +800,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         if (isNaN(values[0])) {
             values.forEach(item => {
                 if(item.length > 20) {
-                    window.width = newFeatures.length * 200;
+                    window.width = newFeatures.length * 200-40;
                     window.paddingXaxis = 200;
                     window.longLabels = true;
                     return;
@@ -955,6 +955,7 @@ function redrawChart(content: any, newFeatures: any): void {
 
     setUpParcoordData(content, newFeatures);
 
+    let height = 360;
     let width = 0;
     if (longLabels) {
         width = newFeatures.length * 200-40;
@@ -966,7 +967,7 @@ function redrawChart(content: any, newFeatures: any): void {
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, width, window.height])
+        .attr('viewBox', [0, 0, width, height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
             if (!(event.shiftKey || event.metaKey)) {
@@ -1580,12 +1581,22 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     });
                     event.stopPropagation();
                 });
+            }
+            else {
+                d3.select('#rangeMenu').style('visibility', 'hidden');
+            }
+            if (!isNaN(values[0])) {
                 d3.select('#resetRangeMenu')
                 .style('visibility', 'visible')
                 .on('click', (event) => {
                     setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
                     event.stopPropagation();
                 });
+            }
+            else {
+                d3.select('#resetRangeMenu').style('visibility', 'hidden');
+            }
+            if (!isNaN(values[0])) {
                 d3.select('#filterMenu')
                     .style('border-top', '0.08rem lightgrey solid')
                     .style('visibility', 'visible')
@@ -1688,20 +1699,27 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     });
                     event.stopPropagation();
                 });
-            
-            d3.select('#resetfilterMenu')
-                .style('visibility', 'visible')
-                .on('click', (event) => {
-                    const range = getDimensionRange(dimension);
-                    if (isInverted(dimension)) {
-                        setFilter(dimension, range[1], range[0]);
-                    }
-                    else {
-                        setFilter(dimension, range[1], range[0]);
-                    }
-                    event.stopPropagation();
+            }
+            else {
+                d3.select('#filterMenu').style('visibility', 'hidden');
+            }
+            if (!isNaN(values[0])) {
+                d3.select('#resetfilterMenu')
+                    .style('visibility', 'visible')
+                    .on('click', (event) => {
+                        const range = getDimensionRange(dimension);
+                        if (isInverted(dimension)) {
+                            setFilter(dimension, range[1], range[0]);
+                        }
+                        else {
+                            setFilter(dimension, range[1], range[0]);
+                        }
+                        event.stopPropagation();
                 });
-           
+            }
+            else {
+                d3.select('#resetfilterMenu').style('visibility', 'hidden');
+            }
             d3.select('#showAllMenu')
                 .style('visibility', 'visible')
                 .style('border-top', '0.08rem lightgrey solid')
@@ -1712,13 +1730,6 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     }
                     event.stopPropagation();
                 });
-            }
-            else {
-                d3.select('#rangeMenu').style('visibility', 'hidden');
-                d3.select('#filterMenu').style('visibility', 'hidden');
-                d3.select('#resetfilterMenu').style('visibility', 'hidden');
-            }
-            
             d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
             event.preventDefault();
         });

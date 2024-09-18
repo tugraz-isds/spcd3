@@ -218,7 +218,7 @@ function showOptionsForRecords(id, buttonId) {
 }
 
 function generateDropdownForShow() {
-    let dimensions = newData['columns'];
+    let dimensions = newData['columns'].reverse();
 
     document.getElementById('showDimensionHeader').style.visibility = 'visible';
 
