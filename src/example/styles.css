@@ -184,7 +184,7 @@ div#invertDimensionHeader {
 
 img {
   width: 0.531rem;
-  aspect-ratio: 1
+  aspect-ratio: 1/1;
 }
 
 div#moveDimensionHeader {
