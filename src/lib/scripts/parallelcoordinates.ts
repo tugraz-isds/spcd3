@@ -1502,6 +1502,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .style('border-top', '0.08rem lightgrey solid')
                 .style('visibility', 'visible')
                 .on('click', (event) => {
+                    d3.select('#rangeMenu').text('Set Range...');
                     popupWindowRange.style('display', 'block')
                             .style('width', 17 + 'rem')
                             .style('height', 12 + 'rem')
@@ -1557,6 +1558,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             popupWindowRangeError.style('display', 'none');
                             setDimensionRange(dimension, min, max);
                             popupWindowRange.style('display', 'none');
+                            d3.select('#rangeMenu').text('Set Range');
                         }
                         
                     });
@@ -1575,9 +1577,11 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     resetRangeButton.on('click', () => {
                         setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
                         popupWindowRange.style('display', 'none');
+                        d3.select('#rangeMenu').text('Set Range');
                     });
                     closeButtonRange.on('click', () => {
                         popupWindowRange.style('display', 'none');
+                        d3.select('#rangeMenu').text('Set Range');
                     });
                     event.stopPropagation();
                 });
@@ -1601,6 +1605,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     .style('border-top', '0.08rem lightgrey solid')
                     .style('visibility', 'visible')
                     .on('click', (event) => {
+                        d3.select('#filterMenu').text('Set Filter...');
                         popupWindowFilter.style('display', 'block')
                             .style('width', 17 + 'rem')
                             .style('height', 8 + 'rem')
@@ -1679,6 +1684,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             if (isOk) {
                                 popupWindowFilterError.style('display', 'none');
                                 popupWindowFilter.style('display', 'none');
+                                d3.select('#filterMenu').text('Set Filter');
                             }
                     });
                     inputMaxFilter.on('keypress', (event) => {
@@ -1696,6 +1702,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     closeButtonFilter.on('click', () => {
                         popupWindowFilter.style('display', 'none');
                         popupWindowFilterError.style('display', 'none');
+                        d3.select('#filterMenu').text('Set Filter');
                     });
                     event.stopPropagation();
                 });

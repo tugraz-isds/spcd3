@@ -59,47 +59,13 @@ let moveLeftButton = document.getElementById('moveLeft');
 moveLeftButton.addEventListener('click', moveDimensionLeft, false);
 moveLeftButton.style.visibility = 'hidden';
 
-/*let filterButton = document.getElementById('filterButton');
-filterButton.addEventListener('click', filter, false);
-filterButton.style.visibility = 'hidden';*/
-
-/*let rangeButton = document.getElementById('rangeButton');
-rangeButton.addEventListener('click', setRange, false);
-rangeButton.style.visibility = 'hidden';*/
-
-/*let topFilter = document.getElementById('filterDimensionInputFieldTop');
-topFilter.addEventListener('keyup', ({key}) => {
-    if (key === 'Enter') {
-        filter();
-    }
-});
-
-let bottomFilter = document.getElementById('filterDimensionInputFieldBottom');
-bottomFilter.addEventListener('keyup', ({key}) => {
-    if (key === 'Enter') {
-        filter();
-    }
-});*/
-
-/*let topRange = document.getElementById('rangeDimensionInputFieldTop');
-topRange.addEventListener('keyup', ({key}) => {
-    if (key === 'Enter') {
-        setRange();
-    }
-});
-
-let bottomRange = document.getElementById('rangeDimensionInputFieldBottom');
-bottomRange.addEventListener('keyup', ({key}) => {
-    if (key === 'Enter') {
-        setRange();
-    }
-});*/
-
 function openFileDialog() {
+    document.getElementById('input').textContent = 'Upload File...';
     document.getElementById('fileInput').click();
 }
 
 function handleFileSelect(event) {
+    document.getElementById('input').textContent = 'Upload File';
     const file = event.target.files[0];
 
     if (file) {
@@ -1062,13 +1028,7 @@ function clearPlot() {
     const showContainer = document.getElementById('showDimensionContainer');
     const moveContainer = document.getElementById('moveDimensionContainer');
     const filterDimensionContainer = document.getElementById('filterDimensionContainer');
-    const filterContainer = document.getElementById('filterContainer');
-    const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
-    const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
     const rangeDimensionContainer = document.getElementById('rangeDimensionContainer');
-    const rangeContainer = document.getElementById('rangeContainer');
-    const inputTextElementMin = document.getElementById('rangeDimensionInputFieldTop');
-    const inputTextElementMax = document.getElementById('rangeDimensionInputFieldBottom');
     const selectRecordsContainer = document.getElementById('selectRecordsContainer');
 
     while (parentElement.firstChild) {
@@ -1092,14 +1052,4 @@ function clearPlot() {
     while (selectRecordsContainer.firstChild) {
         selectRecordsContainer.removeChild(selectRecordsContainer.firstChild);
     }
-
-    filterContainer.style.visibility = 'hidden';
-    filterButton.style.visibility = 'hidden';
-    inputTextElementTop.style.visibility = 'hidden';
-    inputTextElementBottom.style.visibility = 'hidden';
-
-    rangeContainer.style.visibility = 'hidden';
-    rangeButton.style.visibility = 'hidden';
-    inputTextElementMin.style.visibility = 'hidden';
-    inputTextElementMax.style.visibility = 'hidden';
 }
