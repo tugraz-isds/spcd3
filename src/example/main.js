@@ -59,15 +59,15 @@ let moveLeftButton = document.getElementById('moveLeft');
 moveLeftButton.addEventListener('click', moveDimensionLeft, false);
 moveLeftButton.style.visibility = 'hidden';
 
-let filterButton = document.getElementById('filterButton');
+/*let filterButton = document.getElementById('filterButton');
 filterButton.addEventListener('click', filter, false);
-filterButton.style.visibility = 'hidden';
+filterButton.style.visibility = 'hidden';*/
 
-let rangeButton = document.getElementById('rangeButton');
+/*let rangeButton = document.getElementById('rangeButton');
 rangeButton.addEventListener('click', setRange, false);
-rangeButton.style.visibility = 'hidden';
+rangeButton.style.visibility = 'hidden';*/
 
-let topFilter = document.getElementById('filterDimensionInputFieldTop');
+/*let topFilter = document.getElementById('filterDimensionInputFieldTop');
 topFilter.addEventListener('keyup', ({key}) => {
     if (key === 'Enter') {
         filter();
@@ -79,9 +79,9 @@ bottomFilter.addEventListener('keyup', ({key}) => {
     if (key === 'Enter') {
         filter();
     }
-});
+});*/
 
-let topRange = document.getElementById('rangeDimensionInputFieldTop');
+/*let topRange = document.getElementById('rangeDimensionInputFieldTop');
 topRange.addEventListener('keyup', ({key}) => {
     if (key === 'Enter') {
         setRange();
@@ -93,7 +93,7 @@ bottomRange.addEventListener('keyup', ({key}) => {
     if (key === 'Enter') {
         setRange();
     }
-});
+});*/
 
 function openFileDialog() {
     document.getElementById('fileInput').click();
@@ -535,7 +535,7 @@ function generateDropdownForFilter() {
     const dropdown = document.createElement('select');
     dropdown.onchange = (event) => {
         filterDimensionData = event.target.value;
-        generateInputFieldsForSetFilter();
+        generateModuleForSetFilter();
     }
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
@@ -569,129 +569,185 @@ function generateDropdownForFilter() {
     container.appendChild(dropdown);
 }
 
-function generateInputFieldsForSetFilter() {
-  const container = document.getElementById('filterContainer');
-  const labelTop = document.getElementById('filterDimensionLabelTop');
-  const labelBottom = document.getElementById('filterDimensionLabelBottom');
-  const inputTextElementTop = document.getElementById('filterDimensionInputFieldTop');
-  const inputTextElementBottom = document.getElementById('filterDimensionInputFieldBottom');
-  const filterInfo = document.getElementById('filterInfo');
+function generateModuleForSetFilter() {
 
-  if (filterDimensionData === 'Set Filter') {
-        container.style.visibility = 'hidden';
-        labelTop.style.visibility = 'hidden';
-        labelBottom.style.visibility = 'hidden';
-        inputTextElementTop.style.visibility = 'hidden';
-        inputTextElementBottom.style.visibility = 'hidden';
-        filterInfo.style.visibility = 'hidden';
-        filterButton.style.visibility = 'hidden';
-  }
-  else {
-        container.style.visibility = 'visible';
-
-        inputTextElementTop.style.visibility = 'visible';
-        inputTextElementTop.name = 'topRange';
-
-        labelTop.for = 'topRange';
-        labelTop.innerHTML = 'Min';
-
-        inputTextElementBottom.style.visibility = 'visible';
-        inputTextElementBottom.name = 'bottomRange';
-
-        labelBottom.for = 'bottomRange';
-        labelBottom.innerHTML = 'Max';
-
-        filterButton.style.visibility = 'visible';
-        filterButton.textContent = 'Set Filter';
-
-        let range = getDimensionRange(filterDimensionData);
-
-        filterInfo.style.visibility = 'visible';
-        filterInfo.innerHTML = `Filtering for dimension ${filterDimensionData} is possible between ${range[0]} and ${range[1]}.`;
-        filterInfo.style.color = 'grey';
-        filterInfo.style.fontSize = 'smaller';
-
-        container.appendChild(labelTop);
-        container.appendChild(inputTextElementTop);
-        container.appendChild(labelBottom);
-        container.appendChild(inputTextElementBottom);
-        container.appendChild(filterButton);
-  }
-}
-
-function filter() {
-
-    if(isDimensionCategorical(filterDimensionData)) {
-        alert(`Attention: Set Filter works only for numerical data!`);
-        return;
-    }
-
-    let top = Number(document.getElementById('filterDimensionInputFieldTop').value);
-    let bottom = Number(document.getElementById('filterDimensionInputFieldBottom').value);
-    const limit = getDimensionRange(filterDimensionData);
-
-    let topLimit = limit[1];
-    let bottomLimit = limit[0];
-
-    const inverted = isInverted(filterDimensionData);
+    let section = document.getElementById('api-section');
     
-    let isOk = true;
-    if (inverted) { 
-        if (!isNaN(topLimit)) {
-            if (isNaN(top) || isNaN(bottom)) {
-                alert(`Attention: Values are not numbers! 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
-                isOk = false;
-            }
-            if (top < topLimit) {
-                top = topLimit;
-            }
-            if (bottom > bottomLimit) {
-                bottom = bottomLimit;
-            }
-            if (top > bottom) {
-                alert(`Attention: Min value ${top} is bigger than max value ${bottom}. 
-                    Please enter values between ${topLimit} and ${bottomLimit}.`);
-                isOk = false;
-            }
-        }
-    }
-    else {
-        if (!isNaN(topLimit)) {
-            if (isNaN(top) || isNaN(bottom)) {
-                alert(`Attention: Values are not numbers! 
-                    Please enter values between ${bottomLimit} and ${topLimit}.`);
-                isOk = false;
-            }
-            if (top < bottomLimit) {
-                top = bottomLimit;
-            }
-            if (bottom > topLimit) {
-                bottom = topLimit;
-            }
-            if (top > bottom) {
-                alert(`Attention: Min value is bigger than max value. 
-                    Please enter values between ${bottomLimit} and ${topLimit}.`);
-                isOk = false;
-            }
+    let popupWindowFilter = document.createElement('div');
+    popupWindowFilter.id = 'filterContainer';
+    popupWindowFilter.className = 'item7';
+    popupWindowFilter.style.visibility = 'visible';
+    popupWindowFilter.style.display = 'block';
+    popupWindowFilter.style.width = 18 + 'rem';
+    popupWindowFilter.style.height = 7 + 'rem';
+    popupWindowFilter.style.backgroundColor = 'white';
+    popupWindowFilter.style.border = '1px solid black';
+    popupWindowFilter.style.borderRadius = 0.25 + 'rem';
+    
+    section.appendChild(popupWindowFilter);
+
+    let headerFilter = document.createElement('div');
+    headerFilter.textContent = 'Set Filter for ' + filterDimensionData;
+    headerFilter.style.paddingLeft = 0.5 + 'rem';
+    headerFilter.style.paddingTop = 0.5 + 'rem';
+    headerFilter.style.fontSize = 'large';
+    popupWindowFilter.appendChild(headerFilter);
+    
+    let closeButtonFilter = document.createElement('a');
+    closeButtonFilter.textContent = 'x';
+    closeButtonFilter.style.position = 'relative';
+    closeButtonFilter.style.right = -16.5 + 'rem';
+    closeButtonFilter.style.top = -2 + 'rem';
+    closeButtonFilter.style.width = 2.5 + 'rem';
+    closeButtonFilter.style.height = 2.5 + 'rem';
+    closeButtonFilter.style.opacity = 0.3;
+    closeButtonFilter.style.backgroundColor = 'transparent';
+    closeButtonFilter.style.cursor = 'pointer';
+    popupWindowFilter.appendChild(closeButtonFilter);
+
+    closeButtonFilter.onclick = () => {
+        popupWindowFilter.style.display = 'none';
+    };
+
+    let labelMinFilter = document.createElement('label');
+    labelMinFilter.textContent = 'Min';
+    labelMinFilter.style.paddingLeft = 0.5 + 'rem';
+    popupWindowFilter.appendChild(labelMinFilter);
+
+    let inputMinFilter = document.createElement('input');
+    inputMinFilter.id = 'minFilterValue';
+    inputMinFilter.style.width = 2 + 'rem';
+    inputMinFilter.style.marginLeft = 0.5 + 'rem';
+    popupWindowFilter.appendChild(inputMinFilter);
+
+    inputMinFilter.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('filterButton').click();
         }
     }
 
-    if (isOk) {
+    let labelMaxFilter = document.createElement('label');
+    labelMaxFilter.textContent = 'Max';
+    labelMaxFilter.style.paddingLeft = 0.5 + 'rem';
+    popupWindowFilter.appendChild(labelMaxFilter);
+
+    let inputMaxFilter = document.createElement('input');
+    inputMaxFilter.id = 'maxFilterValue';
+    inputMaxFilter.style.width = 2 + 'rem';
+    inputMaxFilter.style.marginLeft = 0.5 + 'rem';
+    popupWindowFilter.appendChild(inputMaxFilter);
+
+    inputMaxFilter.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('filterButton').click();
+        }
+    }
+
+    let popupWindowFilterError = document.createElement('div');
+    popupWindowFilterError.style.position = 'absolute';
+    popupWindowFilter.appendChild(popupWindowFilterError);
+
+    let filterButton = document.createElement('button');
+    filterButton.textContent = 'Save';
+    filterButton.style.marginLeft = 0.5 + 'rem';
+    filterButton.style.marginRight = 0.5 + 'rem';
+    filterButton.style.marginTop = 1 + 'rem';
+    filterButton.style.width = 6 + 'rem';
+    popupWindowFilter.appendChild(filterButton);
+
+    filterButton.onclick = (event) => {
+        let min = Number(inputMinFilter.value);
+        let max = Number(inputMaxFilter.value);
+        const limit = getDimensionRange(filterDimensionData);
+        const inverted = isInverted(filterDimensionData);
+        let isOk = true;
+
+        let topLimit = limit[1];
+        let bottomLimit = limit[0];
+
         if (inverted) {
-            setFilter(filterDimensionData, top, bottom);
+            if (min < topLimit) {
+                min = topLimit;
+                popupWindowFilterError.textContent = `Min value is smaller than 
+                ${getMinValue(filterDimensionData)}, filter is set to min.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
+            if (max > bottomLimit) {
+                max = bottomLimit;
+                popupWindowFilterError.textContent = `Max value is bigger than 
+                ${getMaxValue(filterDimensionData)}, filter is set to max.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
+            if (max > min) {
+                popupWindowFilterError.textContent = `Attention: Min value ${max} is bigger 
+                than max value ${min}.
+                Please enter values between ${topLimit} and ${bottomLimit}.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
         }
         else {
-            setFilter(filterDimensionData, bottom, top);
+            if (min < bottomLimit) {
+                min = bottomLimit;
+                popupWindowFilterError.textContent = `Min value is smaller than 
+                ${getMinValue(filterDimensionData)}, filter is set to min.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
+            if (max > topLimit) {
+                max = topLimit;
+                popupWindowFilterError.textContent = `Max value is bigger than 
+                ${getMaxValue(filterDimensionData)}, filter is set to max.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
+            if (min > max) {
+                popupWindowFilterError.textContent = `Attention: Min value ${max} is bigger 
+                than max value ${min}.
+                Please enter values between ${bottomLimit} and ${topLimit}.`;
+                popupWindowFilterError.style.display = 'block';
+                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
+                popupWindowFilterError.style.color = 'red';
+                popupWindowFilterError.style.fontSize = 'x-small';
+                isOk = false;
+            }
         }
         
-        document.getElementById('filterDimensionInputFieldTop').value = '';
-        document.getElementById('filterDimensionInputFieldBottom').value = '';
-
-        /*document.getElementById('filterButton').style.visibility = 'hidden';
-        document.getElementById('rangeContainer').style.visibility = 'hidden';
-        document.getElementById('filterDimensionInputFieldTop').style.visibility = 'hidden';
-        document.getElementById('filterDimensionInputFieldBottom').style.visibility = 'hidden';*/
+        if (isOk) {
+            popupWindowFilterError.style.display = 'none';
+            if (inverted) {
+                setFilter(filterDimensionData, min, max);
+            }
+            else {
+                setFilter(filterDimensionData, max, min);
+            }
+            popupWindowFilter.style.display = 'none';
+        }
     }
 }
 
@@ -705,7 +761,8 @@ function generateDropdownForRange() {
     const dropdown = document.createElement('select');
     dropdown.onchange = (event) => {
         rangeDimensionData = event.target.value;
-        generateInputFieldsForSetRange();
+        console.log(rangeDimensionData);
+        generateModuleForRangeSettings();
     }
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
@@ -739,103 +796,170 @@ function generateDropdownForRange() {
     container.appendChild(dropdown);
 }
 
-function generateInputFieldsForSetRange() {
-    const container = document.getElementById('rangeContainer');
-    const labelTop = document.getElementById('rangeDimensionLabelTop');
-    const labelBottom = document.getElementById('rangeDimensionLabelBottom');
-    const inputTextElementTop = document.getElementById('rangeDimensionInputFieldTop');
-    const inputTextElementBottom = document.getElementById('rangeDimensionInputFieldBottom');
-    const rangeInfo = document.getElementById('rangeInfo');
+function generateModuleForRangeSettings() {
 
-    if (rangeDimensionData === 'Set Range') {
-        container.style.visibility = 'hidden';
-        labelTop.style.visibility = 'hidden';
-        labelBottom.style.visibility = 'hidden';
-        inputTextElementTop.style.visibility = 'hidden';
-        inputTextElementBottom.style.visibility = 'hidden';
-        rangeInfo.style.visibility = 'hidden';
-        rangeButton.style.visibility = 'hidden';
+    let section = document.getElementById('api-section');
+    
+    let popupWindowRange = document.createElement('div');
+    popupWindowRange.id = 'rangeContainer';
+    popupWindowRange.className = 'item7';
+    popupWindowRange.style.visibility = 'visible';
+    popupWindowRange.style.display = 'block';
+    popupWindowRange.style.width = 18 + 'rem';
+    popupWindowRange.style.height = 11.5 + 'rem';
+    popupWindowRange.style.backgroundColor = 'white';
+    popupWindowRange.style.border = '1px solid black';
+    popupWindowRange.style.borderRadius = 0.25 + 'rem';
+
+    section.appendChild(popupWindowRange);
+
+    let headerRange = document.createElement('div');
+    headerRange.textContent = 'Set Range for ' + rangeDimensionData;
+    headerRange.style.paddingLeft = 0.5 + 'rem';
+    headerRange.style.paddingTop = 0.5 + 'rem';
+    headerRange.style.fontSize = 'large';
+    popupWindowRange.appendChild(headerRange);
+    
+    let closeButtonRange = document.createElement('a');
+    closeButtonRange.textContent = 'x';
+    closeButtonRange.style.position = 'relative';
+    closeButtonRange.style.right = -17 + 'rem';
+    closeButtonRange.style.top = -1.5 + 'rem';
+    closeButtonRange.style.width = 2.5 + 'rem';
+    closeButtonRange.style.height = 2.5 + 'rem';
+    closeButtonRange.style.opacity = 0.3;
+    closeButtonRange.style.backgroundColor = 'transparent';
+    closeButtonRange.style.cursor = 'pointer';
+    popupWindowRange.appendChild(closeButtonRange);
+
+    closeButtonRange.onclick = () => {
+        popupWindowRange.style.display = 'none';
+    };
+
+    let infoRange = document.createElement('div');
+    infoRange.style.color = 'grey';
+    infoRange.style.fontSize = 'smaller';
+    infoRange.style.paddingLeft = 0.5 + 'rem';
+    infoRange.style.paddingTop = 1 + 'rem';
+    infoRange.style.width = 17.3 + 'rem';
+    infoRange.textContent = 'The original range of ' + rangeDimensionData + ' is between ' + 
+        getMinValue(rangeDimensionData) + ' and ' + getMaxValue(rangeDimensionData) + '.';
+    popupWindowRange.appendChild(infoRange);
+
+    let labelMinRange = document.createElement('label');
+    labelMinRange.textContent = 'Min';
+    labelMinRange.style.paddingLeft = 0.5 + 'rem';
+    popupWindowRange.appendChild(labelMinRange);
+
+    let inputMinRange = document.createElement('input');
+    inputMinRange.id = 'minRangeValue';
+    inputMinRange.style.width = 2 + 'rem';
+    inputMinRange.style.marginLeft = 0.5 + 'rem';
+    popupWindowRange.appendChild(inputMinRange);
+
+    inputMinRange.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('rangeButton').click();
+        }
     }
-    else {
-        container.style.visibility = 'visible';
-    
-        inputTextElementTop.style.visibility = 'visible';
-        inputTextElementTop.name = 'minRange';
-    
-        labelTop.for = 'minRange';
-        labelTop.innerHTML = 'Min';
 
-        const max = getMaxValue(rangeDimensionData);
-        const min = getMinValue(rangeDimensionData);
+    let labelMaxRange = document.createElement('label');
+    labelMaxRange.textContent = 'Max';
+    labelMaxRange.style.paddingLeft = 0.5 + 'rem';
+    popupWindowRange.appendChild(labelMaxRange);
 
-        inputTextElementBottom.style.visibility = 'visible';
-        inputTextElementBottom.name = 'maxRange';
-    
-        labelBottom.for = 'maxRange';
-        labelBottom.innerHTML = 'Max';
-    
-        rangeButton.style.visibility = 'visible';
-        rangeButton.textContent = 'Set Range';
+    let inputMaxRange = document.createElement('input');
+    inputMaxRange.id = 'maxRangeValue';
+    inputMaxRange.style.width = 2 + 'rem';
+    inputMaxRange.style.marginLeft = 0.5 + 'rem';
+    popupWindowRange.appendChild(inputMaxRange);
 
-        rangeInfo.style.visibility = 'visible';
-        rangeInfo.innerHTML = `The original range of ${rangeDimensionData} is between ${min} and ${max}.`;
-        rangeInfo.style.color = 'grey';
-        rangeInfo.style.fontSize = 'smaller';
-
-        container.appendChild(labelTop);
-        container.appendChild(inputTextElementTop);
-        container.appendChild(labelBottom);
-        container.appendChild(inputTextElementBottom);
-        container.appendChild(rangeButton);
-    }
-}
-
-function setRange() {
-
-    if(isDimensionCategorical(rangeDimensionData)) {
-        alert(`Attention: Set Range works only for numerical data!`);
-        return;
+    inputMaxRange.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('rangeButton').click();
+        }
     }
 
-    let min = Number(document.getElementById('rangeDimensionInputFieldTop').value);
-    let max = Number(document.getElementById('rangeDimensionInputFieldBottom').value);
-   
-    const inverted = isInverted(rangeDimensionData);
+    let popupWindowRangeError = document.createElement('div');
+    popupWindowRangeError.style.position = 'absolute';
+    popupWindowRange.appendChild(popupWindowRangeError);
     
-    let isOk = true;
-    if (inverted) { 
-        if (!isNaN(getMinValue(rangeDimensionData))) {
-            
+    let rangeButton = document.createElement('button');
+    rangeButton.textContent = 'Save';
+    rangeButton.style.marginLeft = 0.5 + 'rem';
+    rangeButton.style.marginRight = 0.5 + 'rem';
+    rangeButton.style.marginTop = 1 + 'rem';
+    rangeButton.style.width = 6 + 'rem';
+    popupWindowRange.appendChild(rangeButton);
+
+    rangeButton.onclick = (event) => {
+        let min = Number(inputMinRange.value);
+        let max = Number(inputMaxRange.value);
+
+        const inverted = isInverted(rangeDimensionData);
+        let isOk = true;
+                        
+        if (inverted) {
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
             }
             if (max < getMinValue(rangeDimensionData) || 
                 min > getMaxValue(rangeDimensionData)) {
-                    alert(`The range has to be bigger than ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`);
+                popupWindowRangeError.textContent = `The range has to be bigger than 
+                    ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`;
+                    popupWindowRangeError.style.display = 'block';
+                    popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
+                    popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
+                    popupWindowRangeError.style.color = 'red';
+                    popupWindowRangeError.style.fontSize = 'x-small';
                     isOk = false;
             }
         }
-    }
-    else {
-        if (!isNaN(getMinValue(rangeDimensionData))) {
+        else {
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
             }
+
             if (min > getMinValue(rangeDimensionData) || 
                 max < getMaxValue(rangeDimensionData)) {
-                    alert(`The range has to be bigger than ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`);
-                    isOk = false;
-            }
+                    popupWindowRangeError.textContent = `The range has to be bigger than 
+                        ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`;
+                        popupWindowRangeError.style.display = 'block';
+                        popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
+                        popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
+                        popupWindowRangeError.style.paddingBottom = 0.5 + 'rem';
+                        popupWindowRangeError.style.paddingRight = 0.5 + 'rem';
+                        popupWindowRangeError.style.color = 'red';
+                        popupWindowRangeError.style.fontSize = 'x-small';
+                        isOk = false;
+                        }
+                    }
+        if (isOk) {
+            popupWindowRangeError.style.display = 'none';
+            setDimensionRange(rangeDimensionData, min, max);
+            popupWindowRange.style.display = 'none';
         }
     }
+    
+    let newLine = document.createElement('div');
+    let resetRangeButton = document.createElement('button');
+    resetRangeButton.textContent = 'Set Ranges from Data';
+    resetRangeButton.style.marginLeft = 0.5 + 'rem';
+    resetRangeButton.style.marginTop = 1 + 'rem';
+    resetRangeButton.style.marginBottom = 1 + 'rem';
+    resetRangeButton.style.marginRight = 0.5 + 'rem';
+    resetRangeButton.style.width = 16.3 + 'rem';
+    newLine.appendChild(resetRangeButton);
+    popupWindowRange.appendChild(newLine);
 
-    if (isOk) {
-        setDimensionRange(rangeDimensionData, min, max);
-    }
-    document.getElementById('rangeDimensionInputFieldTop').value = '';
-    document.getElementById('rangeDimensionInputFieldBottom').value = '';
+    resetRangeButton.onclick = () => {
+        setDimensionRange(rangeDimensionData, getMinValue(rangeDimensionData), getMaxValue(rangeDimensionData));
+        popupWindowRange.style.display = 'none';
+    };
 }
 
 function resetToOriginalRange() {
