@@ -664,18 +664,18 @@ export function drawChart(content: any): void {
     setUpParcoordData(content, newFeatures);
 
     const height = 360;
-    let width = 0;
+    /*let width = 0;
     if (longLabels) {
         width = newFeatures.length * 200-40;
     }
     else {
-        width = newFeatures.length * 100-40;
-    }
+        width = newFeatures.length * 100-80;
+    }*/
 
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, width, height])
+        .attr('viewBox', [0, 0, window.width, height])
         .attr('font-family', 'Verdana, sans-serif')
         .on('click', (event) => {
             if (!(event.shiftKey || event.metaKey)) {
@@ -784,8 +784,8 @@ export function setDimensionForHovering(dimension: string): void {
 function setUpParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
-    window.paddingXaxis = 100;
-    window.width = newFeatures.length * 100-40;
+    window.paddingXaxis = 60;
+    window.width = newFeatures.length * 100-80;
     window.height = 400;
     window.longLabels = false;
 
@@ -961,7 +961,7 @@ function redrawChart(content: any, newFeatures: any): void {
         width = newFeatures.length * 200-40;
     }
     else {
-        width = newFeatures.length * 100-40;
+        width = newFeatures.length * 100-80;
     }
 
     window.svg = d3.select('#parallelcoords')

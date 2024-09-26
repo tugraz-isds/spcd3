@@ -437,7 +437,7 @@ function generateDropdownForMove() {
             option.id = 'moveOption_' + dimension;
             dropdown.appendChild(option);
         });
-        disableLeftAndRightButton(dimensions[0]);
+        disableLeftAndRightButton('Move Dimension');
     }
 
     const headline = document.createElement('option');
@@ -468,6 +468,7 @@ function moveDimensionRight() {
 }
 
 function disableLeftAndRightButton(dimension) {
+    console.log(dimension);
     const position = getDimensionPosition(dimension);
     const numberOfDimensions = getNumberOfDimensions();
     const headline = document.getElementById('move_headline');
