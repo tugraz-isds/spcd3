@@ -267,7 +267,7 @@ export function moveByOne(dimension: string, direction: string): void {
     const pos = parcoords.xScales(dimension);
     const posNeighbour = parcoords.xScales(neighbour);
 
-    const distance = (width-window.paddingXaxis)/parcoords.newFeatures.length;
+    const distance = 97.5; //(width-window.paddingXaxis)/parcoords.newFeatures.length;
 
     parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
         pos - distance;
@@ -664,13 +664,6 @@ export function drawChart(content: any): void {
     setUpParcoordData(content, newFeatures);
 
     const height = 360;
-    /*let width = 0;
-    if (longLabels) {
-        width = newFeatures.length * 200-40;
-    }
-    else {
-        width = newFeatures.length * 100-80;
-    }*/
 
     window.svg = d3.select('#parallelcoords')
         .append('svg')
@@ -752,20 +745,6 @@ export function getDimensionPosition(dimension: string): number {
     return parcoords.newFeatures.indexOf(dimension);
 }
 
-/*export function setDimensionPosition(dimension: string, position: number): void {
-    const dimensionListCopy = parcoords.newFeatures.slice();
-    const dimensionListInOrder = dimensionListCopy.reverse();
-    const dimensionToMove = dimensionListInOrder[position];
-    const dimensionPositionA = getDimensionPosition(dimension);
-    const dimensionPositionB = getDimensionPosition(dimensionToMove);
-    if (dimensionPositionA > dimensionPositionB) {
-        move(dimension, true, dimensionToMove);
-    }
-    else {
-        move(dimension, false, dimensionToMove);
-    }
-}*/
-
 export function isDimensionCategorical(dimension: string): boolean {
     let values = window.parcoords.newDataset.map(o => o[dimension]);
     if (isNaN(values[0])) {
@@ -785,7 +764,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
     window.paddingXaxis = 60;
-    window.width = newFeatures.length * 100-80;
+    window.width = newFeatures.length * 100;
     window.height = 400;
     window.longLabels = false;
 
@@ -800,7 +779,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         if (isNaN(values[0])) {
             values.forEach(item => {
                 if(item.length > 20) {
-                    window.width = newFeatures.length * 200-40;
+                    window.width = newFeatures.length * 200;
                     window.paddingXaxis = 200;
                     window.longLabels = true;
                     return;
