@@ -274,11 +274,11 @@ function generateDropdownForShow() {
     dimensionContainer.id = 'options';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    
-    if (navigator.appVersion.indexOf("Win") != -1){
+
+    if (window.navigator.userAgent.includes('Mac')){
         dimensionContainer.style.border = '0.1rem lightgrey solid';
     }
-    else if (navigator.appVersion.indexOf("Mac") != -1){
+    else if (window.navigator.userAgent.includes('Win')){
         dimensionContainer.style.border = '0.1rem white solid';
     }
     
