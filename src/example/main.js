@@ -1,8 +1,9 @@
 import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
-    setDimensionRange, isDimensionCategorical, getAllDimensionNames, getAllRecords,
-    toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} from './lib/spcd3.js';
+    setDimensionRange, isDimensionCategorical, getAllDimensionNames, getAllVisibleDimensionNames,
+    getAllRecords, toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} 
+    from './lib/spcd3.js';
 
 let data;
 let newData;
@@ -209,7 +210,7 @@ function generateDropdownForShow() {
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        const newDimensionsOrder = getAllDimensionNames();
+        const newDimensionsOrder = getAllVisibleDimensionNames();
         const oldDimensions = dimensions.slice();
         newDimensionsOrder.forEach(function(dimension) {
             let index = oldDimensions.indexOf(dimension);
@@ -274,15 +275,15 @@ function generateDropdownForShow() {
     dimensionContainer.id = 'options';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-
+    dimensionContainer.style.border = '0.1rem lightgrey solid';
+    
     if (window.navigator.userAgent.includes('Mac')){
-        dimensionContainer.style.border = '0.1rem lightgrey solid';
+        dimensionContainer.style.background = 'whitesmoke';
     }
     else if (window.navigator.userAgent.includes('Win')){
-        dimensionContainer.style.border = '0.1rem white solid';
+        dimensionContainer.style.background = 'white';
     }
     
-    dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
@@ -330,7 +331,7 @@ function generateDropdownForInvert() {
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        const dimensions = getAllDimensionNames();
+        const dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
             let label = document.createElement('label');
             label.className = 'dropdownLabel';
@@ -339,7 +340,12 @@ function generateDropdownForInvert() {
             input.id = 'invert_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
-            input.src = './svg/arrow-up.svg';
+            if (getInversionStatus(dimension) == "ascending") {
+                input.src = './svg/arrow-up.svg';
+            }
+            else {
+                input.src = './svg/arrow-down.svg';
+            }
             input.style.height = '0.7rem';
             input.style.paddingTop = '0.5rem';
             input.style.paddingLeft = '0.5rem';
@@ -350,7 +356,6 @@ function generateDropdownForInvert() {
         });
         showOptions('invertOptions', 'invertButton');
         for (let i = 0; i < newFeatures.length; i++) {
-            const position = getDimensionPosition(newFeatures[i]);
             document.addEventListener("DOMContentLoaded", function(event) {
             if (getInversionStatus(newFeatures[i]) == "ascending") {
                 document.getElementById("invert_" + newFeatures[i]).src = './svg/arrow-up.svg';
@@ -384,6 +389,12 @@ function generateDropdownForInvert() {
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
     dimensionContainer.style.border = '0.1rem lightgrey solid';
+    if (window.navigator.userAgent.includes('Mac')){
+        dimensionContainer.style.background = 'whitesmoke';
+    }
+    else if (window.navigator.userAgent.includes('Win')){
+        dimensionContainer.style.background = 'white';
+    }
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     if (dimensions.length > 10) {
@@ -451,7 +462,7 @@ function generateDropdownForMove() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensionNames();
+        let dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
             let option = document.createElement('option');
             option.textContent = dimension;
@@ -460,6 +471,7 @@ function generateDropdownForMove() {
             dropdown.appendChild(option);
         });
         disableLeftAndRightButton('Move Dimension');
+        disableOptionInDropdown('moveOption_', dimension);
     }
 
     const headline = document.createElement('option');
@@ -528,7 +540,7 @@ function generateDropdownForFilter() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensionNames();
+        let dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
             if (!isDimensionCategorical(dimension)) {
                 let option = document.createElement('option');
@@ -754,7 +766,7 @@ function generateDropdownForRange() {
     dropdown.onfocus = () => {
         dropdown.innerHTML = "";
         dropdown.appendChild(headline);
-        let dimensions = getAllDimensionNames();
+        let dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
             if (!isDimensionCategorical(dimension)) {
                 let option = document.createElement('option');
@@ -1013,6 +1025,12 @@ function generateDropdownForSelectRecords() {
     recordsContainer.className = 'ddList';
     recordsContainer.style.display = 'none';
     recordsContainer.style.border = '0.1rem lightgrey solid';
+    if (window.navigator.userAgent.includes('Mac')){
+        recordsContainer.style.background = 'whitesmoke';
+    }
+    else if (window.navigator.userAgent.includes('Win')){
+        recordsContainer.style.background = 'white';
+    }
     recordsContainer.style.width = 'max-content';
     recordsContainer.style.borderRadius = '0.2rem';
     if (records.length > 10) {

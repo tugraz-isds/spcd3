@@ -937,10 +937,10 @@ function redrawChart(content: any, newFeatures: any): void {
     let height = 360;
     let width = 0;
     if (longLabels) {
-        width = newFeatures.length * 200-40;
+        width = newFeatures.length * 200;
     }
     else {
-        width = newFeatures.length * 100-80;
+        width = newFeatures.length * 100;
     }
 
     window.svg = d3.select('#parallelcoords')
