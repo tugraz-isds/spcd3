@@ -275,13 +275,14 @@ function generateDropdownForShow() {
     dimensionContainer.id = 'options';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    dimensionContainer.style.border = '0.1rem lightgrey solid';
     
     if (window.navigator.userAgent.includes('Mac')){
         dimensionContainer.style.background = 'whitesmoke';
+        dimensionContainer.style.border = '0.1rem lightgrey solid';
     }
     else if (window.navigator.userAgent.includes('Win')){
         dimensionContainer.style.background = 'white';
+        dimensionContainer.style.border = '0.1rem black solid';
     }
     
     dimensionContainer.style.borderRadius = '0.2rem';
@@ -388,12 +389,14 @@ function generateDropdownForInvert() {
     dimensionContainer.id = 'invertOptions';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    dimensionContainer.style.border = '0.1rem lightgrey solid';
+    
     if (window.navigator.userAgent.includes('Mac')){
         dimensionContainer.style.background = 'whitesmoke';
+        dimensionContainer.style.border = '0.1rem lightgrey solid';
     }
     else if (window.navigator.userAgent.includes('Win')){
         dimensionContainer.style.background = 'white';
+        dimensionContainer.style.border = '0.1rem black solid';
     }
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
@@ -1024,12 +1027,14 @@ function generateDropdownForSelectRecords() {
     recordsContainer.id = 'options_r';
     recordsContainer.className = 'ddList';
     recordsContainer.style.display = 'none';
-    recordsContainer.style.border = '0.1rem lightgrey solid';
+    
     if (window.navigator.userAgent.includes('Mac')){
         recordsContainer.style.background = 'whitesmoke';
+        recordsContainer.style.border = '0.1rem lightgrey solid';
     }
     else if (window.navigator.userAgent.includes('Win')){
         recordsContainer.style.background = 'white';
+        recordsContainer.style.border = '0.1rem black solid';
     }
     recordsContainer.style.width = 'max-content';
     recordsContainer.style.borderRadius = '0.2rem';

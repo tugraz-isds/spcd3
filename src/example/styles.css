@@ -74,7 +74,7 @@ section {
   margin-left: 2rem;
   margin-bottom: 4rem;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
   grid-template-rows: auto auto auto;
   grid-column-gap: 1rem;
   grid-row-gap: 1rem;
@@ -121,7 +121,8 @@ section {
 }
 
 .item7 {
-  grid-column: 1 / span 3;
+  grid-column: 4;
+  grid-row: 1 / span 3;
 }
 
 .dropdownLabel {
@@ -140,12 +141,17 @@ section {
   overflow-y: auto;
   display: none;
   position: absolute;
-  min-width: 8.5rem;
+  min-width: 8.2rem;
   box-shadow: 0rem 0.5rem 1rem 0rem rgba(0,0,0,0.2);
   z-index: 1;
   border-radius: 0.5rem;
   color: #414141;
   font-size: smaller;
+}
+
+.dropdownLabel:hover {
+  background-color: lightskyblue;
+  color: white;
 }
 
 div#showDimensionHeader {
