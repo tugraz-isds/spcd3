@@ -268,11 +268,20 @@ function generateDropdownForShow() {
     textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
     selectButton.appendChild(textElement);
 
+    
+
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'options';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    dimensionContainer.style.border = '0.1rem lightgrey solid';
+    
+    if (navigator.appVersion.indexOf("Win") != -1){
+        dimensionContainer.style.border = '0.1rem lightgrey solid';
+    }
+    else if (navigator.appVersion.indexOf("Mac") != -1){
+        dimensionContainer.style.border = '0.1rem white solid';
+    }
+    
     dimensionContainer.style.width = 'max-content';
     dimensionContainer.style.borderRadius = '0.2rem';
     if (dimensions.length > 10) {

@@ -4,8 +4,8 @@ SPCD3 is a JavaScript library which implements a parallel coordinates visualisat
 This project contains the library and an already implemented example
 that the library is using. In addition, the project uses D3v7.
 
-A live version of the `main` branch can be found at
-[spcd3.netlify.app](https://spcd3.netlify.app/).
+A live version of the latest deployment can be found at
+[github.io/spcd3](https://tugraz-isds.github.io/spcd3/).
 
 ## Built With
 
