@@ -38,7 +38,7 @@ async function bundle() {
     }).then(() => {
       const fileData = fs.readFileSync(`${location}/spcd3.${conf.extension}`, 'utf8');
       const formatString = format === 'iife' ? 'IIFE' : format === 'esm' ? 'ESM' : format === 'cjs' ? 'CommonJS' : '';
-      const dataWithHeaderLine = `// SPCD3 version 2.0.0 ${formatString}\n` + fileData;
+      const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${formatString}\n` + fileData;
       fs.writeFileSync(`${location}/spcd3.${conf.extension}`, dataWithHeaderLine, 'utf8');
     }))
   }
@@ -57,7 +57,7 @@ async function bundle() {
       sourcemap: true,
     }).then(() => {
       const fileData = fs.readFileSync(`${location}/spcd3.${conf.extension}`, 'utf8');
-      const dataWithHeaderLine = `// SPCD3 version 2.0.0 ${format}\n` + fileData;
+      const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${format}\n` + fileData;
       fs.writeFileSync(`${location}/spcd3.${conf.extension}`, dataWithHeaderLine, 'utf8');
     }))
   }
