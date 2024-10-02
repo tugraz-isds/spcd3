@@ -149,8 +149,12 @@ section {
   font-size: smaller;
 }
 
+.dropdownLabel {
+  padding-bottom: 0.3rem;
+}
+
 .dropdownLabel:hover {
-  background-color: lightskyblue;
+  background-color: dodgerblue;
   color: white;
 }
 

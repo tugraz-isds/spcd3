@@ -224,7 +224,7 @@ function generateDropdownForShow() {
             input.id = 'show_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
-            input.style.marginTop = '0.5rem';
+            input.style.marginTop = '0.3rem';
             input.style.marginLeft = '0.5rem';
             input.style.fontSize = 'smaller';
             input.checked = true;
@@ -348,7 +348,7 @@ function generateDropdownForInvert() {
                 input.src = './svg/arrow-down.svg';
             }
             input.style.height = '0.7rem';
-            input.style.paddingTop = '0.5rem';
+            input.style.paddingTop = '0.3rem';
             input.style.paddingLeft = '0.5rem';
             input.checked = true;
             label.appendChild(input);
@@ -1054,7 +1054,7 @@ function generateDropdownForSelectRecords() {
         input.id = 'sel_' + record;
         input.value = record;
         input.name = 'record';
-        input.style.marginTop = '0.5rem';
+        input.style.marginTop = '0.3rem';
         input.style.marginLeft = '0.5rem';
         input.checked = false;
         label.appendChild(input);
