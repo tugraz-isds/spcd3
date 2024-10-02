@@ -1,7 +1,7 @@
-# Steerable Parallel Coordinates in D3
+# SPCD3 API Guide
 
-SPC is a library that generates interactive parallel coordinate plots.
-The following sections explain all existing functions.
+The SPCD3 API comprises 41 functions grouped into nine categories.
+
 
 ## I/O Functions
 
