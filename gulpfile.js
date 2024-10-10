@@ -15,22 +15,18 @@ function cleanPackageLock() {
     return del('package-lock.json', {force: true});
 }
 
-function deleteTypesFolder() {
-    return del('./dist/example/lib/types', {force: true});
-}
-
-function deleteSourceMap() {
-    return del('./dist/example/lib/spcd3.js.map', {force: true})
-}
-
 function copyExampleFolder() {
     return src('./src/example/**/*').pipe(dest('./dist/example'));
+}
+
+function copyLibFileToExample() {
+    return src('./dist/library/esm/spcd3.js').pipe(dest('./dist/example/lib/'));
 }
 
 exports.clean = cleanDistFolder;
 
 exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock);
 
-exports.build = series(cleanDistFolder, copyExampleFolder, bundle, deleteTypesFolder, deleteSourceMap);
+exports.build = series(cleanDistFolder, copyExampleFolder, bundle, copyLibFileToExample);
 
 exports.serve = series(exports.build, watch);

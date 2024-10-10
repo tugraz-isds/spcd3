@@ -43,27 +43,7 @@ async function bundle() {
     }))
   }
 
-  function writeLibToExample() {
-    const format = 'esm';
-    const location = `./dist/example/lib`;
-    const config = [
-      { extension: 'js' }
-    ];
-   
-    return config.map((conf) => bundle.write({
-      file:`${location}/spcd3.${conf.extension}`,
-      name: 'spcd3',
-      format,
-      sourcemap: true,
-    }).then(() => {
-      const fileData = fs.readFileSync(`${location}/spcd3.${conf.extension}`, 'utf8');
-      const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${format}\n` + fileData;
-      fs.writeFileSync(`${location}/spcd3.${conf.extension}`, dataWithHeaderLine, 'utf8');
-    }))
-  }
-
   return Promise.all([
-      ...writeLibToExample(),
       ...writeLib('esm'),
       ...writeLib('iife'),
       ...writeLib('cjs')])
