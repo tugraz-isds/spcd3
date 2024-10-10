@@ -1,7 +1,7 @@
 import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
     isInverted, getDimensionPosition, setFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
-    setDimensionRange, isDimensionCategorical, getAllDimensionNames, getAllVisibleDimensionNames,
+    setDimensionRange, getAllDimensionNames, getAllVisibleDimensionNames,
     getAllRecords, toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} 
     from './lib/spcd3.js';
 
@@ -14,6 +14,33 @@ let rangeDimensionData;
 let dimensions;
 
 let studentData = "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
+
+window.addEventListener('click', (event) => {
+    if(!event.target.id.includes('show')) {
+        closeElements('options');
+    }
+    if(!event.target.id.includes('invert')) {
+        closeElements('invertOptions');
+    }
+    if(!event.target.id.includes('move')) {
+        closeElements('moveOptions');
+    }
+    if(!event.target.id.includes('filter')) {
+        closeElements('filterOptions');
+        if (document.getElementById('filtContainer') != null) {
+            document.getElementById('filtContainer').remove();
+        }
+    }
+    if(!event.target.id.includes('range')) {
+        closeElements('rangeOptions');
+        if (document.getElementById('ranContainer')) {
+            document.getElementById('ranContainer').remove();
+        }
+    }
+    if(!event.target.id.includes('select')) {
+        closeElements('options_r');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     data = studentData;
@@ -32,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let inputButton = document.getElementById('input');
 inputButton.addEventListener('click', openFileDialog, false);
+
 let inputFile = document.getElementById('fileInput');
 inputFile.addEventListener('change', handleFileSelect, false);
 inputFile.addEventListener('cancel', () => {
@@ -44,14 +72,7 @@ inputFile.addEventListener('click', (event) => {
 let downloadButton = document.getElementById('download');
 downloadButton.addEventListener('click', () => {
     saveAsSvg();
-    document.getElementById('download').textContent = 'Download SVG';
 });
-inputFile.addEventListener('change', () => {
-    document.getElementById('download').textContent = 'Download SVG...';
-});
-downloadButton.addEventListener('cancel', () => {
-    document.getElementById('download').textContent = 'Download SVG';
-})
 downloadButton.style.visibility = 'hidden';
 
 let resetRangesButton = document.getElementById('resetRanges');
@@ -67,12 +88,10 @@ resetAllButton.addEventListener('click', resetAll, false);
 resetAllButton.style.visibility = 'hidden';
 
 function openFileDialog() {
-    document.getElementById('input').textContent = 'Upload File...';
     document.getElementById('fileInput').click();
 }
 
 function handleFileSelect(event) {
-    document.getElementById('input').textContent = 'Upload File';
     const file = event.target.files[0];
 
     if (file) {
@@ -116,19 +135,17 @@ function updateDimensions(dimension)
     }
 }
 
+function closeElements(id) {
+    let options = document.getElementById(id);
+    options.style.display = 'none';
+}
+
 function showOptions(id, buttonId) {
     
     let options = document.getElementById(id);
     
     options.style.display == 'none' ? options.style.display = 'block' :
     options.style.display = 'none';
-
-    let button = document.getElementById(buttonId);
-
-    options.style.display == 'block' ? button.style.backgroundColor = 'white' :
-        button.style.backgroundColor = 'white';
-    options.style.display == 'block' ? button.style.color = 'black' :
-        button.style.color = 'black';
 
     if (buttonId == "moveButton") {
         disableLeftAndRightButton();
@@ -169,9 +186,9 @@ function showOptionsForRecords(id, buttonId) {
 }
 
 function generateDropdownForShow() {
-    document.getElementById('showDimensionHeader').style.visibility = 'visible';
+    document.getElementById('hideDimensionHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('showDimensionContainer');
+    const container = document.getElementById('hideDimensionContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -179,7 +196,8 @@ function generateDropdownForShow() {
     selectButton.className = 'ddButton';
 
     let textElement = document.createElement('span');
-    textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" id="show"/>';
+    textElement.id = 'showText';
     selectButton.appendChild(textElement);
 
     selectButton.addEventListener('click', () => {
@@ -244,9 +262,9 @@ function generateDropdownForShow() {
 }
 
 function generateDropdownForInvert() {
-    document.getElementById('invertDimensionHeader').style.visibility = 'visible';
+    document.getElementById('invDimensionHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('invertDimensionContainer');
+    const container = document.getElementById('invDimensionContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -255,7 +273,7 @@ function generateDropdownForInvert() {
 
     let textElement = document.createElement('span');
     textElement.id = 'invertText';
-    textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" id="invert"/>';
     selectButton.appendChild(textElement);
 
     selectButton.addEventListener('click', () => {
@@ -326,9 +344,9 @@ function invertDimension(dimension) {
 }
 
 function generateDropdownForMove() {
-    document.getElementById('moveDimensionHeader').style.visibility = 'visible';
+    document.getElementById('moDimensionHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('moveDimensionContainer');
+    const container = document.getElementById('moDimensionContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -337,7 +355,7 @@ function generateDropdownForMove() {
 
     let textElement = document.createElement('span');
     textElement.id = 'moveText';
-    textElement.innerHTML = 'Move Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    textElement.innerHTML = 'Move Dimensions <img src="./svg/dropdown-symbol.svg" id="move"/>';
     selectButton.appendChild(textElement);
 
     selectButton.addEventListener('click', () => {
@@ -443,9 +461,9 @@ function disableLeftAndRightButton() {
 }
 
 function generateDropdownForFilter() {
-    document.getElementById('filterDimensionHeader').style.visibility = 'visible';
+    document.getElementById('filtDimensionHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('filterDimensionContainer');
+    const container = document.getElementById('filtDimensionContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -454,7 +472,7 @@ function generateDropdownForFilter() {
 
     let textElement = document.createElement('span');
     textElement.id = 'filterText';
-    textElement.innerHTML = 'Set Filter <img src="./svg/dropdown-symbol.svg" />';
+    textElement.innerHTML = 'Set Filter <img src="./svg/dropdown-symbol.svg" id="filter"/>';
     selectButton.appendChild(textElement);
 
     selectButton.addEventListener('click', () => {
@@ -507,7 +525,7 @@ function generateModuleForSetFilter() {
     let section = document.getElementById('api-section');
     
     let popupWindowFilter = document.createElement('div');
-    popupWindowFilter.id = 'filterContainer';
+    popupWindowFilter.id = 'filtContainer';
     popupWindowFilter.className = 'item7';
     popupWindowFilter.style.visibility = 'visible';
     popupWindowFilter.style.display = 'block';
@@ -539,7 +557,7 @@ function generateModuleForSetFilter() {
     popupWindowFilter.appendChild(closeButtonFilter);
 
     closeButtonFilter.onclick = () => {
-        popupWindowFilter.style.display = 'none';
+        popupWindowFilter.remove();
     };
 
     let labelMinFilter = document.createElement('label');
@@ -685,9 +703,9 @@ function generateModuleForSetFilter() {
 }
 
 function generateDropdownForRange() {
-    document.getElementById('rangeDimensionHeader').style.visibility = 'visible';
+    document.getElementById('ranDimensionHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('rangeDimensionContainer');
+    const container = document.getElementById('ranDimensionContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -696,7 +714,7 @@ function generateDropdownForRange() {
 
     let textElement = document.createElement('span');
     textElement.id = 'rangeText';
-    textElement.innerHTML = 'Set Range <img src="./svg/dropdown-symbol.svg" />';
+    textElement.innerHTML = 'Set Range <img src="./svg/dropdown-symbol.svg" id="range"/>';
     selectButton.appendChild(textElement);
 
     selectButton.addEventListener('click', () => {
@@ -749,7 +767,7 @@ function generateModuleForRangeSettings() {
     let section = document.getElementById('api-section');
     
     let popupWindowRange = document.createElement('div');
-    popupWindowRange.id = 'rangeContainer';
+    popupWindowRange.id = 'ranContainer';
     popupWindowRange.className = 'item7';
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
@@ -781,7 +799,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.appendChild(closeButtonRange);
 
     closeButtonRange.onclick = () => {
-        popupWindowRange.style.display = 'none';
+        popupWindowRange.remove();
     };
 
     let infoRange = document.createElement('div');
@@ -941,9 +959,9 @@ function generateDropdownForSelectRecords() {
     
     let records = getAllRecords();
     
-    document.getElementById('selectRecordsHeader').style.visibility = 'visible';
+    document.getElementById('selRecordsHeader').style.visibility = 'visible';
 
-    const container = document.getElementById('selectRecordsContainer');
+    const container = document.getElementById('selRecordsContainer');
     container.style.position = 'relative';
 
     let selectButton = document.createElement('button');
@@ -955,7 +973,8 @@ function generateDropdownForSelectRecords() {
     });
 
     let textElement = document.createElement('span');
-    textElement.innerHTML = 'Select Records <img src="./svg/dropdown-symbol.svg" />';
+    textElement.id = 'selectText';
+    textElement.innerHTML = 'Select Records <img src="./svg/dropdown-symbol.svg" id="select"/>';
     selectButton.appendChild(textElement);
 
     let recordsContainer = document.createElement('div');
@@ -993,12 +1012,12 @@ function generateDropdownForSelectRecords() {
 
 function clearPlot() {
     const parentElement = document.getElementById('parallelcoords');
-    const invertContainer = document.getElementById('invertDimensionContainer')
-    const showContainer = document.getElementById('showDimensionContainer');
-    const moveContainer = document.getElementById('moveDimensionContainer');
-    const filterDimensionContainer = document.getElementById('filterDimensionContainer');
-    const rangeDimensionContainer = document.getElementById('rangeDimensionContainer');
-    const selectRecordsContainer = document.getElementById('selectRecordsContainer');
+    const invertContainer = document.getElementById('invDimensionContainer')
+    const hideContainer = document.getElementById('hideDimensionContainer');
+    const moveContainer = document.getElementById('moDimensionContainer');
+    const filterDimensionContainer = document.getElementById('filtDimensionContainer');
+    const rangeDimensionContainer = document.getElementById('ranDimensionContainer');
+    const selectRecordsContainer = document.getElementById('selRecordsContainer');
 
     while (parentElement.firstChild) {
         parentElement.removeChild(parentElement.firstChild);
@@ -1006,8 +1025,8 @@ function clearPlot() {
     while (invertContainer.firstChild) {
         invertContainer.removeChild(invertContainer.firstChild);
     }
-    while (showContainer.firstChild) {
-        showContainer.removeChild(showContainer.firstChild);
+    while (hideContainer.firstChild) {
+        hideContainer.removeChild(hideContainer.firstChild);
     }
     while (moveContainer.firstChild) {
         moveContainer.removeChild(moveContainer.firstChild);
