@@ -125,11 +125,6 @@ section {
   grid-row: 1 / span 3;
 }
 
-.dropdownLabel {
-  display: block;
-  font-family: Verdana, sans-serif;
-}
-
 .ddButton {
   background-color: #ffffff;
   border: 0.08rem grey solid;
@@ -153,12 +148,21 @@ section {
 }
 
 .dropdownLabel {
+  display: block;
+  font-family: Verdana, sans-serif;
   padding-bottom: 0.3rem;
 }
 
 .dropdownLabel:hover {
   background-color: dodgerblue;
   color: white;
+}
+
+.inputFields {
+  height: 0.7rem;
+  margin-top: 0.3rem;
+  margin-left: 0.5rem;
+  font-size: smaller;
 }
 
 .inputMove {
@@ -200,19 +204,6 @@ div#moveDimensionHeader {
   font-weight: bold;
   padding-bottom: 0.8rem;
   padding-top: 0.8rem;
-}
-
-.arrow {
-  display: inline-block;
-  padding: 0.3rem 0.4rem 0.4rem 0.3rem;
-}
-
-.left {
-  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIJCiAgIHZpZXdCb3g9IjAgMCAxMCA2IgogICB2ZXJzaW9uPSIxLjEiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNIDAgMyBMIDQgMCBMIDQgMiBMIDEwIDIgTCAxMCA0IEwgNCA0IEwgNCA2IHoiIC8+CiAgICA8L2c+Cjwvc3ZnPg==') no-repeat center;
-}
-
-.right {
-  background: url('data:image/svg+xml;base64, PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cgo8c3ZnCiAgIHdpZHRoPSIxMiIKICAgaGVpZ2h0PSIxMiIKICAgdmlld0JveD0iMCAwIDEwIDYiCiAgIHZlcnNpb249IjEuMSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik0gMCAyIEwgNiAyIEwgNiAwIEwgMTAgMyBMIDYgNiBMIDYgNCBMIDAgNCB6IiAvPgogICAgPC9nPgo8L3N2Zz4=') no-repeat center;
 }
 
 div#filterDimensionHeader {

@@ -138,11 +138,6 @@ function showOptions(id, buttonId) {
         if(getHiddenStatus(dimension) == 'hidden') {
             document.getElementById('show_' + dimension).checked = false;
         }
-        disableCheckbox(dimension);
-        if (!isDimensionCategorical(dimension)){
-            disableOptionInDropdown('filterOption_', dimension);
-            disableOptionInDropdown('rangeOption_', dimension);
-        }
     });
 }
 
@@ -174,8 +169,6 @@ function showOptionsForRecords(id, buttonId) {
 }
 
 function generateDropdownForShow() {
-    //let dimensions = newData['columns'];
-
     document.getElementById('showDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('showDimensionContainer');
@@ -184,6 +177,11 @@ function generateDropdownForShow() {
     let selectButton = document.createElement('button');
     selectButton.id = 'showButton';
     selectButton.className = 'ddButton';
+
+    let textElement = document.createElement('span');
+    textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    selectButton.appendChild(textElement);
+
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         const newDimensionsOrder = getAllVisibleDimensionNames();
@@ -196,13 +194,11 @@ function generateDropdownForShow() {
             let label = document.createElement('label');
             label.className = 'dropdownLabel';
             let input = document.createElement('input');
+            input.className = 'inputFields';
             input.type = 'checkbox';
             input.id = 'show_' + dimension;
             input.value = dimension;
             input.name = 'dimension';
-            input.style.marginTop = '0.3rem';
-            input.style.marginLeft = '0.5rem';
-            input.style.fontSize = 'smaller';
             input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
@@ -213,13 +209,11 @@ function generateDropdownForShow() {
                 let label = document.createElement('label');
                 label.className = 'dropdownLabel';
                 let input = document.createElement('input');
+                input.className = 'inputFields';
                 input.type = 'checkbox';
                 input.id = 'show_' + dimension;
                 input.value = dimension;
                 input.name = 'dimension';
-                input.style.marginTop = '0.5rem';
-                input.style.marginLeft = '0.5rem';
-                input.style.fontSize = 'smaller';
                 input.checked = false;
                 label.appendChild(input);
                 label.appendChild(document.createTextNode(dimension));
@@ -227,65 +221,22 @@ function generateDropdownForShow() {
             });
         }
         showOptions('options', 'showButton');
-        const dropdownHeight = dimensionContainer.clientHeight;
-        const windowHeight = window.innerHeight;
-        const dropdownTop = selectButton.getBoundingClientRect().top;
-
-        if (windowHeight - dropdownTop < dropdownHeight) {
-            dimensionContainer.style.bottom = '100%';
-            dimensionContainer.style.top = 'auto';
-        }
-        else {
-            dimensionContainer.style.bottom = 'auto';
-            dimensionContainer.style.top = '100%';
-        }
+        calcDDBehaviour(dimensionContainer, selectButton);
     });
-
-    let textElement = document.createElement('span');
-    textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
-    selectButton.appendChild(textElement);
-
 
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'options';
+    dimensionContainer.name = 'options';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
     
-    if (window.navigator.userAgent.includes('Mac')){
-        dimensionContainer.style.background = 'whitesmoke';
-        dimensionContainer.style.border = '0.1rem lightgrey solid';
-    }
-    else if (window.navigator.userAgent.includes('Win')){
-        dimensionContainer.style.background = 'white';
-        dimensionContainer.style.border = '0.1rem black solid';
-    }
-    
-    dimensionContainer.style.borderRadius = '0.2rem';
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
-    dimensionContainer.name = 'options';
+    
     dimensionContainer.addEventListener('change', (event) => {
         updateDimensions(event.target.value);
-        disableCheckbox(event.target.value);
-        disableOptionInDropdown('filterOption_', event.target.value);
-        disableOptionInDropdown('rangeOption_', event.target.value);
-        disableOptionInDropdown('moveOption_', event.target.value);
         disableLeftAndRightButton();
-    });
-
-    dimensions.forEach(function(dimension) {
-        let label = document.createElement('label');
-        label.className = 'dropdownLabel';
-        let input = document.createElement('input');
-        input.type = 'checkbox';
-        input.id = 'show_' + dimension;
-        input.value = dimension;
-        input.name = 'dimension';
-        input.checked = true;
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(dimension));
-        dimensionContainer.appendChild(label);
     });
 
     container.appendChild(selectButton);
@@ -293,8 +244,6 @@ function generateDropdownForShow() {
 }
 
 function generateDropdownForInvert() {
-    //let dimensions = newData['columns'];
-    
     document.getElementById('invertDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('invertDimensionContainer');
@@ -303,6 +252,12 @@ function generateDropdownForInvert() {
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
     selectButton.className = 'ddButton';
+
+    let textElement = document.createElement('span');
+    textElement.id = 'invertText';
+    textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    selectButton.appendChild(textElement);
+
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         const dimensions = getAllVisibleDimensionNames();
@@ -310,6 +265,7 @@ function generateDropdownForInvert() {
             let label = document.createElement('label');
             label.className = 'dropdownLabel';
             let input = document.createElement('input');
+            input.className = 'inputFields';
             input.type = 'image';
             input.id = 'invert_' + dimension;
             input.value = dimension;
@@ -320,14 +276,13 @@ function generateDropdownForInvert() {
             else {
                 input.src = './svg/arrow-down.svg';
             }
-            input.style.height = '0.7rem';
-            input.style.paddingTop = '0.3rem';
-            input.style.paddingLeft = '0.5rem';
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
             dimensionContainer.appendChild(label);
         });
+
         showOptions('invertOptions', 'invertButton');
+        calcDDBehaviour(dimensionContainer, selectButton);
         for (let i = 0; i < newFeatures.length; i++) {
             document.addEventListener("DOMContentLoaded", function(event) {
             if (getInversionStatus(newFeatures[i]) == "ascending") {
@@ -338,44 +293,18 @@ function generateDropdownForInvert() {
             }
             })
         }
-        const dropdownHeight = dimensionContainer.clientHeight;
-        const windowHeight = window.innerHeight;
-        const dropdownTop = selectButton.getBoundingClientRect().top;
-
-        if (windowHeight - dropdownTop < dropdownHeight) {
-            dimensionContainer.style.bottom = '100%';
-            dimensionContainer.style.top = 'auto';
-        }
-        else {
-            dimensionContainer.style.bottom = 'auto';
-            dimensionContainer.style.top = '100%';
-        }
     });
-
-    let textElement = document.createElement('span');
-    textElement.id = 'invertText';
-    textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" />';
-    selectButton.appendChild(textElement);
 
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'invertOptions';
+    dimensionContainer.name = 'invertOptions';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
     
-    if (window.navigator.userAgent.includes('Mac')){
-        dimensionContainer.style.background = 'whitesmoke';
-        dimensionContainer.style.border = '0.1rem lightgrey solid';
-    }
-    else if (window.navigator.userAgent.includes('Win')){
-        dimensionContainer.style.background = 'white';
-        dimensionContainer.style.border = '0.1rem black solid';
-    }
-    dimensionContainer.style.width = 'max-content';
-    dimensionContainer.style.borderRadius = '0.2rem';
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
-    dimensionContainer.name = 'invertOptions';
+  
     dimensionContainer.addEventListener('click', (event) => {
         if(event.target.value != undefined) {
             invertDimension(event.target.value);
@@ -394,32 +323,6 @@ function generateDropdownForInvert() {
 
 function invertDimension(dimension) {
     invert(dimension);
-}
-
-function disableCheckbox(dimension) {
-    let position = getDimensionPosition(dimension);
-    document.addEventListener("DOMContentLoaded", function(event) {
-        if (position != -1) {
-            document.getElementById('invert_' + dimension).disabled = false;
-            document.getElementById('invertLabel_' + dimension).style.opacity = 1;
-        }
-        else {
-            document.getElementById('invert_' + dimension).disabled = true;
-            document.getElementById('invertLabel_' + dimension).style.opacity = 0.5;
-        }
-      });
-    
-}
-
-function disableOptionInDropdown(prefixId, dimension) {
-    const value = prefixId.concat(dimension);
-    const position = getDimensionPosition(dimension);
-    if (position != -1) {
-        document.getElementById(value).disabled = false;
-    }
-    else {
-        document.getElementById(value).disabled = true;
-    }
 }
 
 function generateDropdownForMove() {
@@ -471,6 +374,7 @@ function generateDropdownForMove() {
     dimensionContainer.id = 'moveOptions';
     dimensionContainer.name = 'moveOptions';
     dimensionContainer.className = 'ddList';
+    dimensionContainer.style.display = 'none';
     
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
@@ -539,49 +443,65 @@ function disableLeftAndRightButton() {
 }
 
 function generateDropdownForFilter() {
-    //let dimensions = newData['columns'];
-
     document.getElementById('filterDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('filterDimensionContainer');
+    container.style.position = 'relative';
 
-    const dropdown = document.createElement('select');
-    dropdown.onchange = (event) => {
-        filterDimensionData = event.target.value;
-        generateModuleForSetFilter();
-    }
-    dropdown.onfocus = () => {
-        dropdown.innerHTML = "";
-        dropdown.appendChild(headline);
-        let dimensions = getAllVisibleDimensionNames();
+    let selectButton = document.createElement('button');
+    selectButton.id = 'filterButton';
+    selectButton.className = 'ddButton';
+
+    let textElement = document.createElement('span');
+    textElement.id = 'filterText';
+    textElement.innerHTML = 'Set Filter <img src="./svg/dropdown-symbol.svg" />';
+    selectButton.appendChild(textElement);
+
+    selectButton.addEventListener('click', () => {
+        dimensionContainer.innerHTML = '';
+        const dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
-            if (!isDimensionCategorical(dimension)) {
-                let option = document.createElement('option');
-                option.textContent = dimension;
-                option.value = dimension;
-                option.id = 'filterOption_' + dimension;
-                dropdown.appendChild(option);
-            }
+            let dimensionLabel = document.createElement('label');
+            dimensionLabel.className = 'dropdownLabel';
+            let filterInput = document.createElement('input');
+            filterInput.className = 'inputFields';
+            filterInput.type = 'image';
+            filterInput.name = 'dimension';
+            filterInput.value = dimension;
+            filterInput.src = './svg/dropdown-symbol.svg';
+            filterInput.id = 'filter_' + dimension;
+            filterInput.style.paddingRight = '0.5rem';
+            filterInput.style.height = '0rem';
+            dimensionLabel.appendChild(filterInput);
+            dimensionLabel.appendChild(document.createTextNode(dimension));
+            dimensionContainer.appendChild(dimensionLabel);
         });
+        showOptions('filterOptions', 'filterButton');
+        calcDDBehaviour(dimensionContainer, selectButton);
+    });
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'filterOptions';
+    dimensionContainer.name = 'filterOptions';
+    dimensionContainer.className = 'ddList';
+    dimensionContainer.style.display = 'none';
+    
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
     }
-
-    const headline = document.createElement('option');
-    headline.selected = 'disabled';
-    headline.textContent = 'Set Filter';
-    dropdown.appendChild(headline);
-
-    dimensions.forEach(function(dimension) {
-        if (!isDimensionCategorical(dimension)) {
-        let option = document.createElement('option');
-        option.textContent = dimension;
-        option.value = dimension;
-        option.id = 'filterOption_' + dimension;
-        dropdown.appendChild(option);
+   
+    dimensionContainer.addEventListener('click', (event) => {
+        if(event.target.value != undefined) {
+            filterDimensionData = event.target.value;
+            generateModuleForSetFilter();
         }
     });
-    container.appendChild(dropdown);
+
+    container.appendChild(selectButton);
+    container.appendChild(dimensionContainer);
 }
 
+// TODO
 function generateModuleForSetFilter() {
 
     let section = document.getElementById('api-section');
@@ -765,49 +685,65 @@ function generateModuleForSetFilter() {
 }
 
 function generateDropdownForRange() {
-    //let dimensions = newData['columns'];
-
     document.getElementById('rangeDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('rangeDimensionContainer');
+    container.style.position = 'relative';
 
-    const dropdown = document.createElement('select');
-    dropdown.onchange = (event) => {
-        rangeDimensionData = event.target.value;
-        generateModuleForRangeSettings();
-    }
-    dropdown.onfocus = () => {
-        dropdown.innerHTML = "";
-        dropdown.appendChild(headline);
-        let dimensions = getAllVisibleDimensionNames();
+    let selectButton = document.createElement('button');
+    selectButton.id = 'rangeButton';
+    selectButton.className = 'ddButton';
+
+    let textElement = document.createElement('span');
+    textElement.id = 'rangeText';
+    textElement.innerHTML = 'Set Range <img src="./svg/dropdown-symbol.svg" />';
+    selectButton.appendChild(textElement);
+
+    selectButton.addEventListener('click', () => {
+        dimensionContainer.innerHTML = '';
+        const dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
-            if (!isDimensionCategorical(dimension)) {
-                let option = document.createElement('option');
-                option.textContent = dimension;
-                option.value = dimension;
-                option.id = 'rangeOption_' + dimension;
-                dropdown.appendChild(option);
-            }
+            let dimensionLabel = document.createElement('label');
+            dimensionLabel.className = 'dropdownLabel';
+            let rangeInput = document.createElement('input');
+            rangeInput.className = 'inputFields';
+            rangeInput.type = 'image';
+            rangeInput.name = 'dimension';
+            rangeInput.value = dimension;
+            rangeInput.src = './svg/dropdown-symbol.svg';
+            rangeInput.id = 'range_' + dimension;
+            rangeInput.style.height = '0rem';
+            rangeInput.style.paddingRight = '0.5rem';
+            dimensionLabel.appendChild(rangeInput);
+            dimensionLabel.appendChild(document.createTextNode(dimension));
+            dimensionContainer.appendChild(dimensionLabel);
         });
+        showOptions('rangeOptions', 'rangeButton');
+        calcDDBehaviour(dimensionContainer, selectButton);
+    });
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'rangeOptions';
+    dimensionContainer.name = 'rangeOptions';
+    dimensionContainer.className = 'ddList';
+    dimensionContainer.style.display = 'none';
+    
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
     }
-
-    const headline = document.createElement('option');
-    headline.selected = 'disabled';
-    headline.textContent = 'Set Range';
-    dropdown.appendChild(headline);
-
-    dimensions.forEach(function(dimension) {
-        if (!isDimensionCategorical(dimension)) {
-        let option = document.createElement('option');
-        option.textContent = dimension;
-        option.value = dimension;
-        option.id = 'rangeOption_' + dimension;
-        dropdown.appendChild(option);
+   
+    dimensionContainer.addEventListener('click', (event) => {
+        if(event.target.value != undefined) {
+            rangeDimensionData = event.target.value;
+            generateModuleForRangeSettings();
         }
     });
-    container.appendChild(dropdown);
+
+    container.appendChild(selectButton);
+    container.appendChild(dimensionContainer);
 }
 
+//TODO
 function generateModuleForRangeSettings() {
 
     let section = document.getElementById('api-section');
@@ -1015,18 +951,7 @@ function generateDropdownForSelectRecords() {
     selectButton.className = 'ddButton';
     selectButton.addEventListener('click', () => {
         showOptionsForRecords('options_r', 'selectButtonR');
-        const dropdownHeight = recordsContainer.clientHeight;
-        const windowHeight = window.innerHeight;
-        const dropdownTop = selectButton.getBoundingClientRect().top;
-
-        if (windowHeight - dropdownTop < dropdownHeight) {
-            recordsContainer.style.bottom = '100%';
-            recordsContainer.style.top = 'auto';
-        }
-        else {
-            recordsContainer.style.bottom = 'auto';
-            recordsContainer.style.top = '100%';
-        }
+        calcDDBehaviour(recordsContainer, selectButton);
     });
 
     let textElement = document.createElement('span');
@@ -1035,23 +960,14 @@ function generateDropdownForSelectRecords() {
 
     let recordsContainer = document.createElement('div');
     recordsContainer.id = 'options_r';
+    recordsContainer.name = 'options_r';
     recordsContainer.className = 'ddList';
     recordsContainer.style.display = 'none';
     
-    if (window.navigator.userAgent.includes('Mac')){
-        recordsContainer.style.background = 'whitesmoke';
-        recordsContainer.style.border = '0.1rem lightgrey solid';
-    }
-    else if (window.navigator.userAgent.includes('Win')){
-        recordsContainer.style.background = 'white';
-        recordsContainer.style.border = '0.1rem black solid';
-    }
-    recordsContainer.style.width = 'max-content';
-    recordsContainer.style.borderRadius = '0.2rem';
     if (records.length > 10) {
         recordsContainer.style.height = '12.5rem';
     }
-    recordsContainer.name = 'options_r';
+   
     recordsContainer.addEventListener('change', (event) => {
         toggleSelection(event.target.value);
     });
@@ -1061,11 +977,10 @@ function generateDropdownForSelectRecords() {
         label.className = 'dropdownLabel';
         let input = document.createElement('input');
         input.type = 'checkbox';
+        input.className = 'inputFields';
         input.id = 'sel_' + record;
         input.value = record;
         input.name = 'record';
-        input.style.marginTop = '0.3rem';
-        input.style.marginLeft = '0.5rem';
         input.checked = false;
         label.appendChild(input);
         label.appendChild(document.createTextNode(record));
