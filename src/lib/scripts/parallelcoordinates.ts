@@ -1483,6 +1483,10 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .style('border-top', '0.08rem lightgrey solid')
                 .style('visibility', 'visible')
                 .on('click', (event) => {
+                    let minRange = getCurrentMinRange(dimension);
+                    let maxRange = getCurrentMaxRange(dimension);
+                    inputMinRange.attr('value', minRange);
+                    inputMaxRange.attr('value', maxRange);
                     popupWindowRange.style('display', 'block')
                             .style('width', 17 + 'rem')
                             .style('height', 12 + 'rem')
@@ -1578,6 +1582,9 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 d3.select('#resetRangeMenu').style('visibility', 'hidden');
             }
             if (!isNaN(values[0])) {
+                let currentFilters = getFilter(dimension);
+                inputMaxFilter.attr('value', currentFilters[0]);
+                inputMinFilter.attr('value', currentFilters[1]);
                 d3.select('#filterMenu')
                     .style('border-top', '0.08rem lightgrey solid')
                     .style('visibility', 'visible')

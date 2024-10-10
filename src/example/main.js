@@ -1,5 +1,5 @@
-import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, 
-    isInverted, getDimensionPosition, setFilter, getDimensionRange,
+import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange, getCurrentMaxRange, 
+    isInverted, getDimensionPosition, setFilter, getFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
     setDimensionRange, getAllDimensionNames, getAllVisibleDimensionNames,
     getAllRecords, toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} 
@@ -16,6 +16,7 @@ let dimensions;
 let studentData = "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
 
 window.addEventListener('click', (event) => {
+    console.log(event.target.id);
     if(!event.target.id.includes('show')) {
         closeElements('options');
     }
@@ -27,14 +28,14 @@ window.addEventListener('click', (event) => {
     }
     if(!event.target.id.includes('filter')) {
         closeElements('filterOptions');
-        if (document.getElementById('filtContainer') != null) {
-            document.getElementById('filtContainer').remove();
+        if (document.getElementById('filterContainer') != null) {
+            document.getElementById('filterContainer').remove();
         }
     }
     if(!event.target.id.includes('range')) {
         closeElements('rangeOptions');
-        if (document.getElementById('ranContainer')) {
-            document.getElementById('ranContainer').remove();
+        if (document.getElementById('rangeContainer')) {
+            document.getElementById('rangeContainer').remove();
         }
     }
     if(!event.target.id.includes('select')) {
@@ -525,7 +526,7 @@ function generateModuleForSetFilter() {
     let section = document.getElementById('api-section');
     
     let popupWindowFilter = document.createElement('div');
-    popupWindowFilter.id = 'filtContainer';
+    popupWindowFilter.id = 'filterContainer';
     popupWindowFilter.className = 'item7';
     popupWindowFilter.style.visibility = 'visible';
     popupWindowFilter.style.display = 'block';
@@ -538,6 +539,7 @@ function generateModuleForSetFilter() {
     section.appendChild(popupWindowFilter);
 
     let headerFilter = document.createElement('div');
+    headerFilter.id = 'filterHeader';
     headerFilter.textContent = 'Set Filter for ' + filterDimensionData;
     headerFilter.style.paddingLeft = 0.5 + 'rem';
     headerFilter.style.paddingTop = 0.5 + 'rem';
@@ -545,6 +547,7 @@ function generateModuleForSetFilter() {
     popupWindowFilter.appendChild(headerFilter);
     
     let closeButtonFilter = document.createElement('a');
+    closeButtonFilter.id = 'filterCloseButton';
     closeButtonFilter.textContent = 'x';
     closeButtonFilter.style.position = 'relative';
     closeButtonFilter.style.right = -16.5 + 'rem';
@@ -561,14 +564,18 @@ function generateModuleForSetFilter() {
     };
 
     let labelMinFilter = document.createElement('label');
+    labelMinFilter.id = 'filterLabelMin';
     labelMinFilter.textContent = 'Min';
     labelMinFilter.style.paddingLeft = 0.5 + 'rem';
     popupWindowFilter.appendChild(labelMinFilter);
 
+    let currentFilters = getFilter(filterDimensionData);
+
     let inputMinFilter = document.createElement('input');
-    inputMinFilter.id = 'minFilterValue';
+    inputMinFilter.id = 'filterMinValue';
     inputMinFilter.style.width = 2 + 'rem';
     inputMinFilter.style.marginLeft = 0.5 + 'rem';
+    inputMinFilter.value = currentFilters[1].toFixed(0);
     popupWindowFilter.appendChild(inputMinFilter);
 
     inputMinFilter.onkeydown = (event) => {
@@ -579,14 +586,16 @@ function generateModuleForSetFilter() {
     }
 
     let labelMaxFilter = document.createElement('label');
+    labelMaxFilter.id = 'filterLabelMax';
     labelMaxFilter.textContent = 'Max';
     labelMaxFilter.style.paddingLeft = 0.5 + 'rem';
     popupWindowFilter.appendChild(labelMaxFilter);
 
     let inputMaxFilter = document.createElement('input');
-    inputMaxFilter.id = 'maxFilterValue';
+    inputMaxFilter.id = 'filterMaxValue';
     inputMaxFilter.style.width = 2 + 'rem';
     inputMaxFilter.style.marginLeft = 0.5 + 'rem';
+    inputMaxFilter.value = currentFilters[0].toFixed(0);
     popupWindowFilter.appendChild(inputMaxFilter);
 
     inputMaxFilter.onkeydown = (event) => {
@@ -597,10 +606,12 @@ function generateModuleForSetFilter() {
     }
 
     let popupWindowFilterError = document.createElement('div');
+    popupWindowFilterError.id = 'filterError';
     popupWindowFilterError.style.position = 'absolute';
     popupWindowFilter.appendChild(popupWindowFilterError);
 
     let filterButton = document.createElement('button');
+    filterButton.id = 'filterButton';
     filterButton.textContent = 'Save';
     filterButton.style.marginLeft = 0.5 + 'rem';
     filterButton.style.marginRight = 0.5 + 'rem';
@@ -767,7 +778,7 @@ function generateModuleForRangeSettings() {
     let section = document.getElementById('api-section');
     
     let popupWindowRange = document.createElement('div');
-    popupWindowRange.id = 'ranContainer';
+    popupWindowRange.id = 'rangeContainer';
     popupWindowRange.className = 'item7';
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
@@ -780,6 +791,7 @@ function generateModuleForRangeSettings() {
     section.appendChild(popupWindowRange);
 
     let headerRange = document.createElement('div');
+    headerRange.id = 'rangeHeader';
     headerRange.textContent = 'Set Range for ' + rangeDimensionData;
     headerRange.style.paddingLeft = 0.5 + 'rem';
     headerRange.style.paddingTop = 0.5 + 'rem';
@@ -787,6 +799,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.appendChild(headerRange);
     
     let closeButtonRange = document.createElement('a');
+    closeButtonRange.id = 'rangeCloseButton';
     closeButtonRange.textContent = 'x';
     closeButtonRange.style.position = 'relative';
     closeButtonRange.style.right = -17 + 'rem';
@@ -803,6 +816,7 @@ function generateModuleForRangeSettings() {
     };
 
     let infoRange = document.createElement('div');
+    infoRange.id = 'rangeInfo';
     infoRange.style.color = 'grey';
     infoRange.style.fontSize = 'smaller';
     infoRange.style.paddingLeft = 0.5 + 'rem';
@@ -813,14 +827,16 @@ function generateModuleForRangeSettings() {
     popupWindowRange.appendChild(infoRange);
 
     let labelMinRange = document.createElement('label');
+    labelMinRange.id = 'rangeMinLabel';
     labelMinRange.textContent = 'Min';
     labelMinRange.style.paddingLeft = 0.5 + 'rem';
     popupWindowRange.appendChild(labelMinRange);
 
     let inputMinRange = document.createElement('input');
-    inputMinRange.id = 'minRangeValue';
+    inputMinRange.id = 'rangeMinValue';
     inputMinRange.style.width = 2 + 'rem';
     inputMinRange.style.marginLeft = 0.5 + 'rem';
+    inputMinRange.value = getCurrentMinRange(rangeDimensionData);
     popupWindowRange.appendChild(inputMinRange);
 
     inputMinRange.onkeydown = (event) => {
@@ -831,14 +847,16 @@ function generateModuleForRangeSettings() {
     }
 
     let labelMaxRange = document.createElement('label');
+    labelMaxRange.id = 'rangeMaxLabel';
     labelMaxRange.textContent = 'Max';
     labelMaxRange.style.paddingLeft = 0.5 + 'rem';
     popupWindowRange.appendChild(labelMaxRange);
 
     let inputMaxRange = document.createElement('input');
-    inputMaxRange.id = 'maxRangeValue';
+    inputMaxRange.id = 'rangeMaxValue';
     inputMaxRange.style.width = 2 + 'rem';
     inputMaxRange.style.marginLeft = 0.5 + 'rem';
+    inputMaxRange.value = getCurrentMaxRange(rangeDimensionData);
     popupWindowRange.appendChild(inputMaxRange);
 
     inputMaxRange.onkeydown = (event) => {
@@ -849,10 +867,12 @@ function generateModuleForRangeSettings() {
     }
 
     let popupWindowRangeError = document.createElement('div');
+    popupWindowRangeError.id = 'rangeError';
     popupWindowRangeError.style.position = 'absolute';
     popupWindowRange.appendChild(popupWindowRangeError);
     
     let rangeButton = document.createElement('button');
+    rangeButton.id = 'rangeButton';
     rangeButton.textContent = 'Save';
     rangeButton.style.marginLeft = 0.5 + 'rem';
     rangeButton.style.marginRight = 0.5 + 'rem';
@@ -913,6 +933,7 @@ function generateModuleForRangeSettings() {
     
     let newLine = document.createElement('div');
     let resetRangeButton = document.createElement('button');
+    resetRangeButton.id = 'rangeResetButton';
     resetRangeButton.textContent = 'Set Ranges from Data';
     resetRangeButton.style.marginLeft = 0.5 + 'rem';
     resetRangeButton.style.marginTop = 1 + 'rem';
