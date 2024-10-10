@@ -127,7 +127,7 @@ section {
 
 .dropdownLabel {
   display: block;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Verdana, sans-serif;
 }
 
 .ddButton {
@@ -147,6 +147,9 @@ section {
   border-radius: 0.5rem;
   color: #414141;
   font-size: smaller;
+  width: max-content;
+  background: whitesmoke;
+  border: 0.1rem lightgrey solid;
 }
 
 .dropdownLabel {
@@ -156,6 +159,12 @@ section {
 .dropdownLabel:hover {
   background-color: dodgerblue;
   color: white;
+}
+
+.inputMove {
+  height: 0.5rem;
+  padding-top: 0.3rem;
+  padding-left: 0.5rem;
 }
 
 div#showDimensionHeader {

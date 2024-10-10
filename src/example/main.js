@@ -66,14 +66,6 @@ let resetAllButton = document.getElementById('resetAll');
 resetAllButton.addEventListener('click', resetAll, false);
 resetAllButton.style.visibility = 'hidden';
 
-let moveRightButton = document.getElementById('moveRight');
-moveRightButton.addEventListener('click', moveDimensionRight, false);
-moveRightButton.style.visibility = 'hidden';
-
-let moveLeftButton = document.getElementById('moveLeft');
-moveLeftButton.addEventListener('click', moveDimensionLeft, false);
-moveLeftButton.style.visibility = 'hidden';
-
 function openFileDialog() {
     document.getElementById('input').textContent = 'Upload File...';
     document.getElementById('fileInput').click();
@@ -112,12 +104,6 @@ function showButtons() {
     resetRangesButton.style.visibility = 'visible';
     resetRoundedRangesButton.style.visibility = 'visible';
     resetAllButton.style.visibility = 'visible';
-    moveRightButton.style.visibility = 'visible';
-    moveLeftButton.style.visibility = 'visible';
-    moveRightButton.disabled = true;
-    moveRightButton.style.opacity = 0.5;
-    moveLeftButton.disabled = true;
-    moveLeftButton.style.opacity = 0.5;
 }
 
 function updateDimensions(dimension)
@@ -130,43 +116,33 @@ function updateDimensions(dimension)
     }
 }
 
-function getSelectedDimensions()
-{
-    const checkboxes = document.querySelectorAll('input[name="dimension"]:checked');
-    const checkedDimensions = [];
-
-    checkboxes.forEach(function(checkbox) {
-        checkedDimensions.push(checkbox.value);
-    });
-
-    return checkedDimensions;
-}
-
 function showOptions(id, buttonId) {
     
-    let checkboxes = document.getElementById(id);
+    let options = document.getElementById(id);
     
-    checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
-        checkboxes.style.display = 'none';
+    options.style.display == 'none' ? options.style.display = 'block' :
+    options.style.display = 'none';
 
     let button = document.getElementById(buttonId);
 
-    checkboxes.style.display == 'block' ? button.style.backgroundColor = 'white' :
+    options.style.display == 'block' ? button.style.backgroundColor = 'white' :
         button.style.backgroundColor = 'white';
-    checkboxes.style.display == 'block' ? button.style.color = 'black' :
+    options.style.display == 'block' ? button.style.color = 'black' :
         button.style.color = 'black';
 
-    newFeatures.forEach(function (feature) {
-        if(getHiddenStatus(feature) == 'hidden') {
-            document.getElementById('show_' + feature).checked = false;
+    if (buttonId == "moveButton") {
+        disableLeftAndRightButton();
+    }
+
+    newFeatures.forEach(function (dimension) {
+        if(getHiddenStatus(dimension) == 'hidden') {
+            document.getElementById('show_' + dimension).checked = false;
         }
-        disableCheckbox(feature);
-        if (!isDimensionCategorical(feature)){
-            disableOptionInDropdown('filterOption_', feature);
-            disableOptionInDropdown('rangeOption_', feature);
+        disableCheckbox(dimension);
+        if (!isDimensionCategorical(dimension)){
+            disableOptionInDropdown('filterOption_', dimension);
+            disableOptionInDropdown('rangeOption_', dimension);
         }
-        disableOptionInDropdown('moveOption_', feature);
-        disableLeftAndRightButton(feature);
     });
 }
 
@@ -269,7 +245,6 @@ function generateDropdownForShow() {
     textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" />';
     selectButton.appendChild(textElement);
 
-    
 
     let dimensionContainer = document.createElement('div');
     dimensionContainer.id = 'options';
@@ -296,7 +271,7 @@ function generateDropdownForShow() {
         disableOptionInDropdown('filterOption_', event.target.value);
         disableOptionInDropdown('rangeOption_', event.target.value);
         disableOptionInDropdown('moveOption_', event.target.value);
-        disableLeftAndRightButton(event.target.value);
+        disableLeftAndRightButton();
     });
 
     dimensions.forEach(function(dimension) {
@@ -315,8 +290,6 @@ function generateDropdownForShow() {
 
     container.appendChild(selectButton);
     container.appendChild(dimensionContainer);
-
-    
 }
 
 function generateDropdownForInvert() {
@@ -350,7 +323,6 @@ function generateDropdownForInvert() {
             input.style.height = '0.7rem';
             input.style.paddingTop = '0.3rem';
             input.style.paddingLeft = '0.5rem';
-            input.checked = true;
             label.appendChild(input);
             label.appendChild(document.createTextNode(dimension));
             dimensionContainer.appendChild(label);
@@ -451,80 +423,118 @@ function disableOptionInDropdown(prefixId, dimension) {
 }
 
 function generateDropdownForMove() {
-    //let dimensions = newData['columns'];
-
     document.getElementById('moveDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('moveDimensionContainer');
+    container.style.position = 'relative';
 
-    const dropdown = document.createElement('select');
-    dropdown.onchange = () => {
-        moveDimensionData = dropdown.value;
-        disableLeftAndRightButton(moveDimensionData);
-    }
-    dropdown.onfocus = () => {
-        dropdown.innerHTML = "";
-        dropdown.appendChild(headline);
-        let dimensions = getAllVisibleDimensionNames();
+    let selectButton = document.createElement('button');
+    selectButton.id = 'moveButton';
+    selectButton.className = 'ddButton';
+
+    let textElement = document.createElement('span');
+    textElement.id = 'moveText';
+    textElement.innerHTML = 'Move Dimensions <img src="./svg/dropdown-symbol.svg" />';
+    selectButton.appendChild(textElement);
+
+    selectButton.addEventListener('click', () => {
+        dimensionContainer.innerHTML = '';
+        const dimensions = getAllVisibleDimensionNames();
         dimensions.forEach(function(dimension) {
-            let option = document.createElement('option');
-            option.textContent = dimension;
-            option.value = dimension;
-            option.id = 'moveOption_' + dimension;
-            dropdown.appendChild(option);
+            let dimensionLabel = document.createElement('label');
+            dimensionLabel.className = 'dropdownLabel';
+            let arrowLeft = document.createElement('input');
+            arrowLeft.className = 'inputMove';
+            arrowLeft.type = 'image';
+            arrowLeft.name = 'dimension';
+            arrowLeft.value = dimension;
+            arrowLeft.id = 'moveleft_' + dimension;
+            arrowLeft.src = './svg/arrow-left.svg';
+            let arrowRight = document.createElement('input');
+            arrowRight.className = 'inputMove';
+            arrowRight.type = 'image';
+            arrowRight.name = 'dimension';
+            arrowRight.value = dimension;
+            arrowRight.id = 'moveright_' + dimension;
+            arrowRight.src = './svg/arrow-right.svg';
+            arrowRight.style.paddingRight = '0.5rem';
+            dimensionLabel.appendChild(arrowLeft);
+            dimensionLabel.appendChild(arrowRight);
+            dimensionLabel.appendChild(document.createTextNode(dimension));
+            dimensionContainer.appendChild(dimensionLabel);
         });
-        disableLeftAndRightButton('Move Dimension');
-        disableOptionInDropdown('moveOption_', dimension);
-    }
-
-    const headline = document.createElement('option');
-    headline.selected = 'disabled';
-    headline.textContent = 'Move Dimension';
-    headline.id = 'move_headline';
-    dropdown.appendChild(headline);
-
-    dimensions.forEach(function(dimension) {
-        let option = document.createElement('option');
-        option.textContent = dimension;
-        option.value = dimension;
-        option.id = 'moveOption_' + dimension;
-        dropdown.appendChild(option);
+        showOptions('moveOptions', 'moveButton');
+        calcDDBehaviour(dimensionContainer, selectButton);
     });
-    container.appendChild(dropdown);
-    document.getElementById('moveLeft').disabled = true;
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'moveOptions';
+    dimensionContainer.name = 'moveOptions';
+    dimensionContainer.className = 'ddList';
+    
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
+    }
+   
+    dimensionContainer.addEventListener('click', (event) => {
+        if(event.target.value != undefined) {
+            moveDimensionData = event.target.value;
+            if (event.target.src.includes('right')) {
+                moveDimensionRight();
+            }
+            else {
+                moveDimensionLeft();
+            }  
+            disableLeftAndRightButton();
+        }
+    });
+
+    container.appendChild(selectButton);
+    container.appendChild(dimensionContainer);
+}
+
+function calcDDBehaviour(dimensionContainer, selectButton) {
+    const dropdownHeight = dimensionContainer.clientHeight;
+        const windowHeight = window.innerHeight;
+        const dropdownTop = selectButton.getBoundingClientRect().top;
+
+        if (windowHeight - dropdownTop < dropdownHeight) {
+            dimensionContainer.style.bottom = '100%';
+            dimensionContainer.style.top = 'auto';
+        }
+        else {
+            dimensionContainer.style.bottom = 'auto';
+            dimensionContainer.style.top = '100%';
+        }
 }
 
 function moveDimensionLeft() {  
     moveByOne(moveDimensionData, 'left');
-    disableLeftAndRightButton(moveDimensionData);
+    disableLeftAndRightButton();
 }
 
 function moveDimensionRight() {
     moveByOne(moveDimensionData, 'right');  
-    disableLeftAndRightButton(moveDimensionData);
+    disableLeftAndRightButton();
 }
 
-function disableLeftAndRightButton(dimension) {
-    const position = getDimensionPosition(dimension);
-    const numberOfDimensions = getNumberOfDimensions();
-    const headline = document.getElementById('move_headline');
-    
-    if (position == 0 || position == -1 || headline.selected) {
-        document.getElementById('moveRight').disabled = true;
-        document.getElementById('moveRight').style.opacity = 0.5;
-    }
-    else {
-        document.getElementById('moveRight').disabled = false;
-        document.getElementById('moveRight').style.opacity = 1;
-    }
+function disableLeftAndRightButton() {
+    for (let i = 0; i < dimensions.length; i++) {
+        const position = getDimensionPosition(dimensions[i]);
+        const numberOfDimensions = getNumberOfDimensions();
+        if (position == numberOfDimensions - 1 || position == -1) {
+            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-right.svg';
+        }
+        else {
+            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-left.svg';
+        }
 
-    if (position == numberOfDimensions - 1 || position == -1) {
-        document.getElementById('moveLeft').disabled = true;
-        document.getElementById('moveLeft').style.opacity = 0.5;
-    }
-    else {
-        document.getElementById('moveLeft').disabled = false;
-        document.getElementById('moveLeft').style.opacity = 1;
+        if (position == 0 || position == -1) {
+            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-left.svg';
+        }
+        else {
+            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-right.svg';
+        }
     }
 }
 
