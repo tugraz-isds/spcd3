@@ -1,3 +1,9 @@
+<style>
+* {
+    padding-left: 0;
+}
+</style>
+
 # SPCD3 API Guide
 
 The SPCD3 API comprises 41 functions grouped into nine categories.
@@ -27,6 +33,8 @@ Grace,24,95,98
 Harper,69,9,97
 ```
 
+<br/>
+
 - drawChart
 
 `function drawChart(data: []): void`
@@ -34,11 +42,15 @@ Harper,69,9,97
 Uses the given dataset to create a parallel coordinates chart, using D3 to dynamically create SVG
 elements in the DOM. This chart is considered to be the current chart.
 
+<br/>
+
 - deleteChart
 
 `function deleteChart(): void`
 
 Deletes the current parallel coordinates chart.
+
+<br/>
 
 - saveAsSvg
 
@@ -54,11 +66,15 @@ Saves the current parallel coordinates chart as an SVG file with a default name 
 
 Makes a hidden dimension visible. The dimension is assigned the status **shown**.
 
+<br/>
+
 - hide
 
 `function hide(dimension: string): void`
 
 Hides the given dimension. The dimension is assigned the status **hidden**.
+
+<br/>
 
 - getHiddenStatus
 
@@ -74,11 +90,15 @@ Returns the visibility status of the dimension, which can be either **shown** or
 
 Inverts the given dimension.
 
+<br/>
+
 - getInversionStatus
 
 `function getInversionStatus(dimension: any): string`
 
 Returns the inversion status of a dimension, which can be either **ascending** or **descending**.
+
+<br/>
 
 - setInversionStatus
 
@@ -94,11 +114,15 @@ Sets the inversion status of the given dimension to one of **ascending** and **d
 
 Moves dimension A either to the left side of dimension B or to the right side of dimension B.
 
+<br/>
+
 - moveByOne
 
 `function moveByOne(dimension: string, direction: string): void`
 
 Moves a dimension one position to the left or right, independent of other dimensions.
+
+<br/>
 
 - swap
 
@@ -106,11 +130,15 @@ Moves a dimension one position to the left or right, independent of other dimens
 
 Swaps the positions of the given dimensions.
 
+<br/>
+
 - getDimensionPosition
 
 `function getDimensionPosition(dimension: string): number`
 
 Returns the position of the given dimension (0...n-1).
+
+<br/>
 
 - setDimensionPosition
 
@@ -126,11 +154,15 @@ Sets the position of the given dimension (0...n-1).
 
 Returns the given dimension’s current range (min, max).
 
+<br/>
+
 - setDimensionRange
 
 `function setDimensionRange(dimension: string, min: number, max: number): void`
 
 Sets the range of the given dimension to specific values (min, max).
+
+<br/>
 
 - setDimensionRangeRounded
 
@@ -138,11 +170,15 @@ Sets the range of the given dimension to specific values (min, max).
 
 Sets the range of the given dimension to rounded specific values (min, max).
 
+<br/>
+
 - getMinValue
 
 `function getMinValue(dimension: string): number`
 
 Returns the minimum data value of a dimension.
+
+<br/>
 
 - getMaxValue
 
@@ -150,11 +186,15 @@ Returns the minimum data value of a dimension.
 
 Returns the maximum data value of a dimension.
 
+<br/>
+
 - getCurrentMinRange
 
 `function getCurrentMinRange(dimension: string): number`
 
 Returns the current minimum value of a dimension’s range (in data coordinates).
+
+<br/>
 
 - getCurrentMaxRange
 
@@ -169,6 +209,8 @@ Returns the current maximum value of a dimension’s range (in data coordinates)
 `function getFilter(dimension: string): [min, max]`
 
 Returns the minimum and maximum values of the filter of a dimension.
+
+<br/>
 
 - setFilter
 
@@ -185,11 +227,15 @@ Sets the filter for a dimension by specifying minimum and maximum values. If the
 Returns all selected records in the chart as an array, where each record is identified with its label,
 taken by default from the first column of the dataset.
 
+<br/>
+
 - setSelection
 
 `function setSelection(records: []): void`
 
 Selects one or more records by handing over an array of labels.
+
+<br/>
 
 - toggleSelection
 
@@ -197,17 +243,23 @@ Selects one or more records by handing over an array of labels.
 
 Toggles the selection of a given record by specifying its label.
 
+<br/>
+
 - isSelected
 
 `function isSelected(record: string): boolean`
 
 Returns a boolean for the selection status of a given record by specifying its label: true if the record is selected and false if not.
 
+<br/>
+
 - setSelected
 
 `function setSelected(record: string): void`
 
 Selects a given record by specifying its label.
+
+<br/>
 
 - setUnselected
 
@@ -223,11 +275,15 @@ Deselects a given record by specifying its label.
 
 Selects one or more records by handing over an array of IDs.
 
+<br/>
+
 - toggleSelectionWithId
 
 `function toggleSelectionWithId(recordId: number): void`
 
 Toggles the selection of a given record by specifying its ID.
+
+<br/>
 
 - isSelectedWithId
 
@@ -235,11 +291,15 @@ Toggles the selection of a given record by specifying its ID.
 
 Returns a boolean for the selection status of a given record by specifying its ID: true if the record is selected and false if not.
 
+<br/>
+
 - setSelectedWithId
 
 `function setSelectedWithId(recordId: number): void`
 
 Selects a given record by specifying its ID.
+
+<br/>
 
 - setUnselectedWithId
 
@@ -256,16 +316,23 @@ Deselects a given record by specifying its ID.
 
 Returns an array of all dimensions names in order.
 
+<br/>
+
 - getAllRecords
 
 `function getAllRecords(): []`
 
 Returns all records as an array.
 
+<br/>
+
 - getNumberofDimensions
 
 `function getNumberOfDimensions(): number`
+
 Returns the number of dimensions.
+
+<br/>
 
 - getDimensionPosition
 
@@ -273,17 +340,23 @@ Returns the number of dimensions.
 
 Returns the position of a dimension (0..𝑚 − 1).
 
+<br/>
+
 - isDimensionCategorical
 
 `function isDimensionCategorical(dimensionName: string): boolean`
 
 Returns true if a dimension is categorial and false if not (i.e. it is numerical).
 
+<br/>
+
 - setDimensionForHovering
 
 `function setDimensionForHovering(dimension: string): void`
 
 Sets the dimension as label for hovering.
+
+<br/>
 
 - getRecordWithId
 
