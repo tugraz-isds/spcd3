@@ -554,14 +554,14 @@ export function setFilter(dimension: string, min: number, max: number): void {
 
 export function getSelected(): any[] {
     let selected = [];
-    window.selectable.selectAll('path')
-        .each(function(d) {
-            const isSeletedLine = d3.select(this).style('visibility');
-            if (isSeletedLine == 'visible') {
-                selected.push(d[window.key]);
-            }
+   
+    const records = getAllRecords();
+    for (let i = 0; i < records.length; i++) {
+        let isVisible = d3.select('#select_' + records[i]).style('visibility');
+        if (isVisible == 'visible') {
+            selected.push(records[i]);
         }
-    );
+    }
     return selected;
 }
 
@@ -569,6 +569,7 @@ export function setSelection(records: string[]): void {
     for(let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
         d3.select('#select_' + selectedLine)
+            .transition()
             .style('visibility', 'visible');
         d3.select('.' + selectedLine)
             .transition()
@@ -600,6 +601,7 @@ export function toggleSelection(record: string): void {
 export function setSelected(record: string): void {
     const path = helper.cleanLinePathString(record);
     d3.select('#select_' + path)
+            .transition()
             .style('visibility', 'visible');
     d3.select('.' + path)
             .transition()
@@ -609,6 +611,7 @@ export function setSelected(record: string): void {
 export function setUnselected(record: string): void {
     const path = helper.cleanLinePathString(record);
     d3.select('#select_' + path)
+            .transition()
             .style('visibility', 'hidden');
     d3.select('.' + path)
             .transition()
@@ -669,9 +672,19 @@ export function drawChart(content: any): void {
         .append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, window.width, height])
-        .attr('font-family', 'Verdana, sans-serif')
+        .attr('font-family', 'Verdana, sans-serif');
+
+    window.selectable = setSelectPathLines(svg, content, window.parcoords);
+
+    let inactive = setInactivePathLines(svg, content, window.parcoords);
+
+    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+
+    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
+
+    window.svg
         .on('click', (event) => {
-            if (!(event.shiftKey || event.metaKey)) {
+            if (!(event.shiftKey) && !(event.ctrlKey) && !(event.metaKey)) {
                 if (!(event.target.id.includes('dimension_invert_'))) {
                     for (let i = 0; i < ids.length; i++) {
                         if (d3.select('.' + ids[i]).style('visibility') !== 'visible') {
@@ -680,21 +693,22 @@ export function drawChart(content: any): void {
                     }
                 }
             }
-        });
+            if (event.ctrlKey || event.metaKey) {
+                let selectedRecords = getSelected();
+                
+                for (let i = 0; i < selectedRecords.length; i++) {
+                    if (selectedRecords[i] == event.target.id) {
+                        toggleSelection(event.target.id);
+                }
+            }
+        }
+    });
     
     window.onclick = () => {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#popupFilter').style('display', 'none');
         d3.select('#popupRange').style('display', 'none');
     }
-    
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
-
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
-
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 }
 
 export function deleteChart(): void {
@@ -1272,6 +1286,7 @@ function select(linePaths: any): void {
     for(let i = 0; i < linePaths.length; i++) {
         let selectedLine = helper.cleanLinePathString(linePaths[i]);
         d3.select('#select_' + selectedLine)
+            .transition()
             .style('visibility', 'visible');
         d3.select('.' + selectedLine)
             .transition()

@@ -1,7 +1,7 @@
 import * as d3 from 'd3-selection';
 import * as icon from '../icons/icons';
 import * as helper from './helper';
-import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
+import { getSelected, isSelected, setSelected, setUnselected } from './parallelcoordinates';
 
 let selectionArray = [];
 
@@ -255,8 +255,10 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         
     let active = d3.select('g.active').selectAll('path');
     const emptyString = '';
+
     active.each(function (d) {
         const currentLine = getLineName(d);
+        const selected = isSelected(currentLine);
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
         let value : any;
@@ -271,6 +273,10 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
             
         if (value < topPosition || value > bottomPosition) {
             makeInactive(currentLine, dimensionName);
+            if (selected) {
+                setUnselected(currentLine);
+                selectionArray.push(currentLine);
+            }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
             let checkedLines = [];
@@ -281,6 +287,12 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
             });
             if(!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
+                const index = selectionArray.indexOf(currentLine);
+                if (index != -1)
+                {
+                    setSelected(currentLine);
+                    selectionArray.splice(index,1);
+                }
             }
         }
     });
