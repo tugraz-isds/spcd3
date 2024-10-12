@@ -1,6 +1,3 @@
-<style>
-</style>
-
 # Steerable Parallel Coordinates in D3 (SPCD3)
 
 SPCD3 is a JavaScript library which implements a parallel coordinates

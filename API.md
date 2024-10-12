@@ -1,9 +1,3 @@
-<style>
-* {
-    padding-left: 0;
-}
-</style>
-
 # SPCD3 API Guide
 
 The SPCD3 API comprises 41 functions grouped into nine categories.
@@ -11,7 +5,7 @@ The SPCD3 API comprises 41 functions grouped into nine categories.
 
 ## I/O Functions
 
-- loadCSV
+#### loadCSV
 
 `function loadCSV(csv: string): []`
 
@@ -35,7 +29,7 @@ Harper,69,9,97
 
 <br/>
 
-- drawChart
+#### drawChart
 
 `function drawChart(data: []): void`
 
@@ -44,7 +38,7 @@ elements in the DOM. This chart is considered to be the current chart.
 
 <br/>
 
-- deleteChart
+#### deleteChart
 
 `function deleteChart(): void`
 
@@ -52,7 +46,7 @@ Deletes the current parallel coordinates chart.
 
 <br/>
 
-- saveAsSvg
+#### saveAsSvg
 
 `function saveAsSvg(): void`
 
@@ -60,7 +54,7 @@ Saves the current parallel coordinates chart as an SVG file with a default name 
 
 ## Show And Hide Functions
 
-- show
+#### show
 
 `function show(dimension: string): void`
 
@@ -68,7 +62,7 @@ Makes a hidden dimension visible. The dimension is assigned the status **shown**
 
 <br/>
 
-- hide
+#### hide
 
 `function hide(dimension: string): void`
 
@@ -76,7 +70,7 @@ Hides the given dimension. The dimension is assigned the status **hidden**.
 
 <br/>
 
-- getHiddenStatus
+#### getHiddenStatus
 
 `function getHiddenStatus(dimension: string): string`
 
@@ -84,7 +78,7 @@ Returns the visibility status of the dimension, which can be either **shown** or
 
 ## Invert Functions
 
-- invert
+#### invert
 
 `function invert(dimension: string): void`
 
@@ -92,7 +86,7 @@ Inverts the given dimension.
 
 <br/>
 
-- getInversionStatus
+#### getInversionStatus
 
 `function getInversionStatus(dimension: any): string`
 
@@ -100,7 +94,7 @@ Returns the inversion status of a dimension, which can be either **ascending** o
 
 <br/>
 
-- setInversionStatus
+#### setInversionStatus
 
 `function setInversionStatus(dimension: string, status: string): void`
 
@@ -108,7 +102,7 @@ Sets the inversion status of the given dimension to one of **ascending** and **d
 
 ## Move Functions
 
-- move
+#### move
 
 `function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void`
 
@@ -116,7 +110,7 @@ Moves dimension A either to the left side of dimension B or to the right side of
 
 <br/>
 
-- moveByOne
+#### moveByOne
 
 `function moveByOne(dimension: string, direction: string): void`
 
@@ -124,7 +118,7 @@ Moves a dimension one position to the left or right, independent of other dimens
 
 <br/>
 
-- swap
+#### swap
 
 `function swap(dimensionA: string, dimensionB: string): void`
 
@@ -132,7 +126,7 @@ Swaps the positions of the given dimensions.
 
 <br/>
 
-- getDimensionPosition
+#### getDimensionPosition
 
 `function getDimensionPosition(dimension: string): number`
 
@@ -140,7 +134,7 @@ Returns the position of the given dimension (0...n-1).
 
 <br/>
 
-- setDimensionPosition
+#### setDimensionPosition
 
 `function setDimensionPosition(dimension: string, position: number): void`
 
@@ -148,7 +142,7 @@ Sets the position of the given dimension (0...n-1).
 
 ## Range Functions
 
-- getDimensionRange
+#### getDimensionRange
 
 `function getDimensionRange(dimension: string): [min, max]`
 
@@ -156,7 +150,7 @@ Returns the given dimension’s current range (min, max).
 
 <br/>
 
-- setDimensionRange
+#### setDimensionRange
 
 `function setDimensionRange(dimension: string, min: number, max: number): void`
 
@@ -164,7 +158,7 @@ Sets the range of the given dimension to specific values (min, max).
 
 <br/>
 
-- setDimensionRangeRounded
+#### setDimensionRangeRounded
 
 `function setDimensionRangeRounded(dimension: string, min: number, max: number): void`
 
@@ -172,7 +166,7 @@ Sets the range of the given dimension to rounded specific values (min, max).
 
 <br/>
 
-- getMinValue
+#### getMinValue
 
 `function getMinValue(dimension: string): number`
 
@@ -180,7 +174,7 @@ Returns the minimum data value of a dimension.
 
 <br/>
 
-- getMaxValue
+#### getMaxValue
 
 `function getMaxValue(dimension: string): number`
 
@@ -188,7 +182,7 @@ Returns the maximum data value of a dimension.
 
 <br/>
 
-- getCurrentMinRange
+#### getCurrentMinRange
 
 `function getCurrentMinRange(dimension: string): number`
 
@@ -196,7 +190,7 @@ Returns the current minimum value of a dimension’s range (in data coordinates)
 
 <br/>
 
-- getCurrentMaxRange
+#### getCurrentMaxRange
 
 `function getCurrentMaxRange(dimension: string): number`
 
@@ -204,7 +198,7 @@ Returns the current maximum value of a dimension’s range (in data coordinates)
 
 ## Filter Functions
 
-- getFilter
+#### getFilter
 
 `function getFilter(dimension: string): [min, max]`
 
@@ -212,7 +206,7 @@ Returns the minimum and maximum values of the filter of a dimension.
 
 <br/>
 
-- setFilter
+#### setFilter
 
 `function setFilter(dimension: string, min: number, max: number): void`
 
@@ -220,7 +214,7 @@ Sets the filter for a dimension by specifying minimum and maximum values. If the
 
 ## Selection Functions
 
-- getSelected
+#### getSelected
 
 `function getSelected(): []`
 
@@ -229,7 +223,7 @@ taken by default from the first column of the dataset.
 
 <br/>
 
-- setSelection
+#### setSelection
 
 `function setSelection(records: []): void`
 
@@ -237,7 +231,7 @@ Selects one or more records by handing over an array of labels.
 
 <br/>
 
-- toggleSelection
+#### toggleSelection
 
 `function toggleSelection(record: string): void`
 
@@ -245,7 +239,7 @@ Toggles the selection of a given record by specifying its label.
 
 <br/>
 
-- isSelected
+#### isSelected
 
 `function isSelected(record: string): boolean`
 
@@ -253,7 +247,7 @@ Returns a boolean for the selection status of a given record by specifying its l
 
 <br/>
 
-- setSelected
+#### setSelected
 
 `function setSelected(record: string): void`
 
@@ -261,7 +255,7 @@ Selects a given record by specifying its label.
 
 <br/>
 
-- setUnselected
+#### setUnselected
 
 `function setUnselected(record: string): void`
 
@@ -269,7 +263,7 @@ Deselects a given record by specifying its label.
 
 ## Selection Functions with ID
 
-- setSelectionWithId
+#### setSelectionWithId
 
 `function setSelectionWithId(recordIds: []): void`
 
@@ -277,7 +271,7 @@ Selects one or more records by handing over an array of IDs.
 
 <br/>
 
-- toggleSelectionWithId
+#### toggleSelectionWithId
 
 `function toggleSelectionWithId(recordId: number): void`
 
@@ -285,7 +279,7 @@ Toggles the selection of a given record by specifying its ID.
 
 <br/>
 
-- isSelectedWithId
+#### isSelectedWithId
 
 `function isSelectedWithId(recordId: number): boolean`
 
@@ -293,7 +287,7 @@ Returns a boolean for the selection status of a given record by specifying its I
 
 <br/>
 
-- setSelectedWithId
+#### setSelectedWithId
 
 `function setSelectedWithId(recordId: number): void`
 
@@ -301,7 +295,7 @@ Selects a given record by specifying its ID.
 
 <br/>
 
-- setUnselectedWithId
+#### setUnselectedWithId
 
 `function setUnselectedWithId(recordId: number): void`
 
@@ -310,7 +304,7 @@ Deselects a given record by specifying its ID.
 
 ## Helper Functions
 
-- getAllDimensionNames
+#### getAllDimensionNames
 
 `function getAllDimensionNames(): []`
 
@@ -318,7 +312,7 @@ Returns an array of all dimensions names in order.
 
 <br/>
 
-- getAllRecords
+#### getAllRecords
 
 `function getAllRecords(): []`
 
@@ -326,7 +320,7 @@ Returns all records as an array.
 
 <br/>
 
-- getNumberofDimensions
+#### getNumberofDimensions
 
 `function getNumberOfDimensions(): number`
 
@@ -334,7 +328,7 @@ Returns the number of dimensions.
 
 <br/>
 
-- getDimensionPosition
+#### getDimensionPosition
 
 `function getDimensionPosition(dimensionName: string): number`
 
@@ -342,7 +336,7 @@ Returns the position of a dimension (0..𝑚 − 1).
 
 <br/>
 
-- isDimensionCategorical
+#### isDimensionCategorical
 
 `function isDimensionCategorical(dimensionName: string): boolean`
 
@@ -350,7 +344,7 @@ Returns true if a dimension is categorial and false if not (i.e. it is numerical
 
 <br/>
 
-- setDimensionForHovering
+#### setDimensionForHovering
 
 `function setDimensionForHovering(dimension: string): void`
 
@@ -358,7 +352,7 @@ Sets the dimension as label for hovering.
 
 <br/>
 
-- getRecordWithId
+#### getRecordWithId
 
 `function getRecordWithId(recordId: number): string`
 
