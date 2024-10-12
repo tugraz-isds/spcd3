@@ -22,6 +22,7 @@ body {
   background-color: #ffffff;
   color: #2b2b2b;
   margin-bottom: 0.1rem;
+  overflow-x: hidden;
 }
 
 #buttons {
@@ -29,6 +30,7 @@ body {
   justify-content: flex-start;
   align-items: flex-start;
   margin-left: 1rem;
+  flex-wrap: wrap;
 }
 
 .input-button {
@@ -55,7 +57,7 @@ body {
 }
 
 div#parallelcoords {
-  overflow-y: auto;
+  overflow-x: auto;
 }
 
 #pc_svg {
@@ -70,11 +72,15 @@ div#parallelcoords {
   margin-bottom: 2rem;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 section {
   margin-left: 2rem;
   margin-bottom: 4rem;
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: auto-fit auto-fit auto-fit auto-fit;
   grid-template-rows: auto auto auto;
   grid-column-gap: 1rem;
   grid-row-gap: 1rem;

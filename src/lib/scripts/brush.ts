@@ -1,7 +1,7 @@
 import * as d3 from 'd3-selection';
 import * as icon from '../icons/icons';
 import * as helper from './helper';
-import { getSelected, isSelected, setSelected, setUnselected } from './parallelcoordinates';
+import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
 
 let selectionArray = [];
 

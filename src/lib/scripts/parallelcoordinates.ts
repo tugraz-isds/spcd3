@@ -704,10 +704,14 @@ export function drawChart(content: any): void {
         }
     });
     
-    window.onclick = () => {
+    window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
-        d3.select('#popupFilter').style('display', 'none');
-        d3.select('#popupRange').style('display', 'none');
+        if(!event.target.id.includes('Filter')) {
+            d3.select('#popupFilter').style('display', 'none');
+        }
+        if(!event.target.id.includes('Range')) {
+            d3.select('#popupRange').style('display', 'none');
+        } 
     }
 }
 
@@ -1354,21 +1358,23 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     popupWindowRange.append('div').text('Set Range for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
     let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
     .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
-    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
-    let headerDimensionRange = popupWindowRange.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
+    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonRange');
+    let headerDimensionRange = popupWindowRange.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
+    .attr('id', 'headerDimensionRange');
     let infoRange = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
-    .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem');
+    .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange');
     popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
     let inputMinRange = popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2 + 'rem');
     popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
     let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
     let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
-    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'rangeButton');
+    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonRange');
     let resetRangeButton = popupWindowRange.append('button').text('Set Ranges from Data').style('margin-left', 0.5 + 'rem')
     .style('width', 16 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'resetRangeButton');
 
     let popupWindowRangeError = popupWindowRange
         .append('div')
+        .attr('id', 'errorRange')
         .style('position', 'absolute')
         .style('display', 'none');
     
@@ -1378,20 +1384,22 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
         .style('position', 'absolute')
         .style('display', 'none')
 
-    popupWindowFilter.append('div').text('Set Filter for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');;
-    let headerDimensionFilter = popupWindowFilter.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large');;
+    popupWindowFilter.append('div').text('Set Filter for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
+    let headerDimensionFilter = popupWindowFilter.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
+    .attr('id', 'headerDimensionFilter');
     let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
     .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
-    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer');
+    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonFilter');
     popupWindowFilter.append('label').text('Min').style('padding', 0.5 + 'rem');
     let inputMinFilter = popupWindowFilter.append('input').attr('id', 'minFilterValue').style('width', 2 + 'rem');
     popupWindowFilter.append('label').text('Max').style('padding', 0.5 + 'rem');
     let inputMaxFilter = popupWindowFilter.append('input').attr('id', 'maxFilterValue').style('width', 2 + 'rem');
     let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem')
-    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'filterButton');
+    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonFilter');
 
     let popupWindowFilterError = popupWindowFilter
         .append('div')
+        .attr('id', 'errorFilter')
         .style('position', 'absolute')
         .style('display', 'none');
     
@@ -1563,13 +1571,13 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     inputMaxRange.on('keypress', (event) => {
                         if (event.key === "Enter") {
                             event.preventDefault();
-                            document.getElementById("rangeButton").click();
+                            document.getElementById("buttonRange").click();
                         }
                     });
                     inputMinRange.on('keypress', (event) => {
                         if (event.key === "Enter") {
                             event.preventDefault();
-                            document.getElementById("rangeButton").click();
+                            document.getElementById("buttonRange").click();
                         }
                     });
                     resetRangeButton.on('click', () => {
@@ -1687,13 +1695,13 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     inputMaxFilter.on('keypress', (event) => {
                         if (event.key === "Enter") {
                             event.preventDefault();
-                            document.getElementById("filterButton").click();
+                            document.getElementById("buttonFilter").click();
                         }
                     });
                     inputMinFilter.on('keypress', (event) => {
                         if (event.key === "Enter") {
                             event.preventDefault();
-                            document.getElementById("filterButton").click();
+                            document.getElementById("buttonFilter").click();
                         }
                     });
                     closeButtonFilter.on('click', () => {
