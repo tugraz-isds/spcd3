@@ -1078,6 +1078,14 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('fill', 'none')
         .on('pointerenter', (event, d) => {
             const data = getAllPointerEventsData(event);
+            for(let i = 0; i < data.length; i++) {
+                for(let j = 0; j < parcoords.newDataset.length; j++) {
+                    let recordData = parcoords.newDataset[j][window.hoverlabel];
+                    if (recordData == data[i]) {
+                        createToolTipForValues(parcoords.newDataset[j]);
+                    }
+                }
+            }
             window.hoverdata = [];
             window.hoverdata = data.slice();
             selectedPath = highlight(data);
@@ -1085,10 +1093,20 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         })
         .on('pointerleave', () => {
             doNotHighlight(selectedPath);
+            let dimensions = getAllVisibleDimensionNames();
+            for(let i = 0; i < dimensions.length; i++) {
+                let cleanString = helper.cleanLinePathString(dimensions[i]);
+                d3.select('#tooltip_' + cleanString).remove();
+            }
             return tooltipPath.style('visibility', 'hidden');
         })
         .on('pointerout', () => {
             doNotHighlight(selectedPath);
+            let dimensions = getAllVisibleDimensionNames();
+            for(let i = 0; i < dimensions.length; i++) {
+                let cleanString = helper.cleanLinePathString(dimensions[i]);
+                d3.select('#tooltip_' + cleanString).remove();
+            }
             return tooltipPath.style('visibility', 'hidden');
         })
         .on('click', (event, d) => {
@@ -1137,6 +1155,56 @@ function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any
         return tooltipPath;
     }
 }
+
+function createToolTipForValues(recordData): void {
+
+    let dimensions = getAllVisibleDimensionNames();
+    for(let i = 0; i < dimensions.length; i++) {
+        let cleanString = helper.cleanLinePathString(dimensions[i]);
+        let tooltipValues = d3.select('#parallelcoords')
+            .append('g')
+            .attr('id', 'tooltip_' + cleanString)
+            .style('position', 'absolute')
+            .style('visibility', 'hidden');
+
+        const dimensionName = dimensions[i];
+        const invertStatus = isInverted(dimensionName);
+        const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
+        parcoords.yScales[dimensionName].domain()[0];
+    
+        const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
+        parcoords.yScales[dimensionName].domain()[1];
+
+        const range = maxValue - minValue;
+
+        let value;
+        
+        if(invertStatus) {
+            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]])    :
+                240 / range * (recordData[dimensions[i]] - minValue) + 80;
+        }
+        else {
+            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]]) :
+                240 / range * (maxValue - recordData[dimensions[i]]) + 80;
+        }
+
+        let y = value+150;
+        let x = 65 + (i * 100);
+
+        let tempText = recordData[dimensions[i]].toString();
+        tooltipValues.text(tempText);
+        tooltipValues.style('visibility', 'visible');
+        tooltipValues.style('top', y + 'px').style('left', x + 'px');
+        tooltipValues.style('font-size', '0.75rem')
+            .style('margin', 0.5 + 'rem')
+            .style('color', 'red')
+            .style('font-weight', 'bold')
+            .style('padding', 0.12 + 'rem')
+            .style('white-space', 'pre-line')
+            .style('margin-left', 0.5 + 'rem');       
+    }
+}
+
 
 function getAllPointerEventsData(event: any): any {
     const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
