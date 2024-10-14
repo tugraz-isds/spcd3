@@ -1095,7 +1095,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             doNotHighlight(selectedPath);
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
-                let cleanString = helper.cleanLinePathString(dimensions[i]);
+                let cleanString = helper.cleanString(dimensions[i]);
                 d3.select('#tooltip_' + cleanString).remove();
             }
             return tooltipPath.style('visibility', 'hidden');
@@ -1104,7 +1104,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             doNotHighlight(selectedPath);
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
-                let cleanString = helper.cleanLinePathString(dimensions[i]);
+                let cleanString = helper.cleanString(dimensions[i]);
                 d3.select('#tooltip_' + cleanString).remove();
             }
             return tooltipPath.style('visibility', 'hidden');
@@ -1159,52 +1159,69 @@ function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any
 function createToolTipForValues(recordData): void {
 
     let dimensions = getAllVisibleDimensionNames();
+    let counter = 0;
+    let firstDimension;
     for(let i = 0; i < dimensions.length; i++) {
-        let cleanString = helper.cleanLinePathString(dimensions[i]);
-        let tooltipValues = d3.select('#parallelcoords')
-            .append('g')
-            .attr('id', 'tooltip_' + cleanString)
-            .style('position', 'absolute')
-            .style('visibility', 'hidden');
+        let cleanString = helper.cleanString(dimensions[i]);
+        if(helper.isElementVisible(d3.select('#rect_' + cleanString))) {
+            if (firstDimension == undefined) {
+                firstDimension = cleanString;
+            }
+            let tooltipValues = d3.select('#parallelcoords')
+                .append('g')
+                .attr('id', 'tooltip_' + cleanString)
+                .style('position', 'absolute')
+                .style('visibility', 'hidden');
 
-        const dimensionName = dimensions[i];
-        const invertStatus = isInverted(dimensionName);
-        const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
-        parcoords.yScales[dimensionName].domain()[0];
+            const dimensionName = dimensions[i];
+            const invertStatus = isInverted(dimensionName);
+            const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
+            parcoords.yScales[dimensionName].domain()[0];
     
-        const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-        parcoords.yScales[dimensionName].domain()[1];
+            const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
+            parcoords.yScales[dimensionName].domain()[1];
 
-        const range = maxValue - minValue;
+            const range = maxValue - minValue;
 
-        let value;
+            let value;
         
-        if(invertStatus) {
-            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]])    :
-                240 / range * (recordData[dimensions[i]] - minValue) + 80;
-        }
-        else {
-            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]]) :
-                240 / range * (maxValue - recordData[dimensions[i]]) + 80;
-        }
+            if(invertStatus) {
+                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]])    :
+                    240 / range * (recordData[dimensions[i]] - minValue) + 80;
+            }
+            else {
+                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]]) :
+                    240 / range * (maxValue - recordData[dimensions[i]]) + 80;
+            }
 
-        let y = value+150;
-        let x = 65 + (i * 100);
+            let x;
 
-        let tempText = recordData[dimensions[i]].toString();
-        tooltipValues.text(tempText);
-        tooltipValues.style('visibility', 'visible');
-        tooltipValues.style('top', y + 'px').style('left', x + 'px');
-        tooltipValues.style('font-size', '0.75rem')
-            .style('margin', 0.5 + 'rem')
-            .style('color', 'red')
-            .style('font-weight', 'bold')
-            .style('padding', 0.12 + 'rem')
-            .style('white-space', 'pre-line')
-            .style('margin-left', 0.5 + 'rem');       
+            let posLeft = d3.select('#rect_' + firstDimension).node().getBoundingClientRect().left;
+    
+            if (window.longLabels) {
+                x = posLeft + (counter * 200);
+            }
+            else {
+                x = posLeft + 5 + (counter * 100);
+            }
+            counter = counter + 1;
+
+            let y = value+150;
+
+            let tempText = recordData[dimensions[i]].toString();
+            tooltipValues.text(tempText);
+            tooltipValues.style('visibility', 'visible');
+            tooltipValues.style('top', y + 'px').style('left', x + 'px');
+            tooltipValues.style('font-size', '0.75rem')
+                .style('margin', 0.5 + 'rem')
+                .style('color', 'red')
+                .style('font-weight', 'bold')
+                .style('padding', 0.12 + 'rem')
+                .style('white-space', 'pre-line')
+                .style('margin-left', 0.5 + 'rem');       
+        }
     }
 }
-
 
 function getAllPointerEventsData(event: any): any {
     const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
@@ -1230,7 +1247,9 @@ function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
         .enter()
         .append('g')
         .attr('class', 'feature')
-        .attr('id', 'feature')
+        .attr('id', (d) => {
+            return 'feature_' + d.name
+        })
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
     let tooltipValuesLabel = d3.select('#parallelcoords')
