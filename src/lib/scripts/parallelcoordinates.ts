@@ -18,6 +18,7 @@ declare global {
     let yAxis: {};
     let scrollXPos: any;
     let selected: [];
+    let hoverSelected: [];
     let parcoords: {
         xScales: any,
         yScales: {},
@@ -1247,9 +1248,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
         .enter()
         .append('g')
         .attr('class', 'feature')
-        .attr('id', (d) => {
-            return 'feature_' + d.name
-        })
+        .attr('id', 'feature')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
     let tooltipValuesLabel = d3.select('#parallelcoords')
@@ -1324,12 +1323,13 @@ function highlight(data: any): any {
 
         let newTempText = [];
         for(let i = 0; i < dataWoSpecialC.length; i++) {
-            let isOrange = d3.select('.' + dataWoSpecialC[i].replace(/,./g, '')).style('stroke');
-            if(isOrange !== 'rgb(255, 165, 0)') {
-                newTempText.push(dataWoSpecialC[i].replace(/,./g, ''));
-            }
-            else {
-                // do nothing
+            newTempText.push(dataWoSpecialC[i].replace(/,./g, ''));
+            if (isSelected(dataWoSpecialC[i])) {
+                setUnselected(dataWoSpecialC[i]);
+                if(window.hoverSelected == undefined) {
+                    window.hoverSelected = [];
+                }
+                window.hoverSelected.push(dataWoSpecialC[i]);
             }
         }
 
@@ -1350,13 +1350,11 @@ function doNotHighlight(selectedPath: any): void {
         let tempText = selectedPath.split(',.');
         let newTempText = [];
         for(let i = 0; i < tempText.length; i++) {
-            let isOrange = d3.select('.' + tempText[i]).style('stroke');
-
-            if(isOrange !== 'rgb(255, 165, 0)') {
-                newTempText.push(tempText[i]);
-            }
-            else {
-                // do nothing
+            newTempText.push(tempText[i]);
+            if (window.hoverSelected != undefined && window.hoverSelected.includes(tempText[i])) {
+                setSelected(tempText[i]);
+                const index = window.hoverSelected.indexOf(tempText[i]);
+                window.hoverSelected.splice(index, 1);
             }
         }
 
