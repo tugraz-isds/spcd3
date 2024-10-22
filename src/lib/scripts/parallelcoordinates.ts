@@ -4,6 +4,7 @@ import * as drag from 'd3-drag';
 import * as path from 'd3-shape';
 import * as axis from 'd3-axis';
 import * as scale from 'd3-scale';
+import * as d3brush from 'd3-brush';
 import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from '../icons/icons';
@@ -40,6 +41,9 @@ declare global {
     let hoverdata: any[];
     let hoverlabel: string;
     let longLabels: boolean;
+    let yBrushes: {};
+    let filters: {};
+    let selectedDots: [];
 }
 
 declare const window: any;
@@ -683,6 +687,8 @@ export function drawChart(content: any): void {
 
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 
+    //setBrushRectangle();
+
     window.svg
         .on('click', (event) => {
             if (!(event.shiftKey) && !(event.ctrlKey) && !(event.metaKey)) {
@@ -979,7 +985,7 @@ function redrawChart(content: any, newFeatures: any): void {
                     }
                 }
             }
-        });
+        })
     
     window.onclick = () => {
         d3.select('#contextmenu').style('display', 'none');
@@ -1941,6 +1947,38 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                         tooltipValues.style('visibility', 'hidden');
                     }));
         });
+}
+
+function setBrushRectangle(): void {
+    
+    window.svg
+        .append('g')
+        .attr('class', 'selection_rect')
+        .call(d3brush.brush()
+        .extent([[0, 0], [900, 360]])
+        //.on("start brush", brushed)
+        .on("end", getSelectedRecords)
+    )
+}
+
+function getSelectedRecords(event) {
+    let selection = event.selection;
+    let dimensions = getAllVisibleDimensionNames();
+
+    for (let i = 0; i < window.parcoords.newDataset.length; i++) {
+        let recordData = window.parcoords.newDataset[i];
+       
+        for (let j = 0; j < dimensions.length - 1; j++) {
+            let isIntersect = selection[0][0] <= window.parcoords.xScales(dimensions[j+1]) && 
+            window.parcoords.xScales(dimensions[j]) < selection[1][0] &&
+            selection[0][1] <= window.parcoords.yScales[dimensions[j+1]](recordData[dimensions[j+1]]) && 
+            window.parcoords.yScales[dimensions[j]](recordData[dimensions[j]]) < selection[1][1];
+            if (isIntersect) {
+                setSelected(recordData[window.hoverlabel]);
+            }
+        }
+    
+    }
 }
 
 // Dragging
