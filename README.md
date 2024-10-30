@@ -1,19 +1,21 @@
+
 # Steerable Parallel Coordinates in D3 (SPCD3)
 
-SPCD3 is a JavaScript library which implements a parallel coordinates
-visualisation.  This project contains the library and an already
-implemented example that the library is using. In addition, the
-project uses D3v7.
+SPCD3 is an open-source JavaScript library which implements a
+steerable parallel coordinates visualisation. The visualisation has
+built-in interactive controls as well as an API which allows the
+visualisation to be controlled (steered) externally. The library is
+written in TypeScript and is based on [D3](https://d3js.org/).
 
-A live version of the latest deployment can be found at
+In addition, a simple example program is provided to illustrate how to
+use the library and its steerable API. A live version of the latest
+deployment can be found at
 [https://tugraz-isds.github.io/spcd3](https://tugraz-isds.github.io/spcd3).
 
-## Built With
 
-As mentioned, the library uses D3v7 but not the entire library;
-only some modules from [D3](https://d3js.org/) are used.
+## Dependencies
 
-The modules we are using are:
+The SPCD3 library uses the following D3v7 modules:
 - d3-dsv
 - d3-selection
 - d3-drag
