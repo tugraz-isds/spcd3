@@ -63,7 +63,7 @@ inputButton.addEventListener('click', openFileDialog, false);
 let inputFile = document.getElementById('fileInput');
 inputFile.addEventListener('change', handleFileSelect, false);
 inputFile.addEventListener('cancel', () => {
-    document.getElementById('input').textContent = 'Upload File';
+    document.getElementById('input').textContent = 'Upload File...';
 })
 inputFile.addEventListener('click', (event) => {
     event.target.value = null;
