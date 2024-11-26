@@ -1060,6 +1060,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
+    let delay;
+
     let active = svg.append('g')
         .attr('class', 'active')
         .selectAll('path')
@@ -1085,11 +1087,16 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('fill', 'none')
         .on('pointerenter', (event, d) => {
             const data = getAllPointerEventsData(event);
+            if (delay) {
+                clearTimeout(delay);
+            }
             for(let i = 0; i < data.length; i++) {
                 for(let j = 0; j < parcoords.newDataset.length; j++) {
                     let recordData = parcoords.newDataset[j][window.hoverlabel];
-                    if (recordData == data[i]) {
-                        createToolTipForValues(parcoords.newDataset[j]);
+                    if (recordData == data[i]) {           
+                        delay = setTimeout(function() {
+                            createToolTipForValues(parcoords.newDataset[j])
+                        }, 200);
                     }
                 }
             }
@@ -1103,6 +1110,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
                 let cleanString = helper.cleanString(dimensions[i]);
+                clearTimeout(delay);
                 d3.select('#tooltip_' + cleanString).remove();
             }
             return tooltipPath.style('visibility', 'hidden');
@@ -1112,6 +1120,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
                 let cleanString = helper.cleanString(dimensions[i]);
+                clearTimeout(delay);
                 d3.select('#tooltip_' + cleanString).remove();
             }
             return tooltipPath.style('visibility', 'hidden');
@@ -1171,7 +1180,7 @@ function createToolTipForValues(recordData): void {
     for(let i = 0; i < dimensions.length; i++) {
         let cleanString = helper.cleanString(dimensions[i]);
         if(helper.isElementVisible(d3.select('#rect_' + cleanString))) {
-            if (firstDimension == undefined) {
+            if (firstDimension === undefined) {
                 firstDimension = cleanString;
             }
             let tooltipValues = d3.select('#parallelcoords')
@@ -1222,10 +1231,11 @@ function createToolTipForValues(recordData): void {
             tooltipValues.style('font-size', '0.75rem')
                 .style('margin', 0.5 + 'rem')
                 .style('color', 'red')
+                .style('background-color', 'lightgrey')
                 .style('font-weight', 'bold')
                 .style('padding', 0.12 + 'rem')
                 .style('white-space', 'pre-line')
-                .style('margin-left', 0.5 + 'rem');       
+                .style('margin-left', 0.5 + 'rem');    
         }
     }
 }
@@ -1269,7 +1279,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
             d3.select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
-                .on('mouseover', function (event, d) {
+                .on('mouseenter', function (event, d) {
                     tooltipValuesLabel.text('');
                     tooltipValuesLabel.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
                     tooltipValuesLabel.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')

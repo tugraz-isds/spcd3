@@ -33,14 +33,12 @@
     "del": "^6.0.0",
     "gulp": "^5.0.0",
     "gulp-base64-inline": "^1.0.6",
-    "gulp-rollup": "^2.17.0",
-    "mini-svg-data-uri": "^1.4.4",
+    "gulp-rollup": "^2.17.0", 
     "rollup": "^2.60.0",
     "rollup-plugin-gzip": "^2.5.0",
     "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.2.0",
-    "typescript": "^5.5.3",
-    "xml-formatter": "^3.6.2"
+    "typescript": "^5.5.3"
   },
   "dependencies": {
     "d3-axis": "^3.0.0",
@@ -50,6 +48,8 @@
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
     "d3-transition": "^3.0.1",
-    "d3-brush": "^3.0.0"
+    "d3-brush": "^3.0.0",
+    "xml-formatter": "^3.6.2",
+    "mini-svg-data-uri": "^1.4.4"
   }
 }

@@ -445,16 +445,20 @@ function disableLeftAndRightButton() {
         const position = getDimensionPosition(dimensions[i]);
         const numberOfDimensions = getNumberOfDimensions();
         if (position == numberOfDimensions - 1 || position == -1) {
-            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-right.svg';
+            document.getElementById('moveleft_' + dimensions[i]).disabled = true;
+            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-left-disabled.svg';
         }
         else {
+            document.getElementById('moveleft_' + dimensions[i]).disabled = false;
             document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-left.svg';
         }
 
         if (position == 0 || position == -1) {
-            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-left.svg';
+            document.getElementById('moveright_' + dimensions[i]).disabled = true;
+            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-right-disabled.svg';
         }
         else {
+            document.getElementById('moveright_' + dimensions[i]).disabled = false;
             document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-right.svg';
         }
     }
