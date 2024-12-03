@@ -1110,8 +1110,11 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
                 let cleanString = helper.cleanString(dimensions[i]);
-                clearTimeout(delay);
+                if (delay) {
+                    clearTimeout(delay);
+                }
                 d3.select('#tooltip_' + cleanString).remove();
+                delay = null;
             }
             return tooltipPath.style('visibility', 'hidden');
         })
@@ -1120,8 +1123,11 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             let dimensions = getAllVisibleDimensionNames();
             for(let i = 0; i < dimensions.length; i++) {
                 let cleanString = helper.cleanString(dimensions[i]);
-                clearTimeout(delay);
+                if (delay) {
+                    clearTimeout(delay);
+                }
                 d3.select('#tooltip_' + cleanString).remove();
+                delay = null;
             }
             return tooltipPath.style('visibility', 'hidden');
         })
@@ -1228,10 +1234,10 @@ function createToolTipForValues(recordData): void {
             tooltipValues.text(tempText);
             tooltipValues.style('visibility', 'visible');
             tooltipValues.style('top', y + 'px').style('left', x + 'px');
-            tooltipValues.style('font-size', '0.75rem')
+            tooltipValues.style('font-size', '0.65rem')
                 .style('margin', 0.5 + 'rem')
                 .style('color', 'red')
-                .style('background-color', 'lightgrey')
+                .style('background-color', '#d3d3d3ad')
                 .style('font-weight', 'bold')
                 .style('padding', 0.12 + 'rem')
                 .style('white-space', 'pre-line')
