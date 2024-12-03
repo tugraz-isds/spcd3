@@ -35,7 +35,7 @@ window.addEventListener('click', (event) => {
             document.getElementById('rangeContainer').remove();
         }
     }
-    if(!event.target.id.includes('select')) {
+    if(!event.target.id.includes('sel')) {
         closeElements('options_r');
     }
 });
@@ -470,6 +470,7 @@ function generateDropdownForFilter() {
         dimensions.forEach(function(dimension) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
+            dimensionLabel.id = 'filterLabel';
             let filterInput = document.createElement('input');
             filterInput.className = 'inputFields';
             filterInput.type = 'image';
@@ -501,6 +502,8 @@ function generateDropdownForFilter() {
         if(event.target.value != undefined) {
             filterDimensionData = event.target.value;
             generateModuleForSetFilter();
+            dimensionContainer.style.display == 'none' ? dimensionContainer.style.display = 'block' :
+            dimensionContainer.style.display = 'none';
         }
     });
 
@@ -569,7 +572,7 @@ function generateModuleForSetFilter() {
     inputMinFilter.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('filterButton').click();
+            document.getElementById('onFilterButton').click();
         }
     }
 
@@ -589,7 +592,7 @@ function generateModuleForSetFilter() {
     inputMaxFilter.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('filterButton').click();
+            document.getElementById('onFilterButton').click();
         }
     }
 
@@ -599,7 +602,7 @@ function generateModuleForSetFilter() {
     popupWindowFilter.appendChild(popupWindowFilterError);
 
     let filterButton = document.createElement('button');
-    filterButton.id = 'filterButton';
+    filterButton.id = 'onFilterButton';
     filterButton.textContent = 'Save';
     filterButton.style.marginLeft = 0.5 + 'rem';
     filterButton.style.marginRight = 0.5 + 'rem';
@@ -723,6 +726,7 @@ function generateDropdownForRange() {
         dimensions.forEach(function(dimension) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
+            dimensionLabel.id = 'rangeLabel';
             let rangeInput = document.createElement('input');
             rangeInput.className = 'inputFields';
             rangeInput.type = 'image';
@@ -754,6 +758,8 @@ function generateDropdownForRange() {
         if(event.target.value != undefined) {
             rangeDimensionData = event.target.value;
             generateModuleForRangeSettings();
+            dimensionContainer.style.display == 'none' ? dimensionContainer.style.display = 'block' :
+            dimensionContainer.style.display = 'none';
         }
     });
 
@@ -831,7 +837,7 @@ function generateModuleForRangeSettings() {
     inputMinRange.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('rangeButton').click();
+            document.getElementById('onRangeButton').click();
         }
     }
 
@@ -851,7 +857,7 @@ function generateModuleForRangeSettings() {
     inputMaxRange.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('rangeButton').click();
+            document.getElementById('onRangeButton').click();
         }
     }
 
@@ -861,7 +867,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.appendChild(popupWindowRangeError);
     
     let rangeButton = document.createElement('button');
-    rangeButton.id = 'rangeButton';
+    rangeButton.id = 'onRangeButton';
     rangeButton.textContent = 'Save';
     rangeButton.style.marginLeft = 0.5 + 'rem';
     rangeButton.style.marginRight = 0.5 + 'rem';
@@ -1004,6 +1010,7 @@ function generateDropdownForSelectRecords() {
     records.forEach(function(record) {
         let label = document.createElement('label');
         label.className = 'dropdownLabel';
+        label.id = 'selectLabel';
         let input = document.createElement('input');
         input.type = 'checkbox';
         input.className = 'inputFields';
