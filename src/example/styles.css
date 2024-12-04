@@ -150,14 +150,10 @@ section {
 }
 
 .dropdownLabel {
-  display: block;
   font-family: Verdana, sans-serif;
   padding-bottom: 0.3rem;
-}
-
-.dropdownLabel:hover {
-  background-color: dodgerblue;
-  color: white;
+  display:flex;
+  flex-direction: row;
 }
 
 .inputFields {
@@ -165,6 +161,11 @@ section {
   margin-top: 0.3rem;
   margin-left: 0.5rem;
   font-size: smaller;
+}
+
+.dropdownLabel:hover {
+  background-color: dodgerblue;
+  color: white;
 }
 
 .inputMove {

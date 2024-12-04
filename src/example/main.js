@@ -217,7 +217,7 @@ function generateDropdownForShow() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';      
         dimensions.forEach(function(dimension) {
-            let label = document.createElement('label');
+            let label = document.createElement('div');
             label.className = 'dropdownLabel';
             label.id = 'show';
             let input = document.createElement('input');
@@ -228,8 +228,9 @@ function generateDropdownForShow() {
             input.name = 'dimension';
             input.checked = true;
             label.appendChild(input);
-            let textLabel = document.createTextNode(dimension);
-            textLabel.id = 'textLabel';
+            let textLabel = document.createElement('label');
+            textLabel.textContent = dimension;
+            textLabel.id = 'showLabel';
             label.appendChild(textLabel);
             dimensionContainer.appendChild(label);
         });
@@ -276,8 +277,11 @@ function generateDropdownForInvert() {
             else {
                 input.src = './svg/arrow-down.svg';
             }
+            let textLabel = document.createElement('label');
+            textLabel.textContent = dimension;
+            textLabel.id = 'invertLabel';
             label.appendChild(input);
-            label.appendChild(document.createTextNode(dimension));
+            label.appendChild(textLabel);
             dimensionContainer.appendChild(label);
         });
 
@@ -362,9 +366,12 @@ function generateDropdownForMove() {
             arrowRight.id = 'moveright_' + dimension;
             arrowRight.src = './svg/arrow-right.svg';
             arrowRight.style.paddingRight = '0.5rem';
+            let textLabel = document.createElement('label');
+            textLabel.textContent = dimension;
+            textLabel.id = 'moveLabel';
             dimensionLabel.appendChild(arrowLeft);
             dimensionLabel.appendChild(arrowRight);
-            dimensionLabel.appendChild(document.createTextNode(dimension));
+            dimensionLabel.appendChild(textLabel);
             dimensionContainer.appendChild(dimensionLabel);
         });
         showOptions('moveOptions', 'moveButton');
@@ -1008,7 +1015,7 @@ function generateDropdownForSelectRecords() {
     });
 
     records.forEach(function(record) {
-        let label = document.createElement('label');
+        let label = document.createElement('div');
         label.className = 'dropdownLabel';
         label.id = 'selectLabel';
         let input = document.createElement('input');
@@ -1018,8 +1025,11 @@ function generateDropdownForSelectRecords() {
         input.value = record;
         input.name = 'record';
         input.checked = false;
+        let textLabel = document.createElement('label');
+        textLabel.textContent = record;
+        textLabel.id = 'selectLabel';
         label.appendChild(input);
-        label.appendChild(document.createTextNode(record));
+        label.appendChild(textLabel);
         recordsContainer.appendChild(label);
     });
 
