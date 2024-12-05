@@ -986,6 +986,9 @@ function redrawChart(content: any, newFeatures: any): void {
                 }
             }
         })
+        /*.on("contextmenu", function (event) {
+            d3.event.preventDefault();
+        });*/
     
     window.onclick = () => {
         d3.select('#contextmenu').style('display', 'none');
@@ -1017,7 +1020,10 @@ function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any;
         .each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        });
+        })
+        /*.on("contextmenu", function (d) {
+            d3.event.preventDefault();
+        });*/
 }
 
 function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any; 
@@ -1044,7 +1050,10 @@ function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any;
         .each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        });
+        })
+        /*.on("contextmenu", function (d) {
+            d3.event.preventDefault();
+        });*/
 }
 
 
@@ -1060,6 +1069,34 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
+    let contextMenu = d3.select('#parallelcoords')
+        .append('g')
+        .attr('id', 'contextmenuRecords')
+        .style('position', 'absolute')
+        .style('display', 'none');
+
+    contextMenu.append('div')
+        .attr('id', 'selectRecord')
+        .attr('class', 'contextmenu')
+        .text('Select Record');
+    contextMenu.append('div')
+        .attr('id', 'unSelectRecord')
+        .attr('class', 'contextmenu')
+        .text('Unselect Record');
+    contextMenu.append('div')
+        .attr('id', 'toggleRecord')
+        .attr('class', 'contextmenu')
+        .text('Toggle');
+    contextMenu.append('div')
+        .attr('id', 'addSelection')
+        .attr('class', 'contextmenu')
+        .text('Add to Selection');
+    contextMenu.append('div')
+        .attr('id', 'removeSelection')
+        .attr('class', 'contextmenu')
+        .text('Remove to Selection');
+    
+        
     let delay;
 
     let active = svg.append('g')
@@ -1134,7 +1171,53 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .on('click', (event, d) => {
             //const data = getAllPointerEventsData(event);
             select(window.hoverdata);
-        });
+        })
+        .on('contextmenu', function (event, d) {
+            
+            contextMenu.style('left', event.clientX + 'px')
+            .style('top', 13.6 + 'rem')
+            .style('display', 'block')
+            .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+            .style('padding', 0.35 + 'rem')
+            .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
+            .style('cursor', 'pointer')
+            .on('click', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+            });
+
+            d3.select('#selectRecord')
+                .on('click', (event) => {
+                    select(window.hoverdata);
+                    //console.log(event);
+                    event.stopPropagation();
+                });
+
+            d3.select('#unSelectRecord')
+                .on('click', (event) => {
+                    setUnselected(window.hoverdata);
+                    event.stopPropagation();
+                });
+
+            d3.select('#toggleRecord')
+                .on('click', (event) => {
+                    toggleSelection(window.hoverdata);
+                    event.stopPropagation();
+                });
+
+            d3.select('#addSelection')
+                .on('click', (event) => {
+                    setSelection(window.hoverdata);
+                    event.stopPropagation();
+                });
+            
+            d3.select('#removeSelection')
+                .on('click', (event) => {
+                    setUnselected(window.hoverdata);
+                    event.stopPropagation();
+                });
+        })
 
     return active;
 }
