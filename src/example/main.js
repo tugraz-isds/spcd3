@@ -262,7 +262,7 @@ function generateDropdownForInvert() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         dimensions.forEach(function(dimension) {
-            let label = document.createElement('label');
+            let label = document.createElement('div');
             label.className = 'dropdownLabel';
             label.id = 'invert';
             let input = document.createElement('input');
@@ -349,7 +349,7 @@ function generateDropdownForMove() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         dimensions.forEach(function(dimension) {
-            let dimensionLabel = document.createElement('label');
+            let dimensionLabel = document.createElement('div');
             dimensionLabel.className = 'dropdownLabel';
             let arrowLeft = document.createElement('input');
             arrowLeft.className = 'inputMove';
