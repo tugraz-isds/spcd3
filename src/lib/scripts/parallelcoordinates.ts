@@ -562,7 +562,8 @@ export function getSelected(): any[] {
    
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
-        let isVisible = d3.select('#select_' + records[i]).style('visibility');
+        let selectedLine = helper.cleanLinePathString(records[i]);
+        let isVisible = d3.select('#select_' + selectedLine).style('visibility');
         if (isVisible == 'visible') {
             selected.push(records[i]);
         }
@@ -709,10 +710,15 @@ export function drawChart(content: any): void {
                 }
             }
         }
+    })
+    .on("contextmenu", function (event) {
+        event.stopPropagation();
+        event.preventDefault();
     });
     
     window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
+        d3.select('#contextmenuRecords').style('display', 'none');
         if(!event.target.id.includes('Filter')) {
             d3.select('#popupFilter').style('display', 'none');
         }
@@ -725,6 +731,7 @@ export function drawChart(content: any): void {
 export function deleteChart(): void {
     d3.select('#pc_svg').remove();
     d3.select('#contextmenu').remove();
+    d3.select('#contextmenuRecords').remove();
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
 }
@@ -986,12 +993,13 @@ function redrawChart(content: any, newFeatures: any): void {
                 }
             }
         })
-        /*.on("contextmenu", function (event) {
-            d3.event.preventDefault();
-        });*/
+        .on("contextmenu", function (event) {
+            event.preventDefault();
+        });
     
-    window.onclick = () => {
+    window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
+        d3.select('#contextmenuRecords').style('display', 'none');
     }
     
     window.selectable = setSelectPathLines(svg, content, window.parcoords);
@@ -1021,9 +1029,9 @@ function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any;
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
-        /*.on("contextmenu", function (d) {
-            d3.event.preventDefault();
-        });*/
+        .on("contextmenu", function (event) {
+            event.preventDefault();
+        });
 }
 
 function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any; 
@@ -1051,9 +1059,9 @@ function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any;
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
-        /*.on("contextmenu", function (d) {
-            d3.event.preventDefault();
-        });*/
+        .on("contextmenu", function (event) {
+            event.preventDefault();
+        });
 }
 
 
@@ -1086,7 +1094,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
     contextMenu.append('div')
         .attr('id', 'toggleRecord')
         .attr('class', 'contextmenu')
-        .text('Toggle');
+        .text('Toggle Record');
     contextMenu.append('div')
         .attr('id', 'addSelection')
         .attr('class', 'contextmenu')
@@ -1169,13 +1177,12 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             return tooltipPath.style('visibility', 'hidden');
         })
         .on('click', (event, d) => {
-            //const data = getAllPointerEventsData(event);
             select(window.hoverdata);
         })
         .on('contextmenu', function (event, d) {
             
             contextMenu.style('left', event.clientX + 'px')
-            .style('top', 13.6 + 'rem')
+            .style('top', event.clientY + 'px')
             .style('display', 'block')
             .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
@@ -1184,39 +1191,44 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             .style('cursor', 'pointer')
             .on('click', (event) => {
                 event.stopPropagation();
-                event.preventDefault();
             });
 
             d3.select('#selectRecord')
                 .on('click', (event) => {
-                    select(window.hoverdata);
-                    //console.log(event);
+                    setSelected(d[window.hoverlabel]);
                     event.stopPropagation();
                 });
 
             d3.select('#unSelectRecord')
                 .on('click', (event) => {
-                    setUnselected(window.hoverdata);
+                    setUnselected(d[window.hoverlabel]);
                     event.stopPropagation();
                 });
 
             d3.select('#toggleRecord')
+                .style('border-top', '0.08rem lightgrey solid')
                 .on('click', (event) => {
-                    toggleSelection(window.hoverdata);
+                    toggleSelection(d[window.hoverlabel]);
                     event.stopPropagation();
                 });
 
             d3.select('#addSelection')
+                .style('border-top', '0.08rem lightgrey solid')
                 .on('click', (event) => {
-                    setSelection(window.hoverdata);
+                    let selectedRecords = [];
+                    selectedRecords = getSelected();
+                    selectedRecords.push(d[window.hoverlabel]);
+                    setSelection(selectedRecords);
                     event.stopPropagation();
                 });
             
             d3.select('#removeSelection')
                 .on('click', (event) => {
-                    setUnselected(window.hoverdata);
+                    setUnselected(d[window.hoverlabel]);
                     event.stopPropagation();
                 });
+            d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
+            event.preventDefault();
         })
 
     return active;
