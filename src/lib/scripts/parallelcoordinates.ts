@@ -674,13 +674,13 @@ export function drawChart(content: any): void {
 
     const height = 360;
 
-    window.svg = d3.select('#parallelcoords')
+    /*window.svg = d3.select('#parallelcoords')
         .append('button')
         .text("Refresh")
 
     window.svg = d3.select('#parallelcoords')
         .append('button')
-        .text('Selection Tool');
+        .text('Selection Tool');*/
 
     window.svg = d3.select('#parallelcoords')
         .append('svg')
