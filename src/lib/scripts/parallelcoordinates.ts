@@ -675,6 +675,14 @@ export function drawChart(content: any): void {
     const height = 360;
 
     window.svg = d3.select('#parallelcoords')
+        .append('button')
+        .text("Refresh")
+
+    window.svg = d3.select('#parallelcoords')
+        .append('button')
+        .text('Selection Tool');
+
+    window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, window.width, height])
@@ -1106,6 +1114,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
     
         
     let delay;
+    let storage = [];
 
     let active = svg.append('g')
         .attr('class', 'active')
@@ -1135,16 +1144,19 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             if (delay) {
                 clearTimeout(delay);
             }
+
             for(let i = 0; i < data.length; i++) {
                 for(let j = 0; j < parcoords.newDataset.length; j++) {
                     let recordData = parcoords.newDataset[j][window.hoverlabel];
-                    if (recordData == data[i]) {           
+                    if (recordData == data[i]) {   
+                        storage.push(recordData);        
                         delay = setTimeout(function() {
-                            createToolTipForValues(parcoords.newDataset[j])
-                        }, 200);
+                            createToolTipForValues(parcoords.newDataset[j]);
+                        }, 300);
                     }
                 }
             }
+           
             window.hoverdata = [];
             window.hoverdata = data.slice();
             selectedPath = highlight(data);
@@ -1153,26 +1165,32 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .on('pointerleave', () => {
             doNotHighlight(selectedPath);
             let dimensions = getAllVisibleDimensionNames();
-            for(let i = 0; i < dimensions.length; i++) {
-                let cleanString = helper.cleanString(dimensions[i]);
-                if (delay) {
-                    clearTimeout(delay);
+            for(let j = 0; j < storage.length; j++) {
+                for(let i = 0; i < dimensions.length; i++) {
+                    let cleanString = helper.cleanString(dimensions[i]);
+                    let secondCleanString = helper.cleanLinePathString(storage[j]);
+                    if (delay) {
+                        clearTimeout(delay);
+                    }
+                    d3.select('#tooltip_' + cleanString + '_' + secondCleanString).remove();
+                    delay = null;
                 }
-                d3.select('#tooltip_' + cleanString).remove();
-                delay = null;
             }
             return tooltipPath.style('visibility', 'hidden');
         })
         .on('pointerout', () => {
             doNotHighlight(selectedPath);
             let dimensions = getAllVisibleDimensionNames();
-            for(let i = 0; i < dimensions.length; i++) {
-                let cleanString = helper.cleanString(dimensions[i]);
-                if (delay) {
-                    clearTimeout(delay);
+            for(let j = 0; j < storage.length; j++) {
+                for(let i = 0; i < dimensions.length; i++) {
+                    let cleanString = helper.cleanString(dimensions[i]);
+                    let secondCleanString = helper.cleanLinePathString(storage[j]);
+                    if (delay) {
+                        clearTimeout(delay);
+                    }
+                    d3.select('#tooltip_' + cleanString + '_' + secondCleanString).remove();
+                    delay = null;
                 }
-                d3.select('#tooltip_' + cleanString).remove();
-                delay = null;
             }
             return tooltipPath.style('visibility', 'hidden');
         })
@@ -1280,13 +1298,15 @@ function createToolTipForValues(recordData): void {
     let firstDimension;
     for(let i = 0; i < dimensions.length; i++) {
         let cleanString = helper.cleanString(dimensions[i]);
+        let secondCleanString = helper.cleanLinePathString(recordData[window.hoverlabel]);
         if(helper.isElementVisible(d3.select('#rect_' + cleanString))) {
             if (firstDimension === undefined) {
                 firstDimension = cleanString;
             }
+            
             let tooltipValues = d3.select('#parallelcoords')
                 .append('g')
-                .attr('id', 'tooltip_' + cleanString)
+                .attr('id', 'tooltip_' + cleanString + '_' + secondCleanString)
                 .style('position', 'absolute')
                 .style('visibility', 'hidden');
 
