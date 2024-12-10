@@ -572,21 +572,49 @@ export function getSelected(): any[] {
 }
 
 export function setSelection(records: string[]): void {
+    let selectableLines = [];
     for(let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
-        d3.select('#select_' + selectedLine)
-            .transition()
-            .style('visibility', 'visible');
+        window.active.each(function (d) {
+            if(d[window.hoverlabel] == selectedLine) {
+                selectableLines.push(d);
+            }
+        });
         d3.select('.' + selectedLine)
             .transition()
-            .style('visibility', 'hidden');
+            .style('visibility', 'hidden'); 
     }
+
+    window.selectable = svg.append('g')
+        .attr('class', 'selectable')
+        .selectAll('path')
+        .data(selectableLines)
+        .enter()
+        .append('path')
+        .attr('id', (d) => {
+            const keys = Object.keys(d);
+            window.key = keys[0];
+            const selected_value = helper.cleanLinePathString(d[window.key]);
+            return 'select_' + selected_value;
+        })
+        .style('pointer-events', 'none')
+        .style('fill', 'none')
+        .style('stroke', 'rgb(255, 165, 0)')
+        .style('opacity', '1')
+        .style('visibility', 'visible')
+        .each(function (d) {
+            d3.select(this)
+                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+        })
+        .on("contextmenu", function (event) {
+            event.preventDefault();
+        });
 }
 
 export function isSelected(record: string): boolean {
     let cleanedRecord = helper.cleanLinePathString(record);
-    const path = d3.select('#select_' + cleanedRecord).style('visibility');
-    if (path == 'visible') {
+    const path = d3.select('#select_' + cleanedRecord);
+    if (path.size() != 0) {
         return true;
     }
     else {
@@ -605,20 +633,15 @@ export function toggleSelection(record: string): void {
 }
 
 export function setSelected(record: string): void {
-    const path = helper.cleanLinePathString(record);
-    d3.select('#select_' + path)
-            .transition()
-            .style('visibility', 'visible');
-    d3.select('.' + path)
-            .transition()
-            .style('visibility', 'hidden');
+    let selectableLines = [];
+    selectableLines.push(record);
+    setSelection(selectableLines);
 }
 
 export function setUnselected(record: string): void {
     const path = helper.cleanLinePathString(record);
     d3.select('#select_' + path)
-            .transition()
-            .style('visibility', 'hidden');
+            .remove();
     d3.select('.' + path)
             .transition()
             .style('visibility', 'visible');
@@ -688,7 +711,7 @@ export function drawChart(content: any): void {
         .attr('viewBox', [0, 0, window.width, height])
         .attr('font-family', 'Verdana, sans-serif');
 
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
+    //window.selectable = setSelectPathLines(svg, content, window.parcoords);
 
     let inactive = setInactivePathLines(svg, content, window.parcoords);
 
@@ -1012,8 +1035,6 @@ function redrawChart(content: any, newFeatures: any): void {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
     }
-    
-    window.selectable = setSelectPathLines(svg, content, window.parcoords);
 
     let inactive = setInactivePathLines(svg, content, window.parcoords);
 
@@ -1129,6 +1150,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .enter()
         .append('path')
         .attr('class', (d) => {
+            const keys = Object.keys(d);
+            window.key = keys[0];
             const selected_value = helper.cleanLinePathString(d[window.key]);
             ids.push(selected_value);
             return 'line ' + selected_value;
@@ -1510,12 +1533,7 @@ function doNotHighlight(selectedPath: any): void {
 function select(linePaths: any): void {
     for(let i = 0; i < linePaths.length; i++) {
         let selectedLine = helper.cleanLinePathString(linePaths[i]);
-        d3.select('#select_' + selectedLine)
-            .transition()
-            .style('visibility', 'visible');
-        d3.select('.' + selectedLine)
-            .transition()
-            .style('visibility', 'hidden');
+        setSelected(selectedLine);
     }
 }
 
