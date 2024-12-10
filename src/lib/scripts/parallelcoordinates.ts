@@ -722,6 +722,9 @@ export function drawChart(content: any): void {
     .on("contextmenu", function (event) {
         event.stopPropagation();
         event.preventDefault();
+    })
+    .on("mouseenter", function () {
+        cleanTooltip();
     });
     
     window.onclick = (event) => {
@@ -1072,6 +1075,11 @@ function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any;
         });
 }
 
+function cleanTooltip(){
+	d3.selectAll(".tooltip")
+    	.remove();
+}
+
 
 function setActivePathLines(svg: any, content: any, ids: any[], 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
@@ -1110,11 +1118,9 @@ function setActivePathLines(svg: any, content: any, ids: any[],
     contextMenu.append('div')
         .attr('id', 'removeSelection')
         .attr('class', 'contextmenu')
-        .text('Remove to Selection');
-    
-        
+        .text('Remove from Selection');
+         
     let delay;
-    let storage = [];
 
     let active = svg.append('g')
         .attr('class', 'active')
@@ -1141,6 +1147,11 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('fill', 'none')
         .on('pointerenter', (event, d) => {
             const data = getAllPointerEventsData(event);
+            window.hoverdata = [];
+            window.hoverdata = data.slice();
+            selectedPath = highlight(data);
+            createTooltipForPathLine(data, tooltipPath, event);
+            
             if (delay) {
                 clearTimeout(delay);
             }
@@ -1148,57 +1159,37 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             for(let i = 0; i < data.length; i++) {
                 for(let j = 0; j < parcoords.newDataset.length; j++) {
                     let recordData = parcoords.newDataset[j][window.hoverlabel];
-                    if (recordData == data[i]) {   
-                        storage.push(recordData);        
+                    if (recordData == data[i]) {       
                         delay = setTimeout(function() {
                             createToolTipForValues(parcoords.newDataset[j]);
-                        }, 300);
+                        }, 150);
                     }
                 }
             }
-           
-            window.hoverdata = [];
-            window.hoverdata = data.slice();
-            selectedPath = highlight(data);
-            createTooltipForPathLine(data, tooltipPath, event);
         })
         .on('pointerleave', () => {
             doNotHighlight(selectedPath);
-            let dimensions = getAllVisibleDimensionNames();
-            for(let j = 0; j < storage.length; j++) {
-                for(let i = 0; i < dimensions.length; i++) {
-                    let cleanString = helper.cleanString(dimensions[i]);
-                    let secondCleanString = helper.cleanLinePathString(storage[j]);
-                    if (delay) {
-                        clearTimeout(delay);
-                    }
-                    d3.select('#tooltip_' + cleanString + '_' + secondCleanString).remove();
-                    delay = null;
-                }
+            if (delay) {
+                clearTimeout(delay);
             }
-            return tooltipPath.style('visibility', 'hidden');
+            delay = null;
+            tooltipPath.style('visibility', 'hidden');
+            return cleanTooltip()
         })
         .on('pointerout', () => {
             doNotHighlight(selectedPath);
-            let dimensions = getAllVisibleDimensionNames();
-            for(let j = 0; j < storage.length; j++) {
-                for(let i = 0; i < dimensions.length; i++) {
-                    let cleanString = helper.cleanString(dimensions[i]);
-                    let secondCleanString = helper.cleanLinePathString(storage[j]);
-                    if (delay) {
-                        clearTimeout(delay);
-                    }
-                    d3.select('#tooltip_' + cleanString + '_' + secondCleanString).remove();
-                    delay = null;
-                }
+            if (delay) {
+                clearTimeout(delay);
             }
-            return tooltipPath.style('visibility', 'hidden');
+            
+            delay = null;
+            tooltipPath.style('visibility', 'hidden');
+            return cleanTooltip();
         })
-        .on('click', (event, d) => {
+        .on('click', () => {
             select(window.hoverdata);
         })
         .on('contextmenu', function (event, d) {
-            
             contextMenu.style('left', event.clientX + 'px')
             .style('top', event.clientY + 'px')
             .style('display', 'block')
@@ -1215,12 +1206,14 @@ function setActivePathLines(svg: any, content: any, ids: any[],
                 .on('click', (event) => {
                     setSelected(d[window.hoverlabel]);
                     event.stopPropagation();
+                    d3.select('#contextmenuRecords').style('display', 'none');
                 });
 
             d3.select('#unSelectRecord')
                 .on('click', (event) => {
                     setUnselected(d[window.hoverlabel]);
                     event.stopPropagation();
+                    d3.select('#contextmenuRecords').style('display', 'none');
                 });
 
             d3.select('#toggleRecord')
@@ -1228,6 +1221,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
                 .on('click', (event) => {
                     toggleSelection(d[window.hoverlabel]);
                     event.stopPropagation();
+                    d3.select('#contextmenuRecords').style('display', 'none');
                 });
 
             d3.select('#addSelection')
@@ -1238,12 +1232,14 @@ function setActivePathLines(svg: any, content: any, ids: any[],
                     selectedRecords.push(d[window.hoverlabel]);
                     setSelection(selectedRecords);
                     event.stopPropagation();
+                    d3.select('#contextmenuRecords').style('display', 'none');
                 });
             
             d3.select('#removeSelection')
                 .on('click', (event) => {
                     setUnselected(d[window.hoverlabel]);
                     event.stopPropagation();
+                    d3.select('#contextmenuRecords').style('display', 'none');
                 });
             d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
             event.preventDefault();
@@ -1251,6 +1247,9 @@ function setActivePathLines(svg: any, content: any, ids: any[],
 
     return active;
 }
+
+const delay = 50;
+export const throttleShowValues = helper.throttle(createToolTipForValues, delay);
 
 function trans(g: any): any {
     return g.transition().duration(50);
@@ -1306,7 +1305,7 @@ function createToolTipForValues(recordData): void {
             
             let tooltipValues = d3.select('#parallelcoords')
                 .append('g')
-                .attr('id', 'tooltip_' + cleanString + '_' + secondCleanString)
+                .attr('class', 'tooltip')
                 .style('position', 'absolute')
                 .style('visibility', 'hidden');
 
@@ -1727,6 +1726,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
             d3.select('#rangeMenu')
                 .style('border-top', '0.08rem lightgrey solid')
                 .style('visibility', 'visible')
+                .style('color', 'black')
                 .on('click', (event) => {
                     let minRange = getCurrentMinRange(dimension);
                     let maxRange = getCurrentMaxRange(dimension);
@@ -1813,18 +1813,22 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 });
             }
             else {
-                d3.select('#rangeMenu').style('visibility', 'hidden');
+                d3.select('#rangeMenu').style('display', 'false')
+                .style('color', 'lightgrey')
+                .style('border-top', '0.08rem lightgrey solid');
             }
             if (!isNaN(values[0])) {
                 d3.select('#resetRangeMenu')
                 .style('visibility', 'visible')
+                .style('color', 'black')
                 .on('click', (event) => {
                     setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
                     event.stopPropagation();
                 });
             }
             else {
-                d3.select('#resetRangeMenu').style('visibility', 'hidden');
+                d3.select('#resetRangeMenu').style('display', 'false')
+                .style('color', 'lightgrey');
             }
             if (!isNaN(values[0])) {
                 let currentFilters = getFilter(dimension);
@@ -1833,6 +1837,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 d3.select('#filterMenu')
                     .style('border-top', '0.08rem lightgrey solid')
                     .style('visibility', 'visible')
+                    .style('color', 'black')
                     .on('click', (event) => {
                         popupWindowFilter.style('display', 'block')
                             .style('width', 17 + 'rem')
@@ -1934,11 +1939,14 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 });
             }
             else {
-                d3.select('#filterMenu').style('visibility', 'hidden');
+                d3.select('#filterMenu').style('display', 'false')
+                .style('color', 'lightgrey')
+                .style('border-top', '0.08rem lightgrey solid');
             }
             if (!isNaN(values[0])) {
                 d3.select('#resetfilterMenu')
                     .style('visibility', 'visible')
+                    .style('color', 'black')
                     .on('click', (event) => {
                         const range = getDimensionRange(dimension);
                         if (isInverted(dimension)) {
@@ -1951,7 +1959,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 });
             }
             else {
-                d3.select('#resetfilterMenu').style('visibility', 'hidden');
+                d3.select('#resetfilterMenu').style('display', 'false')
+                .style('color', 'lightgrey');
             }
             d3.select('#showAllMenu')
                 .style('visibility', 'visible')
