@@ -204,9 +204,11 @@ function generateDropdownForShow() {
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
 
-    const dimensions = getAllDimensionNames();
+    let dimensions = getAllDimensionNames();
+    let copyDimensions = dimensions.slice();
+    let reverseDimensions = copyDimensions.reverse();
     
-    if (dimensions.length > 10) {
+    if (reverseDimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
     
@@ -216,7 +218,7 @@ function generateDropdownForShow() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';      
-        dimensions.forEach(function(dimension) {
+        reverseDimensions.forEach(function(dimension) {
             let label = document.createElement('div');
             label.className = 'dropdownLabel';
             label.id = 'show';
@@ -351,6 +353,7 @@ function generateDropdownForMove() {
         dimensions.forEach(function(dimension) {
             let dimensionLabel = document.createElement('div');
             dimensionLabel.className = 'dropdownLabel';
+            dimensionLabel.id = 'move';
             let arrowLeft = document.createElement('input');
             arrowLeft.className = 'inputMove';
             arrowLeft.type = 'image';

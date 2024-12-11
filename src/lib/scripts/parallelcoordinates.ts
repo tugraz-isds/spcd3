@@ -574,13 +574,12 @@ export function getSelected(): any[] {
 export function setSelection(records: string[]): void {
     let selectableLines = [];
     for(let i = 0; i < records.length; i++) {
-        let selectedLine = helper.cleanLinePathString(records[i]);
         window.active.each(function (d) {
-            if(d[window.hoverlabel] == selectedLine) {
+            if(helper.cleanLinePathString(d[window.hoverlabel]) == records[i]) {
                 selectableLines.push(d);
             }
         });
-        d3.select('.' + selectedLine)
+        d3.select('.' + records[i])
             .transition()
             .style('visibility', 'hidden'); 
     }
@@ -603,6 +602,7 @@ export function setSelection(records: string[]): void {
         .style('opacity', '1')
         .style('visibility', 'visible')
         .each(function (d) {
+            console.log(d);
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
