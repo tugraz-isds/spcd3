@@ -602,7 +602,6 @@ export function setSelection(records: string[]): void {
         .style('opacity', '1')
         .style('visibility', 'visible')
         .each(function (d) {
-            console.log(d);
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
@@ -835,6 +834,21 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.width = newFeatures.length * 100;
     window.height = 400;
     window.longLabels = false;
+
+    const label = newFeatures[newFeatures.length-1];
+    
+    data.sort((a,b) => {
+        const item1 = a[label];
+        const item2 = b[label];
+        
+        if (item1 < item2) {
+            return -1;
+        } else if (item1 > item2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
 
     let dataset = prepareData(data, newFeatures);
 
