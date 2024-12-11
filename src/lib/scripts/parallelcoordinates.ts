@@ -563,8 +563,8 @@ export function getSelected(): any[] {
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
         let selectedLine = helper.cleanLinePathString(records[i]);
-        let isVisible = d3.select('#select_' + selectedLine).style('visibility');
-        if (isVisible == 'visible') {
+        let isselected = isSelected(selectedLine);
+        if (isselected) {
             selected.push(records[i]);
         }
     }
