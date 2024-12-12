@@ -488,7 +488,6 @@ function generateDropdownForFilter() {
             filterInput.value = dimension;
             filterInput.src = './svg/dropdown-symbol.svg';
             filterInput.id = 'filter_' + dimension;
-            filterInput.style.paddingRight = '0.5rem';
             filterInput.style.height = '0rem';
             dimensionLabel.appendChild(filterInput);
             dimensionLabel.appendChild(document.createTextNode(dimension));
@@ -531,28 +530,29 @@ function generateModuleForSetFilter() {
     popupWindowFilter.className = 'item7';
     popupWindowFilter.style.visibility = 'visible';
     popupWindowFilter.style.display = 'block';
-    popupWindowFilter.style.width = 18 + 'rem';
-    popupWindowFilter.style.height = 7 + 'rem';
+    popupWindowFilter.style.width = 20 + 'rem';
+    popupWindowFilter.style.height = 8 + 'rem';
     popupWindowFilter.style.backgroundColor = 'white';
     popupWindowFilter.style.border = '1px solid black';
-    popupWindowFilter.style.borderRadius = 0.25 + 'rem';
     
     section.appendChild(popupWindowFilter);
 
     let headerFilter = document.createElement('div');
     headerFilter.id = 'filterHeader';
-    headerFilter.textContent = 'Set Filter for ' + filterDimensionData;
+    const newText = filterDimensionData.length > 25 ? filterDimensionData.substr(0,25) + '...' : filterDimensionData;
+    headerFilter.textContent = 'Set Filter for\r\n' + newText;
+    headerFilter.style.whiteSpace = 'pre';
     headerFilter.style.paddingLeft = 0.5 + 'rem';
     headerFilter.style.paddingTop = 0.5 + 'rem';
     headerFilter.style.fontSize = 'large';
     popupWindowFilter.appendChild(headerFilter);
-    
+
     let closeButtonFilter = document.createElement('a');
     closeButtonFilter.id = 'filterCloseButton';
     closeButtonFilter.textContent = 'x';
     closeButtonFilter.style.position = 'relative';
-    closeButtonFilter.style.right = -16.5 + 'rem';
-    closeButtonFilter.style.top = -2 + 'rem';
+    closeButtonFilter.style.right = -18.5 + 'rem';
+    closeButtonFilter.style.top = -4 + 'rem';    
     closeButtonFilter.style.width = 2.5 + 'rem';
     closeButtonFilter.style.height = 2.5 + 'rem';
     closeButtonFilter.style.opacity = 0.3;
@@ -745,7 +745,6 @@ function generateDropdownForRange() {
             rangeInput.src = './svg/dropdown-symbol.svg';
             rangeInput.id = 'range_' + dimension;
             rangeInput.style.height = '0rem';
-            rangeInput.style.paddingRight = '0.5rem';
             dimensionLabel.appendChild(rangeInput);
             dimensionLabel.appendChild(document.createTextNode(dimension));
             dimensionContainer.appendChild(dimensionLabel);
@@ -787,17 +786,18 @@ function generateModuleForRangeSettings() {
     popupWindowRange.className = 'item7';
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
-    popupWindowRange.style.width = 18 + 'rem';
-    popupWindowRange.style.height = 11.5 + 'rem';
+    popupWindowRange.style.width = 20 + 'rem';
+    popupWindowRange.style.height = 13 + 'rem';
     popupWindowRange.style.backgroundColor = 'white';
     popupWindowRange.style.border = '1px solid black';
-    popupWindowRange.style.borderRadius = 0.25 + 'rem';
 
     section.appendChild(popupWindowRange);
 
     let headerRange = document.createElement('div');
     headerRange.id = 'rangeHeader';
-    headerRange.textContent = 'Set Range for ' + rangeDimensionData;
+    const newText = rangeDimensionData.length > 25 ? rangeDimensionData.substr(0,25) + '...' : rangeDimensionData;
+    headerRange.textContent = 'Set Range for\r\n' + newText;//.replace(/(\S+\s*){1,3}/g, "$&\n");
+    headerRange.style.whiteSpace = 'pre';
     headerRange.style.paddingLeft = 0.5 + 'rem';
     headerRange.style.paddingTop = 0.5 + 'rem';
     headerRange.style.fontSize = 'large';
@@ -807,8 +807,8 @@ function generateModuleForRangeSettings() {
     closeButtonRange.id = 'rangeCloseButton';
     closeButtonRange.textContent = 'x';
     closeButtonRange.style.position = 'relative';
-    closeButtonRange.style.right = -17 + 'rem';
-    closeButtonRange.style.top = -1.5 + 'rem';
+    closeButtonRange.style.right = -18.5 + 'rem';
+    closeButtonRange.style.top = -3 + 'rem';
     closeButtonRange.style.width = 2.5 + 'rem';
     closeButtonRange.style.height = 2.5 + 'rem';
     closeButtonRange.style.opacity = 0.3;
@@ -935,23 +935,6 @@ function generateModuleForRangeSettings() {
             popupWindowRange.style.display = 'none';
         }
     }
-    
-    let newLine = document.createElement('div');
-    let resetRangeButton = document.createElement('button');
-    resetRangeButton.id = 'rangeResetButton';
-    resetRangeButton.textContent = 'Set Ranges from Data';
-    resetRangeButton.style.marginLeft = 0.5 + 'rem';
-    resetRangeButton.style.marginTop = 1 + 'rem';
-    resetRangeButton.style.marginBottom = 1 + 'rem';
-    resetRangeButton.style.marginRight = 0.5 + 'rem';
-    resetRangeButton.style.width = 16.3 + 'rem';
-    newLine.appendChild(resetRangeButton);
-    popupWindowRange.appendChild(newLine);
-
-    resetRangeButton.onclick = () => {
-        setDimensionRange(rangeDimensionData, getMinValue(rangeDimensionData), getMaxValue(rangeDimensionData));
-        popupWindowRange.style.display = 'none';
-    };
 }
 
 function resetToOriginalRange() {
