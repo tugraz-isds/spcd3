@@ -1609,8 +1609,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
         .style('display', 'none');
 
     popupWindowRange.append('div').text('Set Range for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
-    let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
-    .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
+    let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', -1 + 'rem')
+    .style('top', 0.5 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
     .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonRange');
     let headerDimensionRange = popupWindowRange.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
     .attr('id', 'headerDimensionRange');
@@ -1622,9 +1622,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
     let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
     .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonRange');
-    let resetRangeButton = popupWindowRange.append('button').text('Set Ranges from Data').style('margin-left', 0.5 + 'rem')
-    .style('width', 16 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'resetRangeButton');
-
+    
     let popupWindowRangeError = popupWindowRange
         .append('div')
         .attr('id', 'errorRange')
@@ -1640,8 +1638,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     popupWindowFilter.append('div').text('Set Filter for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
     let headerDimensionFilter = popupWindowFilter.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
     .attr('id', 'headerDimensionFilter');
-    let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', 0 + 'rem')
-    .style('top', 2 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
+    let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', -1 + 'rem')
+    .style('top', 0.5 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
     .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonFilter');
     popupWindowFilter.append('label').text('Min').style('padding', 0.5 + 'rem');
     let inputMinFilter = popupWindowFilter.append('input').attr('id', 'minFilterValue').style('width', 2 + 'rem');
@@ -1671,7 +1669,11 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     contextMenu.append('div')
         .attr('id', 'resetRangeMenu')
         .attr('class', 'contextmenu')
-        .text('Reset Range');
+        .text('Set Range from Data');
+    contextMenu.append('div')
+        .attr('id', 'resetRoundRangeMenu')
+        .attr('class', 'contextmenu')
+        .text('Set Rounded Range from Data');
     contextMenu.append('div')
         .attr('id', 'filterMenu')
         .attr('class', 'contextmenu')
@@ -1777,7 +1779,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('bottom', 0)
                             .style('left', 0)
                             .style('z-index', 10);
-                    headerDimensionRange.text(dimension);
+                    const newText = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;
+                    headerDimensionRange.text(newText);
                     infoRange.text('The original range of ' + dimension + ' is between ' + 
                     getMinValue(dimension) + ' and ' + 
                     getMaxValue(dimension) + '.');
@@ -1834,10 +1837,6 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             document.getElementById("buttonRange").click();
                         }
                     });
-                    resetRangeButton.on('click', () => {
-                        setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
-                        popupWindowRange.style('display', 'none');
-                    });
                     closeButtonRange.on('click', () => {
                         popupWindowRange.remove();
                     });
@@ -1863,6 +1862,19 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .style('color', 'lightgrey');
             }
             if (!isNaN(values[0])) {
+                d3.select('#resetRoundRangeMenu')
+                .style('visibility', 'visible')
+                .style('color', 'black')
+                .on('click', (event) => {
+                    setDimensionRangeRounded(dimension, getMinValue(dimension), getMaxValue(dimension));
+                    event.stopPropagation();
+                });
+            }
+            else {
+                d3.select('#resetRoundRangeMenu').style('display', 'false')
+                .style('color', 'lightgrey');
+            }
+            if (!isNaN(values[0])) {
                 let currentFilters = getFilter(dimension);
                 inputMaxFilter.attr('value', currentFilters[0]);
                 inputMinFilter.attr('value', currentFilters[1]);
@@ -1884,7 +1896,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('bottom', 0)
                             .style('left', 0)
                             .style('z-index', 10);
-                        headerDimensionFilter.text(dimension);
+                        const newText1 = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;  
+                        headerDimensionFilter.text(newText1);
                         filterButton.on('click', () => {
                             let min = d3.select('#minFilterValue').node().value;
                             let max = d3.select('#maxFilterValue').node().value;
