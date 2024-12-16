@@ -820,6 +820,19 @@ function generateModuleForRangeSettings() {
         popupWindowRange.remove();
     };
 
+    var resultMin = (getCurrentMinRange(rangeDimensionData) - Math. floor(getCurrentMinRange(rangeDimensionData))) !== 0;
+    var resultMax = (getCurrentMaxRange(rangeDimensionData) - Math. floor(getCurrentMaxRange(rangeDimensionData))) !== 0;
+    let minValue = String(getCurrentMinRange(rangeDimensionData));
+    let maxValue = String(getCurrentMaxRange(rangeDimensionData));
+    if (resultMin && !resultMax) {
+        const count = minValue.split('.')[1].length;
+        maxValue = getCurrentMaxRange(rangeDimensionData).toFixed(count);
+    }
+    else if (!resultMin && resultMax) {
+        const count = maxValue.split('.')[1].length;
+        minValue = getCurrentMinRange(rangeDimensionData).toFixed(count);
+    }
+
     let infoRange = document.createElement('div');
     infoRange.id = 'rangeInfo';
     infoRange.style.color = 'grey';
@@ -828,7 +841,7 @@ function generateModuleForRangeSettings() {
     infoRange.style.paddingTop = 1 + 'rem';
     infoRange.style.width = 17.3 + 'rem';
     infoRange.textContent = 'The original range of ' + rangeDimensionData + ' is between ' + 
-        getMinValue(rangeDimensionData) + ' and ' + getMaxValue(rangeDimensionData) + '.';
+        minValue + ' and ' + maxValue + '.';
     popupWindowRange.appendChild(infoRange);
 
     let labelMinRange = document.createElement('label');
@@ -841,7 +854,7 @@ function generateModuleForRangeSettings() {
     inputMinRange.id = 'rangeMinValue';
     inputMinRange.style.width = 2 + 'rem';
     inputMinRange.style.marginLeft = 0.5 + 'rem';
-    inputMinRange.value = getCurrentMinRange(rangeDimensionData);
+    inputMinRange.value = minValue;
     popupWindowRange.appendChild(inputMinRange);
 
     inputMinRange.onkeydown = (event) => {
@@ -861,7 +874,7 @@ function generateModuleForRangeSettings() {
     inputMaxRange.id = 'rangeMaxValue';
     inputMaxRange.style.width = 2 + 'rem';
     inputMaxRange.style.marginLeft = 0.5 + 'rem';
-    inputMaxRange.value = getCurrentMaxRange(rangeDimensionData);
+    inputMaxRange.value = maxValue;
     popupWindowRange.appendChild(inputMaxRange);
 
     inputMaxRange.onkeydown = (event) => {
@@ -900,7 +913,7 @@ function generateModuleForRangeSettings() {
             if (max < getMinValue(rangeDimensionData) || 
                 min > getMaxValue(rangeDimensionData)) {
                 popupWindowRangeError.textContent = `The range has to be bigger than 
-                    ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`;
+                    ${minValue} and ${maxValue}.`;
                     popupWindowRangeError.style.display = 'block';
                     popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
                     popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
@@ -918,7 +931,7 @@ function generateModuleForRangeSettings() {
             if (min > getMinValue(rangeDimensionData) || 
                 max < getMaxValue(rangeDimensionData)) {
                     popupWindowRangeError.textContent = `The range has to be bigger than 
-                        ${getMinValue(rangeDimensionData)} and ${getMaxValue(rangeDimensionData)}.`;
+                        ${minValue} and ${maxValue}.`;
                         popupWindowRangeError.style.display = 'block';
                         popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
                         popupWindowRangeError.style.paddingTop = 0.5 + 'rem';

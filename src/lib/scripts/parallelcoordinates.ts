@@ -446,13 +446,13 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         .attr('visibility', 'hidden');
         
     // draw selectable lines
-    d3.select('#select_')
+    /*d3.select('#select_')
       .selectAll('path')
         .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
         trans(selectable).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        }) 
+        })*/
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -497,13 +497,13 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         .attr('visibility', 'hidden');
         
     // draw selectable lines
-    d3.select('#select_')
+    /*d3.select('#select_')
       .selectAll('path')
         .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
         trans(selectable).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        }) 
+        }) */
 }
 
 export function getMinValue(dimension: any): number {
@@ -1617,9 +1617,9 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     let infoRange = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
     .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange');
     popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
-    let inputMinRange = popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2 + 'rem');
+    let inputMinRange = popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2.5 + 'rem');
     popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
-    let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2 + 'rem');
+    let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2.5 + 'rem');
     let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
     .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonRange');
     
@@ -1764,8 +1764,20 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                 .on('click', (event) => {
                     let minRange = getCurrentMinRange(dimension);
                     let maxRange = getCurrentMaxRange(dimension);
-                    inputMinRange.attr('value', minRange);
-                    inputMaxRange.attr('value', maxRange);
+                    var resultMin = (minRange - Math. floor(minRange)) !== 0;
+                    var resultMax = (maxRange - Math. floor(maxRange)) !== 0;
+                    let minValue = String(minRange);
+                    let maxValue = String(maxRange);
+                    if (resultMin && !resultMax) {
+                        const count = minValue.split('.')[1].length;
+                        maxValue = maxRange.toFixed(count);
+                    }
+                    else if (!resultMin && resultMax) {
+                        const count = maxValue.split('.')[1].length;
+                        minValue = minRange.toFixed(count);
+                    }
+                    inputMinRange.attr('value', minValue);
+                    inputMaxRange.attr('value', maxValue);
                     popupWindowRange.style('display', 'block')
                             .style('width', 17 + 'rem')
                             .style('height', 12 + 'rem')
@@ -1782,8 +1794,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     const newText = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;
                     headerDimensionRange.text(newText);
                     infoRange.text('The original range of ' + dimension + ' is between ' + 
-                    getMinValue(dimension) + ' and ' + 
-                    getMaxValue(dimension) + '.');
+                    minValue + ' and ' + 
+                    maxValue + '.');
                     rangeButton.on('click', () => {
                         let min = d3.select('#minRangeValue').node().value;
                         let max = d3.select('#maxRangeValue').node().value;
@@ -1794,8 +1806,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             if (max < getMinValue(dimension) || 
                                 min > getMaxValue(dimension)) {
                                 popupWindowRangeError.text(`The range has to be bigger than 
-                                ${getMinValue(dimension)} and 
-                                ${getMaxValue(dimension)}.`)
+                                ${minValue} and 
+                                ${maxValue}.`)
                                 .style('display', 'block')
                                 .style('padding-left', 0.5 + 'rem')
                                 .style('padding-top', 0.5 + 'rem')
@@ -1808,8 +1820,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             if (min > getMinValue(dimension) || 
                                 max < getMaxValue(dimension)) {
                                 popupWindowRangeError.text(`The range has to be bigger than 
-                                ${getMinValue(dimension)} and 
-                                ${getMaxValue(dimension)}.`)
+                                ${minValue} and 
+                                ${maxValue}.`)
                                 .style('display', 'block')
                                 .style('padding-left', 0.5 + 'rem')
                                 .style('padding-top', 0.5 + 'rem')
@@ -1838,7 +1850,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                         }
                     });
                     closeButtonRange.on('click', () => {
-                        popupWindowRange.remove();
+                        popupWindowRange.style('display', 'none');
                     });
                     event.stopPropagation();
                 });
