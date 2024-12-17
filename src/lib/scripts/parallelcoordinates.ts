@@ -172,13 +172,13 @@ export function invert(dimension: string): void {
         .duration(0)
         .attr('visibility', 'hidden');
         
-    d3.select('#select_')
+    /*d3.select('#select_')
         .selectAll('path')
           .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
           trans(selectable).each(function (d) {
               d3.select(this)
                   .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-          }) 
+          }) */
 }
 
 export function getInversionStatus(dimension: string): string {
@@ -235,13 +235,13 @@ export function setInversionStatus(dimension: string, status: string): void {
         .duration(0)
         .attr('visibility', 'hidden');
     
-    d3.select('#select_')
+    /*d3.select('#select_')
         .selectAll('path')
           .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
           trans(selectable).each(function (d) {
               d3.select(this)
                   .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-    }) 
+    }) */
 }
 
 export function isInverted(dimension: string): boolean {
@@ -304,13 +304,13 @@ export function moveByOne(dimension: string, direction: string): void {
         return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
     });
 
-    d3.select('#select_')
+    /*d3.select('#select_')
       .selectAll('path')
         .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
         trans(selectable).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        }) 
+        }) */
 
     delete parcoords.dragging[dimension];
     delete parcoords.dragging[neighbour];
@@ -386,13 +386,13 @@ export function swap(dimensionA: string, dimensionB: string): void {
         return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
     });
 
-    d3.select('#select_')
+    /*d3.select('#select_')
       .selectAll('path')
         .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
         trans(selectable).each(function (d) {
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-    }) 
+    })*/
 
     delete parcoords.dragging[dimensionA];
     delete parcoords.dragging[dimensionB];

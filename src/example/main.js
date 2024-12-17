@@ -219,9 +219,9 @@ function generateDropdownForShow() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';      
         reverseDimensions.forEach(function(dimension) {
-            let label = document.createElement('div');
-            label.className = 'dropdownLabel';
-            label.id = 'show';
+            let ddElement = document.createElement('div');
+            ddElement.className = 'dropdownLabel';
+            ddElement.id = 'show';
             let input = document.createElement('input');
             input.className = 'inputFields';
             input.type = 'checkbox';
@@ -229,12 +229,12 @@ function generateDropdownForShow() {
             input.value = dimension;
             input.name = 'dimension';
             input.checked = true;
-            label.appendChild(input);
             let textLabel = document.createElement('label');
             textLabel.textContent = dimension;
             textLabel.id = 'showLabel';
-            label.appendChild(textLabel);
-            dimensionContainer.appendChild(label);
+            ddElement.appendChild(input);
+            ddElement.appendChild(textLabel);
+            dimensionContainer.appendChild(ddElement);
         });
         showOptions('options', 'showButton');
         calcDDBehaviour(dimensionContainer, selectButton);
@@ -250,6 +250,17 @@ function generateDropdownForInvert() {
     const container = document.getElementById('invDimensionContainer');
     container.style.position = 'relative';
 
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'invertOptions';
+    dimensionContainer.name = 'invertOptions';
+    dimensionContainer.className = 'ddList';
+    dimensionContainer.style.display = 'none';
+    
+    const dimensions = getAllVisibleDimensionNames();
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
+    }
+
     let selectButton = document.createElement('button');
     selectButton.id = 'invertButton';
     selectButton.className = 'ddButton';
@@ -259,32 +270,42 @@ function generateDropdownForInvert() {
     textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" id="invert"/>';
     selectButton.appendChild(textElement);
 
-    const dimensions = getAllVisibleDimensionNames();
-
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         dimensions.forEach(function(dimension) {
-            let label = document.createElement('div');
-            label.className = 'dropdownLabel';
-            label.id = 'invert';
-            let input = document.createElement('input');
-            input.className = 'inputFields';
-            input.type = 'image';
-            input.id = 'invert_' + dimension;
-            input.value = dimension;
-            input.name = 'dimension';
+            let ddElement = document.createElement('div');
+            ddElement.className = 'dropdownLabel';
+            ddElement.id = 'invertElement';
+            let inputButton = document.createElement('button');
+            inputButton.className = 'inputButton';
+            inputButton.id = 'invert_' + dimension;
             if (getInversionStatus(dimension) == "ascending") {
-                input.src = './svg/arrow-up.svg';
+                inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
             }
             else {
-                input.src = './svg/arrow-down.svg';
+                inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
             }
+
+            inputButton.addEventListener('click', (event) => {
+                const value = inputButton.id.replace('invert_', '');
+                if(value != undefined) {
+                    invert(value);
+                    if (getInversionStatus(value) == "ascending") {
+                        inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
+                    }
+                    else {
+                        inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
+                    }
+                }
+            });
+
             let textLabel = document.createElement('label');
+            textLabel.className = 'textLabel';
             textLabel.textContent = dimension;
             textLabel.id = 'invertLabel';
-            label.appendChild(input);
-            label.appendChild(textLabel);
-            dimensionContainer.appendChild(label);
+            ddElement.appendChild(inputButton);
+            ddElement.appendChild(textLabel);
+            dimensionContainer.appendChild(ddElement);
         });
 
         showOptions('invertOptions', 'invertButton');
@@ -292,34 +313,12 @@ function generateDropdownForInvert() {
         for (let i = 0; i < dimensions.length; i++) {
             document.addEventListener("DOMContentLoaded", function(event) {
             if (getInversionStatus(dimensions[i]) == "ascending") {
-                document.getElementById("invert_" + dimensions[i]).src = './svg/arrow-up.svg';
+                inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
             }
             else {
-                document.getElementById("invert_" + dimensions[i]).src = './svg/arrow-down.svg';
+                inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
             }
             })
-        }
-    });
-
-    let dimensionContainer = document.createElement('div');
-    dimensionContainer.id = 'invertOptions';
-    dimensionContainer.name = 'invertOptions';
-    dimensionContainer.className = 'ddList';
-    dimensionContainer.style.display = 'none';
-    
-    if (dimensions.length > 10) {
-        dimensionContainer.style.height = '12.5rem';
-    }
-  
-    dimensionContainer.addEventListener('click', (event) => {
-        if(event.target.value != undefined) {
-            invertDimension(event.target.value);
-            if (getInversionStatus(event.target.value) == "ascending") {
-                document.getElementById("invert_" + event.target.value).src = './svg/arrow-up.svg';
-            }
-            else {
-                document.getElementById("invert_" + event.target.value).src = './svg/arrow-down.svg';
-            }
         }
     });
 
@@ -327,15 +326,17 @@ function generateDropdownForInvert() {
     container.appendChild(dimensionContainer);
 }
 
-function invertDimension(dimension) {
-    invert(dimension);
-}
-
 function generateDropdownForMove() {
     document.getElementById('moDimensionHeader').style.visibility = 'visible';
 
     const container = document.getElementById('moDimensionContainer');
     container.style.position = 'relative';
+
+    let dimensionContainer = document.createElement('div');
+    dimensionContainer.id = 'moveOptions';
+    dimensionContainer.name = 'moveOptions';
+    dimensionContainer.className = 'ddList';
+    dimensionContainer.style.display = 'none';
 
     let selectButton = document.createElement('button');
     selectButton.id = 'moveButton';
@@ -347,6 +348,9 @@ function generateDropdownForMove() {
     selectButton.appendChild(textElement);
 
     const dimensions = getAllVisibleDimensionNames();
+    if (dimensions.length > 10) {
+        dimensionContainer.style.height = '12.5rem';
+    }
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
@@ -354,24 +358,35 @@ function generateDropdownForMove() {
             let dimensionLabel = document.createElement('div');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'move';
-            let arrowLeft = document.createElement('input');
-            arrowLeft.className = 'inputMove';
-            arrowLeft.type = 'image';
-            arrowLeft.name = 'dimension';
-            arrowLeft.value = dimension;
+            let arrowLeft = document.createElement('button');
+            arrowLeft.className = 'inputButtonMoveLeft';
             arrowLeft.id = 'moveleft_' + dimension;
-            arrowLeft.src = './svg/arrow-left.svg';
-            let arrowRight = document.createElement('input');
-            arrowRight.className = 'inputMove';
-            arrowRight.type = 'image';
-            arrowRight.name = 'dimension';
-            arrowRight.value = dimension;
+            arrowLeft.innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
+            arrowLeft.addEventListener('click', () => {
+                const value = arrowLeft.id.replace('moveleft_', '');
+                if(value != undefined) {
+                    moveDimensionData = value;
+                    moveDimensionLeft();
+                    disableLeftAndRightButton();
+                }
+            });         
+            let arrowRight = document.createElement('button');
+            arrowRight.className = 'inputButtonMoveRight';
             arrowRight.id = 'moveright_' + dimension;
-            arrowRight.src = './svg/arrow-right.svg';
+            arrowRight.innerHTML = '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
             arrowRight.style.paddingRight = '0.5rem';
+            arrowRight.addEventListener('click', () => {
+                const value = arrowRight.id.replace('moveright_', '');
+                if(value != undefined) {
+                    moveDimensionData = value;
+                    moveDimensionRight();
+                    disableLeftAndRightButton();
+                }
+            });    
             let textLabel = document.createElement('label');
             textLabel.textContent = dimension;
             textLabel.id = 'moveLabel';
+            textLabel.className = 'textLabel';
             dimensionLabel.appendChild(arrowLeft);
             dimensionLabel.appendChild(arrowRight);
             dimensionLabel.appendChild(textLabel);
@@ -379,29 +394,6 @@ function generateDropdownForMove() {
         });
         showOptions('moveOptions', 'moveButton');
         calcDDBehaviour(dimensionContainer, selectButton);
-    });
-
-    let dimensionContainer = document.createElement('div');
-    dimensionContainer.id = 'moveOptions';
-    dimensionContainer.name = 'moveOptions';
-    dimensionContainer.className = 'ddList';
-    dimensionContainer.style.display = 'none';
-    
-    if (dimensions.length > 10) {
-        dimensionContainer.style.height = '12.5rem';
-    }
-   
-    dimensionContainer.addEventListener('click', (event) => {
-        if(event.target.value != undefined) {
-            moveDimensionData = event.target.value;
-            if (event.target.src.includes('right')) {
-                moveDimensionRight();
-            }
-            else {
-                moveDimensionLeft();
-            }  
-            disableLeftAndRightButton();
-        }
     });
 
     container.appendChild(selectButton);
@@ -440,20 +432,20 @@ function disableLeftAndRightButton() {
         const numberOfDimensions = getNumberOfDimensions();
         if (position == numberOfDimensions - 1 || position == -1) {
             document.getElementById('moveleft_' + dimensions[i]).disabled = true;
-            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-left-disabled.svg';
+            document.getElementById('moveleft_' + dimensions[i]).innerHTML = '<img src="./svg/arrow-left-disabled.svg" id="moveArrow"/>';
         }
         else {
             document.getElementById('moveleft_' + dimensions[i]).disabled = false;
-            document.getElementById('moveleft_' + dimensions[i]).src = './svg/arrow-left.svg';
+            document.getElementById('moveleft_' + dimensions[i]).innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
         }
 
         if (position == 0 || position == -1) {
             document.getElementById('moveright_' + dimensions[i]).disabled = true;
-            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-right-disabled.svg';
+            document.getElementById('moveright_' + dimensions[i]).innerHTML = '<img src="./svg/arrow-right-disabled.svg" id="moveArrow"/>';
         }
         else {
             document.getElementById('moveright_' + dimensions[i]).disabled = false;
-            document.getElementById('moveright_' + dimensions[i]).src = './svg/arrow-right.svg';
+            document.getElementById('moveright_' + dimensions[i]).innerHTML = '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
         }
     }
 }
@@ -482,7 +474,7 @@ function generateDropdownForFilter() {
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'filterLabel';
             let filterInput = document.createElement('input');
-            filterInput.className = 'inputFields';
+            filterInput.className = 'inputText';
             filterInput.type = 'image';
             filterInput.name = 'dimension';
             filterInput.value = dimension;
@@ -738,7 +730,7 @@ function generateDropdownForRange() {
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'rangeLabel';
             let rangeInput = document.createElement('input');
-            rangeInput.className = 'inputFields';
+            rangeInput.className = 'inputText';
             rangeInput.type = 'image';
             rangeInput.name = 'dimension';
             rangeInput.value = dimension;

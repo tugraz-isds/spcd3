@@ -150,27 +150,92 @@ section {
 
 .dropdownLabel {
   font-family: Verdana, sans-serif;
-  padding-bottom: 0.3rem;
   display:flex;
   flex-direction: row;
 }
 
 .inputFields {
-  height: 0.7rem;
-  margin-top: 0.3rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
   margin-left: 0.5rem;
+  margin-right: 0.5rem;
   font-size: smaller;
 }
 
-.dropdownLabel:hover {
-  background-color: dodgerblue;
+.inputButton {
+  height: 1rem;
+  width: 1.4rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-size: smaller;
+}
+
+.inputButton:hover {
+  background-color: rgb(169, 208, 248);
   color: white;
 }
 
-.inputMove {
-  height: 0.5rem;
-  padding-top: 0.3rem;
-  padding-left: 0.5rem;
+.inputButtonMoveLeft {
+  height: 1rem;
+  width: 1.4rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-size: smaller;
+}
+
+.inputButtonMoveLeft:hover:not([disabled]) {
+  background-color: rgb(169, 208, 248);
+  color: white;
+}
+
+.inputButtonMoveRight {
+  height: 1rem;
+  width: 1.4rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  margin-right: 0.5rem;
+  font-size: smaller;
+}
+
+.inputButtonMoveRight:hover:not([disabled]) {
+  background-color: rgb(169, 208, 248);
+  color: white;
+}
+
+.inputText {
+  width: 0.25rem;
+}
+
+#rangeLabel {
+  margin-left: 0.1rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+}
+
+#rangeLabel:hover {
+  background-color: rgb(169, 208, 248);
+  color: white;
+}
+
+#filterLabel {
+  margin-left: 0.1rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+}
+
+#filterLabel:hover {
+  background-color: rgb(169, 208, 248);
+  color: white;
+}
+
+.textLabel {
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
 }
 
 div#showDimensionHeader {
