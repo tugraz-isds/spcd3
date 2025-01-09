@@ -830,7 +830,7 @@ export function setDimensionForHovering(dimension: string): void {
 function setUpParcoordData(data: any, newFeatures: any): any {
     
     window.padding = 80;
-    window.paddingXaxis = 60;
+    window.paddingXaxis = 75;
     window.width = newFeatures.length * 100;
     window.height = 400;
     window.longLabels = false;
@@ -974,7 +974,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
         let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
         let labels = [];
         tempValues.forEach(function(element) {
-            labels.push(element.length > 10 ? element : element);
+            labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
         });
         counter = counter + 1;
 
