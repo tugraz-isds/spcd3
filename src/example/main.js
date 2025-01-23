@@ -1,7 +1,7 @@
 import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange, getCurrentMaxRange, 
     isInverted, getDimensionPosition, setFilter, getFilter, getDimensionRange,
     getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
-    setDimensionRange, getAllDimensionNames, getAllVisibleDimensionNames,
+    setDimensionRange, getAllDimensionNames, getAllVisibleDimensionNames, getAllHiddenDimensionNames,
     getAllRecords, toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} 
     from './lib/spcd3.js';
 
@@ -23,18 +23,18 @@ window.addEventListener('click', (event) => {
     if(!event.target.id.includes('move')) {
         closeElements('moveOptions');
     }
-    if(!event.target.id.includes('filter')) {
+    /*if(!event.target.id.includes('filter')) {
         closeElements('filterOptions');
         if (document.getElementById('filterContainer') != null) {
             document.getElementById('filterContainer').remove();
         }
-    }
-    if(!event.target.id.includes('range')) {
+    }*/
+    /*if(!event.target.id.includes('range')) {
         closeElements('rangeOptions');
         if (document.getElementById('rangeContainer')) {
             document.getElementById('rangeContainer').remove();
         }
-    }
+    }*/
     if(!event.target.id.includes('sel')) {
         closeElements('options_r');
     }
@@ -217,8 +217,11 @@ function generateDropdownForShow() {
     });
 
     selectButton.addEventListener('click', () => {
-        dimensionContainer.innerHTML = '';      
-        reverseDimensions.forEach(function(dimension) {
+        dimensionContainer.innerHTML = '';
+        let test1 = getAllVisibleDimensionNames();
+        let test2 = getAllHiddenDimensionNames();
+        var result = test1.concat(test2);
+        result.forEach(function(dimension) {
             let ddElement = document.createElement('div');
             ddElement.className = 'dropdownLabel';
             ddElement.id = 'show';
@@ -272,7 +275,7 @@ function generateDropdownForInvert() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        dimensions.forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function(dimension) {
             let ddElement = document.createElement('div');
             ddElement.className = 'dropdownLabel';
             ddElement.id = 'invertElement';
@@ -354,7 +357,7 @@ function generateDropdownForMove() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        dimensions.forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function(dimension) {
             let dimensionLabel = document.createElement('div');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'move';
@@ -469,7 +472,7 @@ function generateDropdownForFilter() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        dimensions.forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function(dimension) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'filterLabel';
@@ -519,7 +522,6 @@ function generateModuleForSetFilter() {
     
     let popupWindowFilter = document.createElement('div');
     popupWindowFilter.id = 'filterContainer';
-    popupWindowFilter.className = 'item7';
     popupWindowFilter.style.visibility = 'visible';
     popupWindowFilter.style.display = 'block';
     popupWindowFilter.style.width = 20 + 'rem';
@@ -694,14 +696,13 @@ function generateModuleForSetFilter() {
         }
         
         if (isOk) {
-            popupWindowFilterError.style.display = 'none';
             if (inverted) {
                 setFilter(filterDimensionData, min, max);
             }
             else {
                 setFilter(filterDimensionData, max, min);
             }
-            popupWindowFilter.style.display = 'none';
+            popupWindowFilter.remove();
         }
     }
 }
@@ -725,7 +726,7 @@ function generateDropdownForRange() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        dimensions.forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function(dimension) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'rangeLabel';
@@ -775,7 +776,6 @@ function generateModuleForRangeSettings() {
     
     let popupWindowRange = document.createElement('div');
     popupWindowRange.id = 'rangeContainer';
-    popupWindowRange.className = 'item7';
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
     popupWindowRange.style.width = 20 + 'rem';
@@ -832,9 +832,21 @@ function generateModuleForRangeSettings() {
     infoRange.style.paddingLeft = 0.5 + 'rem';
     infoRange.style.paddingTop = 1 + 'rem';
     infoRange.style.width = 17.3 + 'rem';
-    infoRange.textContent = 'The original range of ' + rangeDimensionData + ' is between ' + 
+    infoRange.textContent = 'The current range of ' + rangeDimensionData + ' is between ' + 
         minValue + ' and ' + maxValue + '.';
     popupWindowRange.appendChild(infoRange);
+
+    let infoRange2 = document.createElement('div');
+    infoRange2.id = 'rangeInfo';
+    infoRange2.style.color = 'grey';
+    infoRange2.style.fontSize = 'smaller';
+    infoRange2.style.paddingLeft = 0.5 + 'rem';
+    infoRange2.style.paddingTop = 1 + 'rem';
+    infoRange2.style.width = 17.3 + 'rem';
+    infoRange2.textContent = 'The original range of ' + rangeDimensionData + ' is between ' + 
+        getMinValue(rangeDimensionData) + ' and ' + getMaxValue(rangeDimensionData) + '.';
+    popupWindowRange.appendChild(infoRange2);
+
 
     let labelMinRange = document.createElement('label');
     labelMinRange.id = 'rangeMinLabel';
