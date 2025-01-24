@@ -30,7 +30,6 @@ window.addEventListener('click', (event) => {
         }
     }
     if(!event.target.id.includes('range')) {
-        console.log(event.target.id);
         closeElements('rangeOptions');
         if (document.getElementById('rangeContainer')) {
             document.getElementById('rangeContainer').remove();

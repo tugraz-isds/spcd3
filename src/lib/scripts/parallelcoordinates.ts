@@ -1115,15 +1115,52 @@ function cleanTooltip(){
     	.remove();
 }
 
+let delay = null;
+let selectedPath = null;
+let tooltipPath;
+
+const handlePointerEnter = (event, d) => {
+    const data = getAllPointerEventsData(event);
+    window.hoverdata = [...data];
+
+    selectedPath = highlight(data);
+    createTooltipForPathLine(data, tooltipPath, event);
+
+    if (delay) {
+        clearTimeout(delay);
+    }
+
+    data.forEach((item, i) => {
+        parcoords.newDataset.forEach((record, j) => {
+            let recordData = record[window.hoverlabel];
+            if (recordData === item) {
+                delay = setTimeout(() => {
+                    createToolTipForValues(record);
+                }, 150);
+            }
+        });
+    });
+};
+
+const handlePointerLeaveOrOut = () => {
+    doNotHighlight(selectedPath);
+
+    if (delay) {
+        clearTimeout(delay);
+    }
+
+    delay = null;
+
+    tooltipPath.style('visibility', 'hidden');
+    cleanTooltip();
+};
 
 function setActivePathLines(svg: any, content: any, ids: any[], 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
-
-    let selectedPath: any;
     
-    let tooltipPath = d3.select('#parallelcoords')
+    tooltipPath = d3.select('#parallelcoords')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
@@ -1182,47 +1219,9 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .style('stroke', 'rgb(0, 129, 175)')
         .style('stroke-width', '0.1rem')
         .style('fill', 'none')
-        .on('pointerenter', (event, d) => {
-            const data = getAllPointerEventsData(event);
-            window.hoverdata = [];
-            window.hoverdata = data.slice();
-            selectedPath = highlight(data);
-            createTooltipForPathLine(data, tooltipPath, event);
-            
-            if (delay) {
-                clearTimeout(delay);
-            }
-
-            for(let i = 0; i < data.length; i++) {
-                for(let j = 0; j < parcoords.newDataset.length; j++) {
-                    let recordData = parcoords.newDataset[j][window.hoverlabel];
-                    if (recordData == data[i]) {       
-                        delay = setTimeout(function() {
-                            createToolTipForValues(parcoords.newDataset[j]);
-                        }, 150);
-                    }
-                }
-            }
-        })
-        .on('pointerleave', () => {
-            doNotHighlight(selectedPath);
-            if (delay) {
-                clearTimeout(delay);
-            }
-            delay = null;
-            tooltipPath.style('visibility', 'hidden');
-            return cleanTooltip()
-        })
-        .on('pointerout', () => {
-            doNotHighlight(selectedPath);
-            if (delay) {
-                clearTimeout(delay);
-            }
-            
-            delay = null;
-            tooltipPath.style('visibility', 'hidden');
-            return cleanTooltip();
-        })
+        .on('pointerenter', handlePointerEnter)
+        .on('pointerleave', handlePointerLeaveOrOut)
+        .on('pointerout', handlePointerLeaveOrOut)
         .on('click', () => {
             select(window.hoverdata);
         })
@@ -1285,8 +1284,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
     return active;
 }
 
-const delay = 50;
-export const throttleShowValues = helper.throttle(createToolTipForValues, delay);
+const delay1 = 50;
+export const throttleShowValues = helper.throttle(createToolTipForValues, delay1);
 
 function trans(g: any): any {
     return g.transition().duration(50);
