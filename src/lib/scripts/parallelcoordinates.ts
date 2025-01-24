@@ -1616,6 +1616,8 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
     .attr('id', 'headerDimensionRange');
     let infoRange = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
     .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange');
+    let infoRange2 = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
+    .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange2');
     popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
     let inputMinRange = popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2.5 + 'rem');
     popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
@@ -1780,7 +1782,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                     inputMaxRange.attr('value', maxValue);
                     popupWindowRange.style('display', 'block')
                             .style('width', 17 + 'rem')
-                            .style('height', 12 + 'rem')
+                            .style('height', 13 + 'rem')
                             .style('background', 'white')
                             .style('border', '1px solid black')
                             .style('border-radius', 0.25 + 'rem')
@@ -1793,9 +1795,12 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('z-index', 10);
                     const newText = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;
                     headerDimensionRange.text(newText);
-                    infoRange.text('The original range of ' + dimension + ' is between ' + 
-                    minValue + ' and ' + 
-                    maxValue + '.');
+                    infoRange.text('The current range of ' + dimension + ' is between ' + 
+                        minValue + ' and ' + 
+                        maxValue + '.');
+                    infoRange2.text('The original range of ' + dimension + ' is between ' + 
+                        getMinValue(dimension) + ' and ' + 
+                        getMaxValue(dimension) + '.');
                     rangeButton.on('click', () => {
                         let min = d3.select('#minRangeValue').node().value;
                         let max = d3.select('#maxRangeValue').node().value;

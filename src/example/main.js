@@ -23,18 +23,19 @@ window.addEventListener('click', (event) => {
     if(!event.target.id.includes('move')) {
         closeElements('moveOptions');
     }
-    /*if(!event.target.id.includes('filter')) {
+    if(!event.target.id.includes('filter')) {
         closeElements('filterOptions');
         if (document.getElementById('filterContainer') != null) {
             document.getElementById('filterContainer').remove();
         }
-    }*/
-    /*if(!event.target.id.includes('range')) {
+    }
+    if(!event.target.id.includes('range')) {
+        console.log(event.target.id);
         closeElements('rangeOptions');
         if (document.getElementById('rangeContainer')) {
             document.getElementById('rangeContainer').remove();
         }
-    }*/
+    }
     if(!event.target.id.includes('sel')) {
         closeElements('options_r');
     }
@@ -576,7 +577,7 @@ function generateModuleForSetFilter() {
     inputMinFilter.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('onFilterButton').click();
+            document.getElementById('onfilterButton').click();
         }
     }
 
@@ -596,7 +597,7 @@ function generateModuleForSetFilter() {
     inputMaxFilter.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('onFilterButton').click();
+            document.getElementById('onfilterButton').click();
         }
     }
 
@@ -606,7 +607,7 @@ function generateModuleForSetFilter() {
     popupWindowFilter.appendChild(popupWindowFilterError);
 
     let filterButton = document.createElement('button');
-    filterButton.id = 'onFilterButton';
+    filterButton.id = 'onfilterButton';
     filterButton.textContent = 'Save';
     filterButton.style.marginLeft = 0.5 + 'rem';
     filterButton.style.marginRight = 0.5 + 'rem';
@@ -779,7 +780,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
     popupWindowRange.style.width = 20 + 'rem';
-    popupWindowRange.style.height = 13 + 'rem';
+    popupWindowRange.style.height = 14 + 'rem';
     popupWindowRange.style.backgroundColor = 'white';
     popupWindowRange.style.border = '1px solid black';
 
@@ -864,7 +865,7 @@ function generateModuleForRangeSettings() {
     inputMinRange.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('onRangeButton').click();
+            document.getElementById('onrangeButton').click();
         }
     }
 
@@ -884,7 +885,7 @@ function generateModuleForRangeSettings() {
     inputMaxRange.onkeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            document.getElementById('onRangeButton').click();
+            document.getElementById('onrangeButton').click();
         }
     }
 
@@ -894,7 +895,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.appendChild(popupWindowRangeError);
     
     let rangeButton = document.createElement('button');
-    rangeButton.id = 'onRangeButton';
+    rangeButton.id = 'onrangeButton';
     rangeButton.textContent = 'Save';
     rangeButton.style.marginLeft = 0.5 + 'rem';
     rangeButton.style.marginRight = 0.5 + 'rem';
@@ -950,6 +951,9 @@ function generateModuleForRangeSettings() {
             popupWindowRangeError.style.display = 'none';
             setDimensionRange(rangeDimensionData, min, max);
             popupWindowRange.style.display = 'none';
+        }
+        else {
+            popupWindowRange.style.display = 'visible';
         }
     }
 }
