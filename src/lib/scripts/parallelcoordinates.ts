@@ -5,6 +5,7 @@ import * as path from 'd3-shape';
 import * as axis from 'd3-axis';
 import * as scale from 'd3-scale';
 import * as d3brush from 'd3-brush';
+import * as ease from 'd3-ease';
 import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from '../icons/icons';
@@ -143,15 +144,23 @@ export function invert(dimension: string): void {
         .scale(parcoords.yScales[dimension]
         .domain(parcoords.yScales[dimension]
         .domain().reverse())))
-        .transition();
+        .transition()
+        .duration(4000)
+        .ease(ease.easeCubicInOut);
 
     let active = d3.select('g.active')
         .selectAll('path')
-        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) })
+        .transition()
+        .duration(4000)
+        .ease(ease.easeCubicInOut);
 
     trans(active).each(function (d) {
         d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
+            .attr('d', linePath(d, parcoords.newFeatures, parcoords))})
+            .transition()
+            .duration(4000)
+            .ease(ease.easeCubicInOut);
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (isInverted(dimension)) {
@@ -720,6 +729,54 @@ export function drawChart(content: any): void {
 
     //setBrushRectangle();
 
+    /*let rect = svg.append('rect')
+        .attr('x', 10)
+        .attr('y', 10)
+        .attr('width', 5)
+        .attr('height', 5)
+        .attr('fill', 'none')
+        .attr('stroke', 'black')
+        .attr('stroke-dasharray', '4');
+
+    const dragging = drag.drag()
+        .on("start", function(event) {
+          // Rechteck bei Drag-Start positionieren
+          rect.attr("x", event.x)
+              .attr("y", event.y)
+              .attr("width", 0)
+              .attr("height", 0);
+        })
+        .on("drag", function(event) {
+            const startX = +rect.attr("x");
+            const startY = +rect.attr("y");
+    
+            const width = event.x - startX;
+            const height = event.y - startY;
+    
+            // Berechne und setze die Position und Größe des Rechtecks
+            rect.attr("x", width < 0 ? event.x : startX)
+                .attr("y", height < 0 ? event.y : startY)
+                .attr("width", Math.abs(width))
+                .attr("height", Math.abs(height));
+        })
+        .on("end", function(event) {
+          // Beim Drag-Ende: Selektiere Linien innerhalb des Rechtecks
+          const x0 = +rect.attr("x");
+          const y0 = +rect.attr("y");
+          const x1 = x0 + +rect.attr("width");
+          const y1 = y0 + +rect.attr("height");
+  
+          // Linien selektieren, die im Rechteck liegen
+    active.classed("selected", function(d) {
+        return newFeatures.every((dim, i) => {
+            const lineY = parcoords.yScales[d[dim]];
+            return lineY >= y0 && lineY <= y1;
+          });
+        });
+    });
+    
+    rect.call(dragging);*/
+
     window.svg
         .on('click', (event) => {
             if (!(event.shiftKey) && !(event.ctrlKey) && !(event.metaKey)) {
@@ -974,7 +1031,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
         let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
         let labels = [];
         tempValues.forEach(function(element) {
-            labels.push(element.length > 10 ? element/*.substr(0, 10) + '...'*/ : element);
+            labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
         });
         counter = counter + 1;
 
