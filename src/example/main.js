@@ -184,8 +184,6 @@ function showOptionsForRecords(id, buttonId) {
 }
 
 function generateDropdownForShow() {
-    document.getElementById('hideDimensionHeader').style.visibility = 'visible';
-
     const container = document.getElementById('hideDimensionContainer');
     container.style.position = 'relative';
 
@@ -248,8 +246,6 @@ function generateDropdownForShow() {
 }
 
 function generateDropdownForInvert() {
-    document.getElementById('invDimensionHeader').style.visibility = 'visible';
-
     const container = document.getElementById('invDimensionContainer');
     container.style.position = 'relative';
 
@@ -330,8 +326,6 @@ function generateDropdownForInvert() {
 }
 
 function generateDropdownForMove() {
-    document.getElementById('moDimensionHeader').style.visibility = 'visible';
-
     const container = document.getElementById('moDimensionContainer');
     container.style.position = 'relative';
 
@@ -454,8 +448,6 @@ function disableLeftAndRightButton() {
 }
 
 function generateDropdownForFilter() {
-    document.getElementById('filtDimensionHeader').style.visibility = 'visible';
-
     const container = document.getElementById('filtDimensionContainer');
     container.style.position = 'relative';
 
@@ -708,8 +700,6 @@ function generateModuleForSetFilter() {
 }
 
 function generateDropdownForRange() {
-    document.getElementById('ranDimensionHeader').style.visibility = 'visible';
-
     const container = document.getElementById('ranDimensionContainer');
     container.style.position = 'relative';
 
@@ -988,8 +978,6 @@ function generateDropdownForSelectRecords() {
     
     let records = getAllRecords();
     
-    document.getElementById('selRecordsHeader').style.visibility = 'visible';
-
     const container = document.getElementById('selRecordsContainer');
     container.style.position = 'relative';
 

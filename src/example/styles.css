@@ -76,12 +76,10 @@ section {
   margin-left: 2rem;
   margin-bottom: 4rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(50px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(27rem, 1fr));
   grid-column-gap: 1rem;
   grid-row-gap: 1rem;
   grid-auto-flow: dense;
-  justify-content: flex-start;
-  align-items: flex-start;
 }
 
 @media (max-width: 1200px) {
@@ -100,10 +98,6 @@ section {
   section {
     grid-template-columns: 1fr;
   }
-
-  .item1, .item2, .item3, .item4, .item5, .item6 {
-    grid-column: 1;
-  }
 }
 
 .item1, .item2, .item3, .item4, .item5, .item6 {
@@ -111,27 +105,27 @@ section {
 }
 
 .item1 {
-  grid-column: 1;
+  grid-column: span 1;
 }
 
 .item2 {
-  grid-column: 2;
+  grid-column: span 1;
 }
 
 .item3 {
-  grid-column: 3;
+  grid-column: span 1;
 }
 
 .item4 {
-  grid-column: 1;
+  grid-column: span 1;
 }
 
 .item5 {
-  grid-column: 2;
+  grid-column: span 1;
 }
 
 .item6 {
-  grid-column: 3;
+  grid-column: span 1;
 }
 
 input[type="checkbox"] {

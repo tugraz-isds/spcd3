@@ -729,54 +729,6 @@ export function drawChart(content: any): void {
 
     //setBrushRectangle();
 
-    /*let rect = svg.append('rect')
-        .attr('x', 10)
-        .attr('y', 10)
-        .attr('width', 5)
-        .attr('height', 5)
-        .attr('fill', 'none')
-        .attr('stroke', 'black')
-        .attr('stroke-dasharray', '4');
-
-    const dragging = drag.drag()
-        .on("start", function(event) {
-          // Rechteck bei Drag-Start positionieren
-          rect.attr("x", event.x)
-              .attr("y", event.y)
-              .attr("width", 0)
-              .attr("height", 0);
-        })
-        .on("drag", function(event) {
-            const startX = +rect.attr("x");
-            const startY = +rect.attr("y");
-    
-            const width = event.x - startX;
-            const height = event.y - startY;
-    
-            // Berechne und setze die Position und Größe des Rechtecks
-            rect.attr("x", width < 0 ? event.x : startX)
-                .attr("y", height < 0 ? event.y : startY)
-                .attr("width", Math.abs(width))
-                .attr("height", Math.abs(height));
-        })
-        .on("end", function(event) {
-          // Beim Drag-Ende: Selektiere Linien innerhalb des Rechtecks
-          const x0 = +rect.attr("x");
-          const y0 = +rect.attr("y");
-          const x1 = x0 + +rect.attr("width");
-          const y1 = y0 + +rect.attr("height");
-  
-          // Linien selektieren, die im Rechteck liegen
-    active.classed("selected", function(d) {
-        return newFeatures.every((dim, i) => {
-            const lineY = parcoords.yScales[d[dim]];
-            return lineY >= y0 && lineY <= y1;
-          });
-        });
-    });
-    
-    rect.call(dragging);*/
-
     window.svg
         .on('click', (event) => {
             if (!(event.shiftKey) && !(event.ctrlKey) && !(event.metaKey)) {
