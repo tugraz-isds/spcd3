@@ -41,7 +41,6 @@ declare global {
     let max: number;
     let hoverdata: any[];
     let hoverlabel: string;
-    let longLabels: boolean;
     let yBrushes: {};
     let filters: {};
     let selectedDots: [];
@@ -842,7 +841,6 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.paddingXaxis = 75;
     window.width = newFeatures.length * 100;
     window.height = 400;
-    window.longLabels = false;
 
     const label = newFeatures[newFeatures.length-1];
     
@@ -864,20 +862,6 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.parcoords = {};
     window.parcoords.features = dataset[0];
     window.parcoords.newDataset = dataset[1];
-
-    for(let i = 0; i < newFeatures.length; i++) {
-        let values = window.parcoords.newDataset.map(o => o[newFeatures[i]]);
-        if (isNaN(values[0])) {
-            values.forEach(item => {
-                if(item.length > 20) {
-                    window.width = newFeatures.length * 200;
-                    window.paddingXaxis = 200;
-                    window.longLabels = true;
-                    return;
-                }
-            })
-        } 
-    }
 
     window.parcoords.xScales = setupXScales(window.width, window.paddingXaxis, dataset[0]);
     window.parcoords.yScales = setupYScales(window.height, window.padding, dataset[0], dataset[1]);
@@ -946,7 +930,7 @@ function setupYScales(height: any, padding: any, features: any, newDataset: any)
         let labels = [];
         if (isNaN(values[0]) !== false) {
             values.forEach(function(element) {
-                labels.push(element.length > 10 ? element : element);
+                labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
             });
             yScales[x.name] = scale.scalePoint()
                 .domain(labels)
@@ -1026,13 +1010,7 @@ function redrawChart(content: any, newFeatures: any): void {
     setUpParcoordData(content, newFeatures);
 
     let height = 360;
-    let width = 0;
-    if (longLabels) {
-        width = newFeatures.length * 200;
-    }
-    else {
-        width = newFeatures.length * 100;
-    }
+    let width = newFeatures.length * 100;
 
     window.svg = d3.select('#parallelcoords')
         .append('svg')
@@ -1375,16 +1353,11 @@ function createToolTipForValues(recordData): void {
                     240 / range * (maxValue - recordData[dimensions[i]]) + 80;
             }
 
-            let x;
+            
 
             let posLeft = d3.select('#rect_' + firstDimension).node().getBoundingClientRect().left;
-    
-            if (window.longLabels) {
-                x = posLeft + (counter * 200);
-            }
-            else {
-                x = posLeft + 5 + (counter * 100);
-            }
+            let x = posLeft + 5 + (counter * 100);
+            
             counter = counter + 1;
 
             let y = value+150;
