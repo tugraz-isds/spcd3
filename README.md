@@ -44,7 +44,7 @@ Open terminal and execute the following command to install all the dependencies:
 
 
 ``` 
-npm install 
+yarn install 
 ```
 
 ### Build And Development

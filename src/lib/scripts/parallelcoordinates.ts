@@ -1197,7 +1197,6 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         })
         .each(function (d) {
             let element = d[window.key].length > 10 ? d[window.key].substr(0, 10) + '...' : d[window.key];
-            console.log(element);
             d[window.key] = element;
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
