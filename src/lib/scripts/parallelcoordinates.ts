@@ -978,7 +978,7 @@ function setupYAxis(features :any[], yScales: any, newDataset: any): any {
             if(uniqueArray.length > limit)
             {
                 let filteredArray = labels.filter(function(value, index, array) {
-                    return index % 3 == 0;
+                    return index % 4 == 0;
                 });
                 yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
             }
@@ -1178,8 +1178,6 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .attr('id', 'removeSelection')
         .attr('class', 'contextmenu')
         .text('Remove from Selection');
-         
-    let delay;
 
     let active = svg.append('g')
         .attr('class', 'active')
@@ -1198,6 +1196,9 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             return d[window.key];
         })
         .each(function (d) {
+            let element = d[window.key].length > 10 ? d[window.key].substr(0, 10) + '...' : d[window.key];
+            console.log(element);
+            d[window.key] = element;
             d3.select(this)
                 .attr('d', linePath(d, parcoords.newFeatures, parcoords));
         })
