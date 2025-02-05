@@ -139,27 +139,32 @@ export function invert(dimension: string): void {
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
-        .call(yAxis[dimension]
-        .scale(parcoords.yScales[dimension]
-        .domain(parcoords.yScales[dimension]
-        .domain().reverse())))
         .transition()
-        .duration(4000)
-        .ease(ease.easeCubicInOut);
+        .duration(1000)
+        .call(yAxis[dimension]
+            .scale(parcoords.yScales[dimension]
+            .domain(parcoords.yScales[dimension]
+            .domain().reverse())))
+        .ease(ease.easeCubic);
 
     let active = d3.select('g.active')
         .selectAll('path')
-        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) })
         .transition()
-        .duration(4000)
-        .ease(ease.easeCubicInOut);
+        .duration(1000)
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            })
+        .ease(ease.easeCubic);
+    
 
     trans(active).each(function (d) {
         d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))})
-            .transition()
-            .duration(4000)
-            .ease(ease.easeCubicInOut);
+        .transition()
+        .duration(1000)
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            })
+        .ease(ease.easeCubic)});
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (isInverted(dimension)) {
