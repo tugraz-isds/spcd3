@@ -215,19 +215,32 @@ export function setInversionStatus(dimension: string, status: string): void {
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
+        .transition()
+        .duration(1000)
         .call(yAxis[dimension]
         .scale(parcoords.yScales[dimension]
         .domain(parcoords.yScales[dimension]
         .domain().reverse())))
-        .transition();
+        .ease(ease.easeCubic);
 
     let active = d3.select('g.active')
         .selectAll('path')
-        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
+        .transition()
+        .duration(1000)
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            })
+        .ease(ease.easeCubic);
+    
 
-        trans(active).each(function (d) {
+    trans(active).each(function (d) {
         d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))});
+        .transition()
+        .duration(1000)
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            })
+        .ease(ease.easeCubic)});
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (isInverted(dimension)) {
@@ -308,14 +321,20 @@ export function moveByOne(dimension: string, direction: string): void {
     let active = d3.select('g.active').selectAll('path');
     let featureAxis = d3.selectAll('#feature');
 
-    active.each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-    });
+    active.transition()
+        .duration(1000)
+        .attr('d', function(d) {
+            return linePath(d, parcoords.newFeatures, parcoords);
+        })
+        .ease(ease.easeCubic);
 
-    featureAxis.attr('transform', (d) => {
-        return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
-    });
+    featureAxis.transition()
+        .duration(1000)
+        .attr('transform', function(d) {
+            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        })
+        .ease(ease.easeCubic);
+
 
     /*d3.select('#select_')
       .selectAll('path')
@@ -390,14 +409,19 @@ export function swap(dimensionA: string, dimensionB: string): void {
     let active = d3.select('g.active').selectAll('path');
     let featureAxis = d3.selectAll('#feature');
 
-    active.each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-    });
+    active.transition()
+        .duration(1000)
+        .attr('d', (d) => {
+            return linePath(d, parcoords.newFeatures, parcoords);
+        })
+        .ease(ease.easeCubic);
 
-    featureAxis.attr('transform', (d) => {
-        return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
-    });
+    featureAxis.transition()
+        .duration(1000)
+        .attr('transform', (d) => {
+            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        })
+        .ease(ease.easeCubic);
 
     /*d3.select('#select_')
       .selectAll('path')
