@@ -461,26 +461,40 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
 
     // draw active lines
     d3.select('#dimension_axis_' + helper.cleanString(dimension))
-        .call(yAxis[dimension]).transition();
+        .call(yAxis[dimension])
+        .transition()
+        .duration(1000)
+        .ease(ease.easeCubic);
+
     let active = d3.select('g.active')
         .selectAll('path')
-        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-        trans(active).each(function (d) {
+        .transition()
+        .duration(1000)
+        .attr('d', (d) => { 
+            return linePath(d, window.parcoords.newFeatures, window.parcoords); 
+        })
+        .ease(ease.easeCubic);
+
+    active.each(function (d) {
         d3.select(this)
+            .transition()
+            .duration(1000)
             .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
-        }
-    );
+            .ease(ease.easeCubic);
+    });
 
     // draw inactive lines
     d3.select('g.inactive')
         .selectAll('path')
         .each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
-        }).transition()
-        .delay(5)
-        .duration(0)
-        .attr('visibility', 'hidden');
+            d3.select(this)
+                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords));
+        })
+        .transition()
+        .delay(500)
+        .duration(1000)
+        .attr('visibility', 'hidden')
+        .ease(ease.easeCubic);
         
     // draw selectable lines
     /*d3.select('#select_')
@@ -512,26 +526,40 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
 
     // draw active lines
     d3.select('#dimension_axis_' + helper.cleanString(dimension))
-        .call(yAxis[dimension]).transition();
+        .call(yAxis[dimension])
+        .transition()
+        .duration(1000)
+        .ease(ease.easeCubic);
+
     let active = d3.select('g.active')
         .selectAll('path')
-        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-        trans(active).each(function (d) {
+        .transition()
+        .duration(1000)
+        .attr('d', (d) => { 
+            return linePath(d, window.parcoords.newFeatures, window.parcoords); 
+        })
+        .ease(ease.easeCubic);
+
+    active.each(function (d) {
         d3.select(this)
+            .transition()
+            .duration(1000)
             .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
-        }
-    );
+            .ease(ease.easeCubic);
+    });
 
     // draw inactive lines
     d3.select('g.inactive')
         .selectAll('path')
         .each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
-        }).transition()
-        .delay(5)
-        .duration(0)
-        .attr('visibility', 'hidden');
+            d3.select(this)
+                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords));
+        })
+        .transition()
+        .delay(500)
+        .duration(1000)
+        .attr('visibility', 'hidden')
+        .ease(ease.easeCubic);
         
     // draw selectable lines
     /*d3.select('#select_')
