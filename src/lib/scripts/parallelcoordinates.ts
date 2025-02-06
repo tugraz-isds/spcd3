@@ -783,7 +783,7 @@ export function drawChart(content: any): void {
 
     setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
 
-    //setBrushRectangle();
+    selectionWithRectangle();
 
     window.svg
         .on('click', (event) => {
@@ -832,6 +832,89 @@ export function deleteChart(): void {
     d3.select('#contextmenuRecords').remove();
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
+}
+
+function selectionWithRectangle(): void {
+
+    const svg = window.svg;
+    let selectionRect = svg.append('rect')
+        .style('fill', 'none')
+        .style('stroke', 'black')
+        .style('stroke-dasharray', '3')
+        .style('visibility', 'hidden');
+
+    let isSelecting = false;
+    let startX;
+    let startY;
+
+    svg.on('mousedown', function(event) {
+        isSelecting = true;
+        const [x, y] = d3.pointer(event);
+        startX = x;
+        startY = y;
+
+        selectionRect
+            .attr('x', startX)
+            .attr('y', startY)
+            .attr('width', 0)
+            .attr('height', 0)
+            .style('visibility', 'visible');
+    });
+
+    svg.on('mousemove', function(event) {
+        if (!isSelecting) return;
+        const [x, y] = d3.pointer(event);
+        const width = Math.abs(x - startX);
+        const height = Math.abs(y - startY);
+
+        selectionRect
+            .attr('x', Math.min(x, startX))
+            .attr('y', Math.min(y, startY))
+            .attr('width', width)
+            .attr('height', height);
+    });
+
+    svg.on('mouseup', function() {
+        if (!isSelecting) return;
+        isSelecting = false;
+    
+        const x1 = parseFloat(selectionRect.attr('x'));
+        const y1 = parseFloat(selectionRect.attr('y'));
+        const x2 = x1 + parseFloat(selectionRect.attr('width'));
+        const y2 = y1 + parseFloat(selectionRect.attr('height'));
+    
+        svg.selectAll('g.active path')
+            .each(function(d) {
+                const path = d3.select(this).node();
+                const pathData = path.getAttribute('d');
+
+                const pathCoords = pathData.match(/[ML]\s*(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/g);
+    
+                let isInSelection = false;
+    
+                if (pathCoords) {
+                    pathCoords.forEach(function(coord) {
+                        const matches = coord.match(/[-+]?\d*\.?\d+/g);
+                        const [x, y] = matches.map(Number);
+                    
+                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                            isInSelection = true;
+                        }
+                    });
+                }
+    
+                if (isInSelection) {
+                    d3.select(this)
+                        .each(function() {
+                            const pathElement = d3.select(this);
+                            const pathId = pathElement.attr('id');
+                            setSelected(pathId);
+                    });
+                }
+            });
+        selectionRect.style('visibility', 'hidden');
+    });
+    
 }
 
 //---------- Helper Functions ----------
@@ -2187,18 +2270,6 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                         tooltipValues.style('visibility', 'hidden');
                     }));
         });
-}
-
-function setBrushRectangle(): void {
-    
-    window.svg
-        .append('g')
-        .attr('class', 'selection_rect')
-        .call(d3brush.brush()
-        .extent([[0, 0], [900, 360]])
-        //.on("start brush", brushed)
-        .on("end", getSelectedRecords)
-    )
 }
 
 function getSelectedRecords(event) {
