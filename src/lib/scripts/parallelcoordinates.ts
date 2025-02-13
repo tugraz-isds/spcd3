@@ -627,7 +627,8 @@ export function getSelected(): any[] {
    
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
-        let selectedLine = helper.cleanLinePathString(records[i]);
+        let editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
+        let selectedLine = helper.cleanLinePathString(editRecord);
         let isselected = isSelected(selectedLine);
         if (isselected) {
             selected.push(records[i]);
@@ -638,13 +639,15 @@ export function getSelected(): any[] {
 
 export function setSelection(records: string[]): void {
     let selectableLines = [];
+    let editRecord;
     for(let i = 0; i < records.length; i++) {
         window.active.each(function (d) {
-            if(helper.cleanLinePathString(d[window.hoverlabel]) == records[i]) {
+            editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
+            if(helper.cleanLinePathString(d[window.hoverlabel]) == helper.cleanLinePathString(editRecord)) {
                 selectableLines.push(d);
             }
         });
-        d3.select('.' + records[i])
+        d3.select('.' + helper.cleanLinePathString(editRecord))
             .transition()
             .style('visibility', 'hidden'); 
     }
@@ -676,7 +679,8 @@ export function setSelection(records: string[]): void {
 }
 
 export function isSelected(record: string): boolean {
-    let cleanedRecord = helper.cleanLinePathString(record);
+    let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
+    let cleanedRecord = helper.cleanLinePathString(editRecord);
     const path = d3.select('#select_' + cleanedRecord);
     if (path.size() != 0) {
         return true;
@@ -703,7 +707,8 @@ export function setSelected(record: string): void {
 }
 
 export function setUnselected(record: string): void {
-    const path = helper.cleanLinePathString(record);
+    let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
+    const path = helper.cleanLinePathString(editRecord);
     d3.select('#select_' + path)
             .remove();
     d3.select('.' + path)
