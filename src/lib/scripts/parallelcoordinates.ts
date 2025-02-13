@@ -4,7 +4,6 @@ import * as drag from 'd3-drag';
 import * as path from 'd3-shape';
 import * as axis from 'd3-axis';
 import * as scale from 'd3-scale';
-import * as d3brush from 'd3-brush';
 import * as ease from 'd3-ease';
 import * as brush from './brush';
 import * as helper from './helper';
@@ -1251,6 +1250,13 @@ let delay = null;
 let selectedPath = null;
 let tooltipPath;
 
+const clearExistingDelay = () => {
+    if (delay) {
+        clearTimeout(delay);
+        delay = null;
+    }
+};
+
 const handlePointerEnter = (event, d) => {
     const data = getAllPointerEventsData(event);
     window.hoverdata = [...data];
@@ -1258,34 +1264,35 @@ const handlePointerEnter = (event, d) => {
     selectedPath = highlight(data);
     createTooltipForPathLine(data, tooltipPath, event);
 
-    if (delay) {
-        clearTimeout(delay);
-    }
+    clearExistingDelay();
 
-    data.forEach((item, i) => {
-        parcoords.newDataset.forEach((record, j) => {
-            let recordData = record[window.hoverlabel];
-            if (recordData === item) {
-                delay = setTimeout(() => {
-                    createToolTipForValues(record);
-                }, 150);
-            }
-        });
+    const datasetMap = new Map();
+    parcoords.newDataset.forEach((record) => {
+        const recordData = record[window.hoverlabel];
+        datasetMap.set(recordData, record);
+    });
+
+    data.forEach((item) => {
+        const matchingRecord = datasetMap.get(item);
+        if (matchingRecord) {
+            delay = setTimeout(() => {
+                createToolTipForValues(matchingRecord);
+            }, 150);
+        }
     });
 };
 
 const handlePointerLeaveOrOut = () => {
     doNotHighlight(selectedPath);
 
-    if (delay) {
-        clearTimeout(delay);
+    clearExistingDelay();
+
+    if (tooltipPath) {
+        tooltipPath.style('visibility', 'hidden');
     }
-
-    delay = null;
-
-    tooltipPath.style('visibility', 'hidden');
     cleanTooltip();
 };
+
 
 function setActivePathLines(svg: any, content: any, ids: any[], 
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
@@ -1459,68 +1466,55 @@ function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any
 }
 
 function createToolTipForValues(recordData): void {
-
-    let dimensions = getAllVisibleDimensionNames();
+    const dimensions = getAllVisibleDimensionNames();
     let counter = 0;
-    let firstDimension;
-    for(let i = 0; i < dimensions.length; i++) {
-        let cleanString = helper.cleanString(dimensions[i]);
-        let secondCleanString = helper.cleanLinePathString(recordData[window.hoverlabel]);
-        if(helper.isElementVisible(d3.select('#rect_' + cleanString))) {
-            if (firstDimension === undefined) {
-                firstDimension = cleanString;
-            }
-            
-            let tooltipValues = d3.select('#parallelcoords')
+
+    const rectLeft = d3.select('#rect_' + dimensions[0])?.node()?.getBoundingClientRect().left;
+
+    dimensions.forEach(dimension => {
+        const cleanString = helper.cleanString(dimension);
+
+        if (helper.isElementVisible(d3.select('#rect_' + cleanString))) {
+            const tooltipValues = d3.select('#parallelcoords')
                 .append('g')
                 .attr('class', 'tooltip')
                 .style('position', 'absolute')
                 .style('visibility', 'hidden');
 
-            const dimensionName = dimensions[i];
-            const invertStatus = isInverted(dimensionName);
-            const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
-            parcoords.yScales[dimensionName].domain()[0];
-    
-            const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-            parcoords.yScales[dimensionName].domain()[1];
-
+            const invertStatus = isInverted(dimension);
+            const scale = parcoords.yScales[dimension];
+            const maxValue = invertStatus ? scale.domain()[0] : scale.domain()[1];
+            const minValue = invertStatus ? scale.domain()[1] : scale.domain()[0];
             const range = maxValue - minValue;
 
             let value;
-        
-            if(invertStatus) {
-                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]])    :
-                    240 / range * (recordData[dimensions[i]] - minValue) + 80;
-            }
-            else {
-                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](recordData[dimensions[i]]) :
-                    240 / range * (maxValue - recordData[dimensions[i]]) + 80;
+            if (invertStatus) {
+                value = isNaN(maxValue) ? scale(recordData[dimension]) :
+                    240 / range * (recordData[dimension] - minValue) + 80;
+            } else {
+                value = isNaN(maxValue) ? scale(recordData[dimension]) :
+                    240 / range * (maxValue - recordData[dimension]) + 80;
             }
 
-            
+            const x = rectLeft + 5 + (counter * 100);
+            const y = value + 150;
 
-            let posLeft = d3.select('#rect_' + firstDimension).node().getBoundingClientRect().left;
-            let x = posLeft + 5 + (counter * 100);
-            
-            counter = counter + 1;
-
-            let y = value+150;
-
-            let tempText = recordData[dimensions[i]].toString();
-            tooltipValues.text(tempText);
-            tooltipValues.style('visibility', 'visible');
-            tooltipValues.style('top', y + 'px').style('left', x + 'px');
-            tooltipValues.style('font-size', '0.65rem')
-                .style('margin', 0.5 + 'rem')
+            tooltipValues.text(recordData[dimension].toString())
+                .style('visibility', 'visible')
+                .style('top', `${y}px`)
+                .style('left', `${x}px`)
+                .style('font-size', '0.65rem')
+                .style('margin', '0.5rem')
                 .style('color', 'red')
                 .style('background-color', '#d3d3d3ad')
                 .style('font-weight', 'bold')
-                .style('padding', 0.12 + 'rem')
+                .style('padding', '0.12rem')
                 .style('white-space', 'pre-line')
-                .style('margin-left', 0.5 + 'rem');    
+                .style('margin-left', '0.5rem');
+
+            counter++;
         }
-    }
+    });
 }
 
 function getAllPointerEventsData(event: any): any {
@@ -1607,59 +1601,53 @@ function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
 
 function highlight(data: any): any {
     let selectedPath = '';
-    let dataWoSpecialC = [];
-    for(let i = 0; i < data.length; i++) {
-        let temp = data[i].replaceAll(/[.,]/g, '');
-        dataWoSpecialC.push(temp);
-    }
-
+    const dataWoSpecialC = data.map(item => item.replace(/[.,]/g, ''));
+    
     if (dataWoSpecialC.length !== 0) {
-        let tempText = dataWoSpecialC.toString();
-        tempText = tempText.replaceAll(',', ',.');
+        let tempText = dataWoSpecialC.join(',').replace(/,/g, ',.');
         tempText = helper.cleanLinePathArrayString(tempText);
         selectedPath = tempText;
-        dataWoSpecialC = tempText.split(',.');
-
-        let newTempText = [];
-        for(let i = 0; i < dataWoSpecialC.length; i++) {
-            newTempText.push(dataWoSpecialC[i].replace(/,./g, ''));
-            if (isSelected(dataWoSpecialC[i])) {
-                setUnselected(dataWoSpecialC[i]);
-                if(window.hoverSelected == undefined) {
-                    window.hoverSelected = [];
-                }
-                window.hoverSelected.push(dataWoSpecialC[i]);
+    
+        const newTempText = dataWoSpecialC.map((item) => {
+            let cleanedItem = item.replace(/,./g, '');
+            if (isSelected(item)) {
+                setUnselected(item);
+                window.hoverSelected = window.hoverSelected || [];
+                window.hoverSelected.push(item);
             }
-        }
-
+            return cleanedItem;
+        });
+    
         selectedPath = newTempText.join(',.');
-
-        if(selectedPath) {
+    
+        if (selectedPath) {
             d3.selectAll('.' + selectedPath)
                 .transition().duration(5)
                 .style('opacity', '0.7')
                 .style('stroke', 'rgb(200, 28, 38)');
         }
     }
+    
     return selectedPath;
 }
 
 function doNotHighlight(selectedPath: any): void {
-    if(selectedPath !== '') {
-        let tempText = selectedPath.split(',.');
-        let newTempText = [];
-        for(let i = 0; i < tempText.length; i++) {
-            newTempText.push(tempText[i]);
-            if (window.hoverSelected != undefined && window.hoverSelected.includes(tempText[i])) {
-                setSelected(tempText[i]);
-                const index = window.hoverSelected.indexOf(tempText[i]);
+    if (selectedPath !== '') {
+        const tempText = selectedPath.split(',.');
+        const newTempText = [];
+
+        tempText.forEach(item => {
+            newTempText.push(item);
+            if (window.hoverSelected && window.hoverSelected.includes(item)) {
+                setSelected(item);
+                const index = window.hoverSelected.indexOf(item);
                 window.hoverSelected.splice(index, 1);
             }
-        }
+        });
 
         selectedPath = newTempText.join(',.');
 
-        if(selectedPath) {
+        if (selectedPath) {
             d3.selectAll('.' + selectedPath)
                 .transition()
                 .style('opacity', '0.7')
