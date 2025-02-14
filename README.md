@@ -26,7 +26,7 @@ The SPCD3 library uses the following D3v7 modules:
 
 In addition to D3, the following JavaScript libraries are used:
  - [Mini SVG data: URI](https://github.com/tigt/mini-svg-data-uri#readme):
-   To convert SVGs in data URIs.
+   To convert SVGs into data URIs.
  - [xml-formatter](https://github.com/chrisbottin/xml-formatter#readme):
    To prettify the SVG file of the parallel coordinate plot for download.
 
