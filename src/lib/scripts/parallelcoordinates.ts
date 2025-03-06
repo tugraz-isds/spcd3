@@ -1199,8 +1199,8 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             select(window.hoverdata);
         })
         .on('contextmenu', function (event, d) {
-            contextMenu.style('left', event.clientX + 'px')
-            .style('top', event.clientY + 'px')
+            contextMenu.style('left', event.clientX/16 + 'rem')
+            .style('top', event.clientY/16 + 'rem')
             .style('display', 'block')
             .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
@@ -1290,7 +1290,7 @@ function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any
         tempText = tempText.split(',').join('\r\n');
         tooltipPath.text(tempText);
         tooltipPath.style('visibility', 'visible');
-        tooltipPath.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+        tooltipPath.style('top', event.clientY/16 + 'rem').style('left', event.clientX/16 + 'rem');
         tooltipPath.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -1330,13 +1330,13 @@ function createToolTipForValues(recordData): void {
                     240 / range * (maxValue - recordData[dimension]) + 80;
             }
 
-            const x = rectLeft + 5 + (counter * 100);
-            const y = value + 150;
+            const x = (rectLeft + (counter * 95))/16;
+            const y = (value + 140)/16;
 
             tooltipValues.text(recordData[dimension].toString())
                 .style('visibility', 'visible')
-                .style('top', `${y}px`)
-                .style('left', `${x}px`)
+                .style('top', `${y}rem`)
+                .style('left', `${x}rem`)
                 .style('font-size', '0.65rem')
                 .style('margin', '0.5rem')
                 .style('color', 'red')
@@ -1374,8 +1374,6 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .data(parcoords.features)
         .enter()
         .append('g')
-        .attr('class', 'feature')
-        .attr('id', 'feature')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
     let tooltipValuesLabel = d3.select('#parallelcoords')
@@ -1392,7 +1390,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
                 .call(yAxis[d.name])
                 .on('mouseenter', function (event, d) {
                     tooltipValuesLabel.text('');
-                    tooltipValuesLabel.style('top', event.clientY + 'px').style('left', event.clientX + 'px');
+                    tooltipValuesLabel.style('top', event.clientY/16 + 'rem').style('left', event.clientX/16 + 'rem');
                     tooltipValuesLabel.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
                     .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
                     .style('padding', 0.12 + 'rem')
@@ -1667,7 +1665,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
             }
 
             tooltipFeatures.text(d.name);
-            tooltipFeatures.style('top', 13.6 + 'rem').style('left', event.clientX + 'px');
+            tooltipFeatures.style('top', 12.8 + 'rem').style('left', event.clientX/16 + 'rem');
             tooltipFeatures.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
                 .style('padding', 0.12 + 'rem')
@@ -1681,7 +1679,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
             const dimension = d.name;
             const values = parcoords.newDataset.map(o => o[dimension]);
             
-            contextMenu.style('left', event.clientX + 'px')
+            contextMenu.style('left', event.clientX/16 + 'rem')
             .style('top', 13.6 + 'rem')
             .style('display', 'block')
             .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
@@ -1731,7 +1729,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('width', 17 + 'rem')
                             .style('height', 13 + 'rem')
                             .style('background', 'white')
-                            .style('border', '1px solid black')
+                            .style('border', '0.0625rem solid black')
                             .style('border-radius', 0.25 + 'rem')
                             .style('padding', 1 + 'rem')
                             .style('margin', 'auto')
@@ -1851,7 +1849,7 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
                             .style('width', 17 + 'rem')
                             .style('height', 8 + 'rem')
                             .style('background', 'white')
-                            .style('border', '1px solid black')
+                            .style('border', '0.0625rem solid black')
                             .style('border-radius', 0.25 + 'rem')
                             .style('padding', 1 + 'rem')
                             .style('margin', 'auto')
