@@ -172,25 +172,6 @@ export function invert(dimension: string): void {
     else {
         brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
     }
-
-    d3.select('g.inactive')
-        .selectAll('path')
-        .each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-        })
-        .transition()
-        .delay(5)
-        .duration(0)
-        .attr('visibility', 'hidden');
-        
-    /*d3.select('#select_')
-        .selectAll('path')
-          .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-          trans(selectable).each(function (d) {
-              d3.select(this)
-                  .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-          }) */
 }
 
 export function getInversionStatus(dimension: string): string {
@@ -248,25 +229,6 @@ export function setInversionStatus(dimension: string, status: string): void {
     else {
         brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
     }
-
-    d3.select('g.inactive')
-        .selectAll('path')
-        .each(function (d) {
-        d3.select(this)
-            .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-        })
-        .transition()
-        .delay(5)
-        .duration(0)
-        .attr('visibility', 'hidden');
-    
-    /*d3.select('#select_')
-        .selectAll('path')
-          .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-          trans(selectable).each(function (d) {
-              d3.select(this)
-                  .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-    }) */
 }
 
 export function isInverted(dimension: string): boolean {
@@ -282,9 +244,6 @@ export function isInverted(dimension: string): boolean {
 export function moveByOne(dimension: string, direction: string): void {
 
     let parcoords = window.parcoords;
-    
-    let inactive = d3.select('g.inactive').selectAll('path');
-    inactive.attr('visibility', 'hidden');
     
     const indexOfDimension = parcoords.newFeatures.indexOf(dimension);
 
@@ -333,15 +292,6 @@ export function moveByOne(dimension: string, direction: string): void {
             return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(ease.easeCubic);
-
-
-    /*d3.select('#select_')
-      .selectAll('path')
-        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
-        trans(selectable).each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        }) */
 
     delete parcoords.dragging[dimension];
     delete parcoords.dragging[neighbour];
@@ -402,9 +352,6 @@ export function swap(dimensionA: string, dimensionB: string): void {
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
-    let inactive = d3.select('g.inactive').selectAll('path');
-    inactive.attr('visibility', 'hidden');
-
     let active = d3.select('g.active').selectAll('path');
     let featureAxis = d3.selectAll('#feature');
 
@@ -421,14 +368,6 @@ export function swap(dimensionA: string, dimensionB: string): void {
             return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(ease.easeCubic);
-
-    /*d3.select('#select_')
-      .selectAll('path')
-        .attr('d', (d) => { linePath(d, parcoords.newFeatures, parcoords) });
-        trans(selectable).each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-    })*/
 
     delete parcoords.dragging[dimensionA];
     delete parcoords.dragging[dimensionB];
@@ -481,28 +420,6 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
             .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
-
-    // draw inactive lines
-    d3.select('g.inactive')
-        .selectAll('path')
-        .each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords));
-        })
-        .transition()
-        .delay(500)
-        .duration(1000)
-        .attr('visibility', 'hidden')
-        .ease(ease.easeCubic);
-        
-    // draw selectable lines
-    /*d3.select('#select_')
-      .selectAll('path')
-        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-        trans(selectable).each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        })*/
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -546,28 +463,6 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
             .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
-
-    // draw inactive lines
-    d3.select('g.inactive')
-        .selectAll('path')
-        .each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords));
-        })
-        .transition()
-        .delay(500)
-        .duration(1000)
-        .attr('visibility', 'hidden')
-        .ease(ease.easeCubic);
-        
-    // draw selectable lines
-    /*d3.select('#select_')
-      .selectAll('path')
-        .attr('d', (d) => { linePath(d, window.parcoords.newFeatures, window.parcoords) });
-        trans(selectable).each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        }) */
 }
 
 export function getMinValue(dimension: any): number {
@@ -751,7 +646,6 @@ export function setUnselectedWithId(recordId: number): void {
     setUnselected(record);
 }
 
-
 //---------- IO Functions ----------
 
 export function drawChart(content: any): void {
@@ -779,13 +673,9 @@ export function drawChart(content: any): void {
         .attr('viewBox', [0, 0, window.width, height])
         .attr('font-family', 'Verdana, sans-serif');
 
-    //window.selectable = setSelectPathLines(svg, content, window.parcoords);
-
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
+    setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 
     selectionWithRectangle();
 
@@ -975,7 +865,6 @@ export function isDimensionCategorical(dimension: string): boolean {
 export function setDimensionForHovering(dimension: string): void {
     window.hoverlabel = dimension;
 }
-
 
 // ---------- Needed for Built-In Interactivity Functions ---------- //
 
@@ -1181,64 +1070,9 @@ function redrawChart(content: any, newFeatures: any): void {
         d3.select('#contextmenuRecords').style('display', 'none');
     }
 
-    let inactive = setInactivePathLines(svg, content, window.parcoords);
-
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
-    setFeatureAxis(svg, yAxis, window.active, inactive, window.parcoords, width, window.padding);
-}
-
-function setInactivePathLines(svg: any, content: any, parcoords: { xScales: any; 
-    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
-    newFeatures: any; features: any[]; newDataset: any[];}): void {
-    
-    return svg.append('g')
-        .attr('class', 'inactive')
-        .selectAll('path')
-        .data(content)
-        .enter()
-        .append('path')
-        .style('pointer-events', 'none')
-        .style('fill', 'none')
-        .style('stroke', 'lightgrey')
-        .style('stroke-opacity', '0.4')
-        .each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        })
-        .on("contextmenu", function (event) {
-            event.preventDefault();
-        });
-}
-
-function setSelectPathLines(svg: any, content: any, parcoords: { xScales: any; 
-    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
-    newFeatures: any; features: any[]; newDataset: any[];}): void {
-    
-    return svg.append('g')
-        .attr('class', 'selectable')
-        .selectAll('path')
-        .data(content)
-        .enter()
-        .append('path')
-        .attr('id', (d) => {
-            const keys = Object.keys(d);
-            window.key = keys[0];
-            const selected_value = helper.cleanLinePathString(d[window.key]);
-            return 'select_' + selected_value;
-        })
-        .style('pointer-events', 'none')
-        .style('fill', 'none')
-        .style('stroke', 'rgb(255, 165, 0)')
-        .style('opacity', '1')
-        .style('visibility', 'hidden')
-        .each(function (d) {
-            d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
-        })
-        .on("contextmenu", function (event) {
-            event.preventDefault();
-        });
+    setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 }
 
 function cleanTooltip(){
@@ -1531,7 +1365,7 @@ function getAllPointerEventsData(event: any): any {
     return data;
 }
 
-function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
+function setFeatureAxis(svg: any, yAxis: any, active: any,
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; }, 
     width: any, padding: any): void {
@@ -1591,11 +1425,10 @@ function setFeatureAxis(svg: any, yAxis: any, active: any, inactive: any,
    
     setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
 
-    setContextMenu(featureAxis, padding, parcoords, inactive, active, width);
+    setContextMenu(featureAxis, padding, parcoords, active, width);
 
     setInvertIcon(featureAxis, padding, parcoords, yAxis);
 }
-
 
 // Hovering
 
@@ -1703,7 +1536,7 @@ function setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any
 
 function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {}; 
     dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[]}, inactive: any, active: any, width: any): void {
+    features: any[]; newDataset: any[]}, active: any, width: any): void {
     
     let tooltipFeatures = d3.select('#parallelcoords')
         .append('g')
@@ -1811,9 +1644,9 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
         .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
         .style('font-size', '0.7rem')
         .call(drag.drag()
-            .on('start', onDragStartEventHandler(parcoords, inactive))
+            .on('start', onDragStartEventHandler(parcoords))
             .on('drag', onDragEventHandler(parcoords, active, featureAxis, width))
-            .on('end', onDragEndEventHandler(parcoords, featureAxis, inactive, active))
+            .on('end', onDragEndEventHandler(parcoords, featureAxis, active))
         )
         .on('mouseover', function () {
             return tooltipFeatures.style('visibility', 'visible');
@@ -2287,14 +2120,13 @@ function getSelectedRecords(event) {
 
 // Dragging
 
-function onDragStartEventHandler(parcoords: any, inactive: any): any {
+function onDragStartEventHandler(parcoords: any): any {
     {
         return function onDragStart (d)
         {
             this.__origin__ = parcoords.xScales((d.subject).name);
             parcoords.dragging[(d.subject).name] = this.__origin__;
             parcoords.dragPosStart[(d.subject).name] = this.__origin__;
-            inactive.attr('visibility', 'hidden');
             const element = document.getElementById("parallelcoords");
             window.scrollXPos = element.scrollLeft;
         }
@@ -2344,7 +2176,7 @@ function onDragEventHandler(parcoords: any, active: any, featureAxis: any, width
     }
 }
 
-function onDragEndEventHandler(parcoords: any, featureAxis: any, inactive: any, active: any): any {
+function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): any {
     {
         return function onDragEnd(d) {
             const width = window.width;
@@ -2369,20 +2201,6 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, inactive: any, 
                 d3.select(this)
                     .attr('d', linePath(d, parcoords.newFeatures, parcoords))
             });
-
-            inactive.each(function (d) {
-                d3.select(this)
-                    .attr('d', linePath(d, parcoords.newFeatures, parcoords))})
-                .transition()
-                .delay(5)
-                .duration(0)
-                .attr('visibility', 'hidden');
         };
     }
 }
-
-/*function getDimensionPosition(dimension: string): number {
-    let listOfDimensions = parcoords.newFeatures.slice();
-    let reverseListOfDimension = listOfDimensions.reverse();
-    return reverseListOfDimension.indexOf(dimension);
-}*/
