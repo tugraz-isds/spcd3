@@ -129,12 +129,10 @@ export function invert(dimension: string): void {
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
-    //const arrow = currentArrowStatus === 'down' ? icon.getArrowUp() : icon.getArrowDown();
-    const arrow = currentArrowStatus === 'down' ? base64icon.getArrowUpBase64() : base64icon.getArrowDownBase64();
+    const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
-    //textElement.attr('href', svgToTinyDataUri.default(arrow));
-    textElement.attr('href', 'data:image/svg+xml;base64,' + arrow);
+    textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
@@ -186,12 +184,10 @@ export function setInversionStatus(dimension: string, status: string): void {
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
-    //const arrow = status === 'ascending' ? icon.getArrowUp() : icon.getArrowDown();
-    const arrow = status === 'ascending' ? base64icon.getArrowUpBase64() : base64icon.getArrowDownBase64();
+    const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
-    //textElement.attr('href', svgToTinyDataUri.default(arrow));
-    textElement.attr('href', 'data:image/svg+xml;base64,' + arrow);
+    textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
 
     d3.select(dimensionId)
@@ -1417,6 +1413,8 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
+    setDefsForIcons();
+
     setBrushDown(featureAxis, parcoords, active, tooltipValues);
 
     setBrushUp(featureAxis, parcoords, active, tooltipValues);
@@ -1425,7 +1423,37 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
 
     setContextMenu(featureAxis, padding, parcoords, active, width);
 
-    setInvertIcon(featureAxis, padding, parcoords, yAxis);
+    setInvertIcon(featureAxis, padding);
+}
+
+function setDefsForIcons(): void {
+    const svgContainer = window.svg;
+    let defs = svgContainer.select('defs');
+    defs = svgContainer.append('defs');
+    
+    defs.append('image')
+        .attr('id', 'arrow_image_up')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowUpBase64());
+
+    defs.append('image')
+        .attr('id', 'arrow_image_down')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowDownBase64());
+
+    defs.append('image')
+        .attr('id', 'brush_image_top')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowTopBase64());
+
+    defs.append('image')
+        .attr('id', 'brush_image_bottom')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowBottomBase64());
 }
 
 // Hovering
@@ -1507,19 +1535,18 @@ function onInvert(): any {
     }
 }
 
-function setInvertIcon(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {};
-    dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[];}, yAxis: any): void {
+function setInvertIcon(featureAxis: any, padding: any): void {
 
     featureAxis
         .append('svg')
         .attr('y', padding / 1.5)
         .attr('x', -6)
-        .append('image')
+        .append('use')
         .attr('width', 12)
         .attr('height', 12)
-        //.attr('href', svgToTinyDataUri.default(icon.getArrowDown()))
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowUpBase64())
+        .attr('y', 0)
+        .attr('x', 0)
+        .attr('href', '#arrow_image_up')
         .each(function (d) {
             const processedDimensionName = helper.cleanString(d.name);
             d3.select(this)
@@ -2039,14 +2066,13 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
             d3.select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
-                .append('svg:image')
+                .append('use')
                 .attr('id', 'triangle_up_' + processedDimensionName)
                 .attr('y', 320)
                 .attr('x', -7)
                 .attr('width', 14)
                 .attr('height', 10)
-                //.attr('href', svgToTinyDataUri.default(icon.getArrowTop()))
-                .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowTopBase64())
+                .attr('href', '#brush_image_top')
                 .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
                 .call(drag.drag().on('drag', (event, d) => {
                     if (parcoords.newFeatures.length > 25) {
@@ -2072,14 +2098,13 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
             d3.select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
-                .append('svg:image')
+                .append('use')
                 .attr('id', 'triangle_down_' + processedDimensionName)
                 .attr('y', 70)
                 .attr('x', -7)
                 .attr('width', 14)
                 .attr('height', 10)
-                //.attr('href', svgToTinyDataUri.default(icon.getArrowBottom()))
-                .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowBottomBase64())
+                .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
                 .call(drag.drag()
                     .on('drag', (event, d) => {
