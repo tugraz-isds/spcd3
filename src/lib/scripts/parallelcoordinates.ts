@@ -67,7 +67,8 @@ export function show(dimension: string): void {
         window.parcoords.currentPosOfDims.forEach(function (item) {
             if (getHiddenStatus(item.key) != 'hidden') {
                 if (item.isInverted) {
-                    invert(item.key);
+                    console.log(item.key);
+                    invertWoTransition(item.key);
                 }
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
@@ -96,7 +97,7 @@ export function hide(dimension: string): void {
         window.parcoords.currentPosOfDims.forEach(function (item) {
             if (getHiddenStatus(item.key) != 'hidden') {
                 if (item.isInverted) {
-                    invert(item.key);
+                    invertWoTransition(item.key);
                 }
                 if (item.top != 80 || item.bottom != 320) {
                     brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
@@ -162,6 +163,45 @@ export function invert(dimension: string): void {
                 return linePath(d, parcoords.newFeatures, parcoords); 
             })
         .ease(ease.easeCubic)});
+
+    brush.addSettingsForBrushing(dimension, parcoords);
+    if (isInverted(dimension)) {
+        brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
+    }
+    else {
+        brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
+    }
+}
+
+function invertWoTransition(dimension: string): void {
+    const processedDimensionName = helper.cleanString(dimension);
+    const invertId = '#dimension_invert_' + processedDimensionName;
+    const dimensionId = '#dimension_axis_' + processedDimensionName;
+    const textElement = d3.select(invertId);
+    const currentArrowStatus = textElement.text();
+    const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
+    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+    textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
+    textElement.attr('href', arrow);
+    textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
+
+    d3.select(dimensionId)
+        .call(yAxis[dimension]
+            .scale(parcoords.yScales[dimension]
+            .domain(parcoords.yScales[dimension]
+            .domain().reverse())));
+
+    let active = d3.select('g.active')
+        .selectAll('path')
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            });
+
+    trans(active).each(function (d) {
+        d3.select(this)
+            .attr('d', (d) => { 
+                return linePath(d, parcoords.newFeatures, parcoords); 
+            })});
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (isInverted(dimension)) {
@@ -252,7 +292,7 @@ export function moveByOne(dimension: string, direction: string): void {
     const pos = parcoords.xScales(dimension);
     const posNeighbour = parcoords.xScales(neighbour);
 
-    const distance = 97.5; //(width-window.paddingXaxis)/parcoords.newFeatures.length;
+    const distance = 93.5; //(width-window.paddingXaxis)/parcoords.newFeatures.length;
 
     parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
         pos - distance;
@@ -1370,6 +1410,8 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .data(parcoords.features)
         .enter()
         .append('g')
+        .attr('class', 'feature')
+        .attr('id', 'feature')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
     let tooltipValuesLabel = d3.select('#parallelcoords')
