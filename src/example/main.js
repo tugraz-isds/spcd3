@@ -510,7 +510,7 @@ function generateDropdownForFilter() {
 // TODO
 function generateModuleForSetFilter() {
 
-    let section = document.getElementById('api-section');
+    let section = document.getElementById('bottom-controls');
     
     let popupWindowFilter = document.createElement('div');
     popupWindowFilter.id = 'filterContainer';
@@ -762,7 +762,7 @@ function generateDropdownForRange() {
 //TODO
 function generateModuleForRangeSettings() {
 
-    let section = document.getElementById('api-section');
+    let section = document.getElementById('bottom-controls');
     
     let popupWindowRange = document.createElement('div');
     popupWindowRange.id = 'rangeContainer';
