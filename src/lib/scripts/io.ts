@@ -36,12 +36,13 @@ export function saveSvg(data: any, name: string): void {
 
     svgData = svgData.replaceAll(/cursor: url\([^)]*\) 8 8, auto;/g, '');
     svgData = svgData.replaceAll(/style="cursor:[^"]*"/g, '');
+    svgData = svgData.replaceAll(/<rect[^>]*><\/rect>/g, '');
+    svgData = svgData.replaceAll(/id="pc_svg"/g, '');
 
     let processedData = xmlFormat(svgData);
     processedData = processedData.replace(/    /g, '  ');
 
-    let preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    let svgBlob = new Blob([preface, processedData], {type:'image/svg+xml;charset=utf-8'});
+    let svgBlob = new Blob([processedData], {type: 'image/svg+xml;charset=utf-8'});
     let svgUrl = URL.createObjectURL(svgBlob);
     let downloadLink = document.createElement('a');
     downloadLink.href = svgUrl;

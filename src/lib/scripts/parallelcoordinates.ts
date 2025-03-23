@@ -8,7 +8,6 @@ import * as ease from 'd3-ease';
 import * as brush from './brush';
 import * as helper from './helper';
 import * as icon from '../icons/icons';
-import * as base64icon from '../icons/iconsbase64';
 
 declare global {
     let padding: any;
@@ -131,7 +130,7 @@ export function invert(dimension: string): void {
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
@@ -180,7 +179,7 @@ function invertWoTransition(dimension: string): void {
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
@@ -225,7 +224,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDown(), 12) : helper.setSize(icon.getArrowUp(), 12);
+    const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
@@ -313,7 +312,7 @@ export function moveByOne(dimension: string, direction: string): void {
     parcoords.xScales.domain(parcoords.newFeatures);
 
     let active = d3.select('g.active').selectAll('path');
-    let featureAxis = d3.selectAll('#feature');
+    let featureAxis = d3.selectAll('.dimensions');
 
     active.transition()
         .duration(1000)
@@ -389,7 +388,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
     parcoords.xScales.domain(parcoords.newFeatures);
 
     let active = d3.select('g.active').selectAll('path');
-    let featureAxis = d3.selectAll('#feature');
+    let featureAxis = d3.selectAll('.dimensions');
 
     active.transition()
         .duration(1000)
@@ -1410,8 +1409,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .data(parcoords.features)
         .enter()
         .append('g')
-        .attr('class', 'feature')
-        .attr('id', 'feature')
+        .attr('class', 'dimensions')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
     let tooltipValuesLabel = d3.select('#parallelcoords')
@@ -1423,6 +1421,16 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .append('g')
         .each(function (d) {
             const processedDimensionName = helper.cleanString(d.name);
+            let tickElements = document.querySelectorAll('g.tick');
+            tickElements.forEach((gElement) => {
+                let transformValue = gElement.getAttribute('transform');
+                let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
+                if (yValue) {
+                    let originalValue = parseFloat(yValue[1]);
+                    let shortenedValue = originalValue.toFixed(4);
+                    gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
+                }
+            });
             d3.select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
@@ -1477,25 +1485,25 @@ function setDefsForIcons(): void {
         .attr('id', 'arrow_image_up')
         .attr('width', 12)
         .attr('height', 12)
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowUpBase64());
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
 
     defs.append('image')
         .attr('id', 'arrow_image_down')
         .attr('width', 12)
         .attr('height', 12)
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowDownBase64());
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
 
     defs.append('image')
         .attr('id', 'brush_image_top')
         .attr('width', 14)
         .attr('height', 10)
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowTopBase64());
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
 
     defs.append('image')
         .attr('id', 'brush_image_bottom')
         .attr('width', 14)
         .attr('height', 10)
-        .attr('href', 'data:image/svg+xml;base64,' + base64icon.getArrowBottomBase64());
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
 }
 
 // Hovering
@@ -1594,7 +1602,7 @@ function setInvertIcon(featureAxis: any, padding: any): void {
             d3.select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
                 .text('up')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowDown(), 12)}') 8 8, auto`);
+                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowDownCursor(), 12)}') 8 8, auto`);
         })
         .on('click', onInvert());
 }
