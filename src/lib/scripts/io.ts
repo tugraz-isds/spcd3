@@ -36,7 +36,7 @@ export function saveSvg(data: any, name: string): void {
 
     svgData = svgData.replaceAll(/cursor: url\([^)]*\) 8 8, auto;/g, '');
     svgData = svgData.replaceAll(/style="cursor:[^"]*"/g, '');
-    svgData = svgData.replaceAll(/<rect[^>]*><\/rect>/g, '');
+    svgData = svgData.replaceAll(/<rect style=[^>]*><\/rect>/g, '');
     svgData = svgData.replaceAll(/id="pc_svg"/g, '');
 
     let processedData = xmlFormat(svgData);

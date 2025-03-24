@@ -1421,16 +1421,6 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .append('g')
         .each(function (d) {
             const processedDimensionName = helper.cleanString(d.name);
-            let tickElements = document.querySelectorAll('g.tick');
-            tickElements.forEach((gElement) => {
-                let transformValue = gElement.getAttribute('transform');
-                let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
-                if (yValue) {
-                    let originalValue = parseFloat(yValue[1]);
-                    let shortenedValue = originalValue.toFixed(4);
-                    gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
-                }
-            });
             d3.select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
@@ -1446,6 +1436,18 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
                 .on('mouseout', function () {
                     return tooltipValuesLabel.style('visibility', 'hidden');
                 });
+        });
+
+        let tickElements = document.querySelectorAll('g.tick');
+        console.log(tickElements);
+        tickElements.forEach((gElement) => {
+            let transformValue = gElement.getAttribute('transform');
+            let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
+            if (yValue) {
+                let originalValue = parseFloat(yValue[1]);
+                let shortenedValue = originalValue.toFixed(4);
+                gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
+            }
         });
 
     let tooltipValues = d3.select('#parallelcoords')
@@ -1586,10 +1588,11 @@ function onInvert(): any {
 }
 
 function setInvertIcon(featureAxis: any, padding: any): void {
+    let value = (padding/1.5).toFixed(4);
 
     featureAxis
         .append('svg')
-        .attr('y', padding / 1.5)
+        .attr('y', value)
         .attr('x', -6)
         .append('use')
         .attr('width', 12)
@@ -1710,12 +1713,14 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
         .attr('id', 'showAllMenu')
         .attr('class', 'contextmenu')
         .text('Show All');
+
+    let y_value = (padding/1.7).toFixed(4);
     
     featureAxis
         .append('text')
-        .attr('id', 'dimension')
+        .attr('class', 'dimension')
         .attr('text-anchor', 'middle')
-        .attr('y', padding / 1.7)
+        .attr('y', y_value)
         .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
         .style('font-size', '0.7rem')
         .call(drag.drag()
@@ -1729,15 +1734,15 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
         .on('mousemove', (event, d) => {
             if (getDimensionPosition(d.name) == 0) {
                 featureAxis
-                    .select('#dimension')
+                    .select('.dimension')
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowRight(), 12)}') 8 8, auto`);
             } else if (getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
                 featureAxis
-                    .select('#dimension')
+                    .select('.dimension')
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowLeft(), 12)}') 8 8, auto`);
             } else {
                 featureAxis
-                    .select('#dimension')
+                    .select('.dimension')
                     .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowLeftAndRight(), 12)}') 8 8, auto`);
             }
 
