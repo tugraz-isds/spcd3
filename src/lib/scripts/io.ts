@@ -1,5 +1,6 @@
 import {csvParse} from 'd3-dsv';
 import xmlFormat from 'xml-formatter';
+import * as icon from '../icons/icons';
 
 export function loadCSV(csv: string): any {
         let completeArray = csv.split(/\r?\n/);
@@ -39,6 +40,24 @@ export function saveSvg(data: any, name: string): void {
     svgData = svgData.replaceAll(/<rect style=[^>]*><\/rect>/g, '');
     svgData = svgData.replaceAll(/id="pc_svg"/g, '');
 
+    let svgArrowUp = encodeURIComponent(icon.getArrowUp());
+    let svgArrowDown = encodeURIComponent(icon.getArrowDown());
+    let svgArrowBottom = encodeURIComponent(icon.getArrowBottom());
+    let svgArrowTop = encodeURIComponent(icon.getArrowTop());
+
+    let regexUp = /<image id="arrow_image_up"[^>]*href="data:image\/svg\+xml[^"]*">/g;
+
+    let regexDown = /<image id="arrow_image_down"[^>]*href="data:image\/svg\+xml[^"]*">/g;
+
+    let regexTop = /<image id="brush_image_top"[^>]*href="data:image\/svg\+xml[^"]*">/g;
+
+    let regexBottom = /<image id="brush_image_bottom"[^>]*href="data:image\/svg\+xml[^"]*">/g;
+
+    svgData = svgData.replaceAll(regexUp, getImageTag("arrow_image_up", svgArrowUp));
+    svgData = svgData.replaceAll(regexDown, getImageTag("arrow_image_down", svgArrowDown));
+    svgData = svgData.replaceAll(regexBottom, getImageTag("brush_image_bottom", svgArrowBottom));
+    svgData = svgData.replaceAll(regexTop, getImageTag("brush_image_top", svgArrowTop));
+
     let processedData = xmlFormat(svgData);
     processedData = processedData.replace(/    /g, '  ');
 
@@ -50,4 +69,8 @@ export function saveSvg(data: any, name: string): void {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
+}
+
+function getImageTag(key: string, svg: string): string {
+    return `<image id="${key}" width="12" height="12" href="data:image/svg+xml,${svg}">`;
 }
