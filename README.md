@@ -44,7 +44,7 @@ Open terminal and execute the following command to install all the dependencies:
 
 
 ``` 
-yarn install 
+yarn
 ```
 
 ### Build And Development
@@ -54,36 +54,36 @@ defines four public tasks:
 
 <br/>
 
- `clean` removes the existing `dist/` directory in
-  order to enable a clean rebuild of the project:
+`clean` removes the existing `dist/` directory in
+order to enable a clean rebuild of the project:
 ```
-  npx gulp clean
+npx gulp clean
 ```
 
 <br/>
 
 `cleanAll` restores the project folder to its virgin state,
-  by deleting the existing `dist/` and `node_modules/` directories
-  and the `package-lock.json` file:
+by deleting the existing `dist/` and `node_modules/` directories
+and the `package-lock.json` file:
 ```
-  npx gulp cleanAll
+npx gulp cleanAll
 ```
 
 <br/>
 
 `build` creates a new build of the library in three formats (CJS, ESM, IIFE)
-  and stores the generated library packages into the `dist/library/` folder.
-  Additionally, the example folder is copied to `dist/example/`:
+and stores the generated library packages into the `dist/library/` folder.
+Additionally, the example folder is copied to `dist/example/`:
 ```
-  npx gulp build
+npx gulp build
 ```
 
 <br/>
 
 `serve` executes the build task, then additionally executes a private task
-  called watcher, which starts live web server in the `dist/example/` folder:
+called watcher, which starts live web server in the `dist/example/` folder:
 ```
-  npx gulp serve
+npx gulp serve
 ```
 
 <br/>
