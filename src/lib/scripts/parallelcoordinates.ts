@@ -133,7 +133,7 @@ export function invert(dimension: string): void {
     const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
-    textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
     d3.select(dimensionId)
         .transition()
@@ -182,7 +182,7 @@ function invertWoTransition(dimension: string): void {
     const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
-    textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
     d3.select(dimensionId)
         .call(yAxis[dimension]
@@ -227,7 +227,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', arrow);
-    textElement.style('cursor', `url('data:image/svg+xml,${arrowStyle}') 8 8 , auto`);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
     d3.select(dimensionId)
         .transition()
@@ -707,6 +707,8 @@ export function drawChart(content: any): void {
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, window.width, height])
         .attr('font-family', 'Verdana, sans-serif');
+
+    setDefsForIcons();
 
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
@@ -1465,8 +1467,6 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    setDefsForIcons();
-
     setBrushDown(featureAxis, parcoords, active, tooltipValues);
 
     setBrushUp(featureAxis, parcoords, active, tooltipValues);
@@ -1605,7 +1605,7 @@ function setInvertIcon(featureAxis: any, padding: any): void {
             d3.select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
                 .text('up')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowDownCursor(), 12)}') 8 8, auto`);
+                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         })
         .on('click', onInvert());
 }
@@ -1735,15 +1735,15 @@ function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: an
             if (getDimensionPosition(d.name) == 0) {
                 featureAxis
                     .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowRight(), 12)}') 8 8, auto`);
+                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
             } else if (getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
                 featureAxis
                     .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowLeft(), 12)}') 8 8, auto`);
+                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
             } else {
                 featureAxis
                     .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowLeftAndRight(), 12)}') 8 8, auto`);
+                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeftAndRight()), 12)}') 8 8, auto`);
             }
 
             tooltipFeatures.text(d.name);
@@ -2128,7 +2128,7 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
                 .attr('width', 14)
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopCursor(), 13)}') 8 8, auto`)
+                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
                 .call(drag.drag().on('drag', (event, d) => {
                     if (parcoords.newFeatures.length > 25) {
                         brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
@@ -2160,7 +2160,7 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                 .attr('width', 14)
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowBottomCursor(), 13)}') 8 8, auto`)
+                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
