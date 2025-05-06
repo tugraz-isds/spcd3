@@ -1,5 +1,4 @@
 import {csvParse} from 'd3-dsv';
-import * as d3 from 'd3-selection';
 import xmlFormat from 'xml-formatter';
 import * as icon from '../icons/icons';
 

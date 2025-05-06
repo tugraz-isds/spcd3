@@ -142,19 +142,18 @@ export function invert(dimension: string): void {
             .scale(parcoords.yScales[dimension]
             .domain(parcoords.yScales[dimension]
             .domain().reverse())))
-        .ease(ease.easeCubic);
+        .ease(ease.easeCubic);    
 
-    let active = d3.select('g.active')
-        .selectAll('path')
+    trans(window.active).each(function (d) {
+        d3.select(this)
         .transition()
         .duration(1000)
             .attr('d', (d) => { 
                 return linePath(d, parcoords.newFeatures, parcoords); 
             })
-        .ease(ease.easeCubic);
-    
+        .ease(ease.easeCubic)});
 
-    trans(active).each(function (d) {
+    trans(window.selectable).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
@@ -172,7 +171,7 @@ export function invert(dimension: string): void {
     }
 }
 
-function invertWoTransition(dimension: string): void {
+export function invertWoTransition(dimension: string): void {
     const processedDimensionName = helper.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
@@ -190,13 +189,13 @@ function invertWoTransition(dimension: string): void {
             .domain(parcoords.yScales[dimension]
             .domain().reverse())));
 
-    let active = d3.select('g.active')
-        .selectAll('path')
+    trans(window.active).each(function (d) {
+        d3.select(this)
             .attr('d', (d) => { 
                 return linePath(d, parcoords.newFeatures, parcoords); 
-            });
+            })});
 
-    trans(active).each(function (d) {
+    trans(window.selectable).each(function (d) {
         d3.select(this)
             .attr('d', (d) => { 
                 return linePath(d, parcoords.newFeatures, parcoords); 
@@ -238,17 +237,17 @@ export function setInversionStatus(dimension: string, status: string): void {
         .domain().reverse())))
         .ease(ease.easeCubic);
 
-    let active = d3.select('g.active')
-        .selectAll('path')
+
+    trans(window.active).each(function (d) {
+        d3.select(this)
         .transition()
         .duration(1000)
             .attr('d', (d) => { 
                 return linePath(d, parcoords.newFeatures, parcoords); 
             })
-        .ease(ease.easeCubic);
-    
+        .ease(ease.easeCubic)});
 
-    trans(active).each(function (d) {
+    trans(window.selectable).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
