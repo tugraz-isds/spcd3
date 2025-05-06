@@ -704,7 +704,7 @@ export function drawChart(content: any): void {
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, window.width, height])
+        .attr('viewBox', [-10, 0, window.width, height])
         .attr('font-family', 'Verdana, sans-serif');
 
     setDefsForIcons();

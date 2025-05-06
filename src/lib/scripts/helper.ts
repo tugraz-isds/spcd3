@@ -4,7 +4,7 @@ export function cleanString(stringValue: string): string {
 }
 
 export function cleanLinePathString(stringValue: string): string {
-    return stringValue.replace(/[*\- .,0123456789%&'\[{()}\]]/g, '');
+    return stringValue.replace(/[*\- .,%&'\[{()}\]]/g, '');
 }
 
 export function cleanLinePathArrayString(stringValue: string): string {
