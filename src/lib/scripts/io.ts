@@ -1,4 +1,5 @@
 import {csvParse} from 'd3-dsv';
+import * as d3 from 'd3-selection';
 import xmlFormat from 'xml-formatter';
 import * as icon from '../icons/icons';
 
@@ -31,8 +32,13 @@ export function saveAsSvg(): void {
 }
 
 export function saveSvg(data: any, name: string): void {
-    
+
     data.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    data.querySelectorAll(".domain").forEach(el => {
+        el.removeAttribute("class");
+    });
+
     let svgData = data.outerHTML;
 
     svgData = svgData.replaceAll(/cursor: url\([^)]*\) 8 8, auto;/g, '');
@@ -59,8 +65,12 @@ export function saveSvg(data: any, name: string): void {
     svgData = svgData.replaceAll(regexTop, getImageTag("brush_image_top", svgArrowTop));
 
     let processedData = xmlFormat(svgData);
+    processedData = flattenTextTags(processedData);
+    processedData = cleanUseElements(processedData);
+    processedData = cleanPathElements(processedData);
+    processedData = removeEmptyOrHiddenRects(processedData);
+    processedData = processedData.replace(/pointer-events\s*:\s*[^;"]*;?/g, '');
     processedData = processedData.replace(/    /g, '  ');
-
     processedData = processedData.replace('<svg', '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
 
     let preface = '<?xml version="1.0" standalone="no"?>\r\n';
@@ -77,3 +87,37 @@ export function saveSvg(data: any, name: string): void {
 function getImageTag(key: string, svg: string): string {
     return `<image id="${key}" width="12" height="12" href="data:image/svg+xml,${svg}">`;
 }
+
+function flattenTextTags(svgString) {
+    return svgString.replace(/<text([^>]*)>\s*([\s\S]*?)\s*<\/text>/g, (_, attrs, content) => {
+      const flattened = content.replace(/\s+/g, ' ').trim();
+      return `<text${attrs}>${flattened}</text>`;
+    });
+  }
+
+  function cleanUseElements(svgString) {
+    return svgString.replace(/<use([^>]*)>([\s\S]*?)<\/use>/g, (_, attrs) => {
+      return `<use${attrs}/>`;
+    });
+  }
+
+  function cleanPathElements(svgString) {
+    return svgString.replace(/<path([^>]*)>([\s\S]*?)<\/path>/g, (_, attrs) => {
+      return `<path${attrs}/>`;
+    });
+  }
+
+  function removeEmptyOrHiddenRects(svgString) {
+    return svgString.replace(/<rect([^>]*?)\s*\/?>/g, (match, attrs) => {
+      const hasZeroSize = /(?:\s|")width\s*=\s*["']?0(?:\.0*)?["']?/i.test(attrs) &&
+                          /(?:\s|")height\s*=\s*["']?0(?:\.0*)?["']?/i.test(attrs);
+      const hasHiddenStyle = /visibility\s*:\s*hidden|display\s*:\s*none/i.test(attrs);
+  
+      if (hasZeroSize || hasHiddenStyle) {
+        return '';
+      }
+      return match;
+    });
+  }
+  
+  
