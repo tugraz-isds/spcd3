@@ -1,12 +1,11 @@
 import 'd3-transition';
 import * as d3 from 'd3-selection';
 import * as drag from 'd3-drag';
-import * as path from 'd3-shape';
-import * as axis from 'd3-axis';
-import * as scale from 'd3-scale';
 import * as ease from 'd3-ease';
 import * as brush from './brush';
-import * as helper from './utils';
+import * as utils from './utils';
+import * as helper from './helper';
+import * as context from './setContextMenu';
 import * as icon from './icons/icons';
 
 declare global {
@@ -16,7 +15,6 @@ declare global {
     let height: any;
     let dataset: any;
     let yAxis: {};
-    let scrollXPos: any;
     let selected: [];
     let hoverSelected: [];
     let parcoords: {
@@ -30,13 +28,10 @@ declare global {
         newDataset: any,
         data: any
     };
-    let timer: number;
     let active: any;
     let key: string;
     let svg: any;
     let selectable: any;
-    let min: number;
-    let max: number;
     let hoverdata: any[];
     let hoverlabel: string;
     let yBrushes: {};
@@ -66,7 +61,6 @@ export function show(dimension: string): void {
         window.parcoords.currentPosOfDims.forEach(function (item) {
             if (getHiddenStatus(item.key) != 'hidden') {
                 if (item.isInverted) {
-                    console.log(item.key);
                     invertWoTransition(item.key);
                 }
                 if (item.top != 80 || item.bottom != 320) {
@@ -124,13 +118,13 @@ export function getHiddenStatus(dimension: string): string {
 //---------- Invert Functions ----------
 
 export function invert(dimension: string): void {
-    const processedDimensionName = helper.cleanString(dimension);
+    const processedDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
+    const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
@@ -144,26 +138,26 @@ export function invert(dimension: string): void {
             .domain().reverse())))
         .ease(ease.easeCubic);    
 
-    trans(window.active).each(function (d) {
+    helper.trans(window.active).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
             .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })
         .ease(ease.easeCubic)});
 
-    trans(window.selectable).each(function (d) {
+    helper.trans(window.selectable).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
             .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })
         .ease(ease.easeCubic)});
 
     brush.addSettingsForBrushing(dimension, parcoords);
-    if (isInverted(dimension)) {
+    if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
     else {
@@ -172,13 +166,13 @@ export function invert(dimension: string): void {
 }
 
 export function invertWoTransition(dimension: string): void {
-    const processedDimensionName = helper.cleanString(dimension);
+    const processedDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = currentArrowStatus === 'down' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
+    const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
@@ -189,20 +183,20 @@ export function invertWoTransition(dimension: string): void {
             .domain(parcoords.yScales[dimension]
             .domain().reverse())));
 
-    trans(window.active).each(function (d) {
+    helper.trans(window.active).each(function (d) {
         d3.select(this)
             .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })});
 
-    trans(window.selectable).each(function (d) {
+    helper.trans(window.selectable).each(function (d) {
         d3.select(this)
-            .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })});
 
     brush.addSettingsForBrushing(dimension, parcoords);
-    if (isInverted(dimension)) {
+    if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
     else {
@@ -211,19 +205,19 @@ export function invertWoTransition(dimension: string): void {
 }
 
 export function getInversionStatus(dimension: string): string {
-    const invertId = '#dimension_invert_' + helper.cleanString(dimension);
+    const invertId = '#dimension_invert_' + utils.cleanString(dimension);
     const element = d3.select(invertId);
     const arrowStatus = element.text();
     return arrowStatus == 'up' ? 'ascending' : 'descending';
 }
 
 export function setInversionStatus(dimension: string, status: string): void {
-    const processedDimensionName = helper.cleanString(dimension);
+    const processedDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + processedDimensionName;
     const dimensionId = '#dimension_axis_' + processedDimensionName;
     const textElement = d3.select(invertId);
     const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = status === 'ascending' ? helper.setSize(icon.getArrowDownCursor(), 12) : helper.setSize(icon.getArrowUpCursor(), 12);
+    const arrowStyle = status === 'ascending' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
@@ -238,26 +232,26 @@ export function setInversionStatus(dimension: string, status: string): void {
         .ease(ease.easeCubic);
 
 
-    trans(window.active).each(function (d) {
+    helper.trans(window.active).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
             .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })
         .ease(ease.easeCubic)});
 
-    trans(window.selectable).each(function (d) {
+    helper.trans(window.selectable).each(function (d) {
         d3.select(this)
         .transition()
         .duration(1000)
-            .attr('d', (d) => { 
-                return linePath(d, parcoords.newFeatures, parcoords); 
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords); 
             })
         .ease(ease.easeCubic)});
 
     brush.addSettingsForBrushing(dimension, parcoords);
-    if (isInverted(dimension)) {
+    if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
     else {
@@ -265,12 +259,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     }
 }
 
-export function isInverted(dimension: string): boolean {
-    const invertId = '#dimension_invert_' + helper.cleanString(dimension);
-    const element = d3.select(invertId);
-    const arrowStatus = element.text();
-    return arrowStatus == 'down' ? true : false;
-}
+
 
 
 //---------- Move Functions ----------
@@ -316,14 +305,14 @@ export function moveByOne(dimension: string, direction: string): void {
     active.transition()
         .duration(1000)
         .attr('d', function(d) {
-            return linePath(d, parcoords.newFeatures, parcoords);
+            return helper.linePath(d, parcoords.newFeatures, parcoords);
         })
         .ease(ease.easeCubic);
 
     featureAxis.transition()
         .duration(1000)
         .attr('transform', function(d) {
-            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(ease.easeCubic);
 
@@ -392,14 +381,14 @@ export function swap(dimensionA: string, dimensionB: string): void {
     active.transition()
         .duration(1000)
         .attr('d', (d) => {
-            return linePath(d, parcoords.newFeatures, parcoords);
+            return helper.linePath(d, parcoords.newFeatures, parcoords);
         })
         .ease(ease.easeCubic);
 
     featureAxis.transition()
         .duration(1000)
         .attr('transform', (d) => {
-            return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(ease.easeCubic);
 
@@ -414,16 +403,16 @@ export function getDimensionRange(dimension: string): any {
 }
 
 export function setDimensionRange(dimension: string, min: number, max: number): void {
-    const inverted = isInverted(dimension);
+    const inverted = helper.isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
-        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]);
-        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
     }
@@ -432,7 +421,7 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
     addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     // draw active lines
-    d3.select('#dimension_axis_' + helper.cleanString(dimension))
+    d3.select('#dimension_axis_' + utils.cleanString(dimension))
         .call(yAxis[dimension])
         .transition()
         .duration(1000)
@@ -443,7 +432,7 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         .transition()
         .duration(1000)
         .attr('d', (d) => { 
-            return linePath(d, window.parcoords.newFeatures, window.parcoords); 
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords); 
         })
         .ease(ease.easeCubic);
 
@@ -451,22 +440,22 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         d3.select(this)
             .transition()
             .duration(1000)
-            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
+            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
-    const inverted = isInverted(dimension);
+    const inverted = helper.isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]).nice();
-        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
     }
@@ -475,7 +464,7 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
     addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     // draw active lines
-    d3.select('#dimension_axis_' + helper.cleanString(dimension))
+    d3.select('#dimension_axis_' + utils.cleanString(dimension))
         .call(yAxis[dimension])
         .transition()
         .duration(1000)
@@ -486,7 +475,7 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         .transition()
         .duration(1000)
         .attr('d', (d) => { 
-            return linePath(d, window.parcoords.newFeatures, window.parcoords); 
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords); 
         })
         .ease(ease.easeCubic);
 
@@ -494,7 +483,7 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         d3.select(this)
             .transition()
             .duration(1000)
-            .attr('d', linePath(d, window.parcoords.newFeatures, window.parcoords))
+            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
 }
@@ -530,7 +519,7 @@ function addRange(value: number, currentPosOfDims: any, dimensionName: any, key:
 //---------- Filter Functions ----------
 
 export function getFilter(dimension): any {
-    const invertStatus = isInverted(dimension);
+    const invertStatus = helper.isInverted(dimension);
     const dimensionRange = getDimensionRange(dimension);
     const maxValue = invertStatus == false ? dimensionRange[1] : dimensionRange[0];
     const minValue = invertStatus == false ? dimensionRange[0] : dimensionRange[1];
@@ -556,7 +545,7 @@ export function getSelected(): any[] {
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
         let editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
-        let selectedLine = helper.cleanLinePathString(editRecord);
+        let selectedLine = utils.cleanLinePathString(editRecord);
         let isselected = isSelected(selectedLine);
         if (isselected) {
             selected.push(records[i]);
@@ -571,11 +560,11 @@ export function setSelection(records: string[]): void {
     for(let i = 0; i < records.length; i++) {
         window.active.each(function (d) {
             editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
-            if(helper.cleanLinePathString(d[window.hoverlabel]) == helper.cleanLinePathString(editRecord)) {
+            if(utils.cleanLinePathString(d[window.hoverlabel]) == utils.cleanLinePathString(editRecord)) {
                 selectableLines.push(d);
             }
         });
-        d3.select('.' + helper.cleanLinePathString(editRecord))
+        d3.select('.' + utils.cleanLinePathString(editRecord))
             .transition()
             .style('visibility', 'hidden'); 
     }
@@ -589,7 +578,7 @@ export function setSelection(records: string[]): void {
         .attr('id', (d) => {
             const keys = Object.keys(d);
             window.key = keys[0];
-            const selected_value = helper.cleanLinePathString(d[window.key]);
+            const selected_value = utils.cleanLinePathString(d[window.key]);
             return 'select_' + selected_value;
         })
         .style('pointer-events', 'none')
@@ -599,7 +588,7 @@ export function setSelection(records: string[]): void {
         .style('visibility', 'visible')
         .each(function (d) {
             d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+                .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         })
         .on("contextmenu", function (event) {
             event.preventDefault();
@@ -608,7 +597,7 @@ export function setSelection(records: string[]): void {
 
 export function isSelected(record: string): boolean {
     let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
-    let cleanedRecord = helper.cleanLinePathString(editRecord);
+    let cleanedRecord = utils.cleanLinePathString(editRecord);
     const path = d3.select('#select_' + cleanedRecord);
     if (path.size() != 0) {
         return true;
@@ -636,7 +625,7 @@ export function setSelected(record: string): void {
 
 export function setUnselected(record: string): void {
     let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
-    const path = helper.cleanLinePathString(editRecord);
+    const path = utils.cleanLinePathString(editRecord);
     d3.select('#select_' + path)
             .remove();
     d3.select('.' + path)
@@ -741,7 +730,7 @@ export function drawChart(content: any): void {
         event.preventDefault();
     })
     .on("mouseenter", function () {
-        cleanTooltip();
+        helper.cleanTooltip();
     });
     
     window.onclick = (event) => {
@@ -926,14 +915,14 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         }
     });
 
-    let dataset = prepareData(data, newFeatures);
+    let dataset = helper.prepareData(data, newFeatures);
 
     window.parcoords = {};
     window.parcoords.features = dataset[0];
     window.parcoords.newDataset = dataset[1];
 
-    window.parcoords.xScales = setupXScales(window.width, window.paddingXaxis, dataset[0]);
-    window.parcoords.yScales = setupYScales(window.height, window.padding, dataset[0], dataset[1]);
+    window.parcoords.xScales = helper.setupXScales(window.width, window.paddingXaxis, dataset[0]);
+    window.parcoords.yScales = helper.setupYScales(window.height, window.padding, dataset[0], dataset[1]);
     window.parcoords.dragging = {};
     window.parcoords.dragPosStart = {};
     window.parcoords.currentPosOfDims = [];
@@ -952,7 +941,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     }
 
     window.yAxis = {};
-    window.yAxis = setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+    window.yAxis = helper.setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
 
     let counter = 0;
     window.parcoords.features.map(x => {
@@ -960,7 +949,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         let values = window.parcoords.newDataset.map(o => o[x.name]);
         for (let i = 0; i < values.length; i++) {
             if(!isNaN(values[i])){
-                const tempNumberOfDigs = helper.digits(Number(values[i]));
+                const tempNumberOfDigs = utils.digits(Number(values[i]));
                 if (tempNumberOfDigs > numberOfDigs)
                 {
                     numberOfDigs = tempNumberOfDigs;
@@ -970,105 +959,12 @@ function setUpParcoordData(data: any, newFeatures: any): any {
                 continue;
             }
         }
-        helper.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
-        helper.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordId');
+        utils.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
+        utils.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordId');
         counter = counter + 1;
     });
 
     window.hoverlabel = getAllVisibleDimensionNames()[0];
-}
-
-function prepareData(data: any, newFeatures: any): any {
-    let newDataset = [];
-    data.forEach(obj => {
-        let newdata = {};
-        newFeatures.forEach(feature => {
-            newdata[feature] = obj[feature];
-        });
-        newDataset.push(newdata);
-    })
-    let features = [];
-    Object.keys(newDataset[0]).forEach(element => features.push({ 'name': element }));
-    return [features, newDataset];
-}
-
-function setupYScales(height: any, padding: any, features: any, newDataset: any): any {
-    let yScales = {};
-    features.map(x => {
-        const values = newDataset.map(o => o[x.name]);
-        let labels = [];
-        if (isNaN(values[0]) !== false) {
-            values.forEach(function(element) {
-                labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
-            });
-            yScales[x.name] = scale.scalePoint()
-                .domain(labels)
-                .range([padding, height - padding])
-                .padding(0.2);
-        }
-        else {
-            const max = Math.max(...newDataset.map(o => o[x.name]));
-            const min = Math.min(...newDataset.map(o => o[x.name]));
-            window.max = max;
-            window.min = min;
-            yScales[x.name] = scale.scaleLinear()
-                .domain([min, max])
-                .range([height - padding, padding]);
-        }
-    });
-    return yScales;
-}
-
-function setupXScales(width: any, padding: any, features: any): any {
-    return scale.scalePoint()
-        .domain(features.map(x => x.name))
-        .range([width - padding, padding]);
-}
-
-function setupYAxis(features :any[], yScales: any, newDataset: any): any {
-    
-    const limit = 30;
-    let counter = 0;
-    let yAxis = {};
-
-    Object.entries(yScales).map(key => {
-        let tempFeatures = Array.from(features.values()).map(c => c.name);
-        let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
-        let labels = [];
-        tempValues.forEach(function(element) {
-            labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
-        });
-        counter = counter + 1;
-
-        if(isNaN(labels[0])) {
-            let uniqueArray = labels.filter(function(item, index, self) {
-                return index === self.indexOf(item);
-            })
-            if(uniqueArray.length > limit)
-            {
-                let filteredArray = labels.filter(function(value, index, array) {
-                    return index % 4 == 0;
-                });
-                yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
-            }
-            else {
-                yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(labels);
-            }
-        }
-        else {
-            let ranges = yScales[key[0]].ticks(5).concat(yScales[key[0]].domain());
-            let sortRanges = ranges.sort(function(a,b){return a-b});
-            let uniqueRanges = [...new Set(sortRanges)];
-            if (Number(uniqueRanges[1]) - 5 < Number(uniqueRanges[0])) {
-                uniqueRanges.splice(1,1);
-            }
-            if (Number(uniqueRanges[uniqueRanges.length-1]) - 5 < Number(uniqueRanges[uniqueRanges.length-2])) {
-                uniqueRanges.splice(uniqueRanges.length-2,1);
-            }
-            yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(uniqueRanges);
-        }
-    });
-    return yAxis;
 }
 
 function redrawChart(content: any, newFeatures: any): void {
@@ -1100,6 +996,8 @@ function redrawChart(content: any, newFeatures: any): void {
         .on("contextmenu", function (event) {
             event.preventDefault();
         });
+
+    setDefsForIcons();
     
     window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
@@ -1109,11 +1007,6 @@ function redrawChart(content: any, newFeatures: any): void {
     window.active = setActivePathLines(svg, content, ids, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
-}
-
-function cleanTooltip(){
-	d3.selectAll(".tooltip")
-    	.remove();
 }
 
 let delay = null;
@@ -1128,11 +1021,11 @@ const clearExistingDelay = () => {
 };
 
 const handlePointerEnter = (event, d) => {
-    const data = getAllPointerEventsData(event);
+    const data = helper.getAllPointerEventsData(event, window.hoverlabel);
     window.hoverdata = [...data];
 
     selectedPath = highlight(data);
-    createTooltipForPathLine(data, tooltipPath, event);
+    helper.createTooltipForPathLine(data, tooltipPath, event);
 
     clearExistingDelay();
 
@@ -1146,7 +1039,7 @@ const handlePointerEnter = (event, d) => {
         const matchingRecord = datasetMap.get(item);
         if (matchingRecord) {
             delay = setTimeout(() => {
-                createToolTipForValues(matchingRecord);
+                helper.createToolTipForValues(matchingRecord);
             }, 150);
         }
     });
@@ -1160,7 +1053,7 @@ const handlePointerLeaveOrOut = () => {
     if (tooltipPath) {
         tooltipPath.style('visibility', 'hidden');
     }
-    cleanTooltip();
+    helper.cleanTooltip();
 };
 
 
@@ -1210,7 +1103,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .attr('class', (d) => {
             const keys = Object.keys(d);
             window.key = keys[0];
-            const selected_value = helper.cleanLinePathString(d[window.key]);
+            const selected_value = utils.cleanLinePathString(d[window.key]);
             ids.push(selected_value);
             return 'line ' + selected_value;
         })
@@ -1221,7 +1114,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             let element = d[window.key].length > 10 ? d[window.key].substr(0, 10) + '...' : d[window.key];
             d[window.key] = element;
             d3.select(this)
-                .attr('d', linePath(d, parcoords.newFeatures, parcoords));
+                .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         })
         .style('opacity', '0.5')
         .style('pointer-events', 'stroke')
@@ -1294,112 +1187,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
 }
 
 const delay1 = 50;
-export const throttleShowValues = helper.throttle(createToolTipForValues, delay1);
-
-function trans(g: any): any {
-    return g.transition().duration(50);
-}
-
-function position(dimensionName: any, dragging: any, xScales: any): any {
-    const value = dragging[dimensionName];  
-    return value == null ? xScales(dimensionName) : value;
-}
-
-function linePath(d: any, newFeatures: any, parcoords: any): any {
-    let lineGenerator = path.line();
-    const tempdata = Object.entries(d).filter(x => x[0]);
-    let points = [];
-
-    newFeatures.map(newfeature => {
-        tempdata.map(x => {
-            if (newfeature === x[0]) {
-                points.push([parcoords.xScales(newfeature), parcoords.yScales[newfeature](x[1])]);
-            }
-        })
-    })
-    return (lineGenerator(points));
-}
-
-function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any): any {
-    if (tooltipText.length !== 0) {
-        let tempText = tooltipText.toString();
-        tempText = tempText.split(',').join('\r\n');
-        tooltipPath.text(tempText);
-        tooltipPath.style('visibility', 'visible');
-        tooltipPath.style('top', event.clientY/16 + 'rem').style('left', event.clientX/16 + 'rem');
-        tooltipPath.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-            .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
-        return tooltipPath;
-    }
-}
-
-function createToolTipForValues(recordData): void {
-    const dimensions = getAllVisibleDimensionNames();
-    let counter = 0;
-
-    const rectLeft = d3.select('#rect_' + dimensions[0])?.node()?.getBoundingClientRect().left;
-
-    dimensions.forEach(dimension => {
-        const cleanString = helper.cleanString(dimension);
-
-        if (helper.isElementVisible(d3.select('#rect_' + cleanString))) {
-            const tooltipValues = d3.select('#parallelcoords')
-                .append('g')
-                .attr('class', 'tooltip')
-                .style('position', 'absolute')
-                .style('visibility', 'hidden');
-
-            const invertStatus = isInverted(dimension);
-            const scale = parcoords.yScales[dimension];
-            const maxValue = invertStatus ? scale.domain()[0] : scale.domain()[1];
-            const minValue = invertStatus ? scale.domain()[1] : scale.domain()[0];
-            const range = maxValue - minValue;
-
-            let value;
-            if (invertStatus) {
-                value = isNaN(maxValue) ? scale(recordData[dimension]) :
-                    240 / range * (recordData[dimension] - minValue) + 80;
-            } else {
-                value = isNaN(maxValue) ? scale(recordData[dimension]) :
-                    240 / range * (maxValue - recordData[dimension]) + 80;
-            }
-
-            const x = (rectLeft + (counter * 95))/16;
-            const y = (value + 140)/16;
-
-            tooltipValues.text(recordData[dimension].toString())
-                .style('visibility', 'visible')
-                .style('top', `${y}rem`)
-                .style('left', `${x}rem`)
-                .style('font-size', '0.65rem')
-                .style('margin', '0.5rem')
-                .style('color', 'red')
-                .style('background-color', '#d3d3d3ad')
-                .style('font-weight', 'bold')
-                .style('padding', '0.12rem')
-                .style('white-space', 'pre-line')
-                .style('margin-left', '0.5rem');
-
-            counter++;
-        }
-    });
-}
-
-function getAllPointerEventsData(event: any): any {
-    const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
-    const object = selection._groups;
-    const data = [];
-    for (let i = 0; i < object[0].length; i++) {
-        const items = object.map(item => item[i]);
-        const itemsdata = items[0].__data__;
-        const label = window.hoverlabel;
-        const text = itemsdata[label];
-        data.push(text);
-    }
-    return data;
-}
+export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
 
 function setFeatureAxis(svg: any, yAxis: any, active: any,
     parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
@@ -1421,7 +1209,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
     featureAxis
         .append('g')
         .each(function (d) {
-            const processedDimensionName = helper.cleanString(d.name);
+            const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
@@ -1440,7 +1228,6 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         });
 
         let tickElements = document.querySelectorAll('g.tick');
-        console.log(tickElements);
         tickElements.forEach((gElement) => {
             let transformValue = gElement.getAttribute('transform');
             let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
@@ -1472,7 +1259,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
    
     setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
 
-    setContextMenu(featureAxis, padding, parcoords, active, width);
+    context.setContextMenu(featureAxis, padding, parcoords, active, width);
 
     setInvertIcon(featureAxis, padding);
 }
@@ -1515,7 +1302,7 @@ function highlight(data: any): any {
     
     if (dataWoSpecialC.length !== 0) {
         let tempText = dataWoSpecialC.join(',').replace(/,/g, ',.');
-        tempText = helper.cleanLinePathArrayString(tempText);
+        tempText = utils.cleanLinePathArrayString(tempText);
         selectedPath = tempText;
     
         const newTempText = dataWoSpecialC.map((item) => {
@@ -1570,7 +1357,7 @@ function doNotHighlight(selectedPath: any): void {
 
 function select(linePaths: any): void {
     for(let i = 0; i < linePaths.length; i++) {
-        let selectedLine = helper.cleanLinePathString(linePaths[i]);
+        let selectedLine = utils.cleanLinePathString(linePaths[i]);
         setSelected(selectedLine);
     }
 }
@@ -1600,469 +1387,13 @@ function setInvertIcon(featureAxis: any, padding: any): void {
         .attr('x', 0)
         .attr('href', '#arrow_image_up')
         .each(function (d) {
-            const processedDimensionName = helper.cleanString(d.name);
+            const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
                 .text('up')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
+                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         })
         .on('click', onInvert());
-}
-
-// Context Menu
-
-function setContextMenu(featureAxis: any, padding: any, parcoords: { xScales: any; yScales: {}; 
-    dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[]}, active: any, width: any): void {
-    
-    let tooltipFeatures = d3.select('#parallelcoords')
-        .append('g')
-        .style('position', 'absolute')
-        .style('visibility', 'hidden');
-
-    let contextMenu = d3.select('#parallelcoords')
-        .append('g')
-        .attr('id', 'contextmenu')
-        .style('position', 'absolute')
-        .style('display', 'none');
-
-    let popupWindowRange = d3.select('#parallelcoords')
-        .append('div')
-        .attr('id', 'popupRange')
-        .style('position', 'absolute')
-        .style('display', 'none');
-
-    popupWindowRange.append('div').text('Set Range for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
-    let closeButtonRange = popupWindowRange.append('a').text('x').style('position', 'absolute').style('right', -1 + 'rem')
-    .style('top', 0.5 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
-    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonRange');
-    let headerDimensionRange = popupWindowRange.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
-    .attr('id', 'headerDimensionRange');
-    let infoRange = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
-    .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange');
-    let infoRange2 = popupWindowRange.append('div').style('color', 'grey').style('font-size', 'smaller')
-    .style('padding-left', 0.5 + 'rem').style('padding-bottom', 0.5 + 'rem').style('padding-top', 1 + 'rem').attr('id', 'infoRange2');
-    popupWindowRange.append('label').text('Min').style('padding', 0.5 + 'rem');
-    let inputMinRange = popupWindowRange.append('input').attr('id', 'minRangeValue').style('width', 2.5 + 'rem');
-    popupWindowRange.append('label').text('Max').style('padding', 0.5 + 'rem');
-    let inputMaxRange = popupWindowRange.append('input').attr('id', 'maxRangeValue').style('width', 2.5 + 'rem');
-    let rangeButton = popupWindowRange.append('button').text('Save').style('margin-left', 0.5 + 'rem')
-    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonRange');
-    
-    let popupWindowRangeError = popupWindowRange
-        .append('div')
-        .attr('id', 'errorRange')
-        .style('position', 'absolute')
-        .style('display', 'none');
-    
-    let popupWindowFilter = d3.select('#parallelcoords')
-        .append('div')
-        .attr('id', 'popupFilter')
-        .style('position', 'absolute')
-        .style('display', 'none')
-
-    popupWindowFilter.append('div').text('Set Filter for ').style('padding-left', 0.5 + 'rem').style('font-size', 'large');
-    let headerDimensionFilter = popupWindowFilter.append('div').style('padding-left', 0.5 + 'rem').style('font-size', 'large')
-    .attr('id', 'headerDimensionFilter');
-    let closeButtonFilter = popupWindowFilter.append('a').text('x').style('position', 'absolute').style('right', -1 + 'rem')
-    .style('top', 0.5 + 'rem').style('width', 2.5 + 'rem').style('height', 2.5 + 'rem')
-    .style('opacity', 0.3).style('background-color', 'transparent').style('cursor', 'pointer').attr('id', 'closeButtonFilter');
-    popupWindowFilter.append('label').text('Min').style('padding', 0.5 + 'rem');
-    let inputMinFilter = popupWindowFilter.append('input').attr('id', 'minFilterValue').style('width', 2 + 'rem');
-    popupWindowFilter.append('label').text('Max').style('padding', 0.5 + 'rem');
-    let inputMaxFilter = popupWindowFilter.append('input').attr('id', 'maxFilterValue').style('width', 2 + 'rem');
-    let filterButton = popupWindowFilter.append('button').text('Save').style('margin-left', 0.5 + 'rem')
-    .style('width', 6.2 + 'rem').style('margin-top', 1 + 'rem').attr('id', 'buttonFilter');
-
-    let popupWindowFilterError = popupWindowFilter
-        .append('div')
-        .attr('id', 'errorFilter')
-        .style('position', 'absolute')
-        .style('display', 'none');
-    
-    contextMenu.append('div')
-        .attr('id', 'hideMenu')
-        .attr('class', 'contextmenu')
-        .text('Hide');
-    contextMenu.append('div')
-        .attr('id', 'invertMenu')
-        .attr('class', 'contextmenu')
-        .text('Invert');
-    contextMenu.append('div')
-        .attr('id', 'rangeMenu')
-        .attr('class', 'contextmenu')
-        .text('Set Range...');
-    contextMenu.append('div')
-        .attr('id', 'resetRangeMenu')
-        .attr('class', 'contextmenu')
-        .text('Set Range from Data');
-    contextMenu.append('div')
-        .attr('id', 'resetRoundRangeMenu')
-        .attr('class', 'contextmenu')
-        .text('Set Rounded Range from Data');
-    contextMenu.append('div')
-        .attr('id', 'filterMenu')
-        .attr('class', 'contextmenu')
-        .text('Set Filter...');
-    contextMenu.append('div')
-        .attr('id', 'resetfilterMenu')
-        .attr('class', 'contextmenu')
-        .text('Reset Filter');
-    contextMenu.append('div')
-        .attr('id', 'showAllMenu')
-        .attr('class', 'contextmenu')
-        .text('Show All');
-
-    let y_value = (padding/1.7).toFixed(4);
-    
-    featureAxis
-        .append('text')
-        .attr('class', 'dimension')
-        .attr('text-anchor', 'middle')
-        .attr('y', y_value)
-        .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
-        .style('font-size', '0.7rem')
-        .call(drag.drag()
-            .on('start', onDragStartEventHandler(parcoords))
-            .on('drag', onDragEventHandler(parcoords, active, featureAxis, width))
-            .on('end', onDragEndEventHandler(parcoords, featureAxis, active))
-        )
-        .on('mouseover', function () {
-            return tooltipFeatures.style('visibility', 'visible');
-        })
-        .on('mousemove', (event, d) => {
-            if (getDimensionPosition(d.name) == 0) {
-                featureAxis
-                    .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
-            } else if (getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
-                featureAxis
-                    .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
-            } else {
-                featureAxis
-                    .select('.dimension')
-                    .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeftAndRight()), 12)}') 8 8, auto`);
-            }
-
-            tooltipFeatures.text(d.name);
-            tooltipFeatures.style('top', 12.8 + 'rem').style('left', event.clientX/16 + 'rem');
-            tooltipFeatures.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-                .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-                .style('padding', 0.12 + 'rem')
-                .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
-            return tooltipFeatures;
-        })
-        .on('mouseout', function () {
-            return tooltipFeatures.style('visibility', 'hidden');
-        })
-        .on('contextmenu', function (event, d) {
-            const dimension = d.name;
-            const values = parcoords.newDataset.map(o => o[dimension]);
-            
-            contextMenu.style('left', event.clientX/16 + 'rem')
-            .style('top', 13.6 + 'rem')
-            .style('display', 'block')
-            .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.35 + 'rem')
-            .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
-            .style('cursor', 'pointer')
-            .on('click', (event) => {
-                event.stopPropagation();
-            });
-
-            d3.select('#hideMenu')
-                .on('click', (event) => {
-                    hide(dimension);
-                    event.stopPropagation();
-                });
-            
-            d3.select('#invertMenu')
-                .on('click', (event) => {
-                    invert(dimension);
-                    event.stopPropagation();
-                });
-            
-            if (!isNaN(values[0])) {
-            d3.select('#rangeMenu')
-                .style('border-top', '0.08rem lightgrey solid')
-                .style('visibility', 'visible')
-                .style('color', 'black')
-                .on('click', (event) => {
-                    let minRange = getCurrentMinRange(dimension);
-                    let maxRange = getCurrentMaxRange(dimension);
-                    var resultMin = (minRange - Math. floor(minRange)) !== 0;
-                    var resultMax = (maxRange - Math. floor(maxRange)) !== 0;
-                    let minValue = String(minRange);
-                    let maxValue = String(maxRange);
-                    if (resultMin && !resultMax) {
-                        const count = minValue.split('.')[1].length;
-                        maxValue = maxRange.toFixed(count);
-                    }
-                    else if (!resultMin && resultMax) {
-                        const count = maxValue.split('.')[1].length;
-                        minValue = minRange.toFixed(count);
-                    }
-                    inputMinRange.attr('value', minValue);
-                    inputMaxRange.attr('value', maxValue);
-                    popupWindowRange.style('display', 'block')
-                            .style('width', 17 + 'rem')
-                            .style('height', 13 + 'rem')
-                            .style('background', 'white')
-                            .style('border', '0.0625rem solid black')
-                            .style('border-radius', 0.25 + 'rem')
-                            .style('padding', 1 + 'rem')
-                            .style('margin', 'auto')
-                            .style('top', 0)
-                            .style('right', 0)
-                            .style('bottom', 0)
-                            .style('left', 0)
-                            .style('z-index', 10);
-                    const newText = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;
-                    headerDimensionRange.text(newText);
-                    infoRange.text('The current range of ' + dimension + ' is between ' + 
-                        minValue + ' and ' + 
-                        maxValue + '.');
-                    infoRange2.text('The original range of ' + dimension + ' is between ' + 
-                        getMinValue(dimension) + ' and ' + 
-                        getMaxValue(dimension) + '.');
-                    rangeButton.on('click', () => {
-                        let min = d3.select('#minRangeValue').node().value;
-                        let max = d3.select('#maxRangeValue').node().value;
-                        const inverted = isInverted(dimension);
-                        let isOk = true;
-                        
-                        if (inverted) {
-                            if (max < getMinValue(dimension) || 
-                                min > getMaxValue(dimension)) {
-                                popupWindowRangeError.text(`The range has to be bigger than 
-                                ${minValue} and 
-                                ${maxValue}.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
-                            }
-                        }
-                        else {
-                            if (min > getMinValue(dimension) || 
-                                max < getMaxValue(dimension)) {
-                                popupWindowRangeError.text(`The range has to be bigger than 
-                                ${minValue} and 
-                                ${maxValue}.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                                isOk = false;
-                            }
-                        }
-                        if (isOk) {
-                            popupWindowRangeError.style('display', 'none');
-                            setDimensionRange(dimension, min, max);
-                            popupWindowRange.style('display', 'none');
-                        }
-                        
-                    });
-                    inputMaxRange.on('keypress', (event) => {
-                        if (event.key === "Enter") {
-                            event.preventDefault();
-                            document.getElementById("buttonRange").click();
-                        }
-                    });
-                    inputMinRange.on('keypress', (event) => {
-                        if (event.key === "Enter") {
-                            event.preventDefault();
-                            document.getElementById("buttonRange").click();
-                        }
-                    });
-                    closeButtonRange.on('click', () => {
-                        popupWindowRange.style('display', 'none');
-                    });
-                    event.stopPropagation();
-                });
-            }
-            else {
-                d3.select('#rangeMenu').style('display', 'false')
-                .style('color', 'lightgrey')
-                .style('border-top', '0.08rem lightgrey solid');
-            }
-            if (!isNaN(values[0])) {
-                d3.select('#resetRangeMenu')
-                .style('visibility', 'visible')
-                .style('color', 'black')
-                .on('click', (event) => {
-                    setDimensionRange(dimension, getMinValue(dimension), getMaxValue(dimension));
-                    event.stopPropagation();
-                });
-            }
-            else {
-                d3.select('#resetRangeMenu').style('display', 'false')
-                .style('color', 'lightgrey');
-            }
-            if (!isNaN(values[0])) {
-                d3.select('#resetRoundRangeMenu')
-                .style('visibility', 'visible')
-                .style('color', 'black')
-                .on('click', (event) => {
-                    setDimensionRangeRounded(dimension, getMinValue(dimension), getMaxValue(dimension));
-                    event.stopPropagation();
-                });
-            }
-            else {
-                d3.select('#resetRoundRangeMenu').style('display', 'false')
-                .style('color', 'lightgrey');
-            }
-            if (!isNaN(values[0])) {
-                let currentFilters = getFilter(dimension);
-                inputMaxFilter.attr('value', currentFilters[0]);
-                inputMinFilter.attr('value', currentFilters[1]);
-                d3.select('#filterMenu')
-                    .style('border-top', '0.08rem lightgrey solid')
-                    .style('visibility', 'visible')
-                    .style('color', 'black')
-                    .on('click', (event) => {
-                        popupWindowFilter.style('display', 'block')
-                            .style('width', 17 + 'rem')
-                            .style('height', 8 + 'rem')
-                            .style('background', 'white')
-                            .style('border', '0.0625rem solid black')
-                            .style('border-radius', 0.25 + 'rem')
-                            .style('padding', 1 + 'rem')
-                            .style('margin', 'auto')
-                            .style('top', 0)
-                            .style('right', 0)
-                            .style('bottom', 0)
-                            .style('left', 0)
-                            .style('z-index', 10);
-                        const newText1 = dimension.length > 25 ? dimension.substr(0,25) + '...' : dimension;  
-                        headerDimensionFilter.text(newText1);
-                        filterButton.on('click', () => {
-                            let min = d3.select('#minFilterValue').node().value;
-                            let max = d3.select('#maxFilterValue').node().value;
-                            const ranges = getDimensionRange(dimension);
-                            const inverted = isInverted(dimension);
-                            let isOk = true;
-                        
-                            if (inverted) {
-                                if (min < ranges[1]) {
-                                    min = ranges[1];
-                                    popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinValue(dimension)}, filter is set to min.`)
-                                    .style('display', 'block')
-                                    .style('padding-left', 0.5 + 'rem')
-                                    .style('padding-top', 0.5 + 'rem')
-                                    .style('color', 'red')
-                                    .style('font-size', 'x-small');
-                                    isOk = false;
-                                }
-                                if (max > ranges[0]) {
-                                    max = ranges[0];
-                                    popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxValue(dimension)}, filter is set to max.`)
-                                    .style('display', 'block')
-                                    .style('padding-left', 0.5 + 'rem')
-                                    .style('padding-top', 0.5 + 'rem')
-                                    .style('color', 'red')
-                                    .style('font-size', 'x-small');
-                                    isOk = false;
-                                }
-                            }
-                            else {
-                                if (min < ranges[0]) {
-                                    min = ranges[0];
-                                    popupWindowFilterError.text(`Min value is smaller than 
-                                    ${getMinValue(dimension)}, filter is set to min.`)
-                                    .style('display', 'block')
-                                    .style('padding-left', 0.5 + 'rem')
-                                    .style('padding-top', 0.5 + 'rem')
-                                    .style('color', 'red')
-                                    .style('font-size', 'x-small');
-                                    isOk = false;
-                                }
-                                if (max > ranges[1]) {
-                                    max = ranges[1];
-                                    popupWindowFilterError.text(`Max value is bigger than 
-                                    ${getMaxValue(dimension)}, filter is set to max.`)
-                                    .style('display', 'block')
-                                    .style('padding-left', 0.5 + 'rem')
-                                    .style('padding-top', 0.5 + 'rem')
-                                    .style('color', 'red')
-                                    .style('font-size', 'x-small');
-                                    isOk = false;
-                                }
-                            }
-                            if (inverted) {
-                                setFilter(dimension, min, max);
-                            }
-                            else {
-                                setFilter(dimension, max, min);
-                            }
-                            if (isOk) {
-                                popupWindowFilterError.style('display', 'none');
-                                popupWindowFilter.style('display', 'none');
-                            }
-                    });
-                    inputMaxFilter.on('keypress', (event) => {
-                        if (event.key === "Enter") {
-                            event.preventDefault();
-                            document.getElementById("buttonFilter").click();
-                        }
-                    });
-                    inputMinFilter.on('keypress', (event) => {
-                        if (event.key === "Enter") {
-                            event.preventDefault();
-                            document.getElementById("buttonFilter").click();
-                        }
-                    });
-                    closeButtonFilter.on('click', () => {
-                        popupWindowFilter.remove();
-                        popupWindowFilterError.style('display', 'none');
-                    });
-                    event.stopPropagation();
-                });
-            }
-            else {
-                d3.select('#filterMenu').style('display', 'false')
-                .style('color', 'lightgrey')
-                .style('border-top', '0.08rem lightgrey solid');
-            }
-            if (!isNaN(values[0])) {
-                d3.select('#resetfilterMenu')
-                    .style('visibility', 'visible')
-                    .style('color', 'black')
-                    .on('click', (event) => {
-                        const range = getDimensionRange(dimension);
-                        if (isInverted(dimension)) {
-                            setFilter(dimension, range[1], range[0]);
-                        }
-                        else {
-                            setFilter(dimension, range[1], range[0]);
-                        }
-                        event.stopPropagation();
-                });
-            }
-            else {
-                d3.select('#resetfilterMenu').style('display', 'false')
-                .style('color', 'lightgrey');
-            }
-            d3.select('#showAllMenu')
-                .style('visibility', 'visible')
-                .style('border-top', '0.08rem lightgrey solid')
-                .on('click', (event) => {
-                    const hiddenDimensions = getAllHiddenDimensionNames();
-                    for(let i = 0; i < hiddenDimensions.length; i++) {
-                        show(hiddenDimensions[i]);
-                    }
-                    event.stopPropagation();
-                });
-            d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
-            event.preventDefault();
-        });
 }
 
 // Brushing
@@ -2075,7 +1406,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yS
     let delta: any;
     featureAxis
         .each(function (d) {
-            const processedDimensionName = helper.cleanString(d.name);
+            const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
                 .append('g')
                 .attr('class', 'rect')
@@ -2116,7 +1447,7 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
     
     featureAxis
         .each(function (d) {
-            const processedDimensionName = helper.cleanString(d.name);
+            const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
@@ -2127,7 +1458,7 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
                 .attr('width', 14)
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
+                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
                 .call(drag.drag().on('drag', (event, d) => {
                     if (parcoords.newFeatures.length > 25) {
                         brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
@@ -2148,7 +1479,7 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
     
     featureAxisG
         .each(function (d) {
-            const processedDimensionName = helper.cleanString(d.name);
+            const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
@@ -2159,7 +1490,7 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                 .attr('width', 14)
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
-                .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
+                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
@@ -2173,111 +1504,4 @@ function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {};
                         tooltipValues.style('visibility', 'hidden');
                     }));
         });
-}
-
-function getSelectedRecords(event) {
-    let selection = event.selection;
-    let dimensions = getAllVisibleDimensionNames();
-
-    for (let i = 0; i < window.parcoords.newDataset.length; i++) {
-        let recordData = window.parcoords.newDataset[i];
-       
-        for (let j = 0; j < dimensions.length - 1; j++) {
-            let isIntersect = selection[0][0] <= window.parcoords.xScales(dimensions[j+1]) && 
-            window.parcoords.xScales(dimensions[j]) < selection[1][0] &&
-            selection[0][1] <= window.parcoords.yScales[dimensions[j+1]](recordData[dimensions[j+1]]) && 
-            window.parcoords.yScales[dimensions[j]](recordData[dimensions[j]]) < selection[1][1];
-            if (isIntersect) {
-                setSelected(recordData[window.hoverlabel]);
-            }
-        }
-    
-    }
-}
-
-// Dragging
-
-function onDragStartEventHandler(parcoords: any): any {
-    {
-        return function onDragStart (d)
-        {
-            this.__origin__ = parcoords.xScales((d.subject).name);
-            parcoords.dragging[(d.subject).name] = this.__origin__;
-            parcoords.dragPosStart[(d.subject).name] = this.__origin__;
-            const element = document.getElementById("parallelcoords");
-            window.scrollXPos = element.scrollLeft;
-        }
-    }
-}
-
-function scroll(parcoords, d) {
-    const element = document.getElementById("parallelcoords");
-    if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-             parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
-                element.scrollLeft += 5;
-            }
-            else if (window.scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
-                element.scrollLeft -= 5;
-            }
-}
-
-function onDragEventHandler(parcoords: any, active: any, featureAxis: any, width: any): any {
-    {
-        return function onDrag(d) {
-            
-            if (window.timer !== null) {
-                clearInterval(window.timer);
-                window.timer = null;
-            }
-            window.timer = setInterval(() => {scroll(parcoords, d), 100});
-            
-            parcoords.dragging[(d.subject).name] = Math.min(width-window.paddingXaxis, 
-                Math.max(window.paddingXaxis, this.__origin__ += d.x));
-
-            active.each(function (d) {
-                d3.select(this)
-                    .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-            });
-
-            parcoords.newFeatures.sort((a, b) => {
-                return position(b, parcoords.dragging, parcoords.xScales) 
-                    - position(a, parcoords.dragging, parcoords.xScales) - 1;
-            });
-        
-            parcoords.xScales.domain(parcoords.newFeatures);
-           
-            featureAxis.attr('transform', (d) => {
-                return 'translate(' + position(d.name, parcoords.dragging, parcoords.xScales) + ')';
-            });
-        }
-    }
-}
-
-function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): any {
-    {
-        return function onDragEnd(d) {
-            const width = window.width;
-            const distance = (width-80)/parcoords.newFeatures.length;
-            const init = parcoords.dragPosStart[(d.subject).name];
-
-            if (parcoords.dragPosStart[(d.subject).name] > parcoords.dragging[(d.subject).name]) {
-                featureAxis.attr('transform', (d) => {
-                    return 'translate(' + position(d.name, init-distance, parcoords.xScales) + ')';
-                })
-            }
-            else {
-                featureAxis.attr('transform', (d) => {
-                    return 'translate(' + position(d.name, init+distance, parcoords.xScales) + ')';
-                })
-            }
-            delete this.__origin__;
-            delete parcoords.dragging[(d.subject).name];
-            delete parcoords.dragPosStart[(d.subject).name];
-            
-            trans(active).each(function (d) {
-                d3.select(this)
-                    .attr('d', linePath(d, parcoords.newFeatures, parcoords))
-            });
-        };
-    }
 }

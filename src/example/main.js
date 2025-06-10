@@ -1,8 +1,10 @@
-import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange, getCurrentMaxRange, 
-    isInverted, getDimensionPosition, setFilter, getFilter, getDimensionRange,
-    getNumberOfDimensions, hide, show, getHiddenStatus, getMinValue, getMaxValue,
-    setDimensionRange, getAllDimensionNames, getAllVisibleDimensionNames, getAllHiddenDimensionNames,
-    getAllRecords, toggleSelection, isSelected, setDimensionRangeRounded, getInversionStatus} 
+import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange, 
+    getCurrentMaxRange, getDimensionPosition, setFilter, getFilter,
+    getDimensionRange, getNumberOfDimensions, hide, show, getHiddenStatus, 
+    getMinValue, getMaxValue, getInversionStatus, setDimensionRange, 
+    getAllDimensionNames, getAllVisibleDimensionNames,
+    getAllHiddenDimensionNames, getAllRecords, toggleSelection, isSelected, 
+    setDimensionRangeRounded, isDimensionCategorical} 
     from './lib/spcd3.js';
 
 let data;
@@ -610,13 +612,13 @@ function generateModuleForSetFilter() {
         let min = Number(inputMinFilter.value);
         let max = Number(inputMaxFilter.value);
         const limit = getDimensionRange(filterDimensionData);
-        const inverted = isInverted(filterDimensionData);
+        const inversionstatus = getInversionStatus(filterDimensionData);
         let isOk = true;
 
         let topLimit = limit[1];
         let bottomLimit = limit[0];
 
-        if (inverted) {
+        if (inversionstatus == "ascending") {
             if (min < topLimit) {
                 min = topLimit;
                 popupWindowFilterError.textContent = `Min value is smaller than 
@@ -688,7 +690,7 @@ function generateModuleForSetFilter() {
         }
         
         if (isOk) {
-            if (inverted) {
+            if (inversionstatus == "ascending") {
                 setFilter(filterDimensionData, min, max);
             }
             else {
@@ -896,10 +898,10 @@ function generateModuleForRangeSettings() {
         let min = Number(inputMinRange.value);
         let max = Number(inputMaxRange.value);
 
-        const inverted = isInverted(rangeDimensionData);
+        const inversionStatus = getInversionStatus(rangeDimensionData);
         let isOk = true;
                         
-        if (inverted) {
+        if (inversionStatus == "ascending") {
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
