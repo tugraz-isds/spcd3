@@ -1,6 +1,6 @@
 import * as d3 from 'd3-selection';
-import * as icon from '../icons/icons';
-import * as helper from './helper';
+import * as icon from './icons/icons';
+import * as helper from './utils';
 import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
 
 let selectionArray = [];
