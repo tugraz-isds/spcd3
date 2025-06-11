@@ -104,7 +104,8 @@ function resetFilterMenu(values: any[], dimension: any) {
             });
     }
     else {
-        d3.select('#resetfilterMenu').style('display', 'false')
+        d3.select('#resetfilterMenu')
+            .style('display', 'false')
             .style('color', 'lightgrey');
     }
 }
@@ -168,7 +169,7 @@ function filterMenu(values: any[], dimension: any) {
                     else {
                         if (min < ranges[0]) {
                             min = ranges[0];
-                            d3.select('errorFilter').text(`Min value is smaller than 
+                            d3.select('#errorFilter').text(`Min value is smaller than 
                                     ${pc.getMinValue(dimension)}, filter is set to min.`)
                                 .style('display', 'block')
                                 .style('padding-left', 0.5 + 'rem')
@@ -213,12 +214,12 @@ function filterMenu(values: any[], dimension: any) {
                     }
                 });
                 d3.select('#closeButtonFilter').on('click', () => {
-                    d3.select('#modalFilter').remove();
                     d3.select('#errorFilter').style('display', 'none');
+                    d3.select('#modalFilter').style('display', 'none');
                 });
                 event.stopPropagation();
             });
-    }
+    } 
     else {
         d3.select('#filterMenu').style('display', 'false')
             .style('color', 'lightgrey')
@@ -237,7 +238,8 @@ function resetRoundRangeMenu(values: any[], dimension: any) {
             });
     }
     else {
-        d3.select('#resetRoundRangeMenu').style('display', 'false')
+        d3.select('#resetRoundRangeMenu')
+            .style('display', 'false')
             .style('color', 'lightgrey');
     }
 }

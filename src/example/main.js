@@ -467,6 +467,7 @@ function generateDropdownForFilter() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         getAllVisibleDimensionNames().forEach(function(dimension) {
+            if (!isDimensionCategorical(dimension)) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'filterLabel';
@@ -481,6 +482,7 @@ function generateDropdownForFilter() {
             dimensionLabel.appendChild(filterInput);
             dimensionLabel.appendChild(document.createTextNode(dimension));
             dimensionContainer.appendChild(dimensionLabel);
+            }
         });
         showOptions('filterOptions', 'filterButton');
         calcDDBehaviour(dimensionContainer, selectButton);
@@ -719,6 +721,7 @@ function generateDropdownForRange() {
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
         getAllVisibleDimensionNames().forEach(function(dimension) {
+            if (!isDimensionCategorical(dimension)) {
             let dimensionLabel = document.createElement('label');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'rangeLabel';
@@ -733,6 +736,7 @@ function generateDropdownForRange() {
             dimensionLabel.appendChild(rangeInput);
             dimensionLabel.appendChild(document.createTextNode(dimension));
             dimensionContainer.appendChild(dimensionLabel);
+            }
         });
         showOptions('rangeOptions', 'rangeButton');
         calcDDBehaviour(dimensionContainer, selectButton);
