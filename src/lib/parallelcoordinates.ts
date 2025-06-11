@@ -5,7 +5,7 @@ import * as ease from 'd3-ease';
 import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
-import * as context from './setContextMenu';
+import * as context from './contextMenu';
 import * as icon from './icons/icons';
 
 declare global {
