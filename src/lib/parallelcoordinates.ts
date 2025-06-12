@@ -6,6 +6,7 @@ import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as context from './contextMenu';
+import * as svgcreator from './svgStringCreator';
 import * as icon from './icons/icons';
 
 declare global {
@@ -1007,6 +1008,56 @@ function redrawChart(content: any, newFeatures: any): void {
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 }
 
+export function createSvgString(): any {
+    //setUpParcoordData(window.parcoords.data, window.parcoords.newFeatures);
+    
+
+    let height = 360;
+    let width = window.parcoords.newFeatures.length * 100;
+
+    let xScalesForDownload = helper.setupXScales(width, window.padding, parcoords.features);
+    let yScalesForDownload = helper.setupYScales(400, window.padding, window.parcoords.features, window.parcoords.newDataset);
+    let yAxisForDownload = helper.setupYAxis(window.parcoords.features, yScalesForDownload, window.parcoords.newDataset);
+
+    let svg = d3.create('svg')
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        .attr('viewBox', [0, 0, width, height])
+        .attr('font-family', 'Verdana, sans-serif');
+
+        let defs = svg.append('defs');
+        
+        defs.append('image')
+            .attr('id', 'arrow_image_up')
+            .attr('width', 12)
+            .attr('height', 12)
+            .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
+    
+        defs.append('image')
+            .attr('id', 'arrow_image_down')
+            .attr('width', 12)
+            .attr('height', 12)
+            .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
+    
+        defs.append('image')
+            .attr('id', 'brush_image_top')
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
+    
+        defs.append('image')
+            .attr('id', 'brush_image_bottom')
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
+
+    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, xScalesForDownload, window.parcoords, window.padding);
+    
+    let active = svgcreator.setActivePathLinesToDownload(svg, window.parcoords, window.key);
+
+    return svg.node().outerHTML;
+}
+
 let delay = null;
 let selectedPath = null;
 let tooltipPath;
@@ -1475,11 +1526,11 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
         });
 }
 
-function setBrushDown(featureAxisG: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
+function setBrushDown(featureAxis: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
     dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
     newDataset: any[];}, active: any, tooltipValues: any): void {
     
-    featureAxisG
+    featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
             d3.select(this)
