@@ -38,6 +38,7 @@ declare global {
     let yBrushes: {};
     let filters: {};
     let selectedDots: [];
+    let refreshData: any;
 }
 
 declare const window: any;
@@ -679,6 +680,8 @@ export function setUnselectedWithId(recordId: number): void {
 export function drawChart(content: any): void {
     let ids = [];
 
+    window.refreshData = structuredClone(content);
+
     deleteChart();
 
     let newFeatures = content['columns'].reverse();
@@ -686,14 +689,6 @@ export function drawChart(content: any): void {
     setUpParcoordData(content, newFeatures);
 
     const height = 360;
-
-    /*window.svg = d3.select('#parallelcoords')
-        .append('button')
-        .text("Refresh")
-
-    window.svg = d3.select('#parallelcoords')
-        .append('button')
-        .text('Selection Tool');*/
 
     window.svg = d3.select('#parallelcoords')
         .append('svg')
@@ -748,6 +743,16 @@ export function drawChart(content: any): void {
             d3.select('#popupRange').style('display', 'none');
         }
     }
+
+    window.svg = d3.select('#parallelcoords')
+        .append('button')
+        .attr('id', 'refreshButton')
+        .html(icon.getRefreshIcon())
+        .on('click', refresh);
+}
+
+export function refresh() {
+    drawChart(window.refreshData);
 }
 
 export function deleteChart(): void {
@@ -756,6 +761,7 @@ export function deleteChart(): void {
     d3.select('#contextmenuRecords').remove();
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
+    d3.select('#refreshButton').remove();
 }
 
 function selectionWithRectangle(): void {

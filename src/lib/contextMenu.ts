@@ -501,8 +501,7 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): a
 
 function scroll(parcoords, d) {
     const element = document.getElementById("parallelcoords");
-    if (parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-        parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
+    if (parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name]) {
         element.scrollLeft += 5;
     }
     else if (scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
