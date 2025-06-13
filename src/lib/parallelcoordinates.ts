@@ -74,7 +74,7 @@ export function show(dimension: string): void {
         });
 
         setSelection(window.selected);
-    }  
+    }
 }
 
 export function hide(dimension: string): void {
@@ -135,27 +135,29 @@ export function invert(dimension: string): void {
         .duration(1000)
         .call(yAxis[dimension]
             .scale(parcoords.yScales[dimension]
-            .domain(parcoords.yScales[dimension]
-            .domain().reverse())))
-        .ease(ease.easeCubic);    
+                .domain(parcoords.yScales[dimension]
+                    .domain().reverse())))
+        .ease(ease.easeCubic);
 
     helper.trans(window.active).each(function (d) {
         d3.select(this)
-        .transition()
-        .duration(1000)
-            .attr('d', (d) => { 
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
+            .transition()
+            .duration(1000)
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
             })
-        .ease(ease.easeCubic)});
+            .ease(ease.easeCubic)
+    });
 
     helper.trans(window.selectable).each(function (d) {
         d3.select(this)
-        .transition()
-        .duration(1000)
-            .attr('d', (d) => { 
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
+            .transition()
+            .duration(1000)
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
             })
-        .ease(ease.easeCubic)});
+            .ease(ease.easeCubic)
+    });
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (helper.isInverted(dimension)) {
@@ -181,20 +183,22 @@ export function invertWoTransition(dimension: string): void {
     d3.select(dimensionId)
         .call(yAxis[dimension]
             .scale(parcoords.yScales[dimension]
-            .domain(parcoords.yScales[dimension]
-            .domain().reverse())));
+                .domain(parcoords.yScales[dimension]
+                    .domain().reverse())));
 
     helper.trans(window.active).each(function (d) {
         d3.select(this)
-            .attr('d', (d) => { 
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
-            })});
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
+            })
+    });
 
     helper.trans(window.selectable).each(function (d) {
         d3.select(this)
             .attr('d', (d) => {
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
-            })});
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
+            })
+    });
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (helper.isInverted(dimension)) {
@@ -227,29 +231,31 @@ export function setInversionStatus(dimension: string, status: string): void {
         .transition()
         .duration(1000)
         .call(yAxis[dimension]
-        .scale(parcoords.yScales[dimension]
-        .domain(parcoords.yScales[dimension]
-        .domain().reverse())))
+            .scale(parcoords.yScales[dimension]
+                .domain(parcoords.yScales[dimension]
+                    .domain().reverse())))
         .ease(ease.easeCubic);
 
 
     helper.trans(window.active).each(function (d) {
         d3.select(this)
-        .transition()
-        .duration(1000)
-            .attr('d', (d) => { 
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
+            .transition()
+            .duration(1000)
+            .attr('d', (d) => {
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
             })
-        .ease(ease.easeCubic)});
+            .ease(ease.easeCubic)
+    });
 
     helper.trans(window.selectable).each(function (d) {
         d3.select(this)
-        .transition()
-        .duration(1000)
+            .transition()
+            .duration(1000)
             .attr('d', (d) => {
-                return helper.linePath(d, parcoords.newFeatures, parcoords); 
+                return helper.linePath(d, parcoords.newFeatures, parcoords);
             })
-        .ease(ease.easeCubic)});
+            .ease(ease.easeCubic)
+    });
 
     brush.addSettingsForBrushing(dimension, parcoords);
     if (helper.isInverted(dimension)) {
@@ -266,36 +272,36 @@ export function setInversionStatus(dimension: string, status: string): void {
 export function moveByOne(dimension: string, direction: string): void {
 
     let parcoords = window.parcoords;
-    
+
     const indexOfDimension = parcoords.newFeatures.indexOf(dimension);
 
-    const indexOfNeighbor = direction == 'right' ? indexOfDimension - 1 
-            : indexOfDimension + 1;
+    const indexOfNeighbor = direction == 'right' ? indexOfDimension - 1
+        : indexOfDimension + 1;
 
     const neighbour = parcoords.newFeatures[indexOfNeighbor];
-    
+
     const width = window.width;
     const pos = parcoords.xScales(dimension);
     const posNeighbour = parcoords.xScales(neighbour);
 
     const distance = 93.5; //(width-window.paddingXaxis)/parcoords.newFeatures.length;
 
-    parcoords.dragging[dimension] = direction == 'right' ? pos + distance : 
+    parcoords.dragging[dimension] = direction == 'right' ? pos + distance :
         pos - distance;
 
     parcoords.dragging[neighbour] = direction == 'right' ? posNeighbour - distance :
         posNeighbour + distance;
 
-        
+
     if (direction == 'right') {
-        [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension-1]] = 
-        [parcoords.newFeatures[indexOfDimension-1], parcoords.newFeatures[indexOfDimension]];
+        [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension - 1]] =
+            [parcoords.newFeatures[indexOfDimension - 1], parcoords.newFeatures[indexOfDimension]];
     }
     else {
-        [parcoords.newFeatures[indexOfDimension+1], parcoords.newFeatures[indexOfDimension]] = 
-        [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension+1]];
+        [parcoords.newFeatures[indexOfDimension + 1], parcoords.newFeatures[indexOfDimension]] =
+            [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension + 1]];
     }
-    
+
     parcoords.xScales.domain(parcoords.newFeatures);
 
     let active = d3.select('g.active').selectAll('path');
@@ -303,14 +309,14 @@ export function moveByOne(dimension: string, direction: string): void {
 
     active.transition()
         .duration(1000)
-        .attr('d', function(d) {
+        .attr('d', function (d) {
             return helper.linePath(d, parcoords.newFeatures, parcoords);
         })
         .ease(ease.easeCubic);
 
     featureAxis.transition()
         .duration(1000)
-        .attr('transform', function(d) {
+        .attr('transform', function (d) {
             return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(ease.easeCubic);
@@ -321,37 +327,37 @@ export function moveByOne(dimension: string, direction: string): void {
 
 export function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void {
     let parcoords = window.parcoords;
-        
+
     const indexOfDimensionA = getDimensionPosition(dimensionA);
     const indexOfDimensionB = getDimensionPosition(dimensionB);
 
     if (toRightOf) {
         if (indexOfDimensionA > indexOfDimensionB) {
-            for(let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
-                if (i != indexOfDimensionB-1) {
-                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i-1]);
+            for (let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                if (i != indexOfDimensionB - 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i - 1]);
                 }
             }
         }
         else {
-            for(let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
-                if (i != indexOfDimensionB-1) {
-                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i+1]);
+            for (let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                if (i != indexOfDimensionB - 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i + 1]);
                 }
             }
         }
     }
     else {
         if (indexOfDimensionA > indexOfDimensionB) {
-            for(let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
-                if (i != indexOfDimensionB+1) {
-                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i-1]);
+            for (let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                if (i != indexOfDimensionB + 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i - 1]);
                 }
             }
         }
         else {
-            for(let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
-                swap(parcoords.newFeatures[i], parcoords.newFeatures[i+1]);
+            for (let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                swap(parcoords.newFeatures[i], parcoords.newFeatures[i + 1]);
             }
         }
     }
@@ -359,7 +365,7 @@ export function move(dimensionA: string, toRightOf: boolean, dimensionB: string)
 
 export function swap(dimensionA: string, dimensionB: string): void {
     let parcoords = window.parcoords;
-        
+
     const positionA = parcoords.xScales(dimensionA);
     const positionB = parcoords.xScales(dimensionB);
 
@@ -369,8 +375,8 @@ export function swap(dimensionA: string, dimensionB: string): void {
     const indexOfDimensionA = parcoords.newFeatures.indexOf(dimensionA);
     const indexOfDimensionB = parcoords.newFeatures.indexOf(dimensionB);
 
-    [parcoords.newFeatures[indexOfDimensionA], parcoords.newFeatures[indexOfDimensionB]] = 
-    [parcoords.newFeatures[indexOfDimensionB], parcoords.newFeatures[indexOfDimensionA]];
+    [parcoords.newFeatures[indexOfDimensionA], parcoords.newFeatures[indexOfDimensionB]] =
+        [parcoords.newFeatures[indexOfDimensionB], parcoords.newFeatures[indexOfDimensionA]];
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
@@ -405,13 +411,13 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
     const inverted = helper.isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]);
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
     }
@@ -430,8 +436,8 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', (d) => { 
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords); 
+        .attr('d', (d) => {
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
         })
         .ease(ease.easeCubic);
 
@@ -448,13 +454,13 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
     const inverted = helper.isInverted(dimension);
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMinRange(dimension), getCurrentMaxRange(dimension));
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales, 
+        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
             window.parcoords.newDataset);
         //setFilter(dimension, getCurrentMaxRange(dimension), getCurrentMinRange(dimension));
     }
@@ -473,8 +479,8 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', (d) => { 
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords); 
+        .attr('d', (d) => {
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
         })
         .ease(ease.easeCubic);
 
@@ -507,7 +513,7 @@ export function getCurrentMaxRange(dimension: any): number {
     return item.currentRangeTop;
 }
 
-function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any):void {
+function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any): void {
     let newObject = {};
     newObject[key] = Number(value);
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
@@ -525,10 +531,10 @@ export function getFilter(dimension): any {
     const range = maxValue - minValue;
 
     const dimensionSettings = window.parcoords.currentPosOfDims.find((obj) => obj.key == dimension);
-    const top =  invertStatus == false ? maxValue - (dimensionSettings.top - 80) / (240/range) :
-                (dimensionSettings.top - 80) / (240/range) + minValue;
-    const bottom = invertStatus == false ? maxValue - (dimensionSettings.bottom - 80) / (240/range) :
-                (dimensionSettings.bottom - 80) / (240/range) + minValue;
+    const top = invertStatus == false ? maxValue - (dimensionSettings.top - 80) / (240 / range) :
+        (dimensionSettings.top - 80) / (240 / range) + minValue;
+    const bottom = invertStatus == false ? maxValue - (dimensionSettings.bottom - 80) / (240 / range) :
+        (dimensionSettings.bottom - 80) / (240 / range) + minValue;
     return [top, bottom];
 }
 
@@ -540,7 +546,7 @@ export function setFilter(dimension: string, min: number, max: number): void {
 
 export function getSelected(): any[] {
     let selected = [];
-   
+
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
         let editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
@@ -556,16 +562,16 @@ export function getSelected(): any[] {
 export function setSelection(records: string[]): void {
     let selectableLines = [];
     let editRecord;
-    for(let i = 0; i < records.length; i++) {
+    for (let i = 0; i < records.length; i++) {
         window.active.each(function (d) {
             editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
-            if(utils.cleanLinePathString(d[window.hoverlabel]) == utils.cleanLinePathString(editRecord)) {
+            if (utils.cleanLinePathString(d[window.hoverlabel]) == utils.cleanLinePathString(editRecord)) {
                 selectableLines.push(d);
             }
         });
         d3.select('.' + utils.cleanLinePathString(editRecord))
             .transition()
-            .style('visibility', 'hidden'); 
+            .style('visibility', 'hidden');
     }
 
     window.selectable = svg.append('g')
@@ -626,16 +632,16 @@ export function setUnselected(record: string): void {
     let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
     const path = utils.cleanLinePathString(editRecord);
     d3.select('#select_' + path)
-            .remove();
+        .remove();
     d3.select('.' + path)
-            .transition()
-            .style('visibility', 'visible');
+        .transition()
+        .style('visibility', 'visible');
 }
 
 //---------- Selection Functions With IDs ----------
 
 export function setSelectionWithId(recordIds: []): void {
-    let records : string[] = [];
+    let records: string[] = [];
     for (let i = 0; i < recordIds.length; i++) {
         let record = getRecordWithId(recordIds[i]);
         records.push(record);
@@ -716,31 +722,31 @@ export function drawChart(content: any): void {
             }
             if (event.ctrlKey || event.metaKey) {
                 let selectedRecords = getSelected();
-                
+
                 for (let i = 0; i < selectedRecords.length; i++) {
                     if (selectedRecords[i] == event.target.id) {
                         toggleSelection(event.target.id);
+                    }
                 }
             }
-        }
-    })
-    .on("contextmenu", function (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    })
-    .on("mouseenter", function () {
-        helper.cleanTooltip();
-    });
-    
+        })
+        .on("contextmenu", function (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        })
+        .on("mouseenter", function () {
+            helper.cleanTooltip();
+        });
+
     window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
-        if(!event.target.id.includes('Filter')) {
+        if (!event.target.id.includes('Filter')) {
             d3.select('#popupFilter').style('display', 'none');
         }
-        if(!event.target.id.includes('Range')) {
+        if (!event.target.id.includes('Range')) {
             d3.select('#popupRange').style('display', 'none');
-        } 
+        }
     }
 }
 
@@ -765,7 +771,7 @@ function selectionWithRectangle(): void {
     let startX;
     let startY;
 
-    svg.on('mousedown', function(event) {
+    svg.on('mousedown', function (event) {
         isSelecting = true;
         const [x, y] = d3.pointer(event);
         startX = x;
@@ -779,7 +785,7 @@ function selectionWithRectangle(): void {
             .style('visibility', 'visible');
     });
 
-    svg.on('mousemove', function(event) {
+    svg.on('mousemove', function (event) {
         if (!isSelecting) return;
         const [x, y] = d3.pointer(event);
         const width = Math.abs(x - startX);
@@ -792,47 +798,47 @@ function selectionWithRectangle(): void {
             .attr('height', height);
     });
 
-    svg.on('mouseup', function() {
+    svg.on('mouseup', function () {
         if (!isSelecting) return;
         isSelecting = false;
-    
+
         const x1 = parseFloat(selectionRect.attr('x'));
         const y1 = parseFloat(selectionRect.attr('y'));
         const x2 = x1 + parseFloat(selectionRect.attr('width'));
         const y2 = y1 + parseFloat(selectionRect.attr('height'));
-    
+
         svg.selectAll('g.active path')
-            .each(function(d) {
+            .each(function (d) {
                 const path = d3.select(this).node();
                 const pathData = path.getAttribute('d');
 
                 const pathCoords = pathData.match(/[ML]\s*(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/g);
-    
+
                 let isInSelection = false;
-    
+
                 if (pathCoords) {
-                    pathCoords.forEach(function(coord) {
+                    pathCoords.forEach(function (coord) {
                         const matches = coord.match(/[-+]?\d*\.?\d+/g);
                         const [x, y] = matches.map(Number);
-                    
+
                         if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
                             isInSelection = true;
                         }
                     });
                 }
-    
+
                 if (isInSelection) {
                     d3.select(this)
-                        .each(function() {
+                        .each(function () {
                             const pathElement = d3.select(this);
                             const pathId = pathElement.attr('id');
                             setSelected(pathId);
-                    });
+                        });
                 }
             });
         selectionRect.style('visibility', 'hidden');
     });
-    
+
 }
 
 //---------- Helper Functions ----------
@@ -862,7 +868,7 @@ export function getAllDimensionNames(): string[] {
 export function getAllHiddenDimensionNames(): string[] {
     const dimensions = getAllDimensionNames();
     const hiddenDimensions = [];
-    for(let i = 0; i < dimensions.length; i++) {
+    for (let i = 0; i < dimensions.length; i++) {
         if (getHiddenStatus(dimensions[i]) == 'hidden') {
             hiddenDimensions.push(dimensions[i]);
         }
@@ -893,18 +899,18 @@ export function setDimensionForHovering(dimension: string): void {
 // ---------- Needed for Built-In Interactivity Functions ---------- //
 
 function setUpParcoordData(data: any, newFeatures: any): any {
-    
+
     window.padding = 80;
     window.paddingXaxis = 75;
     window.width = newFeatures.length * 100;
     window.height = 400;
 
-    const label = newFeatures[newFeatures.length-1];
-    
-    data.sort((a,b) => {
+    const label = newFeatures[newFeatures.length - 1];
+
+    data.sort((a, b) => {
         const item1 = a[label];
         const item2 = b[label];
-        
+
         if (item1 < item2) {
             return -1;
         } else if (item1 > item2) {
@@ -929,13 +935,15 @@ function setUpParcoordData(data: any, newFeatures: any): any {
 
     window.parcoords.data = data;
 
-    for(let i = 0; i < newFeatures.length; i++) {
+    for (let i = 0; i < newFeatures.length; i++) {
         const max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
         const min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
         const ranges = getDimensionRange(newFeatures[i]);
         window.parcoords.currentPosOfDims.push(
-            { key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i ,
-                 min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0] }
+            {
+                key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
+                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0]
+            }
         );
     }
 
@@ -947,10 +955,9 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         let numberOfDigs = 0
         let values = window.parcoords.newDataset.map(o => o[x.name]);
         for (let i = 0; i < values.length; i++) {
-            if(!isNaN(values[i])){
+            if (!isNaN(values[i])) {
                 const tempNumberOfDigs = utils.digits(Number(values[i]));
-                if (tempNumberOfDigs > numberOfDigs)
-                {
+                if (tempNumberOfDigs > numberOfDigs) {
                     numberOfDigs = tempNumberOfDigs;
                 }
             }
@@ -997,7 +1004,7 @@ function redrawChart(content: any, newFeatures: any): void {
         });
 
     setDefsForIcons();
-    
+
     window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
@@ -1010,7 +1017,7 @@ function redrawChart(content: any, newFeatures: any): void {
 
 export function createSvgString(): any {
     //setUpParcoordData(window.parcoords.data, window.parcoords.newFeatures);
-    
+
 
     let height = 360;
     let width = window.parcoords.newFeatures.length * 100;
@@ -1025,35 +1032,36 @@ export function createSvgString(): any {
         .attr('viewBox', [0, 0, width, height])
         .attr('font-family', 'Verdana, sans-serif');
 
-        let defs = svg.append('defs');
-        
-        defs.append('image')
-            .attr('id', 'arrow_image_up')
-            .attr('width', 12)
-            .attr('height', 12)
-            .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
-    
-        defs.append('image')
-            .attr('id', 'arrow_image_down')
-            .attr('width', 12)
-            .attr('height', 12)
-            .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
-    
-        defs.append('image')
-            .attr('id', 'brush_image_top')
-            .attr('width', 14)
-            .attr('height', 10)
-            .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
-    
-        defs.append('image')
-            .attr('id', 'brush_image_bottom')
-            .attr('width', 14)
-            .attr('height', 10)
-            .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
+    let defs = svg.append('defs');
 
-    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, xScalesForDownload, window.parcoords, window.padding);
-    
-    let active = svgcreator.setActivePathLinesToDownload(svg, window.parcoords, window.key);
+    defs.append('image')
+        .attr('id', 'arrow_image_up')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
+
+    defs.append('image')
+        .attr('id', 'arrow_image_down')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
+
+    defs.append('image')
+        .attr('id', 'brush_image_top')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
+
+    defs.append('image')
+        .attr('id', 'brush_image_bottom')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
+
+
+    svgcreator.setActivePathLinesToDownload(svg, window.parcoords, window.key);
+
+    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, window.parcoords, window.padding);
 
     return svg.node().outerHTML;
 }
@@ -1106,11 +1114,12 @@ const handlePointerLeaveOrOut = () => {
 };
 
 
-function setActivePathLines(svg: any, content: any, ids: any[], 
-    parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+function setActivePathLines(svg: any, content: any, ids: any[],
+    parcoords: {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
-    
+
     tooltipPath = d3.select('#parallelcoords')
         .append('g')
         .style('position', 'absolute')
@@ -1243,8 +1252,10 @@ function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any) {
 }
 
 function setFeatureAxis(svg: any, yAxis: any, active: any,
-    parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]; }, 
+    parcoords: {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+    },
     width: any, padding: any): void {
 
     let featureAxis = svg.selectAll('g.feature')
@@ -1268,11 +1279,11 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
                 .call(yAxis[d.name])
                 .on('mouseenter', function (event, d) {
                     tooltipValuesLabel.text('');
-                    tooltipValuesLabel.style('top', event.clientY/16 + 'rem').style('left', event.clientX/16 + 'rem');
+                    tooltipValuesLabel.style('top', event.clientY / 16 + 'rem').style('left', event.clientX / 16 + 'rem');
                     tooltipValuesLabel.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-                    .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-                    .style('padding', 0.12 + 'rem')
-                    .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
+                        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+                        .style('padding', 0.12 + 'rem')
+                        .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
                     return tooltipValuesLabel.style('visibility', 'hidden');
                 })
                 .on('mouseout', function () {
@@ -1280,16 +1291,16 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
                 });
         });
 
-        let tickElements = document.querySelectorAll('g.tick');
-        tickElements.forEach((gElement) => {
-            let transformValue = gElement.getAttribute('transform');
-            let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
-            if (yValue) {
-                let originalValue = parseFloat(yValue[1]);
-                let shortenedValue = originalValue.toFixed(4);
-                gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
-            }
-        });
+    let tickElements = document.querySelectorAll('g.tick');
+    tickElements.forEach((gElement) => {
+        let transformValue = gElement.getAttribute('transform');
+        let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
+        if (yValue) {
+            let originalValue = parseFloat(yValue[1]);
+            let shortenedValue = originalValue.toFixed(4);
+            gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
+        }
+    });
 
     let tooltipValues = d3.select('#parallelcoords')
         .append('g')
@@ -1309,7 +1320,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
     setBrushDown(featureAxis, parcoords, active, tooltipValues);
 
     setBrushUp(featureAxis, parcoords, active, tooltipValues);
-   
+
     setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
 
     context.setContextMenu(featureAxis, padding, parcoords, active, width);
@@ -1321,7 +1332,7 @@ function setDefsForIcons(): void {
     const svgContainer = window.svg;
     let defs = svgContainer.select('defs');
     defs = svgContainer.append('defs');
-    
+
     defs.append('image')
         .attr('id', 'arrow_image_up')
         .attr('width', 12)
@@ -1352,12 +1363,12 @@ function setDefsForIcons(): void {
 function highlight(data: any): any {
     let selectedPath = '';
     const dataWoSpecialC = data.map(item => item.replace(/[.,]/g, ''));
-    
+
     if (dataWoSpecialC.length !== 0) {
         let tempText = dataWoSpecialC.join(',').replace(/,/g, ',.');
         tempText = utils.cleanLinePathArrayString(tempText);
         selectedPath = tempText;
-    
+
         const newTempText = dataWoSpecialC.map((item) => {
             let cleanedItem = item.replace(/,./g, '');
             if (isSelected(item)) {
@@ -1367,9 +1378,9 @@ function highlight(data: any): any {
             }
             return cleanedItem;
         });
-    
+
         selectedPath = newTempText.join(',.');
-    
+
         if (selectedPath) {
             d3.selectAll('.' + selectedPath)
                 .transition().duration(5)
@@ -1377,7 +1388,7 @@ function highlight(data: any): any {
                 .style('stroke', 'rgb(200, 28, 38)');
         }
     }
-    
+
     return selectedPath;
 }
 
@@ -1409,7 +1420,7 @@ function doNotHighlight(selectedPath: any): void {
 // Selecting
 
 function select(linePaths: any): void {
-    for(let i = 0; i < linePaths.length; i++) {
+    for (let i = 0; i < linePaths.length; i++) {
         let selectedLine = utils.cleanLinePathString(linePaths[i]);
         setSelected(selectedLine);
     }
@@ -1427,7 +1438,7 @@ function onInvert(): any {
 }
 
 function setInvertIcon(featureAxis: any, padding: any): void {
-    let value = (padding/1.5).toFixed(4);
+    let value = (padding / 1.5).toFixed(4);
 
     featureAxis
         .append('svg')
@@ -1451,11 +1462,13 @@ function setInvertIcon(featureAxis: any, padding: any): void {
 
 // Brushing
 
-function setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yScales: {}; 
-    dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[]; }, active: any, tooltipValuesTop: any,
+function setRectToDrag(featureAxis: any, svg: any, parcoords: {
+    xScales: any; yScales: {};
+    dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any;
+    features: any[]; newDataset: any[];
+}, active: any, tooltipValuesTop: any,
     tooltipValuesDown: any): void {
-    
+
     let delta: any;
     featureAxis
         .each(function (d) {
@@ -1474,14 +1487,14 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yS
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
-                            brush.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                            brush.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta,
                                 tooltipValuesTop, tooltipValuesDown, window);
                         }
                         else {
-                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta, 
+                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta,
                                 tooltipValuesTop, tooltipValuesDown, window);
                         }
-                        
+
                     })
                     .on('start', (event, d) => {
                         let current = d3.select("#rect_" + processedDimensionName);
@@ -1494,10 +1507,12 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: { xScales: any; yS
         });
 }
 
-function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-    newDataset: any[];}, active: any, tooltipValues: any): void {
-    
+function setBrushUp(featureAxis: any, parcoords: {
+    xScales: any; yScales: {}; dragging: {};
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[];
+    newDataset: any[];
+}, active: any, tooltipValues: any): void {
+
     featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
@@ -1520,16 +1535,18 @@ function setBrushUp(featureAxis: any, parcoords: { xScales: any; yScales: {}; dr
                         brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                     }
                 })
-                .on('end', () => {
-                    tooltipValues.style('visibility', 'hidden');
-                }));
+                    .on('end', () => {
+                        tooltipValues.style('visibility', 'hidden');
+                    }));
         });
 }
 
-function setBrushDown(featureAxis: any, parcoords: { xScales: any; yScales: {}; dragging: {}; 
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; 
-    newDataset: any[];}, active: any, tooltipValues: any): void {
-    
+function setBrushDown(featureAxis: any, parcoords: {
+    xScales: any; yScales: {}; dragging: {};
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[];
+    newDataset: any[];
+}, active: any, tooltipValues: any): void {
+
     featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);

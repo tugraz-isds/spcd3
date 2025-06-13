@@ -6,14 +6,15 @@ import * as temp from './helper';
 import * as pc from './parallelcoordinates';
 import * as icon from './icons/icons';
 
-export function setContextMenu(featureAxis: any, padding: any, parcoords: { 
+export function setContextMenu(featureAxis: any, padding: any, parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]}, active: any, width: any): void {
-    
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]
+}, active: any, width: any): void {
+
     createContextMenu()
     createModalToSetRange();
     createModalToFilter();
-    
+
     let tooltipFeatures = d3.select('#parallelcoords')
         .append('g')
         .style('position', 'absolute')
@@ -23,12 +24,12 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .append('text')
         .attr('class', 'dimension')
         .attr('text-anchor', 'middle')
-        .attr('y', (padding/1.7).toFixed(4))
+        .attr('y', (padding / 1.7).toFixed(4))
         .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
         .style('font-size', '0.7rem')
         .call(drag.drag()
             .on('start', onDragStartEventHandler(parcoords))
-            .on('drag', onDragEventHandler(parcoords, featureAxis, active, 
+            .on('drag', onDragEventHandler(parcoords, featureAxis, active,
                 width))
             .on('end', onDragEndEventHandler(parcoords, featureAxis, active))
         )
@@ -40,7 +41,7 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
             tooltipFeatures.text(d.name);
             tooltipFeatures
                 .style('top', 12.8 + 'rem')
-                .style('left', event.clientX/16 + 'rem')
+                .style('left', event.clientX / 16 + 'rem')
                 .style('font-size', '0.75rem')
                 .style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem')
@@ -56,7 +57,7 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .on('contextmenu', function (event, d) {
             const dimension = d.name;
             const values = parcoords.newDataset.map(o => o[dimension]);
-            
+
             styleContextMenu(event);
             hideDimensionMenu(dimension);
             invertDimensionMenu(dimension);
@@ -219,7 +220,7 @@ function filterMenu(values: any[], dimension: any) {
                 });
                 event.stopPropagation();
             });
-    } 
+    }
     else {
         d3.select('#filterMenu').style('display', 'false')
             .style('color', 'lightgrey')
@@ -403,15 +404,17 @@ function styleContextMenu(event: any) {
     d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
 }
 
-function setCursorForDimensions(d: any, featureAxis: any, parcoords: { xScales: any; 
-    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; 
-    newFeatures: any; features: any[]; newDataset: any[]; }, event: any) {
+function setCursorForDimensions(d: any, featureAxis: any, parcoords: {
+    xScales: any;
+    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
+    newFeatures: any; features: any[]; newDataset: any[];
+}, event: any) {
     if (pc.getDimensionPosition(d.name) == 0) {
         featureAxis
             .select('.dimension')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
-    } else if 
-    (pc.getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
+    } else if
+        (pc.getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
         featureAxis
             .select('.dimension')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
@@ -424,8 +427,7 @@ function setCursorForDimensions(d: any, featureAxis: any, parcoords: { xScales: 
 
 function onDragStartEventHandler(parcoords: any): any {
     {
-        return function onDragStart (d)
-        {
+        return function onDragStart(d) {
             this.__origin__ = parcoords.xScales((d.subject).name);
             parcoords.dragging[(d.subject).name] = this.__origin__;
             parcoords.dragPosStart[(d.subject).name] = this.__origin__;
@@ -435,18 +437,18 @@ function onDragStartEventHandler(parcoords: any): any {
     }
 }
 
-function onDragEventHandler(parcoords: any, featureAxis: any, active: any, 
+function onDragEventHandler(parcoords: any, featureAxis: any, active: any,
     width: any): any {
     {
         return function onDrag(d) {
-            
+
             if (timer !== null) {
                 clearInterval(timer);
                 timer = null;
             }
-            timer = setInterval(() => {scroll(parcoords, d), 100});
-            
-            parcoords.dragging[(d.subject).name] = Math.min(width-paddingXaxis, 
+            timer = setInterval(() => { scroll(parcoords, d), 100 });
+
+            parcoords.dragging[(d.subject).name] = Math.min(width - paddingXaxis,
                 Math.max(paddingXaxis, this.__origin__ += d.x));
 
             active.each(function (d) {
@@ -455,12 +457,12 @@ function onDragEventHandler(parcoords: any, featureAxis: any, active: any,
             });
 
             parcoords.newFeatures.sort((a, b) => {
-                return temp.position(b, parcoords.dragging, parcoords.xScales) 
+                return temp.position(b, parcoords.dragging, parcoords.xScales)
                     - temp.position(a, parcoords.dragging, parcoords.xScales) - 1;
             });
-        
+
             parcoords.xScales.domain(parcoords.newFeatures);
-           
+
             featureAxis.attr('transform', (d) => {
                 return 'translate(' + temp.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
             });
@@ -472,23 +474,23 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): a
     {
         return function onDragEnd(d) {
             const width = parcoords.width;
-            const distance = (width-80)/parcoords.newFeatures.length;
+            const distance = (width - 80) / parcoords.newFeatures.length;
             const init = parcoords.dragPosStart[(d.subject).name];
 
             if (parcoords.dragPosStart[(d.subject).name] > parcoords.dragging[(d.subject).name]) {
                 featureAxis.attr('transform', (d) => {
-                    return 'translate(' + temp.position(d.name, init-distance, parcoords.xScales) + ')';
+                    return 'translate(' + temp.position(d.name, init - distance, parcoords.xScales) + ')';
                 })
             }
             else {
                 featureAxis.attr('transform', (d) => {
-                    return 'translate(' + temp.position(d.name, init+distance, parcoords.xScales) + ')';
+                    return 'translate(' + temp.position(d.name, init + distance, parcoords.xScales) + ')';
                 })
             }
             delete this.__origin__;
             delete parcoords.dragging[(d.subject).name];
             delete parcoords.dragPosStart[(d.subject).name];
-            
+
             temp.trans(active).each(function (d) {
                 d3.select(this)
                     .attr('d', temp.linePath(d, parcoords.newFeatures, parcoords))
@@ -499,17 +501,16 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): a
 
 function scroll(parcoords, d) {
     const element = document.getElementById("parallelcoords");
-    if(parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
-             parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
-                element.scrollLeft += 5;
-            }
-            else if (scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
-                element.scrollLeft -= 5;
-            }
+    if (parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name] &&
+        parcoords.dragging[(d.subject).name] > window.innerWidth - 20) {
+        element.scrollLeft += 5;
+    }
+    else if (scrollXPos + 20 > parcoords.dragging[(d.subject).name]) {
+        element.scrollLeft -= 5;
+    }
 }
 
-function createContextMenu()
-{
+function createContextMenu() {
     let contextMenu = d3.select('#parallelcoords')
         .append('g')
         .attr('id', 'contextmenu')
@@ -550,8 +551,7 @@ function createContextMenu()
         .text('Show All');
 }
 
-function createModalToSetRange()
-{
+function createModalToSetRange() {
     const modalSetRange = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'modalSetRange')
@@ -569,8 +569,7 @@ function createModalToSetRange()
     createErrorMessage(modalSetRange, 'errorRange');
 }
 
-function createModalToFilter()
-{
+function createModalToFilter() {
     let modalFilter = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'modalFilter')
@@ -586,8 +585,7 @@ function createModalToFilter()
     createErrorMessage(modalFilter, 'errorFilter');
 }
 
-function createModalTitle(modal: any, modalTitel: string)
-{
+function createModalTitle(modal: any, modalTitel: string) {
     const title = document.createElement('div');
     title.textContent = modalTitel;
     title.style.paddingLeft = '0.5rem';
@@ -595,8 +593,7 @@ function createModalTitle(modal: any, modalTitel: string)
     modal.append(() => title);
 }
 
-function createHeader(modal: any, id: string)
-{
+function createHeader(modal: any, id: string) {
     const header = document.createElement('div');
     header.id = id;
     header.style.paddingLeft = '0.5rem';
@@ -604,8 +601,7 @@ function createHeader(modal: any, id: string)
     modal.append(() => header);
 }
 
-function createInfoMessage(modal: any, id: string)
-{
+function createInfoMessage(modal: any, id: string) {
     const infoMessage = document.createElement('div');
     infoMessage.id = id;
     infoMessage.style.color = 'grey';
@@ -616,8 +612,7 @@ function createInfoMessage(modal: any, id: string)
     modal.append(() => infoMessage);
 }
 
-function createInputFieldWithLabel(modal: any, text: string, inputId: string)
-{
+function createInputFieldWithLabel(modal: any, text: string, inputId: string) {
     const label = document.createElement('label');
     label.textContent = text;
     label.style.padding = '0.5rem';
@@ -629,8 +624,7 @@ function createInputFieldWithLabel(modal: any, text: string, inputId: string)
     modal.append(() => input);
 }
 
-function createButton(modal: any, id: string)
-{
+function createButton(modal: any, id: string) {
     const button = document.createElement('button');
     button.id = id;
     button.textContent = 'Save';
@@ -640,8 +634,7 @@ function createButton(modal: any, id: string)
     modal.append(() => button);
 }
 
-function createCloseButton(modal: any, id: string)
-{
+function createCloseButton(modal: any, id: string) {
     let closeButton = document.createElement('a');
     closeButton.textContent = 'x';
     closeButton.id = id;
@@ -656,8 +649,7 @@ function createCloseButton(modal: any, id: string)
     modal.append(() => closeButton);
 }
 
-function createErrorMessage(modal: any, id: string)
-{
+function createErrorMessage(modal: any, id: string) {
     const errorMessage = document.createElement('div');
     errorMessage.id = id;
     errorMessage.style.position = 'absolute';

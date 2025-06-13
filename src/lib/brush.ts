@@ -5,23 +5,25 @@ import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
 
 let selectionArray = [];
 
-export function brushDown(cleanDimensionName: any, event: any, d: any, 
-    parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, tooltipValues: any, window: any):void {
-    
+export function brushDown(cleanDimensionName: any, event: any, d: any,
+    parcoords: {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+    },
+    active: any, tooltipValues: any, window: any): void {
+
     const yPosBottom = Number(d3.select('#triangle_up_' + cleanDimensionName).attr('y'));
-    
+
     let yPosTop: number;
     let yPosRect: number;
     let topToAdd: number;
-    
+
     if (event.y < 70) {
         yPosTop = 70;
         yPosRect = 80;
         topToAdd = 80;
     }
-    else if (event.y > yPosBottom - 10 ) {
+    else if (event.y > yPosBottom - 10) {
         yPosTop = yPosBottom - 10;
         topToAdd = yPosBottom - 10;
         yPosRect = 320;
@@ -38,41 +40,43 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
     }
 
     addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
-    
-    if(yPosTop == 70 && yPosBottom == 320) {
+
+    if (yPosTop == 70 && yPosBottom == 320) {
         d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', 'default');
+            .style('cursor', 'default');
     }
     else {
         d3.select('#rect_' + cleanDimensionName)
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
     }
-    
+
     d3.select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
 
     const heightTopRect = yPosRect - 80;
     const heightBottomRect = 320 - yPosBottom;
-    
+
     d3.select('#rect_' + cleanDimensionName)
         .attr('y', yPosRect)
         .attr('height', 240 - heightTopRect - heightBottomRect);
 
     if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-    setToolTipBrush(tooltipValues, d, event, parcoords, window, true);
+        setToolTipBrush(tooltipValues, d, event, parcoords, window, true);
     }
 
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }
 
-export function brushUp(cleanDimensionName: any, event: any, d: any, 
-    parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}, 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, tooltipValues: any, window: any):void {
-    
+export function brushUp(cleanDimensionName: any, event: any, d: any,
+    parcoords: {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {},
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+    },
+    active: any, tooltipValues: any, window: any): void {
+
     const yPosTop = Number(d3.select('#triangle_down_' + cleanDimensionName).attr('y'));
-    
+
     let yPosBottom: number;
-    
+
     if (event.y < yPosTop + 10) {
         yPosBottom = yPosTop + 10;
     }
@@ -88,20 +92,20 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 
     addPosition(yPosBottom, parcoords.currentPosOfDims, d.name, 'bottom');
 
-    if(yPosTop == 70 && yPosBottom == 320) {
+    if (yPosTop == 70 && yPosBottom == 320) {
         d3.select('#rect_' + cleanDimensionName)
-        .style('cursor', 'default');
+            .style('cursor', 'default');
     }
     else {
         d3.select('#rect_' + cleanDimensionName)
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
     }
-    
+
     d3.select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
 
     const heightTopRect = yPosTop - 70;
     const heightBottomRect = 320 - yPosBottom;
-    
+
     d3.select('#rect_' + cleanDimensionName)
         .attr('height', 240 - heightTopRect - heightBottomRect);
 
@@ -112,11 +116,13 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     updateLines(parcoords, active, d.name, cleanDimensionName);
 }
 
-export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any, 
-    parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; 
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, delta: any,  tooltipValuesTop: any, tooltipValuesDown: any, window: any):void {
-    
+export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any,
+    parcoords: {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
+        currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+    },
+    active: any, delta: any, tooltipValuesTop: any, tooltipValuesDown: any, window: any): void {
+
     let yPosTop: number;
     let yPosRect: number;
     let topToAdd: number;
@@ -126,9 +132,9 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
     const heightTopRect = yPosTopNew - 70;
     const heightBottomRect = 320 - yPosBottom;
-    
-    const rectHeight =  240 - heightTopRect - heightBottomRect;
-    
+
+    const rectHeight = 240 - heightTopRect - heightBottomRect;
+
     if (event.y + delta - 10 <= 70) {
         yPosTop = 70;
         topToAdd = 80;
@@ -159,23 +165,23 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         const dimensionName = d.name;
         const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
         const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
-        parcoords.yScales[dimensionName].domain()[0];
+            parcoords.yScales[dimensionName].domain()[0];
 
         const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-        parcoords.yScales[dimensionName].domain()[1];
+            parcoords.yScales[dimensionName].domain()[1];
 
         const range = maxValue - minValue;
 
         if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-            setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window, 
+            setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window,
                 true, yPosTop, yPosRect + rectHeight);
         }
 
         active.each(function (d) {
             const currentLine = getLineName(d);
 
-            let value : any;
-            if(invertStatus) {
+            let value: any;
+            if (invertStatus) {
                 value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
                     240 / range * (d[dimensionName] - minValue) + 80;
             }
@@ -185,7 +191,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
             }
 
             const dimNameToCheck = d3.select('.' + currentLine).text();
-            
+
             const emptyString = '';
             if (value < yPosRect || value > yPosRect + rectHeight) {
                 makeInactive(currentLine, dimensionName);
@@ -198,7 +204,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
                         checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
                     }
                 });
-                if(!checkedLines.includes(currentLine)) {
+                if (!checkedLines.includes(currentLine)) {
                     makeActive(currentLine);
                 }
             }
@@ -209,26 +215,28 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
     }
 }
 
-export function filter(dimensionName: any, topValue: any, bottomValue: any, parcoords: 
-    { xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; 
-    newFeatures: any; features: any[]; newDataset: any[];}): void {
+export function filter(dimensionName: any, topValue: any, bottomValue: any, parcoords:
+    {
+        xScales: any; yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
+        newFeatures: any; features: any[]; newDataset: any[];
+    }): void {
 
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
-    parcoords.yScales[dimensionName].domain()[0];
+        parcoords.yScales[dimensionName].domain()[0];
 
     const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-    parcoords.yScales[dimensionName].domain()[1];
+        parcoords.yScales[dimensionName].domain()[1];
 
     const range = maxValue - minValue;
 
     let topPosition: any;
     let bottomPosition: any;
-    if(invertStatus) {
+    if (invertStatus) {
         topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
-        240 / range * (topValue - minValue) + 80;
+            240 / range * (topValue - minValue) + 80;
         bottomPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](bottomValue) :
-        240 / range * (bottomValue - minValue) + 80;
+            240 / range * (bottomValue - minValue) + 80;
     }
     else {
         topPosition = isNaN(maxValue) ? parcoords.yScales[dimensionName](topValue) :
@@ -241,18 +249,18 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, 'bottom');
 
     const cleanDimensionName = helper.cleanString(dimensionName);
-    
+
     let rectHeight = bottomPosition - topPosition;
 
     d3.select('#rect_' + cleanDimensionName)
         .attr('y', topPosition);
     d3.select('#triangle_down_' + cleanDimensionName)
-        .attr('y', topPosition-10);
+        .attr('y', topPosition - 10);
     d3.select('#triangle_up_' + cleanDimensionName)
         .attr('y', bottomPosition);
     d3.select('#rect_' + cleanDimensionName)
         .attr('height', rectHeight);
-        
+
     let active = d3.select('g.active').selectAll('path');
     const emptyString = '';
 
@@ -261,8 +269,8 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         const selected = isSelected(currentLine);
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
-        let value : any;
-        if(invertStatus) {
+        let value: any;
+        if (invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
                 240 / range * (d[dimensionName] - minValue) + 80;
         }
@@ -270,7 +278,7 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
                 240 / range * (maxValue - d[dimensionName]) + 80;
         }
-            
+
         if (value < topPosition || value > bottomPosition) {
             makeInactive(currentLine, dimensionName);
             if (selected) {
@@ -283,15 +291,14 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
             parcoords.currentPosOfDims.forEach(function (item) {
                 checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
                 checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                
+
             });
-            if(!checkedLines.includes(currentLine)) {
+            if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
                 const index = selectionArray.indexOf(currentLine);
-                if (index != -1)
-                {
+                if (index != -1) {
                     setSelected(currentLine);
-                    selectionArray.splice(index,1);
+                    selectionArray.splice(index, 1);
                 }
             }
         }
@@ -303,26 +310,26 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
     addPosition(bottomPosition, currentPosOfDims, dimension, 'bottom');
 
     const cleanDimensionName = helper.cleanString(dimension);
-    
+
     let rectHeight = bottomPosition - topPosition;
 
     d3.select('#rect_' + cleanDimensionName)
         .attr('y', topPosition);
     d3.select('#triangle_down_' + cleanDimensionName)
-        .attr('y', topPosition-10);
+        .attr('y', topPosition - 10);
     d3.select('#triangle_up_' + cleanDimensionName)
         .attr('y', bottomPosition);
     d3.select('#rect_' + cleanDimensionName)
         .attr('height', rectHeight);
-        
+
 
     const invertStatus = getInvertStatus(dimension, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? parcoords.yScales[dimension].domain()[1] :
-    parcoords.yScales[dimension].domain()[0];
-    
+        parcoords.yScales[dimension].domain()[0];
+
     const minValue = invertStatus == false ? parcoords.yScales[dimension].domain()[0] :
-    parcoords.yScales[dimension].domain()[1];
-    
+        parcoords.yScales[dimension].domain()[1];
+
     const range = maxValue - minValue;
 
     let active = d3.select('g.active').selectAll('path');
@@ -331,8 +338,8 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
         const currentLine = getLineName(d);
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
-        let value : any;
-        if(invertStatus) {
+        let value: any;
+        if (invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimension](d[dimension]) :
                 240 / range * (d[dimension] - minValue) + 80;
         }
@@ -340,7 +347,7 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
             value = isNaN(maxValue) ? parcoords.yScales[dimension](d[dimension]) :
                 240 / range * (maxValue - d[dimension]) + 80;
         }
-            
+
         if (value < topPosition || value > bottomPosition) {
             makeInactive(currentLine, dimension);
         }
@@ -349,9 +356,9 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
             parcoords.currentPosOfDims.forEach(function (item) {
                 checkAllPositionsTop(item, dimension, parcoords, d, checkedLines, currentLine);
                 checkAllPositionsBottom(item, dimension, parcoords, d, checkedLines, currentLine);
-                
+
             });
-            if(!checkedLines.includes(currentLine)) {
+            if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
             }
         }
@@ -359,13 +366,13 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
 }
 
 
-function getLineName(d: any):string {
+function getLineName(d: any): string {
     const keys = Object.keys(d);
     const key = keys[0];
     return helper.cleanLinePathString(d[key]);
 }
 
-export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: any, key: any):void {
+export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: any, key: any): void {
     let newObject = {};
     newObject[key] = yPosTop;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
@@ -374,7 +381,7 @@ export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: 
 
 function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
     window: any, direction: any): void {
-    
+
     const range = parcoords.yScales[d.name].domain();
     const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? range[1] : range[0];
@@ -384,12 +391,12 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
 
     let tooltipValue: any;
     if (invertStatus) {
-        tooltipValue = direction == true ? ((event.y - 70)/(240/(scale)) + minValue) :
-        ((event.y - 80)/(240/(scale)) + minValue);
+        tooltipValue = direction == true ? ((event.y - 70) / (240 / (scale)) + minValue) :
+            ((event.y - 80) / (240 / (scale)) + minValue);
     }
     else {
-        tooltipValue = direction == true ? maxValue - ((event.y - 70)/(240/(scale))) :
-            maxValue - ((event.y - 80)/(240/(scale)));
+        tooltipValue = direction == true ? maxValue - ((event.y - 70) / (240 / (scale))) :
+            maxValue - ((event.y - 80) / (240 / (scale)));
     }
 
     if (!invertStatus) {
@@ -408,11 +415,11 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
             tooltipValue = range[1];
         }
     }
-    
+
     const digs = getSigDig(d.name, parcoords.currentPosOfDims);
-    tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB')*10)/10);
+    tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB') * 10) / 10);
     tooltipValues.style('visibility', 'visible');
-    tooltipValues.style('top', window.event.clientY/16 + 'rem').style('left', window.event.clientX/16 + 'rem');
+    tooltipValues.style('top', window.event.clientY / 16 + 'rem').style('left', window.event.clientX / 16 + 'rem');
     tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -421,7 +428,7 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
 
 function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d: any, parcoords: any,
     window: any, direction: any, yPosTop, yPosBottom): void {
-    
+
     const range = parcoords.yScales[d.name].domain();
     const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
     const maxValue = invertStatus == false ? range[1] : range[0];
@@ -432,49 +439,51 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d
     let tooltipValueTop: any;
     let tooltipValueBottom: any;
     if (invertStatus) {
-        tooltipValueTop = direction == true ? ((yPosTop - 70)/(240/(scale)) + minValue) :
-        ((yPosTop - 80)/(240/(scale)) + minValue);
-        tooltipValueBottom = direction == true ? ((yPosBottom - 80)/(240/(scale)) + minValue) :
-        ((yPosBottom - 70)/(240/(scale)) + minValue);
+        tooltipValueTop = direction == true ? ((yPosTop - 70) / (240 / (scale)) + minValue) :
+            ((yPosTop - 80) / (240 / (scale)) + minValue);
+        tooltipValueBottom = direction == true ? ((yPosBottom - 80) / (240 / (scale)) + minValue) :
+            ((yPosBottom - 70) / (240 / (scale)) + minValue);
     }
     else {
-        tooltipValueTop = direction == true ? maxValue - ((yPosTop - 70)/(240/(scale))) :
-            maxValue - ((yPosTop - 80)/(240/(scale)));
-        tooltipValueBottom = direction == true ? maxValue - ((yPosBottom - 80)/(240/(scale))) :
-            maxValue - ((yPosBottom - 70)/(240/(scale)));
+        tooltipValueTop = direction == true ? maxValue - ((yPosTop - 70) / (240 / (scale))) :
+            maxValue - ((yPosTop - 80) / (240 / (scale)));
+        tooltipValueBottom = direction == true ? maxValue - ((yPosBottom - 80) / (240 / (scale))) :
+            maxValue - ((yPosBottom - 70) / (240 / (scale)));
     }
 
     if ((!invertStatus && tooltipValueTop == maxValue) || (invertStatus && tooltipValueTop == minValue)) {
         tooltipValuesTop.style('visibility', 'hidden');
     }
     else {
-    tooltipValuesTop.text(Math.round(tooltipValueTop));
-    tooltipValuesTop.style('visibility', 'visible');
-    tooltipValuesTop.style('top', (Number(yPosTop+150)/16) + 'rem').style('left', window.event.clientX/16 + 'rem');
-    tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+        tooltipValuesTop.text(Math.round(tooltipValueTop));
+        tooltipValuesTop.style('visibility', 'visible');
+        tooltipValuesTop.style('top', (Number(yPosTop + 150) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
+        tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
     }
 
     if ((!invertStatus && tooltipValueBottom == minValue) || (invertStatus && tooltipValueBottom == maxValue)) {
         tooltipValuesDown.style('visibility', 'hidden');
     }
     else {
-    tooltipValuesDown.text(Math.round(tooltipValueBottom));
-    tooltipValuesDown.style('visibility', 'visible');
-    tooltipValuesDown.style('top', (Number(yPosBottom+155)/16) + 'rem').style('left', window.event.clientX/16 + 'rem');
-    tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
+        tooltipValuesDown.text(Math.round(tooltipValueBottom));
+        tooltipValuesDown.style('visibility', 'visible');
+        tooltipValuesDown.style('top', (Number(yPosBottom + 155) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
+        tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
+            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
+            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
     }
 }
 
-function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, 
-    active: any, dimensionName: any, cleanDimensionName: any):void {
-    
+function updateLines(parcoords: {
+    xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+},
+    active: any, dimensionName: any, cleanDimensionName: any): void {
+
     const rangeTop = Number(d3.select('#triangle_down_' + cleanDimensionName).attr('y'));
     const rangeBottom = Number(d3.select('#triangle_up_' + cleanDimensionName).attr('y'));
 
@@ -483,15 +492,15 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         parcoords.yScales[dimensionName].domain()[0];
 
     const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-    parcoords.yScales[dimensionName].domain()[1];
+        parcoords.yScales[dimensionName].domain()[1];
 
     const range = maxValue - minValue;
-    
+
     active.each(function (d) {
-        let value : any;
-        if(invertStatus) {
+        let value: any;
+        if (invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-            240 / range * (d[dimensionName] - minValue) + 80;
+                240 / range * (d[dimensionName] - minValue) + 80;
         }
         else {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
@@ -503,54 +512,50 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
         const emptyString = '';
-       
+
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
-                if(isSelected(currentLine))
-                {
+                if (isSelected(currentLine)) {
                     setUnselected(currentLine);
                     selectionArray.push(currentLine);
-                } 
+                }
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
-                if(isSelected(currentLine))
-                {
+                if (isSelected(currentLine)) {
                     setUnselected(currentLine);
                     selectionArray.push(currentLine);
-                } 
+                }
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
                 makeInactive(currentLine, dimensionName);
-                if(isSelected(currentLine))
-                {
+                if (isSelected(currentLine)) {
                     setUnselected(currentLine);
                     selectionArray.push(currentLine);
-                } 
+                }
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
             let checkedLines = [];
             parcoords.currentPosOfDims.forEach(function (item) {
-                if(item.top != 80 || item.bottom != 320) {
-                    checkAllPositionsTop(item, dimensionName, parcoords, d, 
+                if (item.top != 80 || item.bottom != 320) {
+                    checkAllPositionsTop(item, dimensionName, parcoords, d,
                         checkedLines, currentLine);
-                    checkAllPositionsBottom(item, dimensionName, parcoords, d, 
+                    checkAllPositionsBottom(item, dimensionName, parcoords, d,
                         checkedLines, currentLine);
                 }
             });
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
                 const index = selectionArray.indexOf(currentLine);
-                if (index != -1)
-                {
+                if (index != -1) {
                     setSelected(currentLine);
-                    selectionArray.splice(index,1);
+                    selectionArray.splice(index, 1);
                 }
             }
         }
@@ -560,77 +565,81 @@ function updateLines(parcoords: { xScales: any; yScales: {}; dragging: {}; dragP
     });
 }
 
-function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
-    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[];}, d: any, checkedLines: any[], 
-    currentLine: any):void {
-    
-        if (positionItem.key != dimensionName && positionItem.top != 70) {
-        
-            const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
-            const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
-                parcoords.yScales[positionItem.key].domain()[0];
+function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: {
+    xScales: any;
+    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any;
+    features: any[]; newDataset: any[];
+}, d: any, checkedLines: any[],
+    currentLine: any): void {
 
-            const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
-                parcoords.yScales[positionItem.key].domain()[1];
+    if (positionItem.key != dimensionName && positionItem.top != 70) {
 
-            const scale = maxValue - minValue;
+        const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
+        const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
+            parcoords.yScales[positionItem.key].domain()[0];
 
-            let value: any;
-            if (!isNaN(maxValue)) {
+        const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
+            parcoords.yScales[positionItem.key].domain()[1];
+
+        const scale = maxValue - minValue;
+
+        let value: any;
+        if (!isNaN(maxValue)) {
             value = invertStatus == false ? 240 / scale * (maxValue - d[positionItem.key]) + 80 :
                 240 / scale * (d[positionItem.key] - minValue) + 80;
-            }
-            else {
-                value = parcoords.yScales[positionItem.key](d[positionItem.key])
-            }
-
-            if (value < positionItem.top) {
-                checkedLines.push(currentLine);
-                d3.select('.' + currentLine).text(positionItem.key);
-            }
-            else {
-                //makeActive(currentLine);
-            }
         }
+        else {
+            value = parcoords.yScales[positionItem.key](d[positionItem.key])
+        }
+
+        if (value < positionItem.top) {
+            checkedLines.push(currentLine);
+            d3.select('.' + currentLine).text(positionItem.key);
+        }
+        else {
+            //makeActive(currentLine);
+        }
+    }
 }
 
-function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoords: { xScales: any; 
-    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; 
-    features: any[]; newDataset: any[];}, d: any, checkedLines: any[], 
-    currentLine: any):void {
-    
-        if (positionItem.key != dimensionName && positionItem.bottom != 320) {
-            
-            const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
-            const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
-                parcoords.yScales[positionItem.key].domain()[0];
+function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoords: {
+    xScales: any;
+    yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any;
+    features: any[]; newDataset: any[];
+}, d: any, checkedLines: any[],
+    currentLine: any): void {
 
-            const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
-                parcoords.yScales[positionItem.key].domain()[1];
+    if (positionItem.key != dimensionName && positionItem.bottom != 320) {
 
-            const scale = maxValue - minValue;
+        const invertStatus = getInvertStatus(positionItem.key, parcoords.currentPosOfDims);
+        const maxValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[1] :
+            parcoords.yScales[positionItem.key].domain()[0];
 
-            let value: any;
-            if (!isNaN(maxValue)) {
+        const minValue = invertStatus == false ? parcoords.yScales[positionItem.key].domain()[0] :
+            parcoords.yScales[positionItem.key].domain()[1];
+
+        const scale = maxValue - minValue;
+
+        let value: any;
+        if (!isNaN(maxValue)) {
             value = invertStatus == false ? 240 / scale * (maxValue - d[positionItem.key]) + 80 :
                 240 / scale * (d[positionItem.key] - minValue) + 80;
-            }
-            else {
-                value = parcoords.yScales[positionItem.key](d[positionItem.key])
-            }
-
-            if (value >= positionItem.bottom) {
-                checkedLines.push(currentLine);
-                d3.select('.' + currentLine).text(positionItem.key);
-            }
-            else {
-                //makeActive(currentLine);
-            }
         }
+        else {
+            value = parcoords.yScales[positionItem.key](d[positionItem.key])
+        }
+
+        if (value >= positionItem.bottom) {
+            checkedLines.push(currentLine);
+            d3.select('.' + currentLine).text(positionItem.key);
+        }
+        else {
+            //makeActive(currentLine);
+        }
+    }
 }
 
-function makeActive(currentLineName: any):void {
+function makeActive(currentLineName: any): void {
     d3.select('.' + currentLineName).style('opacity', '0.7')
         .style('pointer-events', 'stroke')
         .style('stroke', 'rgb(0, 129, 175)')
@@ -639,7 +648,7 @@ function makeActive(currentLineName: any):void {
         .text('');
 }
 
-function makeInactive(currentLineName: any, dimensionName: any):void {
+function makeInactive(currentLineName: any, dimensionName: any): void {
     d3.select('.' + currentLineName).style('pointer-events', 'none')
         .style('fill', 'none')
         .style('stroke', 'lightgrey')
@@ -647,7 +656,7 @@ function makeInactive(currentLineName: any, dimensionName: any):void {
         .text(dimensionName);
 }
 
-export function addSettingsForBrushing(dimensionName: any, parcoords: any):void {
+export function addSettingsForBrushing(dimensionName: any, parcoords: any): void {
     const processedDimensionName = helper.cleanString(dimensionName);
     const rectHeight = Number(d3.select('#rect_' + processedDimensionName).node().getBoundingClientRect().height);
     const yPosRectTop = Number(d3.select('#rect_' + processedDimensionName).attr('y'));
@@ -679,7 +688,7 @@ export function addSettingsForBrushing(dimensionName: any, parcoords: any):void 
     }
 }
 
-function getInvertStatus(key: any, currentPosOfDims: any):boolean {
+function getInvertStatus(key: any, currentPosOfDims: any): boolean {
     const item = currentPosOfDims.find((object) => object.key == key);
     return item.isInverted;
 }
@@ -689,7 +698,7 @@ function getSigDig(key: any, currentPosOfDims: any): number {
     return item.sigDig;
 }
 
-export function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any):void {
+export function addInvertStatus(status: any, currentPosOfDims: any, dimensionName: any, key: any): void {
     let newObject = {};
     newObject[key] = status;
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);

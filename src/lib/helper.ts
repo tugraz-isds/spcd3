@@ -24,7 +24,7 @@ export function setupYScales(height: any, padding: any, features: any, newDatase
         const values = newDataset.map(o => o[x.name]);
         let labels = [];
         if (isNaN(values[0]) !== false) {
-            values.forEach(function(element) {
+            values.forEach(function (element) {
                 labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
             });
             yScales[x.name] = scale.scalePoint()
@@ -49,8 +49,8 @@ export function setupXScales(width: any, padding: any, features: any): any {
         .range([width - padding, padding]);
 }
 
-export function setupYAxis(features :any[], yScales: any, newDataset: any): any {
-    
+export function setupYAxis(features: any[], yScales: any, newDataset: any): any {
+
     const limit = 30;
     let counter = 0;
     let yAxis = {};
@@ -59,18 +59,17 @@ export function setupYAxis(features :any[], yScales: any, newDataset: any): any 
         let tempFeatures = Array.from(features.values()).map(c => c.name);
         let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
         let labels = [];
-        tempValues.forEach(function(element) {
+        tempValues.forEach(function (element) {
             labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
         });
         counter = counter + 1;
 
-        if(isNaN(labels[0])) {
-            let uniqueArray = labels.filter(function(item, index, self) {
+        if (isNaN(labels[0])) {
+            let uniqueArray = labels.filter(function (item, index, self) {
                 return index === self.indexOf(item);
             })
-            if(uniqueArray.length > limit)
-            {
-                let filteredArray = labels.filter(function(value, index, array) {
+            if (uniqueArray.length > limit) {
+                let filteredArray = labels.filter(function (value, index, array) {
                     return index % 4 == 0;
                 });
                 yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
@@ -81,13 +80,13 @@ export function setupYAxis(features :any[], yScales: any, newDataset: any): any 
         }
         else {
             let ranges = yScales[key[0]].ticks(5).concat(yScales[key[0]].domain());
-            let sortRanges = ranges.sort(function(a,b){return a-b});
+            let sortRanges = ranges.sort(function (a, b) { return a - b });
             let uniqueRanges = [...new Set(sortRanges)];
             if (Number(uniqueRanges[1]) - 5 < Number(uniqueRanges[0])) {
-                uniqueRanges.splice(1,1);
+                uniqueRanges.splice(1, 1);
             }
-            if (Number(uniqueRanges[uniqueRanges.length-1]) - 5 < Number(uniqueRanges[uniqueRanges.length-2])) {
-                uniqueRanges.splice(uniqueRanges.length-2,1);
+            if (Number(uniqueRanges[uniqueRanges.length - 1]) - 5 < Number(uniqueRanges[uniqueRanges.length - 2])) {
+                uniqueRanges.splice(uniqueRanges.length - 2, 1);
             }
             yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(uniqueRanges);
         }
@@ -153,8 +152,8 @@ export function createToolTipForValues(recordData): void {
                     240 / range * (maxValue - recordData[dimension]) + 80;
             }
 
-            const x = (rectLeft + (counter * 95))/16;
-            const y = (value + 140)/16;
+            const x = (rectLeft + (counter * 95)) / 16;
+            const y = (value + 140) / 16;
 
             tooltipValues.text(recordData[dimension].toString())
                 .style('visibility', 'visible')
@@ -193,7 +192,7 @@ export function createTooltipForPathLine(tooltipText: any, tooltipPath: any, eve
         tempText = tempText.split(',').join('\r\n');
         tooltipPath.text(tempText);
         tooltipPath.style('visibility', 'visible');
-        tooltipPath.style('top', event.clientY/16 + 'rem').style('left', event.clientX/16 + 'rem');
+        tooltipPath.style('top', event.clientY / 16 + 'rem').style('left', event.clientX / 16 + 'rem');
         tooltipPath.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -207,11 +206,11 @@ export function trans(g: any): any {
 }
 
 export function position(dimensionName: any, dragging: any, xScales: any): any {
-    const value = dragging[dimensionName];  
+    const value = dragging[dimensionName];
     return value == null ? xScales(dimensionName) : value;
 }
 
-export function cleanTooltip(){
-	d3.selectAll(".tooltip")
-    	.remove();
+export function cleanTooltip() {
+    d3.selectAll(".tooltip")
+        .remove();
 }
