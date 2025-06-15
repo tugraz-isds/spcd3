@@ -634,17 +634,15 @@ function createButton(modal: any, id: string) {
 }
 
 function createCloseButton(modal: any, id: string) {
-    let closeButton = document.createElement('a');
-    closeButton.textContent = 'x';
+    const closeButton = document.createElement('span');
     closeButton.id = id;
+    closeButton.innerHTML = '&times;';
     closeButton.style.position = 'absolute';
-    closeButton.style.right = '-1rem';
-    closeButton.style.top = '0.5rem';
-    closeButton.style.width = '2.5rem';
-    closeButton.style.height = '2.5rem';
-    closeButton.style.opacity = '0.3';
-    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.top = '0.625rem';
+    closeButton.style.right = '0.938rem';
     closeButton.style.cursor = 'pointer';
+    closeButton.style.fontWeight = 'bold';
+    closeButton.style.fontSize = '1.25rem';
     modal.append(() => closeButton);
 }
 

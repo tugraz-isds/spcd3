@@ -744,14 +744,157 @@ export function drawChart(content: any): void {
         }
     }
 
-    window.svg = d3.select('#parallelcoords')
-        .append('button')
-        .attr('id', 'refreshButton')
-        .html(icon.getRefreshIcon())
-        .on('click', refresh);
+    const toolbar = document.createElement('div');
+    toolbar.style.display = 'flex';
+    toolbar.style.gap = '0.5rem';
+    toolbar.style.marginTop = '1rem';
+    toolbar.style.marginBottom = '1rem';
+    toolbar.style.marginLeft = '1rem';
+    toolbar.style.alignItems = 'center';
+
+    const refreshButton = document.createElement('button');
+    refreshButton.id = 'refreshButton';
+    refreshButton.innerHTML = icon.getRefreshIcon();
+    refreshButton.addEventListener('click', refresh);
+
+    const showDataButton = document.createElement('button');
+    showDataButton.id = 'showData';
+    showDataButton.textContent = 'Show';
+    showDataButton.addEventListener('click', showModalWithData);
+
+    toolbar.appendChild(refreshButton);
+    toolbar.appendChild(showDataButton);
+    const parent = d3.select('#parallelcoords').node().parentNode;
+    parent.insertBefore(toolbar, document.getElementById('parallelcoords'));
 }
 
-export function refresh() {
+function showModalWithData() {
+
+    const modal = d3.select('#parallelcoords')
+        .append('div')
+        .attr('id', 'myModal')
+        .style('top', 0)
+        .style('left', 0)
+        .style('position', 'absolute')
+        .style('margin', '4.688rem')
+        .style('background', 'white')
+        .style('padding', '1rem')
+        .style('box-shadow', '0 0 10px rgba(0, 0, 0, 0.3)')
+        .style('max-height', '80vh')
+        .style('max-width', '90vw')
+        .style('overflow', 'auto')
+        .style('z-index', '1000')
+        .style('display', 'block');
+
+    const saveAsCSV = document.createElement('button');
+    saveAsCSV.id = 'saveAsCsv';
+    saveAsCSV.textContent = 'Save as CSV';
+    modal.append(() => saveAsCSV);
+
+    saveAsCSV.addEventListener('click', () => {
+        const reservedArray = window.parcoords.newDataset.map(entry => {
+            const entries = Object.entries(entry).reverse();
+            return Object.fromEntries(entries);
+        });
+        downloadCSV(reservedArray);
+    });
+
+    const closeButton = document.createElement('span');
+    closeButton.innerHTML = '&times;';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '0.625rem';
+    closeButton.style.right = '0.938rem';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontWeight = 'bold';
+    closeButton.style.fontSize = '1.25rem';
+    modal.append(() => closeButton);
+
+    const tableContainer = document.createElement('table');
+    tableContainer.style.width = '100%';
+    tableContainer.style.marginTop = '3.125rem';
+    tableContainer.style.borderCollapse = 'collapse';
+
+    tableContainer.style.display = 'block';
+    tableContainer.style.overflowX = 'auto';
+    tableContainer.style.whiteSpace = 'nowrap';
+    modal.append(() => tableContainer);
+
+    generateTable(window.parcoords.newDataset, tableContainer);
+
+    closeButton.addEventListener('click', () => {
+        modal.style('display', 'none');
+    });
+}
+
+function generateTable(dataArray, table) {
+    table.innerHTML = '';
+    const reservedArray = dataArray.map(entry => {
+        const entries = Object.entries(entry).reverse();
+        return Object.fromEntries(entries);
+    });
+    const headers = Object.keys(reservedArray[0]);
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.innerText = header.charAt(0).toUpperCase() + header.slice(1);
+        th.style.border = '0.063rem solid #ddd';
+        th.style.padding = '0.5rem';
+        th.style.backgroundColor = 'rgba(255, 255, 0, 0.4)';
+        headRow.appendChild(th);
+    });
+
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    reservedArray.forEach(obj => {
+        const row = document.createElement('tr');
+        headers.forEach(key => {
+            const td = document.createElement('td');
+            td.innerText = obj[key];
+            td.style.border = '0.063rem solid #ddd';
+            td.style.padding = '0.5rem';
+            row.appendChild(td);
+        });
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+}
+
+function downloadCSV(dataArray, filename = 'data.csv') {
+    if (!dataArray || !dataArray.length) return;
+
+    const keys = Object.keys(dataArray[0]);
+
+    const csvRows = [];
+
+    csvRows.push(keys.join(','));
+
+    dataArray.forEach(row => {
+        const values = keys.map(k => {
+            const value = row[k];
+            return typeof value === 'string' && value.includes(',')
+                ? `"${value}"`
+                : value;
+        });
+        csvRows.push(values.join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function refresh() {
     drawChart(window.refreshData);
 }
 
@@ -762,6 +905,7 @@ export function deleteChart(): void {
     d3.select('#popupFilter').remove();
     d3.select('#popupRange').remove();
     d3.select('#refreshButton').remove();
+    d3.select('#showData').remove();
 }
 
 function selectionWithRectangle(): void {
