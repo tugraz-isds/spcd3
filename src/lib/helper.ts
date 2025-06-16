@@ -186,20 +186,19 @@ export function getAllPointerEventsData(event: any, hoverlabel: string): any {
     return data;
 }
 
-export function createTooltipForPathLine(tooltipText: any, tooltipPath: any, event: any): any {
-    if (tooltipText.length !== 0) {
-        let tempText = tooltipText.toString();
+export function createTooltipForPathLine(tooltipText, tooltipPath, event) {
+    if (!tooltipText || tooltipText.length === 0) return;
+
+    let tempText = tooltipText.toString();
         tempText = tempText.split(',').join('\r\n');
-        tooltipPath.text(tempText);
-        tooltipPath.style('visibility', 'visible');
-        tooltipPath.style('top', event.clientY / 16 + 'rem').style('left', event.clientX / 16 + 'rem');
-        tooltipPath.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-            .style('background-color', 'lightgrey').style('margin-left', 0.5 + 'rem');
-        return tooltipPath;
-    }
+        tooltipPath.text(tempText)
+        .style('visibility', 'visible')
+        .style('top', `${event.pageY + 10}px`)
+        .style('left', `${event.pageX + 10}px`);
+
+    return tooltipPath;
 }
+
 
 export function trans(g: any): any {
     return g.transition().duration(50);

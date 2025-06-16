@@ -1227,9 +1227,8 @@ export function createSvgString(): any {
     return svg.node().outerHTML;
 }
 
-const tooltipPath = d3.select('body')
+const tooltipPath = d3.select('#parallelcoords')
     .append('div')
-    .attr('class', 'tooltip-div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
     .style('pointer-events', 'none')
@@ -1240,9 +1239,22 @@ const tooltipPath = d3.select('body')
     .style('font-size', '0.75rem')
     .style('z-index', '1000');
 
+const tooltipTest = d3.select('#parallelcoords')
+    .append('div')
+    .attr('id', 'tooltipTest')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden')
+    .style('pointer-events', 'none')
+    .style('background', 'lightgrey')
+    .style('padding', '0.2rem')
+    .style('border', '1px solid gray')
+    .style('border-radius', '0.2rem')
+    .style('white-space', 'pre-line')
+    .style('font-size', '0.75rem')
+    .style('z-index', '1000');
+
 let delay = null;
 let cleanupTimeout = null;
-let selectedPath = null;
 
 const clearExistingDelay = () => {
     if (delay) {
@@ -1253,63 +1265,46 @@ const clearExistingDelay = () => {
 
 const handlePointerEnter = (event, d) => {
     clearExistingDelay();
+    doNotHighlight();
 
     const data = helper.getAllPointerEventsData(event, window.hoverlabel);
     window.hoverdata = [...data];
 
-    selectedPath = highlight(data);
-    helper.createTooltipForPathLine(data, tooltipPath, event);
+    highlight(data);
+    helper.createTooltipForPathLine(data, tooltipTest, event);
 
     const datasetMap = new Map();
     parcoords.newDataset.forEach((record) => {
-        const recordData = record[window.hoverlabel];
-        datasetMap.set(recordData, record);
+        datasetMap.set(record[window.hoverlabel], record);
     });
-
-    let combinedHTML = '';
 
     data.forEach((item) => {
         const matchingRecord = datasetMap.get(item);
         if (matchingRecord) {
-            const htmlPart = helper.createToolTipForValues(matchingRecord);
-            combinedHTML += `<div style="margin-bottom: 0.25rem;">${htmlPart}</div>`;
+            helper.createToolTipForValues(matchingRecord);
         }
     });
-
-    if (combinedHTML) {
-        tooltipPath
-            .html(combinedHTML)
-            .style('visibility', 'visible')
-            .style('top', `${event.pageY + 0.625}rem`)
-            .style('left', `${event.pageX + 0.625}rem`);
-    }
 };
 
+
 const handlePointerLeaveOrOut = () => {
-    doNotHighlight(selectedPath);
+    doNotHighlight();
     clearExistingDelay();
     tooltipPath.style('visibility', 'hidden');
+    d3.select('#tooltipTest').style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
-d3.select('#parallelcoords')
-    .on('mouseleave', () => {
-        if (cleanupTimeout) clearTimeout(cleanupTimeout);
-
-        cleanupTimeout = setTimeout(() => {
-            doNotHighlight(selectedPath);
-            clearExistingDelay();
-            tooltipPath.style('visibility', 'hidden');
-            helper.cleanTooltip();
-        }, 100);
-    });
-
-d3.select('#parallelcoords')
-    .on('mousemove', (event) => {
-        tooltipPath
-            .style('top', `${event.pageY + 0.625}rem`)
-            .style('left', `${event.pageX + 0.625}rem`);
-    });
+d3.select('#parallelcoords').on('mouseleave', () => {
+    if (cleanupTimeout) clearTimeout(cleanupTimeout);
+    cleanupTimeout = setTimeout(() => {
+        doNotHighlight();
+        clearExistingDelay();
+        tooltipPath.style('visibility', 'hidden');
+        d3.select('#tooltipTest').style('visibility', 'hidden');
+        helper.cleanTooltip();
+    }, 100);
+});
 
 document.addEventListener('mousemove', (e) => {
     const chartBounds = document.querySelector('#parallelcoords').getBoundingClientRect();
@@ -1567,62 +1562,49 @@ function setDefsForIcons(): void {
 
 // Hovering
 
-function highlight(data: any): any {
-    let selectedPath = '';
-    const dataWoSpecialC = data.map(item => item.replace(/[.,]/g, ''));
+let currentlyHighlightedItems = [];
 
-    if (dataWoSpecialC.length !== 0) {
-        let tempText = dataWoSpecialC.join(',').replace(/,/g, ',.');
-        tempText = utils.cleanLinePathArrayString(tempText);
-        selectedPath = tempText;
+function highlight(data) {
+    const cleanedItems = data.map(item => item.replace(/[.,]/g, ''));
+    currentlyHighlightedItems = [...cleanedItems];
 
-        const newTempText = dataWoSpecialC.map((item) => {
-            let cleanedItem = item.replace(/,./g, '');
-            if (isSelected(item)) {
-                setUnselected(item);
-                window.hoverSelected = window.hoverSelected || [];
-                window.hoverSelected.push(item);
-            }
-            return cleanedItem;
-        });
-
-        selectedPath = newTempText.join(',.');
-
-        if (selectedPath) {
-            d3.selectAll('.' + selectedPath)
-                .transition().duration(5)
-                .style('opacity', '0.7')
-                .style('stroke', 'rgb(200, 28, 38)');
+    cleanedItems.forEach(item => {
+        if (isSelected(item)) {
+            setUnselected(item);
+            window.hoverSelected = window.hoverSelected || [];
+            window.hoverSelected.push(item);
         }
-    }
 
-    return selectedPath;
+        d3.selectAll('.' + item)
+            .transition()
+            .duration(5)
+            .style('opacity', '0.7')
+            .style('stroke', 'rgb(200, 28, 38)');
+    });
+
+    return cleanedItems;
 }
 
-function doNotHighlight(selectedPath: any): void {
-    if (selectedPath !== '') {
-        const tempText = selectedPath.split(',.');
-        const newTempText = [];
+function doNotHighlight() {
+    if (!currentlyHighlightedItems.length) return;
 
-        tempText.forEach(item => {
-            newTempText.push(item);
-            if (window.hoverSelected && window.hoverSelected.includes(item)) {
-                setSelected(item);
-                const index = window.hoverSelected.indexOf(item);
-                window.hoverSelected.splice(index, 1);
-            }
-        });
+    currentlyHighlightedItems.forEach(item => {
+        d3.selectAll('.' + item)
+            .transition()
+            .style('opacity', '0.7')
+            .style('stroke', 'rgb(0, 129, 175)');
 
-        selectedPath = newTempText.join(',.');
-
-        if (selectedPath) {
-            d3.selectAll('.' + selectedPath)
-                .transition()
-                .style('opacity', '0.7')
-                .style('stroke', 'rgb(0, 129, 175)');
+        if (window.hoverSelected?.includes(item)) {
+            setSelected(item);
+            const index = window.hoverSelected.indexOf(item);
+            if (index > -1) window.hoverSelected.splice(index, 1);
         }
-    }
+    });
+
+    currentlyHighlightedItems = [];
 }
+
+
 
 // Selecting
 
