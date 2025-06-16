@@ -694,7 +694,8 @@ export function drawChart(content: any): void {
         .append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [-10, 0, window.width, height])
-        .attr('font-family', 'Verdana, sans-serif');
+        .attr('font-family', 'Verdana, sans-serif')
+        .attr('user-select', 'none');
 
     setDefsForIcons();
 
@@ -737,18 +738,19 @@ export function drawChart(content: any): void {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
         if (!event.target.id.includes('Filter')) {
-            d3.select('#popupFilter').style('display', 'none');
+            d3.select('#modalFilter').style('display', 'none');
         }
         if (!event.target.id.includes('Range')) {
-            d3.select('#popupRange').style('display', 'none');
+            d3.select('#modalSetRange').style('display', 'none');
         }
+        d3.select('#dataModal').style('display', 'none');
     }
 
     const toolbar = document.createElement('div');
+    toolbar.id = 'toolbar';
     toolbar.style.display = 'flex';
-    toolbar.style.gap = '0.5rem';
+    toolbar.style.gap = '0.3rem';
     toolbar.style.marginTop = '1rem';
-    toolbar.style.marginBottom = '1rem';
     toolbar.style.marginLeft = '1rem';
     toolbar.style.alignItems = 'center';
 
@@ -759,7 +761,7 @@ export function drawChart(content: any): void {
 
     const showDataButton = document.createElement('button');
     showDataButton.id = 'showData';
-    showDataButton.textContent = 'Show';
+    showDataButton.innerHTML = icon.getTableIcon();
     showDataButton.addEventListener('click', showModalWithData);
 
     toolbar.appendChild(refreshButton);
@@ -772,14 +774,14 @@ function showModalWithData() {
 
     const modal = d3.select('#parallelcoords')
         .append('div')
-        .attr('id', 'myModal')
+        .attr('id', 'dataModal')
         .style('top', 0)
         .style('left', 0)
         .style('position', 'absolute')
         .style('margin', '4.688rem')
         .style('background', 'white')
         .style('padding', '1rem')
-        .style('box-shadow', '0 0 10px rgba(0, 0, 0, 0.3)')
+        .style('box-shadow', '0 0 0.625rem rgba(0, 0, 0, 0.3)')
         .style('max-height', '80vh')
         .style('max-width', '90vw')
         .style('overflow', 'auto')
@@ -809,15 +811,19 @@ function showModalWithData() {
     closeButton.style.fontSize = '1.25rem';
     modal.append(() => closeButton);
 
+    const scrollWrapper = document.createElement('div');
+    scrollWrapper.style.maxHeight = '60vh';
+    scrollWrapper.style.overflow = 'auto';
+    scrollWrapper.style.border = '0.063rem solid #ccc';
+    scrollWrapper.style.marginTop = '3.125rem';
+
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
-    tableContainer.style.marginTop = '3.125rem';
     tableContainer.style.borderCollapse = 'collapse';
-
-    tableContainer.style.display = 'block';
-    tableContainer.style.overflowX = 'auto';
     tableContainer.style.whiteSpace = 'nowrap';
-    modal.append(() => tableContainer);
+
+    scrollWrapper.appendChild(tableContainer);
+    modal.append(() => scrollWrapper);
 
     generateTable(window.parcoords.newDataset, tableContainer);
 
@@ -828,10 +834,14 @@ function showModalWithData() {
 
 function generateTable(dataArray, table) {
     table.innerHTML = '';
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+
     const reservedArray = dataArray.map(entry => {
         const entries = Object.entries(entry).reverse();
         return Object.fromEntries(entries);
     });
+
     const headers = Object.keys(reservedArray[0]);
     const thead = document.createElement('thead');
     const headRow = document.createElement('tr');
@@ -841,7 +851,10 @@ function generateTable(dataArray, table) {
         th.innerText = header.charAt(0).toUpperCase() + header.slice(1);
         th.style.border = '0.063rem solid #ddd';
         th.style.padding = '0.5rem';
-        th.style.backgroundColor = 'rgba(255, 255, 0, 0.4)';
+        th.style.backgroundColor = 'rgb(232, 232, 158)';
+        th.style.position = 'sticky';
+        th.style.top = '0';
+        th.style.zIndex = '1';
         headRow.appendChild(th);
     });
 
@@ -902,10 +915,11 @@ export function deleteChart(): void {
     d3.select('#pc_svg').remove();
     d3.select('#contextmenu').remove();
     d3.select('#contextmenuRecords').remove();
-    d3.select('#popupFilter').remove();
-    d3.select('#popupRange').remove();
+    d3.select('#modalFilter').remove();
+    d3.select('#modalRange').remove();
     d3.select('#refreshButton').remove();
     d3.select('#showData').remove();
+    d3.select('#toolbar').remove();
 }
 
 function selectionWithRectangle(): void {
@@ -922,6 +936,7 @@ function selectionWithRectangle(): void {
     let startY;
 
     svg.on('mousedown', function (event) {
+        event.preventDefault();
         isSelecting = true;
         const [x, y] = d3.pointer(event);
         startX = x;
@@ -1166,13 +1181,9 @@ function redrawChart(content: any, newFeatures: any): void {
 }
 
 export function createSvgString(): any {
-    //setUpParcoordData(window.parcoords.data, window.parcoords.newFeatures);
-
-
     let height = 360;
     let width = window.parcoords.newFeatures.length * 100;
 
-    let xScalesForDownload = helper.setupXScales(width, window.padding, parcoords.features);
     let yScalesForDownload = helper.setupYScales(400, window.padding, window.parcoords.features, window.parcoords.newDataset);
     let yAxisForDownload = helper.setupYAxis(window.parcoords.features, yScalesForDownload, window.parcoords.newDataset);
 
@@ -1216,9 +1227,22 @@ export function createSvgString(): any {
     return svg.node().outerHTML;
 }
 
+const tooltipPath = d3.select('body')
+    .append('div')
+    .attr('class', 'tooltip-div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden')
+    .style('pointer-events', 'none')
+    .style('background', 'rgba(0,0,0,0.8)')
+    .style('color', '#fff')
+    .style('padding', '0.5rem')
+    .style('border-radius', '0.25rem')
+    .style('font-size', '0.75rem')
+    .style('z-index', '1000');
+
 let delay = null;
+let cleanupTimeout = null;
 let selectedPath = null;
-let tooltipPath;
 
 const clearExistingDelay = () => {
     if (delay) {
@@ -1228,13 +1252,13 @@ const clearExistingDelay = () => {
 };
 
 const handlePointerEnter = (event, d) => {
+    clearExistingDelay();
+
     const data = helper.getAllPointerEventsData(event, window.hoverlabel);
     window.hoverdata = [...data];
 
     selectedPath = highlight(data);
     helper.createTooltipForPathLine(data, tooltipPath, event);
-
-    clearExistingDelay();
 
     const datasetMap = new Map();
     parcoords.newDataset.forEach((record) => {
@@ -1242,38 +1266,68 @@ const handlePointerEnter = (event, d) => {
         datasetMap.set(recordData, record);
     });
 
+    let combinedHTML = '';
+
     data.forEach((item) => {
         const matchingRecord = datasetMap.get(item);
         if (matchingRecord) {
-            delay = setTimeout(() => {
-                helper.createToolTipForValues(matchingRecord);
-            }, 150);
+            const htmlPart = helper.createToolTipForValues(matchingRecord);
+            combinedHTML += `<div style="margin-bottom: 0.25rem;">${htmlPart}</div>`;
         }
     });
+
+    if (combinedHTML) {
+        tooltipPath
+            .html(combinedHTML)
+            .style('visibility', 'visible')
+            .style('top', `${event.pageY + 0.625}rem`)
+            .style('left', `${event.pageX + 0.625}rem`);
+    }
 };
 
 const handlePointerLeaveOrOut = () => {
     doNotHighlight(selectedPath);
-
     clearExistingDelay();
-
-    if (tooltipPath) {
-        tooltipPath.style('visibility', 'hidden');
-    }
+    tooltipPath.style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
+d3.select('#parallelcoords')
+    .on('mouseleave', () => {
+        if (cleanupTimeout) clearTimeout(cleanupTimeout);
+
+        cleanupTimeout = setTimeout(() => {
+            doNotHighlight(selectedPath);
+            clearExistingDelay();
+            tooltipPath.style('visibility', 'hidden');
+            helper.cleanTooltip();
+        }, 100);
+    });
+
+d3.select('#parallelcoords')
+    .on('mousemove', (event) => {
+        tooltipPath
+            .style('top', `${event.pageY + 0.625}rem`)
+            .style('left', `${event.pageX + 0.625}rem`);
+    });
+
+document.addEventListener('mousemove', (e) => {
+    const chartBounds = document.querySelector('#parallelcoords').getBoundingClientRect();
+    if (
+        e.clientX < chartBounds.left ||
+        e.clientX > chartBounds.right ||
+        e.clientY < chartBounds.top ||
+        e.clientY > chartBounds.bottom
+    ) {
+        handlePointerLeaveOrOut();
+    }
+});
 
 function setActivePathLines(svg: any, content: any, ids: any[],
     parcoords: {
         xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
-
-    tooltipPath = d3.select('#parallelcoords')
-        .append('g')
-        .style('position', 'absolute')
-        .style('visibility', 'hidden');
 
     let contextMenu = d3.select('#parallelcoords')
         .append('g')
@@ -1332,6 +1386,9 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .on('pointerenter', handlePointerEnter)
         .on('pointerleave', handlePointerLeaveOrOut)
         .on('pointerout', handlePointerLeaveOrOut)
+        .on('mouseenter', handlePointerEnter)
+        .on('mouseout', handlePointerLeaveOrOut)
+        .on('mouseleave', handlePointerLeaveOrOut)
         .on('click', () => {
             select(window.hoverdata);
         })

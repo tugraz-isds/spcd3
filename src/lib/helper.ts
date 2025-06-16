@@ -153,7 +153,7 @@ export function createToolTipForValues(recordData): void {
             }
 
             const x = (rectLeft + (counter * 95)) / 16;
-            const y = (value + 140) / 16;
+            const y = (value + 195) / 16;
 
             tooltipValues.text(recordData[dimension].toString())
                 .style('visibility', 'visible')

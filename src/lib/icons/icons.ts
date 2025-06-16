@@ -47,5 +47,9 @@ export function getArrowUpCursor(): string {
 }
 
 export function getRefreshIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="15"><polyline points="6.5 4 8.5 4 8.5 2" fill="none" stroke="black" stroke-width="1"/><path d="M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5" fill="none" stroke="black" stroke-width="1"/><polyline points="3.5 6 1.5 6 1.5 8" fill="none" stroke="black" stroke-width="1"/><path d="M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7" fill="none" stroke="black" stroke-width="1"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18"><polyline points="6.5 4 8.5 4 8.5 2" fill="none" stroke="black" stroke-width="1"/><path d="M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5" fill="none" stroke="black" stroke-width="1"/><polyline points="3.5 6 1.5 6 1.5 8" fill="none" stroke="black" stroke-width="1"/><path d="M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7" fill="none" stroke="black" stroke-width="1"/></svg>';
+}
+
+export function getTableIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" fill="none" /><line x1="0.5" y1="3.3" x2="9.5" y2="3.3" stroke="black" stroke-width="1"/><line x1="0.5" y1="6.6" x2="9.5" y2="6.6" stroke="black" stroke-width="1"/><line x1="3.3" y1="0.5" x2="3.3" y2="9.5" stroke="black" stroke-width="1"/><line x1="6.6" y1="0.5" x2="6.6" y2="9.5" stroke="black" stroke-width="1"/></svg>';
 }
