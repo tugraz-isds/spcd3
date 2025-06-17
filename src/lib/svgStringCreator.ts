@@ -132,8 +132,6 @@ function setBrushUpToDownload(featureAxis: any, parcoords: any): void {
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
             const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
-            let test = item.top != 80 && item.bottom == 320 ? item.bottom : item.bottom + 10;
-            let test1 = item.top == 80 || item.bottm == 320 ? item.bottom : item.bottom + 10;
             d3.select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
@@ -153,7 +151,11 @@ function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
             const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
-            const height = item.bottom - item.top;
+            let height = item.bottom - item.top;
+            if (item.top != 80 && item.bottom == 320) height = height - 10;
+            console.log(item.bottom);
+            console.log(item.top);
+            console.log(height);
             d3.select(this)
                 .append('g')
                 .attr('class', 'rect')
@@ -162,7 +164,7 @@ function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
                 .attr('width', 12)
                 .attr('height', height)
                 .attr('x', -6)
-                .attr('y', item.top != 80 && item.bottom != 320 ? item.top + 10 : item.top)
+                .attr('y', item.top != 80 && item.bottom != 320 || item.top != 80 ? item.top + 10 : item.top)
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.4')
         });
