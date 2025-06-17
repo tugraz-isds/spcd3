@@ -153,9 +153,6 @@ function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
             const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
             let height = item.bottom - item.top;
             if (item.top != 80 && item.bottom == 320) height = height - 10;
-            console.log(item.bottom);
-            console.log(item.top);
-            console.log(height);
             d3.select(this)
                 .append('g')
                 .attr('class', 'rect')
