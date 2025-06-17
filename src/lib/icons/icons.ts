@@ -53,3 +53,11 @@ export function getRefreshIcon(): string {
 export function getTableIcon(): string {
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" fill="none" /><line x1="0.5" y1="3.3" x2="9.5" y2="3.3" stroke="black" stroke-width="1"/><line x1="0.5" y1="6.6" x2="9.5" y2="6.6" stroke="black" stroke-width="1"/><line x1="3.3" y1="0.5" x2="3.3" y2="9.5" stroke="black" stroke-width="1"/><line x1="6.6" y1="0.5" x2="6.6" y2="9.5" stroke="black" stroke-width="1"/></svg>';
 }
+
+export function getSelectionIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>'
+}
+
+export function getSelectionActiveIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="orange" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>'
+}

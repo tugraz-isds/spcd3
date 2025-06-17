@@ -703,8 +703,6 @@ export function drawChart(content: any): void {
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 
-    selectionWithRectangle();
-
     window.svg
         .on('click', (event) => {
             if (!(event.shiftKey) && !(event.ctrlKey) && !(event.metaKey)) {
@@ -743,7 +741,6 @@ export function drawChart(content: any): void {
         if (!event.target.id.includes('Range')) {
             d3.select('#modalSetRange').style('display', 'none');
         }
-        d3.select('#dataModal').style('display', 'none');
     }
 
     const toolbar = document.createElement('div');
@@ -751,21 +748,33 @@ export function drawChart(content: any): void {
     toolbar.style.display = 'flex';
     toolbar.style.gap = '0.3rem';
     toolbar.style.marginTop = '1rem';
-    toolbar.style.marginLeft = '1rem';
+    toolbar.style.marginLeft = '2rem';
     toolbar.style.alignItems = 'center';
 
-    const refreshButton = document.createElement('button');
-    refreshButton.id = 'refreshButton';
-    refreshButton.innerHTML = icon.getRefreshIcon();
-    refreshButton.addEventListener('click', refresh);
+    const selectionToolButton = document.createElement('button');
+    selectionToolButton.id = 'selectionTool';
+    selectionToolButton.innerHTML = icon.getSelectionIcon();
+    selectionToolButton.addEventListener('click', function () {
+        isSelectionMode = !isSelectionMode;
+
+        selectionWithRectangle(isSelectionMode);
+
+        this.innerHTML = isSelectionMode ? icon.getSelectionActiveIcon() : icon.getSelectionIcon();
+    });
 
     const showDataButton = document.createElement('button');
     showDataButton.id = 'showData';
     showDataButton.innerHTML = icon.getTableIcon();
     showDataButton.addEventListener('click', showModalWithData);
 
-    toolbar.appendChild(refreshButton);
+    const refreshButton = document.createElement('button');
+    refreshButton.id = 'refreshButton';
+    refreshButton.innerHTML = icon.getRefreshIcon();
+    refreshButton.addEventListener('click', refresh);
+
+    toolbar.appendChild(selectionToolButton);
     toolbar.appendChild(showDataButton);
+    toolbar.appendChild(refreshButton);
     const parent = d3.select('#parallelcoords').node().parentNode;
     parent.insertBefore(toolbar, document.getElementById('parallelcoords'));
 }
@@ -775,10 +784,10 @@ function showModalWithData() {
     const modal = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'dataModal')
-        .style('top', 0)
-        .style('left', 0)
+        .style('top', '50%')
+        .style('left', '50%')
+        .style('transform', 'translate(-50%, -50%)')
         .style('position', 'absolute')
-        .style('margin', '4.688rem')
         .style('background', 'white')
         .style('padding', '1rem')
         .style('box-shadow', '0 0 0.625rem rgba(0, 0, 0, 0.3)')
@@ -811,19 +820,15 @@ function showModalWithData() {
     closeButton.style.fontSize = '1.25rem';
     modal.append(() => closeButton);
 
-    const scrollWrapper = document.createElement('div');
-    scrollWrapper.style.maxHeight = '60vh';
-    scrollWrapper.style.overflow = 'auto';
-    scrollWrapper.style.border = '0.063rem solid #ccc';
-    scrollWrapper.style.marginTop = '3.125rem';
-
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
+    tableContainer.style.marginTop = '3.125rem';
     tableContainer.style.borderCollapse = 'collapse';
-    tableContainer.style.whiteSpace = 'nowrap';
 
-    scrollWrapper.appendChild(tableContainer);
-    modal.append(() => scrollWrapper);
+    tableContainer.style.display = 'block';
+    tableContainer.style.overflowX = 'auto';
+    tableContainer.style.whiteSpace = 'nowrap';
+    modal.append(() => tableContainer);
 
     generateTable(window.parcoords.newDataset, tableContainer);
 
@@ -922,20 +927,28 @@ export function deleteChart(): void {
     d3.select('#toolbar').remove();
 }
 
-function selectionWithRectangle(): void {
+let isSelectionMode = false;
+
+function selectionWithRectangle(enable: boolean): void {
 
     const svg = window.svg;
+
+    svg.on('.selection', null);
+
+    if (!enable) return;
+
     let selectionRect = svg.append('rect')
         .style('fill', 'none')
         .style('stroke', 'black')
         .style('stroke-dasharray', '3')
-        .style('visibility', 'hidden');
+        .style('visibility', 'hidden')
+        .style('pointer-events', 'none');
 
     let isSelecting = false;
     let startX;
     let startY;
 
-    svg.on('mousedown', function (event) {
+    svg.on('mousedown.selection', function (event) {
         event.preventDefault();
         isSelecting = true;
         const [x, y] = d3.pointer(event);
@@ -950,7 +963,7 @@ function selectionWithRectangle(): void {
             .style('visibility', 'visible');
     });
 
-    svg.on('mousemove', function (event) {
+    svg.on('mousemove.selection', function (event) {
         if (!isSelecting) return;
         const [x, y] = d3.pointer(event);
         const width = Math.abs(x - startX);
@@ -963,7 +976,7 @@ function selectionWithRectangle(): void {
             .attr('height', height);
     });
 
-    svg.on('mouseup', function () {
+    svg.on('mouseup.selection', function () {
         if (!isSelecting) return;
         isSelecting = false;
 
@@ -1264,6 +1277,7 @@ const clearExistingDelay = () => {
 };
 
 const handlePointerEnter = (event, d) => {
+    if (isSelectionMode) return;
     clearExistingDelay();
     doNotHighlight();
 
@@ -1565,7 +1579,12 @@ function setDefsForIcons(): void {
 let currentlyHighlightedItems = [];
 
 function highlight(data) {
-    const cleanedItems = data.map(item => item.replace(/[.,]/g, ''));
+    if (isSelectionMode) return;
+    currentlyHighlightedItems = [];
+    const cleanedItems = data.map(item =>
+        utils.cleanLinePathArrayString(item).replace(/[.,]/g, '')
+    );
+
     currentlyHighlightedItems = [...cleanedItems];
 
     cleanedItems.forEach(item => {
@@ -1575,7 +1594,8 @@ function highlight(data) {
             window.hoverSelected.push(item);
         }
 
-        d3.selectAll('.' + item)
+        let selectedPath = cleanedItems.join(',.');
+        d3.selectAll('.' + selectedPath)
             .transition()
             .duration(5)
             .style('opacity', '0.7')
