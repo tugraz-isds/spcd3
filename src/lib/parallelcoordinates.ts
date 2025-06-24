@@ -820,15 +820,19 @@ function showModalWithData() {
     closeButton.style.fontSize = '1.25rem';
     modal.append(() => closeButton);
 
+    const scrollWrapper = document.createElement('div');
+    scrollWrapper.style.width = '100%';
+    scrollWrapper.style.overflowX = 'auto';
+    scrollWrapper.style.whiteSpace = 'nowrap';
+    scrollWrapper.style.maxHeight = '79vh';
+
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
     tableContainer.style.marginTop = '3.125rem';
     tableContainer.style.borderCollapse = 'collapse';
 
-    tableContainer.style.display = 'block';
-    tableContainer.style.overflowX = 'auto';
-    tableContainer.style.whiteSpace = 'nowrap';
-    modal.append(() => tableContainer);
+    scrollWrapper.appendChild(tableContainer);
+    modal.append(() => scrollWrapper);
 
     generateTable(window.parcoords.newDataset, tableContainer);
 
@@ -860,6 +864,7 @@ function generateTable(dataArray, table) {
         th.style.position = 'sticky';
         th.style.top = '0';
         th.style.zIndex = '1';
+        th.style.textAlign = 'left';
         headRow.appendChild(th);
     });
 
@@ -872,9 +877,18 @@ function generateTable(dataArray, table) {
         const row = document.createElement('tr');
         headers.forEach(key => {
             const td = document.createElement('td');
-            td.innerText = obj[key];
+            const value = obj[key];
+            td.innerText = value;
+
             td.style.border = '0.063rem solid #ddd';
             td.style.padding = '0.5rem';
+
+            if (!isNaN(parseFloat(value)) && isFinite(value)) {
+                td.style.textAlign = 'right';
+            } else {
+                td.style.textAlign = 'left';
+            }
+
             row.appendChild(td);
         });
         tbody.appendChild(row);

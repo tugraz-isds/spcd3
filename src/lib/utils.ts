@@ -61,3 +61,12 @@ export function isElementVisible(element) {
         || element.node().contains(efp(rect.left, rect.bottom))
     );
 }
+
+export function getMouseCoords(event, targetContainer = document.body) {
+    if (targetContainer === document.body) {
+      return [event.clientX + window.scrollX, event.clientY + window.scrollY];
+    } else {
+      const rect = targetContainer.getBoundingClientRect();
+      return [event.clientX - rect.left, event.clientY - rect.top];
+    }
+}

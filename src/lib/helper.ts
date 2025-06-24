@@ -2,7 +2,7 @@ import * as d3 from 'd3-selection';
 import * as scale from 'd3-scale';
 import * as axis from 'd3-axis';
 import * as path from 'd3-shape';
-import * as helper from './utils';
+import * as utils from './utils';
 
 export function prepareData(data: any, newFeatures: any): any {
     let newDataset = [];
@@ -110,7 +110,7 @@ export function linePath(d: any, newFeatures: any, parcoords: any): any {
 }
 
 export function isInverted(dimension: string): boolean {
-    const invertId = '#dimension_invert_' + helper.cleanString(dimension);
+    const invertId = '#dimension_invert_' + utils.cleanString(dimension);
     const element = d3.select(invertId);
     const arrowStatus = element.text();
     return arrowStatus == 'down' ? true : false;
@@ -128,9 +128,9 @@ export function createToolTipForValues(recordData): void {
     const rectLeft = d3.select('#rect_' + dimensions[0])?.node()?.getBoundingClientRect().left;
 
     dimensions.forEach(dimension => {
-        const cleanString = helper.cleanString(dimension);
+        const cleanString = utils.cleanString(dimension);
 
-        if (helper.isElementVisible(d3.select('#rect_' + cleanString))) {
+        if (utils.isElementVisible(d3.select('#rect_' + cleanString))) {
             const tooltipValues = d3.select('#parallelcoords')
                 .append('g')
                 .attr('class', 'tooltip')
@@ -188,13 +188,13 @@ export function getAllPointerEventsData(event: any, hoverlabel: string): any {
 
 export function createTooltipForPathLine(tooltipText, tooltipPath, event) {
     if (!tooltipText || tooltipText.length === 0) return;
-
+    const [x, y] = utils.getMouseCoords(event);
     let tempText = tooltipText.toString();
         tempText = tempText.split(',').join('\r\n');
         tooltipPath.text(tempText)
         .style('visibility', 'visible')
-        .style('top', `${event.pageY + 10}px`)
-        .style('left', `${event.pageX + 10}px`);
+        .style('top', y / 16 + 'rem')
+        .style('left', x / 16 + 0.5 + 'rem');
 
     return tooltipPath;
 }

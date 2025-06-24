@@ -64,7 +64,7 @@ npx gulp clean
 
 `cleanAll` restores the project folder to its virgin state,
 by deleting the existing `dist/` and `node_modules/` directories
-and the `package-lock.json` file:
+and the `yarn-lock.json` file:
 ```
 npx gulp cleanAll
 ```

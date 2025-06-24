@@ -10,6 +10,10 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
 
     let active = svg.append('g')
         .attr('class', 'active')
+        .style('opacity', '0.5')
+        .style('stroke', 'rgb(0, 129, 175)')
+        .style('stroke-width', '0.1rem')
+        .style('fill', 'none')
         .selectAll('path')
         .data(parcoords.data)
         .enter()
@@ -22,12 +26,7 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
             d[key] = element;
             d3.select(this)
                 .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
-        })
-        .style('opacity', '0.5')
-        .style('stroke', 'rgb(0, 129, 175)')
-        .style('stroke-width', '0.1rem')
-        .style('fill', 'none');
-
+        });
 
     const records = pc.getAllRecords();
     records.forEach(element => {

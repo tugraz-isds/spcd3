@@ -12,7 +12,7 @@ function cleanNodeModules() {
 }
 
 function cleanPackageLock() {
-    return del('package-lock.json', {force: true});
+    return del('yarn-lock.json', {force: true});
 }
 
 function copyExampleFolder() {

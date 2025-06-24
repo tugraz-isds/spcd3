@@ -1,7 +1,7 @@
 import 'd3-transition';
 import * as d3 from 'd3-selection';
 import * as drag from 'd3-drag';
-import * as helper from './utils';
+import * as utils from './utils';
 import * as temp from './helper';
 import * as pc from './parallelcoordinates';
 import * as icon from './icons/icons';
@@ -15,9 +15,11 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
     createModalToSetRange();
     createModalToFilter();
 
-    let tooltipFeatures = d3.select('#parallelcoords')
-        .append('g')
+    let tooltipFeatures = d3.select('body')
+        .append('div')
+        .attr('id', 'tooltip')
         .style('position', 'absolute')
+        .style('pointer-events', 'none')
         .style('visibility', 'hidden');
 
     featureAxis
@@ -38,10 +40,11 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         })
         .on('mousemove', (event, d) => {
             setCursorForDimensions(d, featureAxis, parcoords, event);
+            const [x, y] = utils.getMouseCoords(event);
             tooltipFeatures.text(d.name);
             tooltipFeatures
-                .style('top', 12.8 + 'rem')
-                .style('left', event.clientX / 16 + 'rem')
+                .style("left", x/16 + 'rem')
+                .style("top", y/16 + 'rem')
                 .style('font-size', '0.75rem')
                 .style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem')
@@ -412,16 +415,16 @@ function setCursorForDimensions(d: any, featureAxis: any, parcoords: {
     if (pc.getDimensionPosition(d.name) == 0) {
         featureAxis
             .select('.dimension')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
     } else if
         (pc.getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
         featureAxis
             .select('.dimension')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
     } else {
         featureAxis
             .select('.dimension')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowLeftAndRight()), 12)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowLeftAndRight()), 12)}') 8 8, auto`);
     }
 }
 
