@@ -95,18 +95,27 @@ export function setupYAxis(features: any[], yScales: any, newDataset: any): any 
 }
 
 export function linePath(d: any, newFeatures: any, parcoords: any): any {
-    let lineGenerator = path.line();
+    const lineGenerator = path.line();
     const tempdata = Object.entries(d).filter(x => x[0]);
-    let points = [];
+    const points = [];
 
-    newFeatures.map(newfeature => {
-        tempdata.map(x => {
-            if (newfeature === x[0]) {
-                points.push([parcoords.xScales(newfeature), parcoords.yScales[newfeature](x[1])]);
-            }
-        })
-    })
-    return (lineGenerator(points));
+    newFeatures.forEach(newFeature => {
+        const valueEntry = tempdata.find(x => x[0] === newFeature);
+        if (valueEntry) {
+            const name = newFeature;
+            const value = valueEntry[1];
+
+            const x = parcoords.dragging[name] !== undefined
+                ? parcoords.dragging[name]
+                : parcoords.xScales(name);
+
+            const y = parcoords.yScales[name](value);
+
+            points.push([x, y]);
+        }
+    });
+
+    return lineGenerator(points);
 }
 
 export function isInverted(dimension: string): boolean {
