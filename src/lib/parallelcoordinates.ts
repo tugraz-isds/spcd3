@@ -775,16 +775,35 @@ export function drawChart(content: any): void {
 
 function showModalWithData() {
 
+    const overlay = d3.select('#parallelcoords')
+        .append('div')
+        .attr('id', 'modalOverlay')
+        .style('position', 'fixed')
+        .style('top', 0)
+        .style('left', 0)
+        .style('width', '100vw')
+        .style('height', '100vh')
+        .style('background-color', 'rgba(0, 0, 0, 0.5)')
+        .style('z-index', '999')
+        .style('display', 'block');
+
+    overlay.on('click', () => {
+        overlay.style('display', 'none');
+        modal.style('display', 'none');
+    });
+
     const modal = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'dataModal')
         .style('top', '50%')
         .style('left', '50%')
         .style('transform', 'translate(-50%, -50%)')
-        .style('position', 'absolute')
+        .style('position', 'fixed')
         .style('background', 'white')
         .style('padding', '1rem')
         .style('box-shadow', '0 0 0.625rem rgba(0, 0, 0, 0.3)')
+        .style('border', '0.08rem solid gray')
+        .style('border-radius', '0.5rem')
         .style('max-height', '80vh')
         .style('max-width', '90vw')
         .style('overflow', 'auto')
@@ -794,6 +813,7 @@ function showModalWithData() {
     const saveAsCSV = document.createElement('button');
     saveAsCSV.id = 'saveAsCsv';
     saveAsCSV.textContent = 'Save as CSV';
+    saveAsCSV.style.marginBottom = '3rem';
     modal.append(() => saveAsCSV);
 
     saveAsCSV.addEventListener('click', () => {
@@ -812,6 +832,7 @@ function showModalWithData() {
     closeButton.style.cursor = 'pointer';
     closeButton.style.fontWeight = 'bold';
     closeButton.style.fontSize = '1.25rem';
+    closeButton.style.marginBottom = '3rem';
     modal.append(() => closeButton);
 
     const scrollWrapper = document.createElement('div');
@@ -822,7 +843,6 @@ function showModalWithData() {
 
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
-    tableContainer.style.marginTop = '3.125rem';
     tableContainer.style.borderCollapse = 'collapse';
 
     scrollWrapper.appendChild(tableContainer);
@@ -832,6 +852,7 @@ function showModalWithData() {
 
     closeButton.addEventListener('click', () => {
         modal.style('display', 'none');
+        overlay.style('display', 'none');
     });
 }
 
