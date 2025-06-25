@@ -117,8 +117,8 @@ function resetFilterMenu(values: any[], dimension: any) {
 function filterMenu(values: any[], dimension: any) {
     if (!isNaN(values[0])) {
         let currentFilters = pc.getFilter(dimension);
-        d3.select('#maxFilterValue').attr('value', currentFilters[0]);
-        d3.select('#minFilterValue').attr('value', currentFilters[1]);
+        d3.select('#maxFilterValue').property('value', currentFilters[0]);
+        d3.select('#minFilterValue').property('value', currentFilters[1]);
         d3.select('#filterMenu')
             .style('border-top', '0.08rem lightgrey solid')
             .style('visibility', 'visible')
@@ -263,7 +263,6 @@ function setRangeMenu(values: any[], dimension: any) {
             .style('visibility', 'visible')
             .style('color', 'black')
             .on('click', (event) => {
-                console.log(dimension);
                 let minRange = pc.getCurrentMinRange(dimension);
                 let maxRange = pc.getCurrentMaxRange(dimension);
                 var resultMin = (minRange - Math.floor(minRange)) !== 0;
@@ -278,8 +277,8 @@ function setRangeMenu(values: any[], dimension: any) {
                     const count = maxValue.split('.')[1].length;
                     minValue = minRange.toFixed(count);
                 }
-                d3.select('#minRangeValue').attr('value', minValue);
-                d3.select('#maxRangeValue').attr('value', maxValue);
+                d3.select('#minRangeValue').property('value', minValue);
+                d3.select('#maxRangeValue').property('value', maxValue);
                 d3.select('#contextmenu').style('display', 'none');
                 d3.select('#modalOverlaySetRange').style('display', 'block');
                 d3.select('#modalSetRange').style('display', 'block');
