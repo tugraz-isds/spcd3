@@ -735,12 +735,6 @@ export function drawChart(content: any): void {
     window.onclick = (event) => {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
-        if (!event.target.id.includes('Filter')) {
-            d3.select('#modalFilter').style('display', 'none');
-        }
-        if (!event.target.id.includes('Range')) {
-            d3.select('#modalSetRange').style('display', 'none');
-        }
     }
 
     const toolbar = document.createElement('div');

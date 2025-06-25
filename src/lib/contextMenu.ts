@@ -43,8 +43,8 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
             const [x, y] = utils.getMouseCoords(event);
             tooltipFeatures.text(d.name);
             tooltipFeatures
-                .style("left", x/16 + 'rem')
-                .style("top", y/16 + 'rem')
+                .style("left", x / 16 + 'rem')
+                .style("top", y / 16 + 'rem')
                 .style('font-size', '0.75rem')
                 .style('border', 0.08 + 'rem solid gray')
                 .style('border-radius', 0.1 + 'rem')
@@ -124,19 +124,9 @@ function filterMenu(values: any[], dimension: any) {
             .style('visibility', 'visible')
             .style('color', 'black')
             .on('click', (event) => {
-                d3.select('#modalFilter').style('display', 'block')
-                    .style('width', 17 + 'rem')
-                    .style('height', 8 + 'rem')
-                    .style('background', 'white')
-                    .style('border', '0.0625rem solid black')
-                    .style('border-radius', 0.25 + 'rem')
-                    .style('padding', 1 + 'rem')
-                    .style('margin', 'auto')
-                    .style('top', 0)
-                    .style('right', 0)
-                    .style('bottom', 0)
-                    .style('left', 0)
-                    .style('z-index', 10);
+                d3.select('#modalOverlayFilter').style('display', 'block');
+                d3.select('#modalFilter').style('display', 'block');
+                d3.select('#contextmenu').style('display', 'none');
                 const newText1 = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
                 d3.select('#headerDimensionFilter').text(newText1);
                 d3.select('#buttonFilter').on('click', () => {
@@ -203,6 +193,7 @@ function filterMenu(values: any[], dimension: any) {
                     if (isOk) {
                         d3.select('#errorFilter').style('display', 'none');
                         d3.select('#modalFilter').style('display', 'none');
+                        d3.select('#modalOverlayFilter').style('display', 'none');
                     }
                 });
                 d3.select('#maxFilterValue').on('keypress', (event) => {
@@ -220,6 +211,7 @@ function filterMenu(values: any[], dimension: any) {
                 d3.select('#closeButtonFilter').on('click', () => {
                     d3.select('#errorFilter').style('display', 'none');
                     d3.select('#modalFilter').style('display', 'none');
+                    d3.select('#modalOverlayFilter').style('display', 'none');
                 });
                 event.stopPropagation();
             });
@@ -288,19 +280,9 @@ function setRangeMenu(values: any[], dimension: any) {
                 }
                 d3.select('#minRangeValue').attr('value', minValue);
                 d3.select('#maxRangeValue').attr('value', maxValue);
-                d3.select('#modalSetRange').style('display', 'block')
-                    .style('width', 17 + 'rem')
-                    .style('height', 13 + 'rem')
-                    .style('background', 'white')
-                    .style('border', '0.0625rem solid black')
-                    .style('border-radius', 0.25 + 'rem')
-                    .style('padding', 1 + 'rem')
-                    .style('margin', 'auto')
-                    .style('top', 0)
-                    .style('right', 0)
-                    .style('bottom', 0)
-                    .style('left', 0)
-                    .style('z-index', 10);
+                d3.select('#contextmenu').style('display', 'none');
+                d3.select('#modalOverlaySetRange').style('display', 'block');
+                d3.select('#modalSetRange').style('display', 'block');
                 const newText = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
                 d3.select('#headerDimensionRange').text(newText);
                 d3.select('#infoRange').text('The current range of ' + dimension + ' is between ' +
@@ -347,6 +329,7 @@ function setRangeMenu(values: any[], dimension: any) {
                         d3.select('#errorRange').style('display', 'none');
                         pc.setDimensionRange(dimension, min, max);
                         d3.select('#modalSetRange').style('display', 'none');
+                        d3.select('#modalOverlaySetRange').style('display', 'none');
                     }
 
                 });
@@ -364,6 +347,7 @@ function setRangeMenu(values: any[], dimension: any) {
                 });
                 d3.select('#closeButtonRange').on('click', () => {
                     d3.select('#modalSetRange').style('display', 'none');
+                    d3.select('#modalOverlaySetRange').style('display', 'none');
                 });
                 event.stopPropagation();
             });
@@ -397,10 +381,10 @@ function styleContextMenu(event: any) {
         .style('top', 13.6 + 'rem')
         .style('display', 'block')
         .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
+        .style('border-radius', 0.3 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.35 + 'rem')
         .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
-        .style('cursor', 'pointer')
+        .style('cursor', 'pointer').style('minWidth', 15 + 'rem')
         .on('click', (event) => {
             event.stopPropagation();
         });
@@ -554,10 +538,36 @@ function createContextMenu() {
 }
 
 function createModalToSetRange() {
+
+    d3.select('#parallelcoords')
+        .append('div')
+        .attr('id', 'modalOverlaySetRange')
+        .style('position', 'fixed')
+        .style('top', '0')
+        .style('left', '0')
+        .style('width', '100vw')
+        .style('height', '100vh')
+        .style('background-color', 'rgba(0, 0, 0, 0.5)')
+        .style('display', 'none')
+        .style('z-index', '999');
+
+    d3.select('#modalOverlaySetRange').on('click', () => {
+        d3.select('#modalSetRange').style('display', 'none');
+        d3.select('#modalOverlaySetRange').style('display', 'none');
+    });
+
     const modalSetRange = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'modalSetRange')
-        .style('position', 'absolute')
+        .style('position', 'fixed')
+        .style('top', '50%')
+        .style('left', '50%')
+        .style('transform', 'translate(-50%, -50%)')
+        .style('z-index', '1000')
+        .style('background-color', 'white')
+        .style('padding', '1rem')
+        .style('border-radius', '0.5rem')
+        .style('box-shadow', '0 0.25rem 0.625rem rgba(0,0,0,0.2)')
         .style('display', 'none');
 
     createModalTitle(modalSetRange, 'Set Range for ');
@@ -572,10 +582,36 @@ function createModalToSetRange() {
 }
 
 function createModalToFilter() {
-    let modalFilter = d3.select('#parallelcoords')
+
+    d3.select('#parallelcoords')
+        .append('div')
+        .attr('id', 'modalOverlayFilter')
+        .style('position', 'fixed')
+        .style('top', '0')
+        .style('left', '0')
+        .style('width', '100vw')
+        .style('height', '100vh')
+        .style('background-color', 'rgba(0, 0, 0, 0.5)')
+        .style('display', 'none')
+        .style('z-index', '999');
+
+    d3.select('#modalOverlayFilter').on('click', () => {
+        d3.select('#modalFilter').style('display', 'none');
+        d3.select('#modalOverlayFilter').style('display', 'none');
+    });
+
+    const modalFilter = d3.select('#parallelcoords')
         .append('div')
         .attr('id', 'modalFilter')
-        .style('position', 'absolute')
+        .style('position', 'fixed')
+        .style('top', '50%')
+        .style('left', '50%')
+        .style('transform', 'translate(-50%, -50%)')
+        .style('z-index', '1000')
+        .style('background-color', 'white')
+        .style('padding', '1rem')
+        .style('border-radius', '0.5rem')
+        .style('box-shadow', '0 0.25rem 0.625rem rgba(0,0,0,0.2)')
         .style('display', 'none');
 
     createModalTitle(modalFilter, 'Set Filter for ');

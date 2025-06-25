@@ -8,7 +8,7 @@ const formatFloat = format(".4f");
 
 export function setActivePathLinesToDownload(svg: any, parcoords: any, key: string,) {
 
-    let active = svg.append('g')
+    svg.append('g')
         .attr('class', 'active')
         .style('opacity', '0.5')
         .style('stroke', 'rgb(0, 129, 175)')
@@ -52,7 +52,6 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         .data(parcoords.features)
         .enter()
         .append('g')
-        .attr('class', 'dimensions')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name)) + ')');
 
     featureAxis
@@ -94,7 +93,6 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
 
     featureAxis
         .append('text')
-        .attr('class', 'dimension')
         .attr('text-anchor', 'middle')
         .attr('y', (padding / 1.7).toFixed(4))
         .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
@@ -114,7 +112,6 @@ function setBrushDownToDownload(featureAxis: any, parcoords: any): void {
             const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
             d3.select(this)
                 .append('g')
-                .attr('class', 'brush_' + processedDimensionName)
                 .append('use')
                 .attr('id', 'triangle_down_' + processedDimensionName)
                 .attr('y', item.top == 80 ? 70 : item.top)
@@ -133,7 +130,6 @@ function setBrushUpToDownload(featureAxis: any, parcoords: any): void {
             const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
             d3.select(this)
                 .append('g')
-                .attr('class', 'brush_' + processedDimensionName)
                 .append('use')
                 .attr('id', 'triangle_up_' + processedDimensionName)
                 .attr('y', item.top != 80 && item.bottom != 320 ? item.bottom + 10 : item.bottom)
@@ -154,7 +150,6 @@ function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
             if (item.top != 80 && item.bottom == 320) height = height - 10;
             d3.select(this)
                 .append('g')
-                .attr('class', 'rect')
                 .append('rect')
                 .attr('id', 'rect_' + processedDimensionName)
                 .attr('width', 12)
