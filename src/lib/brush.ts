@@ -643,7 +643,7 @@ function makeActive(currentLineName: any): void {
     d3.select('.' + currentLineName).style('opacity', '0.7')
         .style('pointer-events', 'stroke')
         .style('stroke', 'rgb(0, 129, 175)')
-        .style('stroke-width', '0.5rem')
+        .style('opacity', '0.5rem')
         .style('fill', 'none')
         .text('');
 }
@@ -652,7 +652,7 @@ function makeInactive(currentLineName: any, dimensionName: any): void {
     d3.select('.' + currentLineName).style('pointer-events', 'none')
         .style('fill', 'none')
         .style('stroke', 'lightgrey')
-        .style('stroke-opacity', '0.4')
+        .style('opacity', '0.4')
         .text(dimensionName);
 }
 

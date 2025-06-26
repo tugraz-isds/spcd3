@@ -535,13 +535,7 @@ export function setSelection(records: string[]): void {
 
 export function isSelected(record: string): boolean {
     let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
-    const color = d3.select('.' + utils.cleanLinePathString(editRecord)).style('stroke');
-    if (color == 'rgb(255, 165, 0)') {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return d3.select('.' + utils.cleanLinePathString(editRecord)).classed('selected');
 }
 
 export function toggleSelection(record: string): void {
@@ -640,6 +634,9 @@ export function drawChart(content: any): void {
         })
         .on("mouseenter", function () {
             helper.cleanTooltip();
+        })
+        .on("click", function () {
+            clearSelection();
         });
 
     window.onclick = (event) => {
@@ -1111,6 +1108,9 @@ function redrawChart(content: any, newFeatures: any): void {
         })
         .on("mouseenter", function () {
             helper.cleanTooltip();
+        })
+        .on("click", function () {
+            clearSelection();
         });
 
     setDefsForIcons();
@@ -1584,10 +1584,6 @@ function clearSelection(): void {
 
     });
 }
-
-d3.select('#parallelcoords').on('click', () => {
-    clearSelection();
-});
 
 
 // Inverting
