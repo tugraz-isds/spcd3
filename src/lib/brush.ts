@@ -643,7 +643,7 @@ function makeActive(currentLineName: any): void {
     d3.select('.' + currentLineName).style('opacity', '0.7')
         .style('pointer-events', 'stroke')
         .style('stroke', 'rgb(0, 129, 175)')
-        .style('stroke-width', '0.1rem')
+        .style('stroke-width', '0.5rem')
         .style('fill', 'none')
         .text('');
 }
