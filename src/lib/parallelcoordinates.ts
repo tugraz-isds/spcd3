@@ -676,15 +676,15 @@ export function drawChart(content: any): void {
     toolbar.appendChild(selectionToolButton);
     toolbar.appendChild(showDataButton);
     toolbar.appendChild(refreshButton);
-    const parent = d3.select('#parallelcoords').node().parentNode;
-    parent.insertBefore(toolbar, document.getElementById('parallelcoords'));
+    const parent = d3.select('#pc_svg').node().parentNode;
+    parent.insertBefore(toolbar, document.getElementById('pc_svg'));
 }
 
 function showModalWithData() {
 
     const overlay = d3.select('#parallelcoords')
         .append('div')
-        .attr('id', 'modalOverlay')
+        .attr('id', 'modalTableOverlay')
         .style('position', 'fixed')
         .style('top', 0)
         .style('left', 0)
@@ -1240,7 +1240,7 @@ const handlePointerLeaveOrOut = () => {
     helper.cleanTooltip();
 };
 
-d3.select('#parallelcoords').on('mouseleave', () => {
+d3.select('#pc_svg').on('mouseleave', () => {
     if (cleanupTimeout) clearTimeout(cleanupTimeout);
     cleanupTimeout = setTimeout(() => {
         doNotHighlight();
@@ -1252,7 +1252,7 @@ d3.select('#parallelcoords').on('mouseleave', () => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    const chartBounds = document.querySelector('#parallelcoords').getBoundingClientRect();
+    const chartBounds = document.querySelector('#pc_svg').getBoundingClientRect();
     if (
         e.clientX < chartBounds.left ||
         e.clientX > chartBounds.right ||
@@ -1576,7 +1576,7 @@ function select(linePaths: any): void {
 function clearSelection(): void {
     const selectedRecords = getSelected();
     selectedRecords.forEach(element => {
-        d3.select('.' + element)
+        d3.select('.' + utils.cleanLinePathString(element))
             .classed('selected', false)
             .transition()
             .style('stroke', 'rgb(0, 129, 175)')

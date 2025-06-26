@@ -508,6 +508,7 @@ function updateLines(parcoords: {
         }
 
         const currentLine = getLineName(d);
+        const cleanLine = helper.cleanLinePathString(currentLine);
 
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
@@ -515,29 +516,17 @@ function updateLines(parcoords: {
 
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
-                if (isSelected(currentLine)) {
-                    setUnselected(currentLine);
-                    selectionArray.push(currentLine);
-                }
+                makeInactive(cleanLine, dimensionName);
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
-                if (isSelected(currentLine)) {
-                    setUnselected(currentLine);
-                    selectionArray.push(currentLine);
-                }
+                makeInactive(cleanLine, dimensionName);
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
-                if (isSelected(currentLine)) {
-                    setUnselected(currentLine);
-                    selectionArray.push(currentLine);
-                }
+                makeInactive(cleanLine, dimensionName);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -545,18 +534,13 @@ function updateLines(parcoords: {
             parcoords.currentPosOfDims.forEach(function (item) {
                 if (item.top != 80 || item.bottom != 320) {
                     checkAllPositionsTop(item, dimensionName, parcoords, d,
-                        checkedLines, currentLine);
+                        checkedLines, cleanLine);
                     checkAllPositionsBottom(item, dimensionName, parcoords, d,
-                        checkedLines, currentLine);
+                        checkedLines, cleanLine);
                 }
             });
-            if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine);
-                const index = selectionArray.indexOf(currentLine);
-                if (index != -1) {
-                    setSelected(currentLine);
-                    selectionArray.splice(index, 1);
-                }
+            if (!checkedLines.includes(cleanLine)) {
+                makeActive(cleanLine);
             }
         }
         else {
@@ -640,17 +624,25 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
 }
 
 function makeActive(currentLineName: any): void {
-    d3.select('.' + currentLineName).style('opacity', '0.7')
-        .style('pointer-events', 'stroke')
-        .style('stroke', 'rgb(0, 129, 175)')
-        .style('opacity', '0.5rem')
-        .style('fill', 'none')
-        .text('');
+    if (d3.select('.' + currentLineName).classed('selected')) {
+        d3.select('.' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'rgb(255, 165, 0)')
+            .style('opacity', '1')
+            .text('');
+    }
+    else {
+        d3.select('.' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'rgb(0, 129, 175)')
+            .style('opacity', '0.5')
+            .text('');
+    }
 }
 
 function makeInactive(currentLineName: any, dimensionName: any): void {
-    d3.select('.' + currentLineName).style('pointer-events', 'none')
-        .style('fill', 'none')
+    d3.select('.' + currentLineName)
+        .style('pointer-events', 'none')
         .style('stroke', 'lightgrey')
         .style('opacity', '0.4')
         .text(dimensionName);
