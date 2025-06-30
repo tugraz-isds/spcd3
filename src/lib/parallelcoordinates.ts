@@ -1333,7 +1333,7 @@ function setActivePathLines(svg: any, content: any, ids: any[],
             const data = helper.getAllPointerEventsData(event, window.hoverlabel);
             const selectedRecords = getSelected();
 
-            if (event.ctrlKey || event.metaKey) {
+            if (event.metaKey || event.shiftKey) {
                 data.forEach(record => {
                     if (selectedRecords.includes(record)) {
                         setUnselected(record);
@@ -1341,7 +1341,13 @@ function setActivePathLines(svg: any, content: any, ids: any[],
                         select([record]);
                     }
                 });
-            } else {
+            }
+            else if (event.ctrlKey) {
+                data.forEach(record => {
+                    toggleSelection(record);
+                })
+            }
+            else {
                 clearSelection();
                 select(data);
             }
@@ -1485,9 +1491,19 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
 
     setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
 
+    setMarker(featureAxis);
+
     context.setContextMenu(featureAxis, padding, parcoords, active, width);
 
     setInvertIcon(featureAxis, padding);
+}
+
+export function showMarker(dimension) {
+    d3.select('#marker_' + dimension).attr('opacity', 1);
+}
+
+export function hideMarker(dimension) {
+    d3.select('#marker_' + dimension).attr('opacity', 0);
 }
 
 function setDefsForIcons(): void {
@@ -1617,6 +1633,27 @@ function setInvertIcon(featureAxis: any, padding: any): void {
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         })
         .on('click', onInvert());
+}
+
+function setMarker(featureAxis: any): void {
+    featureAxis
+        .each(function (d) {
+            const processedDimensionName = utils.cleanString(d.name);
+            d3.select(this)
+                .append('g')
+                .attr('class', 'marker')
+                .append('rect')
+                .attr('id', 'marker_' + processedDimensionName)
+                .attr('width', 44)
+                .attr('height', 305)
+                .attr('x', -22)
+                .attr('y', 30)
+                .attr('fill', 'none')
+                .attr('stroke', 'red')
+                .attr('stroke-width', '0.15rem')
+                .attr('opacity', '0')
+
+        });
 }
 
 // Brushing
