@@ -19,26 +19,25 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
         .enter()
         .append('path')
         .attr('id', (d) => {
-            return d[key];
+            return utils.cleanString(d[key]);
         })
         .each(function (d) {
-            let element = d[key].length > 10 ? d[key].substr(0, 10) + '...' : d[key];
-            d[key] = element;
             d3.select(this)
                 .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         });
 
     const records = pc.getAllRecords();
     records.forEach(element => {
-        const isSelected = pc.isSelected(element);
+        const cleanRecord = utils.cleanString(element);
+        const isSelected = pc.isSelected(cleanRecord);
         if (isSelected) {
-            svg.select('#' + element)
+            svg.select('#' + cleanRecord)
                 .style('stroke', 'rgb(255, 165, 0)')
                 .style('opacity', '1');
         }
-        const dimNameToCheck = d3.select('.' + element).text();
+        const dimNameToCheck = d3.select('#' + cleanRecord).text();
         if (dimNameToCheck != '') {
-            svg.select('#' + element)
+            svg.select('#' + cleanRecord)
                 .style('stroke', 'lightgrey')
                 .style('stroke-opacity', '0.4')
         }
@@ -58,36 +57,36 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         .append('g')
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
-            const ranges = pc.getDimensionRange(processedDimensionName);
-            if (!pc.isDimensionCategorical(processedDimensionName)) {
-                const status = pc.getInversionStatus(processedDimensionName);
+            const ranges = pc.getDimensionRange(d.name);
+            if (!pc.isDimensionCategorical(d.name)) {
+                const status = pc.getInversionStatus(d.name);
                 if (status == 'ascending') {
-                    yScales[processedDimensionName].domain([ranges[0], ranges[1]]);
+                    yScales[d.name].domain([ranges[0], ranges[1]]);
                     yAxis = helper.setupYAxis(parcoords.features, yScales,
                         parcoords.newDataset);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
-                        .call(yAxis[processedDimensionName]
-                            .scale(yScales[processedDimensionName]
-                                .domain(yScales[processedDimensionName]
+                        .call(yAxis[d.name]
+                            .scale(yScales[d.name]
+                                .domain(yScales[d.name]
                                     .domain())));
                 }
                 else {
-                    yScales[processedDimensionName].domain([ranges[1], ranges[0]]);
+                    yScales[d.name].domain([ranges[1], ranges[0]]);
                     yAxis = helper.setupYAxis(parcoords.features, yScales,
                         parcoords.newDataset);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
-                        .call(yAxis[processedDimensionName]
-                            .scale(yScales[processedDimensionName]
-                                .domain(yScales[processedDimensionName]
+                        .call(yAxis[d.name]
+                            .scale(yScales[d.name]
+                                .domain(yScales[d.name]
                                     .domain().reverse())));
                 }
             }
             else {
                 d3.select(this)
                     .attr('id', 'dimension_axis_' + processedDimensionName)
-                    .call(yAxis[processedDimensionName])
+                    .call(yAxis[d.name])
             }
         });
 
@@ -109,7 +108,7 @@ function setBrushDownToDownload(featureAxis: any, parcoords: any): void {
     featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
+            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
             d3.select(this)
                 .append('g')
                 .append('use')
@@ -127,7 +126,7 @@ function setBrushUpToDownload(featureAxis: any, parcoords: any): void {
     featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
+            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
             d3.select(this)
                 .append('g')
                 .append('use')
@@ -145,7 +144,7 @@ function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
     featureAxis
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == processedDimensionName);
+            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
             let height = item.bottom - item.top;
             if (item.top != 80 && item.bottom == 320) height = height - 10;
             d3.select(this)

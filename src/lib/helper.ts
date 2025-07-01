@@ -134,7 +134,7 @@ export function createToolTipForValues(recordData): void {
     const dimensions = getAllVisibleDimensionNames();
     let counter = 0;
 
-    const rectLeft = d3.select('#rect_' + dimensions[0])?.node()?.getBoundingClientRect().left;
+    const rectLeft = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().left;
 
     dimensions.forEach(dimension => {
         const cleanString = utils.cleanString(dimension);
