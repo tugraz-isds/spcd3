@@ -369,7 +369,7 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
 function getLineName(d: any): string {
     const keys = Object.keys(d);
     const key = keys[0];
-    return helper.cleanLinePathString(d[key]);
+    return helper.cleanString(d[key]);
 }
 
 export function addPosition(yPosTop: any, currentPosOfDims: any, dimensionName: any, key: any): void {
@@ -508,25 +508,23 @@ function updateLines(parcoords: {
         }
 
         const currentLine = getLineName(d);
-        const cleanLine = helper.cleanLinePathString(currentLine);
-
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
         const emptyString = '';
 
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(cleanLine, dimensionName);
+                makeInactive(currentLine, dimensionName);
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(cleanLine, dimensionName);
+                makeInactive(currentLine, dimensionName);
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(cleanLine, dimensionName);
+                makeInactive(currentLine, dimensionName);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -534,13 +532,13 @@ function updateLines(parcoords: {
             parcoords.currentPosOfDims.forEach(function (item) {
                 if (item.top != 80 || item.bottom != 320) {
                     checkAllPositionsTop(item, dimensionName, parcoords, d,
-                        checkedLines, cleanLine);
+                        checkedLines, currentLine);
                     checkAllPositionsBottom(item, dimensionName, parcoords, d,
-                        checkedLines, cleanLine);
+                        checkedLines, currentLine);
                 }
             });
-            if (!checkedLines.includes(cleanLine)) {
-                makeActive(cleanLine);
+            if (!checkedLines.includes(currentLine)) {
+                makeActive(currentLine);
             }
         }
         else {

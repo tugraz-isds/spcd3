@@ -1,14 +1,15 @@
 export function cleanString(stringValue: string): string {
-    let value = stringValue.replace(/ /g, '_');
-    return value.replace(/[.,*\-%&'\[{()}\]]/g, '');
-}
+    let value = stringValue
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 
-export function cleanLinePathString(stringValue: string): string {
-    return stringValue.replace(/[*\- .,%&'\[{()}\]]/g, '');
-}
-
-export function cleanLinePathArrayString(stringValue: string): string {
-    return stringValue.replace(/[*\- 0123456789%&'\[{()}\]]/g, '');
+    if (/^[0-9]/.test(value)) {
+        value = "x-" + value;
+    }
+    return value;
 }
 
 export function setSize(stringValue: string, size: number): string {
@@ -70,3 +71,13 @@ export function getMouseCoords(event, targetContainer = document.body) {
       return [event.clientX - rect.left, event.clientY - rect.top];
     }
 }
+
+/*export function getMouseCoords(event, targetContainer = document.body) {
+    if (targetContainer === document.body) {
+        return [event.clientX + window.scrollX, event.clientY + window.scrollY];
+    } else {
+        const rect = targetContainer.getBoundingClientRect();
+        return [event.clientX - rect.left, event.clientY - rect.top];
+    }
+}*/
+

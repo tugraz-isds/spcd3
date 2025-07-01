@@ -113,9 +113,9 @@ export function getHiddenStatus(dimension: string): string {
 //---------- Invert Functions ----------
 
 export function invert(dimension: string): void {
-    const processedDimensionName = utils.cleanString(dimension);
-    const invertId = '#dimension_invert_' + processedDimensionName;
-    const dimensionId = '#dimension_axis_' + processedDimensionName;
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
@@ -153,9 +153,9 @@ export function invert(dimension: string): void {
 }
 
 export function invertWoTransition(dimension: string): void {
-    const processedDimensionName = utils.cleanString(dimension);
-    const invertId = '#dimension_invert_' + processedDimensionName;
-    const dimensionId = '#dimension_axis_' + processedDimensionName;
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
     const textElement = d3.select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
@@ -194,9 +194,9 @@ export function getInversionStatus(dimension: string): string {
 }
 
 export function setInversionStatus(dimension: string, status: string): void {
-    const processedDimensionName = utils.cleanString(dimension);
-    const invertId = '#dimension_invert_' + processedDimensionName;
-    const dimensionId = '#dimension_axis_' + processedDimensionName;
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
     const textElement = d3.select(invertId);
     const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = status === 'ascending' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
@@ -512,9 +512,7 @@ export function getSelected(): any[] {
 
     const records = getAllRecords();
     for (let i = 0; i < records.length; i++) {
-        let editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
-        let selectedLine = utils.cleanLinePathString(editRecord);
-        let isselected = isSelected(selectedLine);
+        let isselected = isSelected(records[i]);
         if (isselected) {
             selected.push(records[i]);
         }
@@ -524,8 +522,7 @@ export function getSelected(): any[] {
 
 export function setSelection(records: string[]): void {
     for (let i = 0; i < records.length; i++) {
-        let editRecord = records[i].length > 10 ? records[i].substr(0, 10) + '...' : records[i];
-        d3.select('.' + utils.cleanLinePathString(editRecord))
+        d3.select('#' + utils.cleanString(records[i]))
             .classed('selected', true)
             .transition()
             .style('stroke', 'rgb(255, 165, 0)')
@@ -534,8 +531,7 @@ export function setSelection(records: string[]): void {
 }
 
 export function isSelected(record: string): boolean {
-    let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
-    return d3.select('.' + utils.cleanLinePathString(editRecord)).classed('selected');
+    return d3.select('#' + utils.cleanString(record)).classed('selected');
 }
 
 export function toggleSelection(record: string): void {
@@ -555,8 +551,7 @@ export function setSelected(record: string): void {
 }
 
 export function setUnselected(record: string): void {
-    let editRecord = record.length > 10 ? record.substr(0, 10) + '...' : record;
-    d3.selectAll('.' + utils.cleanLinePathString(editRecord))
+    d3.selectAll('#' + utils.cleanString(record))
         .classed('selected', false)
         .transition()
         .style('opacity', '0.5')
@@ -602,8 +597,6 @@ export function setUnselectedWithId(recordId: number): void {
 //---------- IO Functions ----------
 
 export function drawChart(content: any): void {
-    let ids = [];
-
     window.refreshData = structuredClone(content);
 
     deleteChart();
@@ -623,7 +616,7 @@ export function drawChart(content: any): void {
 
     setDefsForIcons();
 
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+    window.active = setActivePathLines(svg, content, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 
@@ -1088,8 +1081,6 @@ function setUpParcoordData(data: any, newFeatures: any): any {
 }
 
 function redrawChart(content: any, newFeatures: any): void {
-    let ids = [];
-
     deleteChart();
 
     setUpParcoordData(content, newFeatures);
@@ -1120,7 +1111,7 @@ function redrawChart(content: any, newFeatures: any): void {
         d3.select('#contextmenuRecords').style('display', 'none');
     }
 
-    window.active = setActivePathLines(svg, content, ids, window.parcoords);
+    window.active = setActivePathLines(svg, content, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 }
@@ -1263,7 +1254,7 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-function setActivePathLines(svg: any, content: any, ids: any[],
+function setActivePathLines(svg: any, content: any,
     parcoords: {
         xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
@@ -1305,16 +1296,13 @@ function setActivePathLines(svg: any, content: any, ids: any[],
         .attr('class', (d) => {
             const keys = Object.keys(d);
             window.key = keys[0];
-            const selected_value = utils.cleanLinePathString(d[window.key]);
-            ids.push(selected_value);
+            const selected_value = utils.cleanString(d[window.key]);
             return 'line ' + selected_value;
         })
         .attr('id', (d) => {
-            return d[window.key];
+            return utils.cleanString(d[window.key]);
         })
         .each(function (d) {
-            let element = d[window.key].length > 10 ? d[window.key].substr(0, 10) + '...' : d[window.key];
-            d[window.key] = element;
             d3.select(this)
                 .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         })
@@ -1499,11 +1487,13 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
 }
 
 export function showMarker(dimension) {
-    d3.select('#marker_' + dimension).attr('opacity', 1);
+    const cleanDimensionName = utils.cleanString(dimension);
+    d3.select('#marker_' + cleanDimensionName).attr('opacity', 1);
 }
 
 export function hideMarker(dimension) {
-    d3.select('#marker_' + dimension).attr('opacity', 0);
+    const cleanDimensionName = utils.cleanString(dimension);
+    d3.select('#marker_' + cleanDimensionName).attr('opacity', 0);
 }
 
 function setDefsForIcons(): void {
@@ -1545,13 +1535,13 @@ function highlight(data) {
     if (isSelectionMode) return;
 
     const cleanedItems = data.map(item =>
-        utils.cleanLinePathArrayString(item).replace(/[.,]/g, '')
+        utils.cleanString(item).replace(/[.,]/g, '')
     );
 
     currentlyHighlightedItems = [...cleanedItems];
 
     cleanedItems.forEach(item => {
-        d3.select('.' + item)
+        d3.select('#' + item)
             .transition()
             .duration(5)
             .style('opacity', '0.7')
@@ -1564,7 +1554,7 @@ function doNotHighlight() {
     if (!currentlyHighlightedItems.length) return;
 
     currentlyHighlightedItems.forEach(item => {
-        const line = d3.select('.' + item);
+        const line = d3.select('#' + item);
         if (line.classed('selected')) {
             line.transition()
                 .style('stroke', 'rgb(255, 165, 0)')
@@ -1584,15 +1574,14 @@ function doNotHighlight() {
 
 function select(linePaths: any): void {
     for (let i = 0; i < linePaths.length; i++) {
-        let selectedLine = utils.cleanLinePathString(linePaths[i]);
-        setSelected(selectedLine);
+        setSelected(linePaths[i]);
     }
 }
 
 function clearSelection(): void {
     const selectedRecords = getSelected();
     selectedRecords.forEach(element => {
-        d3.select('.' + utils.cleanLinePathString(element))
+        d3.select('#' + utils.cleanString(element))
             .classed('selected', false)
             .transition()
             .style('stroke', 'rgb(0, 129, 175)')
