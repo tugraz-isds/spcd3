@@ -496,7 +496,7 @@ function scroll(parcoords, d) {
 }
 
 function createContextMenu() {
-    let contextMenu = d3.select('body')
+    let contextMenu = d3.select('#parallelcoords')
         .append('g')
         .attr('id', 'contextmenu')
         .style('position', 'absolute')

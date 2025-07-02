@@ -692,7 +692,7 @@ function showModalWithData() {
         modal.style('display', 'none');
     });
 
-    const modal = overlay
+    const modal = d3.select('body')
         .append('div')
         .attr('id', 'dataModal')
         .style('top', '50%')
@@ -1178,6 +1178,7 @@ const tooltipPath = d3.select('body')
 const tooltipTest = d3.select('body')
     .append('div')
     .attr('id', 'tooltipTest')
+    .attr('font-family', 'Verdana, sans-serif')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
     .style('pointer-events', 'none')
@@ -1260,7 +1261,7 @@ function setActivePathLines(svg: any, content: any,
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
 
-    let contextMenu = d3.select('body')
+    let contextMenu = d3.select('#parallelcoords')
         .append('g')
         .attr('id', 'contextmenuRecords')
         .style('position', 'absolute')

@@ -470,7 +470,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d
     else {
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
-        tooltipValuesDown.style('top', (Number(yPosBottom + 155) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
+        tooltipValuesDown.style('top', (Number(yPosBottom) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
         tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
