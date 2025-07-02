@@ -675,7 +675,7 @@ export function drawChart(content: any): void {
 
 function showModalWithData() {
 
-    const overlay = d3.select('#parallelcoords')
+    const overlay = d3.select('body')
         .append('div')
         .attr('id', 'modalTableOverlay')
         .style('position', 'fixed')
@@ -692,7 +692,7 @@ function showModalWithData() {
         modal.style('display', 'none');
     });
 
-    const modal = d3.select('#parallelcoords')
+    const modal = overlay
         .append('div')
         .attr('id', 'dataModal')
         .style('top', '50%')
@@ -1163,7 +1163,7 @@ export function createSvgString(): any {
     return svg.node().outerHTML;
 }
 
-const tooltipPath = d3.select('#parallelcoords')
+const tooltipPath = d3.select('body')
     .append('div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
@@ -1175,7 +1175,7 @@ const tooltipPath = d3.select('#parallelcoords')
     .style('font-size', '0.75rem')
     .style('z-index', '1000');
 
-const tooltipTest = d3.select('#parallelcoords')
+const tooltipTest = d3.select('body')
     .append('div')
     .attr('id', 'tooltipTest')
     .style('position', 'absolute')
@@ -1260,7 +1260,7 @@ function setActivePathLines(svg: any, content: any,
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
 
-    let contextMenu = d3.select('#parallelcoords')
+    let contextMenu = d3.select('body')
         .append('g')
         .attr('id', 'contextmenuRecords')
         .style('position', 'absolute')
@@ -1421,7 +1421,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .attr('class', 'dimensions')
         .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
 
-    let tooltipValuesLabel = d3.select('#parallelcoords')
+    let tooltipValuesLabel = d3.select('body')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
@@ -1458,17 +1458,17 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         }
     });
 
-    let tooltipValues = d3.select('#parallelcoords')
+    let tooltipValues = d3.select('body')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesTop = d3.select('#parallelcoords')
+    let tooltipValuesTop = d3.select('body')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesDown = d3.select('#parallelcoords')
+    let tooltipValuesDown = d3.select('body')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');

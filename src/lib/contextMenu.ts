@@ -496,7 +496,7 @@ function scroll(parcoords, d) {
 }
 
 function createContextMenu() {
-    let contextMenu = d3.select('#parallelcoords')
+    let contextMenu = d3.select('body')
         .append('g')
         .attr('id', 'contextmenu')
         .style('position', 'absolute')
@@ -538,7 +538,7 @@ function createContextMenu() {
 
 function createModalToSetRange() {
 
-    d3.select('#parallelcoords')
+    d3.select('body')
         .append('div')
         .attr('id', 'modalOverlaySetRange')
         .style('position', 'fixed')
@@ -555,7 +555,7 @@ function createModalToSetRange() {
         d3.select('#modalOverlaySetRange').style('display', 'none');
     });
 
-    const modalSetRange = d3.select('#parallelcoords')
+    const modalSetRange = d3.select('body')
         .append('div')
         .attr('id', 'modalSetRange')
         .style('position', 'fixed')
@@ -582,7 +582,7 @@ function createModalToSetRange() {
 
 function createModalToFilter() {
 
-    d3.select('#parallelcoords')
+    d3.select('body')
         .append('div')
         .attr('id', 'modalOverlayFilter')
         .style('position', 'fixed')
@@ -599,7 +599,7 @@ function createModalToFilter() {
         d3.select('#modalOverlayFilter').style('display', 'none');
     });
 
-    const modalFilter = d3.select('#parallelcoords')
+    const modalFilter = d3.select('body')
         .append('div')
         .attr('id', 'modalFilter')
         .style('position', 'fixed')
