@@ -262,13 +262,11 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
         .attr('height', rectHeight);
 
     let active = d3.select('g.active').selectAll('path');
-    const emptyString = '';
+
+    const rangeTop = Number(d3.select('#triangle_down_' + cleanDimensionName).attr('y'));
+    const rangeBottom = Number(d3.select('#triangle_up_' + cleanDimensionName).attr('y'));
 
     active.each(function (d) {
-        const currentLine = getLineName(d);
-        const selected = isSelected(currentLine);
-        const dimNameToCheck = d3.select('.' + currentLine).text();
-
         let value: any;
         if (invertStatus) {
             value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
@@ -279,30 +277,43 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
                 240 / range * (maxValue - d[dimensionName]) + 80;
         }
 
-        if (value < topPosition || value > bottomPosition) {
-            makeInactive(currentLine, dimensionName);
-            if (selected) {
-                setUnselected(currentLine);
-                selectionArray.push(currentLine);
+        const currentLine = getLineName(d);
+        const dimNameToCheck = d3.select('.' + currentLine).text();
+
+        const emptyString = '';
+
+        if (value < rangeTop + 10 || value > rangeBottom) {
+            if (dimNameToCheck == emptyString) {
+                makeInactive(currentLine, dimensionName);
+            }
+        }
+        else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
+            if (dimNameToCheck == emptyString) {
+                makeInactive(currentLine, dimensionName);
+            }
+        }
+        else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
+            if (dimNameToCheck == emptyString) {
+                makeInactive(currentLine, dimensionName);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
             let checkedLines = [];
             parcoords.currentPosOfDims.forEach(function (item) {
-                checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
-
+                if (item.top != 80 || item.bottom != 320) {
+                    checkAllPositionsTop(item, dimensionName, parcoords, d,
+                        checkedLines, currentLine);
+                    checkAllPositionsBottom(item, dimensionName, parcoords, d,
+                        checkedLines, currentLine);
+                }
             });
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine);
-                const index = selectionArray.indexOf(currentLine);
-                if (index != -1) {
-                    setSelected(currentLine);
-                    selectionArray.splice(index, 1);
-                }
             }
         }
-    });
+        else {
+            // do nothing
+    }})
 }
 
 export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, dimension) {
