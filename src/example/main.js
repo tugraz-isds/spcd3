@@ -953,7 +953,6 @@ function generateModuleForRangeSettings() {
     }
 }
 
-
 function resetToOriginalRange() {
     const dimensions = getAllDimensionNames();
     dimensions.forEach(function(dimension) {
