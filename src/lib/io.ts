@@ -44,12 +44,27 @@ function setOptionsAndDownload(svgString: string) {
 
   const modal = document.createElement('div');
   modal.style.backgroundColor = 'white';
-  modal.style.padding = '0.35rem';
+  modal.style.padding = '0';
   modal.style.border = '0.08rem solid gray';
   modal.style.borderRadius = '0.5rem';
   modal.style.boxShadow = '0 0 0.625rem rgba(0,0,0,0.3)';
   modal.style.textAlign = 'center';
   modal.style.minWidth = '18rem';
+
+  const fakeheader = document.createElement('div');
+  fakeheader.style.height = '0.4rem';
+  fakeheader.style.background = 'lightgrey';
+  fakeheader.style.borderTopLeftRadius = '0.5rem';
+  fakeheader.style.borderTopRightRadius = '0.5rem';
+  modal.append(fakeheader);
+
+  const title = document.createElement('div');
+  title.textContent = 'Download SVG';
+  title.style.padding = '0.5rem';
+  title.style.marginBottom = '0.5rem';
+  title.style.background = 'lightgrey';
+  title.style.textAlign =  'left';
+  modal.append(title);
 
   const form = document.createElement('div');
   form.style.display = 'flex';
@@ -62,12 +77,14 @@ function setOptionsAndDownload(svgString: string) {
   rowDecimals.style.justifyContent = 'space-between';
 
   const label = document.createElement('label');
-  label.textContent = 'Set decimals (0-10): ';
+  label.textContent = 'Decimals places (0-10): ';
+  label.style.padding = '0.35rem';
   label.style.textAlign = 'left';
   label.style.flex = '1';
   label.htmlFor = 'decimalsInput';
 
   const input = document.createElement('input');
+  input.style.marginRight = '0.45rem';
   input.type = 'number';
   input.min = '0';
   input.max = '10';
@@ -85,6 +102,7 @@ function setOptionsAndDownload(svgString: string) {
 
   const labelKeepClasses = document.createElement('label');
   labelKeepClasses.textContent = 'Keep classes: ';
+  labelKeepClasses.style.padding = '0.35rem';
   labelKeepClasses.style.flex = '1';
   labelKeepClasses.style.textAlign = 'left';
   labelKeepClasses.style.marginRight = '0.5rem';
@@ -92,6 +110,7 @@ function setOptionsAndDownload(svgString: string) {
   const inputKeepClasses = document.createElement('input');
   inputKeepClasses.type = 'checkbox';
   inputKeepClasses.id = 'keepClassesInput';
+  inputKeepClasses.style.marginRight = '0.45rem';
   inputKeepClasses.checked = true;
 
   rowKeepClasses.appendChild(labelKeepClasses);

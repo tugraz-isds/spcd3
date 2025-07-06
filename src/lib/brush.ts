@@ -46,8 +46,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName)
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
     }
 
     d3.select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
@@ -97,8 +96,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName)
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(icon.getArrowTopAndBottom(), 20)}') 8 8, auto`);
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
     }
 
     d3.select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
@@ -173,8 +171,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         const range = maxValue - minValue;
 
         if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-            setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window,
-                true, yPosTop, yPosRect + rectHeight);
+            setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window, true, yPosTop, yPosRect + rectHeight);
         }
 
         active.each(function (d) {
@@ -430,15 +427,16 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
     const digs = getSigDig(d.name, parcoords.currentPosOfDims);
     tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB') * 10) / 10);
     tooltipValues.style('visibility', 'visible');
-    tooltipValues.style('top', (window.event.clientY) / 16 + 'rem').style('left', (window.event.clientX) / 16 + 'rem');
+    tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
     tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
         .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
 }
 
-function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d: any, parcoords: any,
-    window: any, direction: any, yPosTop, yPosBottom): void {
+function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,  
+    d: any, parcoords: any, window: any, direction: any, yPosTop, 
+    yPosBottom): void {
 
     const range = parcoords.yScales[d.name].domain();
     const invertStatus = getInvertStatus(d.name, parcoords.currentPosOfDims);
@@ -468,7 +466,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d
     else {
         tooltipValuesTop.text(Math.round(tooltipValueTop));
         tooltipValuesTop.style('visibility', 'visible');
-        tooltipValuesTop.style('top', (Number(yPosTop) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
+        tooltipValuesTop.style('top', Number(yPosTop) + 'px').style('left', window.event.clientX + 'px');
         tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -481,7 +479,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any, d
     else {
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
-        tooltipValuesDown.style('top', (Number(yPosBottom) / 16) + 'rem').style('left', window.event.clientX / 16 + 'rem');
+        tooltipValuesDown.style('top', Number(yPosBottom) + 'px').style('left', window.event.clientX + 'px');
         tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')

@@ -522,11 +522,14 @@ export function getSelected(): any[] {
 
 export function setSelection(records: string[]): void {
     for (let i = 0; i < records.length; i++) {
-        d3.select('#' + utils.cleanString(records[i]))
-            .classed('selected', true)
-            .transition()
-            .style('stroke', 'rgb(255, 165, 0)')
-            .style('opacity', '1');
+        let stroke = d3.select('#' + utils.cleanString(records[i])).style('stroke');
+        if (stroke !== 'lightgrey') {
+            d3.select('#' + utils.cleanString(records[i]))
+                .classed('selected', true)
+                .transition()
+                .style('stroke', 'rgb(255, 165, 0)')
+                .style('opacity', '1');
+        }
     }
 }
 
@@ -841,8 +844,15 @@ function downloadCSV(dataArray, filename = 'data.csv') {
     document.body.removeChild(link);
 }
 
-function refresh() {
+function reset() {
     drawChart(window.refreshData);
+}
+
+function refresh() {
+    const dimensions = getAllVisibleDimensionNames();
+    for (let i = 0; i < dimensions.length; i++) {
+        show(dimensions[i]);
+    }
 }
 
 export function deleteChart(): void {
@@ -1114,6 +1124,41 @@ function redrawChart(content: any, newFeatures: any): void {
     window.active = setActivePathLines(svg, content, window.parcoords);
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
+
+    const toolbar = document.createElement('div');
+    toolbar.id = 'toolbar';
+    toolbar.style.display = 'flex';
+    toolbar.style.gap = '0.3rem';
+    toolbar.style.marginTop = '1rem';
+    toolbar.style.marginLeft = '2rem';
+    toolbar.style.alignItems = 'center';
+
+    const selectionToolButton = document.createElement('button');
+    selectionToolButton.id = 'selectionTool';
+    selectionToolButton.innerHTML = icon.getSelectionIcon();
+    selectionToolButton.addEventListener('click', function () {
+        isSelectionMode = !isSelectionMode;
+
+        selectionWithRectangle(isSelectionMode);
+
+        this.innerHTML = isSelectionMode ? icon.getSelectionActiveIcon() : icon.getSelectionIcon();
+    });
+
+    const showDataButton = document.createElement('button');
+    showDataButton.id = 'showData';
+    showDataButton.innerHTML = icon.getTableIcon();
+    showDataButton.addEventListener('click', showModalWithData);
+
+    const refreshButton = document.createElement('button');
+    refreshButton.id = 'refreshButton';
+    refreshButton.innerHTML = icon.getRefreshIcon();
+    refreshButton.addEventListener('click', refresh);
+
+    toolbar.appendChild(selectionToolButton);
+    toolbar.appendChild(showDataButton);
+    toolbar.appendChild(refreshButton);
+    const parent = d3.select('#pc_svg').node().parentNode;
+    parent.insertBefore(toolbar, document.getElementById('pc_svg'));
 }
 
 export function createSvgString(): any {
@@ -1433,7 +1478,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
             d3.select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
-                .on('mouseenter', function (event, d) {
+                /*.on('mouseenter', function (event, d) {
                     tooltipValuesLabel.text('');
                     tooltipValuesLabel.style('top', event.clientY / 16 + 'rem').style('left', event.clientX / 16 + 'rem');
                     tooltipValuesLabel.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
@@ -1444,7 +1489,7 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
                 })
                 .on('mouseout', function () {
                     return tooltipValuesLabel.style('visibility', 'hidden');
-                });
+                })*/;
         });
 
     let tickElements = document.querySelectorAll('g.tick');
@@ -1459,17 +1504,17 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
     });
 
     let tooltipValues = d3.select('body')
-        .append('g')
+        .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesTop = d3.select('body')
-        .append('g')
+    let tooltipValuesTop = d3.select('#parallelcoords')
+        .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesDown = d3.select('body')
-        .append('g')
+    let tooltipValuesDown = d3.select('#parallelcoords')
+        .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
@@ -1669,6 +1714,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('y', 80)
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.4')
+                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
