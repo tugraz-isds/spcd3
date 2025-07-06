@@ -55,9 +55,25 @@ export function getTableIcon(): string {
 }
 
 export function getSelectionIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
 }
 
 export function getSelectionActiveIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="orange" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="orange" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
+}
+
+export function getExpandToolbarIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" width="15" height="18"><polyline points="1.5 0.75 3 2.75 1.5 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="3.5 0.75 5 2.75 3.5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
+}
+
+export function getCollapseToolbarIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" width="15" height="18"> <polyline points="3 0.75 1.5 2.75 3 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="5 0.75 3.5 2.75 5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
+}
+
+export function getResetIcon(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" width="15" height="18"><path d="M8 4 A4 4 0 1 1 2 4" fill="none" stroke="black" stroke-width="1"/><polyline points="3 5.5 2 4 0 4" fill="none" stroke="black" stroke-width="1"/><path d="M 5 1 L 5 6.5 z" fill="none" stroke="black" stroke-width="1"/></svg>';
+}
+
+export function getDownloadButton(): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 7" width="15" height="18"><path d="M 2.5 5 L 2.5 1 L 3 1 L 3 5 z"/><polyline points="0.75 3.5 2.75 5 4.75 3.5" fill="none" stroke="black" stroke-width="0.5"/><path d="M 0 6 L 6 6 L 6 6.5 L 0 6.5 z"/></svg>';
 }
