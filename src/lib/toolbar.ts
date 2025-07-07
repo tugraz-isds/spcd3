@@ -72,8 +72,7 @@ export function createToolbar(dataset) {
     toggleButton.on('click', () => {
         expanded = !expanded;
 
-        toolbar
-            .style('max-width', expanded ? '12.5rem' : '0')
+        toolbar.style('max-width', expanded ? '12.5rem' : '0')
             .style('opacity', expanded ? '1' : '0')
             .style('pointer-events', expanded ? 'auto' : 'none');
 

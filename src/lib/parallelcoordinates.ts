@@ -616,6 +616,7 @@ export function drawChart(content: any): void {
     wrapper.append('div')
         .attr('id', 'toolbarRow')
         .style('display', 'flex')
+        .style('flex-wrap', 'wrap')
         .style('align-items', 'center')
         .style('margin-top', '1.5rem')
         .style('margin-left', '1rem')
