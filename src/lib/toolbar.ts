@@ -4,115 +4,84 @@ import * as pc from './parallelcoordinates';
 import * as io from './io';
 
 export function createToolbar(dataset) {
-    const toolbarRow = document.createElement('div');
-        toolbarRow.id = 'toolbarRow';
-        toolbarRow.style.display = 'flex';
-        toolbarRow.style.alignItems = 'center';
-        toolbarRow.style.marginTop = '1.5rem';
-        toolbarRow.style.marginLeft = '1rem';
-    
-        const toggleButton = document.createElement('button');
-        toggleButton.innerHTML = icon.getExpandToolbarIcon();
-        toggleButton.style.margin = '0';
-        toggleButton.style.border = 'none';
-        toggleButton.style.borderRadius = '0';
-        toggleButton.style.padding = '0';
-        toggleButton.style.width = '2rem';
-        toggleButton.style.height = '2rem';
-        toolbarRow.appendChild(toggleButton);
-    
-        const toolbar = document.createElement('div');
-        toolbar.style.display = 'flex';
-        toolbar.style.overflow = 'hidden';
-        toolbar.style.maxWidth = '0';
-        toolbar.style.opacity = '0';
-        toolbar.style.transition = 'max-width 0.3s ease, opacity 0.3s ease';
-        toolbar.style.pointerEvents = 'none';
-    
-        /*const selectionToolButton = document.createElement('button');
-        selectionToolButton.id = 'selectionTool';
-        selectionToolButton.innerHTML = icon.getSelectionIcon();
-        selectionToolButton.addEventListener('click', function () {
-            isSelectionMode = !isSelectionMode;
-    
-            selectionWithRectangle(isSelectionMode);
-    
-            this.innerHTML = isSelectionMode ? icon.getSelectionActiveIcon() : icon.getSelectionIcon();
-        });*/
-    
-        const showDataButton = document.createElement('button');
-        showDataButton.id = 'showData';
-        showDataButton.innerHTML = icon.getTableIcon();
-        showDataButton.style.margin = '0rem';
-        showDataButton.style.border = 'none';
-        showDataButton.style.borderRadius = '0';
-        showDataButton.style.padding = '0';
-        showDataButton.style.width = '2rem';
-        showDataButton.style.height = '2rem';
-        showDataButton.addEventListener('click', function () {
-            showModalWithData(dataset);
-        });
-    
-        const downloadButton = document.createElement('button');
-        downloadButton.id = 'downloadButton';
-        downloadButton.innerHTML = icon.getDownloadButton();
-        downloadButton.style.margin = '0';
-        downloadButton.style.border = 'none';
-        downloadButton.style.borderRadius = '0';
-        downloadButton.style.padding = '0';
-        downloadButton.style.width = '2rem';
-        downloadButton.style.height = '2rem';
-        downloadButton.addEventListener('click', io.saveAsSvg);
-    
-        const refreshButton = document.createElement('button');
-        refreshButton.id = 'refreshButton';
-        refreshButton.innerHTML = icon.getRefreshIcon();
-        refreshButton.style.margin = '0';
-        refreshButton.style.border = 'none';
-        refreshButton.style.borderRadius = '0';
-        refreshButton.style.padding = '0';
-        refreshButton.style.width = '2rem';
-        refreshButton.style.height = '2rem';
-        refreshButton.addEventListener('click', pc.refresh);
-    
-        const resetButton = document.createElement('button');
-        resetButton.id = 'resetButton';
-        resetButton.innerHTML = icon.getResetIcon();
-        resetButton.style.margin = '0';
-        resetButton.style.border = 'none';
-        resetButton.style.borderRadius = '0';
-        resetButton.style.padding = '0';
-        resetButton.style.width = '2rem';
-        resetButton.style.height = '2rem';
-        resetButton.addEventListener('click', pc.reset);
-    
-        //toolbar.appendChild(selectionToolButton);
-        toolbar.appendChild(showDataButton);
-        toolbar.appendChild(downloadButton);
-        toolbar.appendChild(refreshButton);
-        toolbar.appendChild(resetButton);
-        toolbarRow.appendChild(toolbar);
-    
-        let expanded = false;
-    
-        toggleButton.addEventListener('click', () => {
-            expanded = !expanded;
-        
-            if (!expanded) {
-                toolbar.style.maxWidth = '0';
-                toolbar.style.opacity = '0';
-                toolbar.style.pointerEvents = 'none';
-                toggleButton.innerHTML = icon.getExpandToolbarIcon();;
-            } else {
-                toolbar.style.maxWidth = '12.5rem';
-                toolbar.style.opacity = '1';
-                toolbar.style.pointerEvents = 'auto';
-                toggleButton.innerHTML = icon.getCollapseToolbarIcon();;
-            }
-        })
-    
-        const parent = d3.select('#pc_svg').node().parentNode;
-        parent.insertBefore(toolbarRow, document.getElementById('pc_svg'));
+    const toolbarRow = d3.select('#toolbarRow')
+
+    const toggleButton = toolbarRow.append('button')
+        .html(icon.getExpandToolbarIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '0')
+        .style('padding', '0')
+        .style('width', '2rem')
+        .style('height', '2rem');
+
+    const toolbar = toolbarRow.append('div')
+        .style('display', 'flex')
+        .style('overflow', 'hidden')
+        .style('max-width', '0')
+        .style('opacity', '0')
+        .style('transition', 'max-width 0.3s ease, opacity 0.3s ease')
+        .style('pointer-events', 'none');
+
+    const showDataButton = toolbar.append('button')
+        .attr('id', 'showData')
+        .html(icon.getTableIcon())
+        .style('margin', '0rem')
+        .style('border', 'none')
+        .style('border-radius', '0')
+        .style('padding', '0')
+        .style('width', '2rem')
+        .style('height', '2rem')
+        .on('click', () => showModalWithData(dataset));
+
+    const downloadButton = toolbar.append('button')
+        .attr('id', 'downloadButton')
+        .html(icon.getDownloadButton())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '0')
+        .style('padding', '0')
+        .style('width', '2rem')
+        .style('height', '2rem')
+        .on('click', io.saveAsSvg);
+
+    const refreshButton = toolbar.append('button')
+        .attr('id', 'refreshButton')
+        .html(icon.getRefreshIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '0')
+        .style('padding', '0')
+        .style('width', '2rem')
+        .style('height', '2rem')
+        .on('click', pc.refresh);
+
+    const resetButton = toolbar.append('button')
+        .attr('id', 'resetButton')
+        .html(icon.getResetIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '0')
+        .style('padding', '0')
+        .style('width', '2rem')
+        .style('height', '2rem')
+        .on('click', pc.reset);
+
+    let expanded = false;
+
+    toggleButton.on('click', () => {
+        expanded = !expanded;
+
+        toolbar
+            .style('max-width', expanded ? '12.5rem' : '0')
+            .style('opacity', expanded ? '1' : '0')
+            .style('pointer-events', expanded ? 'auto' : 'none');
+
+        toggleButton.html(
+            expanded ? icon.getCollapseToolbarIcon() : icon.getExpandToolbarIcon()
+        );
+    });
+
 }
 
 function showModalWithData(dataset) {

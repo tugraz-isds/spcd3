@@ -611,12 +611,25 @@ export function drawChart(content: any): void {
 
     const height = 360;
 
-    window.svg = d3.select('#parallelcoords')
+    const wrapper = d3.select('#parallelcoords');
+
+    wrapper.append('div')
+        .attr('id', 'toolbarRow')
+        .style('display', 'flex')
+        .style('align-items', 'center')
+        .style('margin-top', '1.5rem')
+        .style('margin-left', '1rem')
+        .style('margin-bottom', 0);
+
+    toolbar.createToolbar(window.parcoords.newDataset);
+
+    window.svg = wrapper
         .append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [-10, 0, window.width, height])
+        .attr('viewBox', [-10, 20, window.width, height])
         .attr('font-family', 'Verdana, sans-serif')
-        .attr('user-select', 'none');
+        .attr('user-select', 'none')
+        .style('margin-top', 0);
 
     setDefsForIcons();
 
@@ -640,8 +653,6 @@ export function drawChart(content: any): void {
         d3.select('#contextmenu').style('display', 'none');
         d3.select('#contextmenuRecords').style('display', 'none');
     }
-
-    toolbar.createToolbar(window.parcoords.newDataset);
 }
 
 export function reset() {

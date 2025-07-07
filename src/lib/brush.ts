@@ -1,9 +1,6 @@
 import * as d3 from 'd3-selection';
 import * as icon from './icons/icons';
 import * as helper from './utils';
-import { isSelected, setSelected, setUnselected } from './parallelcoordinates';
-
-let selectionArray = [];
 
 export function brushDown(cleanDimensionName: any, event: any, d: any,
     parcoords: {
@@ -46,7 +43,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 15)}') 8 8, auto`)
     }
 
     d3.select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
@@ -96,7 +93,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 15)}') 8 8, auto`)
     }
 
     d3.select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
@@ -251,8 +248,8 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
 
     d3.select('#rect_' + cleanDimensionName)
         .attr('y', topPosition);
-    d3.select('#triangle_down_' + cleanDimensionName)
-        .attr('y', topPosition - 10);
+    const triangle_down = d3.select('#triangle_down_' + cleanDimensionName).attr('y', topPosition - 10);
+    //triangle_down.transition().duration(500).attr('y', topPosition - 10);
     d3.select('#triangle_up_' + cleanDimensionName)
         .attr('y', bottomPosition);
     d3.select('#rect_' + cleanDimensionName)
