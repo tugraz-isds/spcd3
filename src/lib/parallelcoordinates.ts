@@ -658,6 +658,10 @@ export function drawChart(content: any): void {
 
 export function reset() {
     drawChart(window.refreshData);
+    let toolbar = d3.select('#toolbar');
+    toolbar.style('max-width', '12.5rem')
+            .style('opacity', '1')
+            .style('pointer-events', 'auto');
 }
 
 export function refresh() {

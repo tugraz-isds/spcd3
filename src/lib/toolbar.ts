@@ -7,6 +7,7 @@ export function createToolbar(dataset) {
     const toolbarRow = d3.select('#toolbarRow')
 
     const toggleButton = toolbarRow.append('button')
+        .attr('title', 'Expand toolbar')
         .html(icon.getExpandToolbarIcon())
         .style('margin', '0')
         .style('border', 'none')
@@ -16,6 +17,7 @@ export function createToolbar(dataset) {
         .style('height', '2rem');
 
     const toolbar = toolbarRow.append('div')
+        .attr('id', 'toolbar')
         .style('display', 'flex')
         .style('overflow', 'hidden')
         .style('max-width', '0')
@@ -25,6 +27,7 @@ export function createToolbar(dataset) {
 
     const showDataButton = toolbar.append('button')
         .attr('id', 'showData')
+        .attr('title', 'Show table')
         .html(icon.getTableIcon())
         .style('margin', '0rem')
         .style('border', 'none')
@@ -36,6 +39,7 @@ export function createToolbar(dataset) {
 
     const downloadButton = toolbar.append('button')
         .attr('id', 'downloadButton')
+        .attr('title', 'Download SVG')
         .html(icon.getDownloadButton())
         .style('margin', '0')
         .style('border', 'none')
@@ -47,6 +51,7 @@ export function createToolbar(dataset) {
 
     const refreshButton = toolbar.append('button')
         .attr('id', 'refreshButton')
+        .attr('title', 'Refresh')
         .html(icon.getRefreshIcon())
         .style('margin', '0')
         .style('border', 'none')
@@ -58,6 +63,7 @@ export function createToolbar(dataset) {
 
     const resetButton = toolbar.append('button')
         .attr('id', 'resetButton')
+        .attr('title', 'Reset')
         .html(icon.getResetIcon())
         .style('margin', '0')
         .style('border', 'none')
@@ -75,6 +81,8 @@ export function createToolbar(dataset) {
         toolbar.style('max-width', expanded ? '12.5rem' : '0')
             .style('opacity', expanded ? '1' : '0')
             .style('pointer-events', expanded ? 'auto' : 'none');
+            
+        toggleButton.attr('title', expanded ? 'Collapse toolbar' : 'Expand toolbar');
 
         toggleButton.html(
             expanded ? icon.getCollapseToolbarIcon() : icon.getExpandToolbarIcon()
