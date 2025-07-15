@@ -136,6 +136,14 @@ export function createToolTipForValues(recordData): void {
 
     const rectLeft = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().left;
 
+    const rectTop = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().top;
+
+    const rectBottom = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().bottom;
+
+    const xScale1 = parcoords.xScales(dimensions[0]);
+    const xScale2 = parcoords.xScales(dimensions[1]);
+    const range = xScale2 - xScale1;
+
     dimensions.forEach(dimension => {
         const cleanString = utils.cleanString(dimension);
 
@@ -146,28 +154,17 @@ export function createToolTipForValues(recordData): void {
                 .style('position', 'absolute')
                 .style('visibility', 'hidden');
 
-            const invertStatus = isInverted(dimension);
             const scale = parcoords.yScales[dimension];
-            const maxValue = invertStatus ? scale.domain()[0] : scale.domain()[1];
-            const minValue = invertStatus ? scale.domain()[1] : scale.domain()[0];
-            const range = maxValue - minValue;
+           
+            let value = scale(recordData[dimension]);
 
-            let value;
-            if (invertStatus) {
-                value = isNaN(maxValue) ? scale(recordData[dimension]) :
-                    240 / range * (recordData[dimension] - minValue) + 80;
-            } else {
-                value = isNaN(maxValue) ? scale(recordData[dimension]) :
-                    240 / range * (maxValue - recordData[dimension]) + 80;
-            }
-
-            const x = (rectLeft + (counter * 95)) / 16;
-            const y = (value + 195) / 16;
+            const x = rectLeft + counter * range;
+            const y = rectTop + value - 100;
 
             tooltipValues.text(recordData[dimension].toString())
                 .style('visibility', 'visible')
-                .style('top', `${y}rem`)
-                .style('left', `${x}rem`)
+                .style('top', `${y}px`)
+                .style('left', `${x}px`)
                 .style('font-size', '0.65rem')
                 .style('margin', '0.5rem')
                 .style('color', 'red')
