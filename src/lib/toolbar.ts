@@ -124,7 +124,6 @@ function showModalWithData(dataset) {
         .style('border-radius', '0.5rem')
         .style('max-height', '80vh')
         .style('max-width', '90vw')
-        .style('overflow', 'auto')
         .style('z-index', '1000')
         .style('display', 'block');
 
@@ -155,9 +154,9 @@ function showModalWithData(dataset) {
 
     const scrollWrapper = document.createElement('div');
     scrollWrapper.style.width = '100%';
-    scrollWrapper.style.overflowX = 'auto';
+    scrollWrapper.style.overflowY = 'auto';
     scrollWrapper.style.whiteSpace = 'nowrap';
-    scrollWrapper.style.maxHeight = '79vh';
+    scrollWrapper.style.maxHeight = '70vh';
 
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
