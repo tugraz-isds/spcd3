@@ -914,6 +914,19 @@ function redrawChart(content: any, newFeatures: any): void {
     let height = 360;
     let width = newFeatures.length * 100;
 
+    const wrapper = d3.select('#parallelcoords');
+
+    wrapper.append('div')
+        .attr('id', 'toolbarRow')
+        .style('display', 'flex')
+        .style('flex-wrap', 'wrap')
+        .style('align-items', 'center')
+        .style('margin-top', '1.5rem')
+        .style('margin-left', '1rem')
+        .style('margin-bottom', 0);
+
+    toolbar.createToolbar(window.parcoords.newDataset);
+
     window.svg = d3.select('#parallelcoords')
         .append('svg')
         .attr('id', 'pc_svg')
@@ -941,7 +954,6 @@ function redrawChart(content: any, newFeatures: any): void {
 
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
 
-    toolbar.createToolbar(window.parcoords.newDataset);
 }
 
 export function createSvgString(): any {
