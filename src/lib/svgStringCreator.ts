@@ -45,13 +45,13 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
 }
 
 export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
-    parcoords: any, padding: any): void {
+    parcoords: any, padding: any, xScales: any): void {
 
     let featureAxis = svg.selectAll('g.feature')
         .data(parcoords.features)
         .enter()
         .append('g')
-        .attr('transform', d => ('translate(' + parcoords.xScales(d.name)) + ')');
+        .attr('transform', d => ('translate(' + xScales(d.name)) + ')');
 
     featureAxis
         .append('g')

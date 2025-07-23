@@ -33,6 +33,7 @@ declare global {
     let svg: any;
     let hoverlabel: string;
     let refreshData: any;
+    let initDimension: any;
 }
 
 declare const window: any;
@@ -41,64 +42,76 @@ declare const window: any;
 
 //---------- Show and Hide Functions ----------
 
-export function show(dimension: string): void {
-    const tempFeatures = parcoords.newFeatures.slice();
-    const isShown = getHiddenStatus(dimension);
-    const temp = parcoords.currentPosOfDims.slice();
-    const item = parcoords.currentPosOfDims.find((object) => object.key == dimension);
-    const index = item.index;
-    window.selected = getSelected();
-    if (isShown == "hidden") {
-        tempFeatures.splice(index, 0, dimension);
-        redrawChart(parcoords.data, tempFeatures);
+export function hide(dimension: string): void {
+    const newDimensions = window.parcoords.newFeatures.filter(d => d !== dimension);
+    const featureSet = window.parcoords.features.filter(d => d.name !== dimension);
 
-        window.parcoords.currentPosOfDims = temp.slice();
+    window.parcoords.features = featureSet;
+    window.parcoords.newFeatures = newDimensions;
 
-        window.parcoords.currentPosOfDims.forEach(function (item) {
-            if (getHiddenStatus(item.key) != 'hidden') {
-                if (item.isInverted) {
-                    invertWoTransition(item.key);
-                }
-                if (item.top != 80 || item.bottom != 320) {
-                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
-                }
-                if (!isDimensionCategorical(item.key)) {
-                    setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
-                }
-            }
+    window.parcoords.xScales.domain(newDimensions);
+
+    d3.selectAll('.dimensions')
+        .filter(d => newDimensions.includes(d.name || d))
+        .transition()
+        .duration(1000)
+        .attr('transform', d =>
+            'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
+        )
+        .ease(ease.easeCubic);
+
+    d3.selectAll('.dimensions')
+        .filter(d => d.name === dimension)
+        .transition()
+        .duration(500)
+        .style('opacity', 0)
+        .on('end', function () {
+            d3.select(this).attr('visibility', 'hidden');
         });
 
-        setSelection(window.selected);
-    }
+    d3.select('g.active').selectAll('path')
+        .transition()
+        .duration(1000)
+        .attr('d', d => helper.linePath(d, newDimensions, parcoords))
+        .ease(ease.easeCubic);
 }
 
-export function hide(dimension: string): void {
-    d3.select('#contextmenu').style('display', 'none');
-    const tempFeatures = parcoords.newFeatures.slice();
-    const isShown = getHiddenStatus(dimension);
-    const temp = window.parcoords.currentPosOfDims.slice();
-    window.selected = getSelected();
-    if (isShown == "shown") {
-        tempFeatures.splice(tempFeatures.indexOf(dimension), 1);
-        redrawChart(parcoords.data, tempFeatures);
 
-        window.parcoords.currentPosOfDims = temp.slice();
-        window.parcoords.currentPosOfDims.forEach(function (item) {
-            if (getHiddenStatus(item.key) != 'hidden') {
-                if (item.isInverted) {
-                    invertWoTransition(item.key);
-                }
-                if (item.top != 80 || item.bottom != 320) {
-                    brush.filterWithCoords(item.top, item.bottom, parcoords.currentPosOfDims, item.key);
-                }
-                if (!isDimensionCategorical(item.key)) {
-                    setDimensionRange(item.key, item.currentRangeBottom, item.currentRangeTop);
-                }
-            }
-        });
+export function show(dimension: string): void {
+    if (window.parcoords.newFeatures.includes(dimension)) return;
 
-        setSelection(window.selected);
+    const existingIndex = window.initDimension.indexOf(dimension);
+    if (existingIndex !== -1) {
+        window.parcoords.newFeatures.splice(existingIndex, 0, dimension);
+        const removedItem = { name: dimension };
+        window.parcoords.features.push(removedItem);
     }
+
+    window.parcoords.xScales.domain(window.parcoords.newFeatures);
+
+    d3.selectAll('.dimensions')
+    .filter(d => (typeof d === "object" ? d.name : d) === dimension)
+        .style('opacity', 1)
+        .transition()
+        .duration(500)
+        .attr('visibility', 'visible');;
+
+    d3.selectAll('.dimensions')
+        .filter(d => window.parcoords.newFeatures.includes(
+            typeof d === "object" ? d.name : d
+        ))
+        .transition()
+        .duration(1000)
+        .attr('transform', d =>
+            'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
+        )
+        .ease(ease.easeCubic);
+
+    d3.select('g.active').selectAll('path')
+        .transition()
+        .duration(1000)
+        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, parcoords))
+        .ease(ease.easeCubic);
 }
 
 export function getHiddenStatus(dimension: string): string {
@@ -259,7 +272,6 @@ export function moveByOne(dimension: string, direction: string): void {
 
     parcoords.dragging[neighbour] = direction == 'right' ? posNeighbour - distance :
         posNeighbour + distance;
-
 
     if (direction == 'right') {
         [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension - 1]] =
@@ -660,8 +672,8 @@ export function reset() {
     drawChart(window.refreshData);
     let toolbar = d3.select('#toolbar');
     toolbar.style('max-width', '12.5rem')
-            .style('opacity', '1')
-            .style('pointer-events', 'auto');
+        .style('opacity', '1')
+        .style('pointer-events', 'auto');
 }
 
 export function refresh() {
@@ -837,6 +849,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.paddingXaxis = 75;
     window.width = newFeatures.length * 100;
     window.height = 400;
+    window.initDimension = newFeatures;
 
     const label = newFeatures[newFeatures.length - 1];
 
@@ -906,62 +919,13 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.hoverlabel = getAllVisibleDimensionNames()[0];
 }
 
-function redrawChart(content: any, newFeatures: any): void {
-    deleteChart();
-
-    setUpParcoordData(content, newFeatures);
-
-    let height = 360;
-    let width = newFeatures.length * 100;
-
-    const wrapper = d3.select('#parallelcoords');
-
-    wrapper.append('div')
-        .attr('id', 'toolbarRow')
-        .style('display', 'flex')
-        .style('flex-wrap', 'wrap')
-        .style('align-items', 'center')
-        .style('margin-top', '1.5rem')
-        .style('margin-left', '1rem')
-        .style('margin-bottom', 0);
-
-    toolbar.createToolbar(window.parcoords.newDataset);
-
-    window.svg = d3.select('#parallelcoords')
-        .append('svg')
-        .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, width, height])
-        .attr('font-family', 'Verdana, sans-serif')
-        .on("contextmenu", function (event) {
-            event.stopPropagation();
-            event.preventDefault();
-        })
-        .on("mouseenter", function () {
-            helper.cleanTooltip();
-        })
-        .on("click", function () {
-            clearSelection();
-        });
-
-    setDefsForIcons();
-
-    window.onclick = (event) => {
-        d3.select('#contextmenu').style('display', 'none');
-        d3.select('#contextmenuRecords').style('display', 'none');
-    }
-
-    window.active = setActivePathLines(svg, content, window.parcoords);
-
-    setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
-
-}
-
 export function createSvgString(): any {
-    let height = 360;
-    let width = window.parcoords.newFeatures.length * 100;
+    let height = window.height;
+    let width = window.width;
 
     let yScalesForDownload = helper.setupYScales(400, window.padding, window.parcoords.features, window.parcoords.newDataset);
     let yAxisForDownload = helper.setupYAxis(window.parcoords.features, yScalesForDownload, window.parcoords.newDataset);
+    let xScalesForDownload = helper.setupXScales(window.width, window.paddingXaxis, parcoords.features);
 
     let svg = d3.create('svg')
         .attr("xmlns", "http://www.w3.org/2000/svg")
@@ -998,7 +962,7 @@ export function createSvgString(): any {
 
     svgcreator.setActivePathLinesToDownload(svg, window.parcoords, window.key);
 
-    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, window.parcoords, window.padding);
+    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, window.parcoords, window.padding, xScalesForDownload);
 
     return svg.node().outerHTML;
 }

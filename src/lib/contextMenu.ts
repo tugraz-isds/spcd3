@@ -86,6 +86,7 @@ function showAllMenu() {
             const hiddenDimensions = pc.getAllHiddenDimensionNames();
             for (let i = 0; i < hiddenDimensions.length; i++) {
                 pc.show(hiddenDimensions[i]);
+                d3.select('#contextmenu').style('display', 'none');
             }
             event.stopPropagation();
         });
@@ -370,6 +371,7 @@ function hideDimensionMenu(dimension: any) {
     d3.select('#hideMenu')
         .on('click', (event) => {
             pc.hide(dimension);
+            d3.select('#contextmenu').style('display', 'none');
             event.stopPropagation();
         });
 }
