@@ -674,7 +674,13 @@ export function reset() {
     toolbar.style('max-width', '12.5rem')
         .style('opacity', '1')
         .style('pointer-events', 'auto');
+
+    let toggleButton = d3.select('#toggleButton');
+    toggleButton.attr('title', 'Collapse toolbar');
+    
+    toggleButton.html(icon.getCollapseToolbarIcon());
 }
+
 
 export function refresh() {
     const dimensions = getAllVisibleDimensionNames();

@@ -7,6 +7,7 @@ export function createToolbar(dataset) {
     const toolbarRow = d3.select('#toolbarRow')
 
     const toggleButton = toolbarRow.append('button')
+        .attr('id', 'toggleButton')
         .attr('title', 'Expand toolbar')
         .html(icon.getExpandToolbarIcon())
         .style('margin', '0')
@@ -73,10 +74,11 @@ export function createToolbar(dataset) {
         .style('height', '2rem')
         .on('click', pc.reset);
 
-    let expanded = false;
 
     toggleButton.on('click', () => {
-        expanded = !expanded;
+        let isExpanded = toolbar.style('max-width') !== '0px';
+
+        let expanded = !isExpanded;
 
         toolbar.style('max-width', expanded ? '12.5rem' : '0')
             .style('opacity', expanded ? '1' : '0')
