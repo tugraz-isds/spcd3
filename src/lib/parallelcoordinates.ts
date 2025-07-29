@@ -84,7 +84,7 @@ export function show(dimension: string): void {
     if (existingIndex !== -1) {
         window.parcoords.newFeatures.splice(existingIndex, 0, dimension);
         const removedItem = { name: dimension };
-        window.parcoords.features.push(removedItem);
+        window.parcoords.features.splice(existingIndex, 0, removedItem);
     }
 
     window.parcoords.xScales.domain(window.parcoords.newFeatures);
