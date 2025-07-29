@@ -99,12 +99,8 @@ function resetFilterMenu(values: any[], dimension: any) {
             .style('color', 'black')
             .on('click', (event) => {
                 const range = pc.getDimensionRange(dimension);
-                if (temp.isInverted(dimension)) {
-                    pc.setFilter(dimension, range[1], range[0]);
-                }
-                else {
-                    pc.setFilter(dimension, range[1], range[0]);
-                }
+                pc.setFilter(dimension, range[1], range[0]);
+                d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
@@ -118,8 +114,9 @@ function resetFilterMenu(values: any[], dimension: any) {
 function filterMenu(values: any[], dimension: any) {
     if (!isNaN(values[0])) {
         let currentFilters = pc.getFilter(dimension);
-        d3.select('#maxFilterValue').property('value', currentFilters[0]);
-        d3.select('#minFilterValue').property('value', currentFilters[1]);
+        const inverted = temp.isInverted(dimension);
+        inverted ? d3.select('#maxFilterValue').property('value', currentFilters[1]) : d3.select('#maxFilterValue').property('value', currentFilters[0]);
+        inverted ? d3.select('#minFilterValue').property('value', currentFilters[0]) : d3.select('#minFilterValue').property('value', currentFilters[1]);
         d3.select('#filterMenu')
             .style('border-top', '0.08rem lightgrey solid')
             .style('visibility', 'visible')
@@ -128,13 +125,13 @@ function filterMenu(values: any[], dimension: any) {
                 d3.select('#modalOverlayFilter').style('display', 'block');
                 d3.select('#modalFilter').style('display', 'block');
                 d3.select('#contextmenu').style('display', 'none');
-                const newText1 = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
-                d3.select('#headerDimensionFilter').text(newText1);
+                const header = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
+                d3.select('#headerDimensionFilter').text(header);
                 d3.select('#buttonFilter').on('click', () => {
                     let min = d3.select('#minFilterValue').node().value;
                     let max = d3.select('#maxFilterValue').node().value;
                     const ranges = pc.getDimensionRange(dimension);
-                    const inverted = temp.isInverted(dimension);
+                   
                     let isOk = true;
 
                     if (inverted) {
@@ -185,12 +182,8 @@ function filterMenu(values: any[], dimension: any) {
                             isOk = false;
                         }
                     }
-                    if (inverted) {
-                        pc.setFilter(dimension, min, max);
-                    }
-                    else {
-                        pc.setFilter(dimension, max, min);
-                    }
+                    inverted ? pc.setFilter(dimension, min, max) :
+                    pc.setFilter(dimension, max, min);
                     if (isOk) {
                         d3.select('#errorFilter').style('display', 'none');
                         d3.select('#modalFilter').style('display', 'none');
@@ -231,6 +224,7 @@ function resetRoundRangeMenu(values: any[], dimension: any) {
             .style('color', 'black')
             .on('click', (event) => {
                 pc.setDimensionRangeRounded(dimension, pc.getMinValue(dimension), pc.getMaxValue(dimension));
+                d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
@@ -248,6 +242,7 @@ function resetRangeMenu(values: any[], dimension: any) {
             .style('color', 'black')
             .on('click', (event) => {
                 pc.setDimensionRange(dimension, pc.getMinValue(dimension), pc.getMaxValue(dimension));
+                d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
