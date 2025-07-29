@@ -684,7 +684,7 @@ function createCloseButton(modal: any, id: string) {
 function createErrorMessage(modal: any, id: string) {
     const errorMessage = document.createElement('div');
     errorMessage.id = id;
-    errorMessage.style.position = 'absolute';
+    errorMessage.style.position = 'relative';
     errorMessage.style.display = 'none';
     modal.append(() => errorMessage);
 }

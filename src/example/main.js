@@ -1,10 +1,12 @@
-import {loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange, 
+import {
+    loadCSV, drawChart, invert, saveAsSvg, moveByOne, getCurrentMinRange,
     getCurrentMaxRange, getDimensionPosition, setFilter, getFilter,
-    getDimensionRange, getNumberOfDimensions, hide, show, getHiddenStatus, 
-    getMinValue, getMaxValue, getInversionStatus, setDimensionRange, 
+    getDimensionRange, getNumberOfDimensions, hide, show, getHiddenStatus,
+    getMinValue, getMaxValue, getInversionStatus, setDimensionRange,
     getAllDimensionNames, getAllVisibleDimensionNames,
-    getAllHiddenDimensionNames, getAllRecords, toggleSelection, isSelected, 
-    setDimensionRangeRounded, isDimensionCategorical} 
+    getAllHiddenDimensionNames, getAllRecords, toggleSelection, isSelected,
+    setDimensionRangeRounded, isDimensionCategorical
+}
     from './lib/spcd3.js';
 
 let data;
@@ -16,33 +18,33 @@ let rangeDimensionData;
 let studentData = "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
 
 window.addEventListener('click', (event) => {
-    if(!event.target.id.includes('show')) {
+    if (!event.target.id.includes('show')) {
         closeElements('options');
     }
-    if(!event.target.id.includes('invert')) {
+    if (!event.target.id.includes('invert')) {
         closeElements('invertOptions');
     }
-    if(!event.target.id.includes('move')) {
+    if (!event.target.id.includes('move')) {
         closeElements('moveOptions');
     }
-    if(!event.target.id.includes('filter')) {
+    if (!event.target.id.includes('filter')) {
         closeElements('filterOptions');
         if (document.getElementById('filterContainer') != null) {
             document.getElementById('filterContainer').remove();
         }
     }
-    if(!event.target.id.includes('range')) {
+    if (!event.target.id.includes('range')) {
         closeElements('rangeOptions');
         if (document.getElementById('rangeContainer')) {
             document.getElementById('rangeContainer').remove();
         }
     }
-    if(!event.target.id.includes('sel')) {
+    if (!event.target.id.includes('sel')) {
         closeElements('options_r');
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     data = studentData;
     newData = loadCSV(data);
     showButtons();
@@ -96,7 +98,7 @@ function handleFileSelect(event) {
     if (file) {
         const reader = new FileReader();
 
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
@@ -110,7 +112,7 @@ function handleFileSelect(event) {
             generateDropdownForFilter();
             generateDropdownForRange();
             generateDropdownForSelectRecords();
-            
+
             document.getElementById('border').style.visibility = 'visible';
         };
         reader.readAsText(file);
@@ -124,9 +126,8 @@ function showButtons() {
     resetAllButton.style.visibility = 'visible';
 }
 
-function updateDimensions(dimension)
-{
-    if(getHiddenStatus(dimension) == 'shown') {
+function updateDimensions(dimension) {
+    if (getHiddenStatus(dimension) == 'shown') {
         hide(dimension);
     }
     else {
@@ -140,11 +141,11 @@ function closeElements(id) {
 }
 
 function showOptions(id, buttonId) {
-    
+
     let options = document.getElementById(id);
-    
+
     options.style.display == 'none' ? options.style.display = 'block' :
-    options.style.display = 'none';
+        options.style.display = 'none';
 
     if (buttonId == "moveButton") {
         disableLeftAndRightButton();
@@ -152,16 +153,16 @@ function showOptions(id, buttonId) {
 
     const dimensions = getAllDimensionNames();
     dimensions.forEach(function (dimension) {
-        if(getHiddenStatus(dimension) == 'hidden') {
+        if (getHiddenStatus(dimension) == 'hidden') {
             document.getElementById('show_' + dimension).checked = false;
         }
     });
 }
 
 function showOptionsForRecords(id, buttonId) {
-    
+
     let checkboxes = document.getElementById(id);
-    
+
     checkboxes.style.display == 'none' ? checkboxes.style.display = 'block' :
         checkboxes.style.display = 'none';
 
@@ -207,11 +208,11 @@ function generateDropdownForShow() {
     let dimensions = getAllDimensionNames();
     let copyDimensions = dimensions.slice();
     let reverseDimensions = copyDimensions.reverse();
-    
+
     if (reverseDimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
-    
+
     dimensionContainer.addEventListener('change', (event) => {
         updateDimensions(event.target.value);
     });
@@ -221,7 +222,7 @@ function generateDropdownForShow() {
         let test1 = getAllVisibleDimensionNames();
         let test2 = getAllHiddenDimensionNames();
         var result = test1.concat(test2);
-        result.forEach(function(dimension) {
+        result.forEach(function (dimension) {
             let ddElement = document.createElement('div');
             ddElement.className = 'dropdownLabel';
             ddElement.id = 'show';
@@ -256,7 +257,7 @@ function generateDropdownForInvert() {
     dimensionContainer.name = 'invertOptions';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    
+
     const dimensions = getAllVisibleDimensionNames();
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
@@ -273,7 +274,7 @@ function generateDropdownForInvert() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        getAllVisibleDimensionNames().forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function (dimension) {
             let ddElement = document.createElement('div');
             ddElement.className = 'dropdownLabel';
             ddElement.id = 'invertElement';
@@ -289,7 +290,7 @@ function generateDropdownForInvert() {
 
             inputButton.addEventListener('click', (event) => {
                 const value = inputButton.id.replace('invert_', '');
-                if(value != undefined) {
+                if (value != undefined) {
                     invert(value);
                     if (getInversionStatus(value) == "ascending") {
                         inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
@@ -312,13 +313,13 @@ function generateDropdownForInvert() {
         showOptions('invertOptions', 'invertButton');
         calcDDBehaviour(dimensionContainer, selectButton);
         for (let i = 0; i < dimensions.length; i++) {
-            document.addEventListener("DOMContentLoaded", function(event) {
-            if (getInversionStatus(dimensions[i]) == "ascending") {
-                inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
-            }
-            else {
-                inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
-            }
+            document.addEventListener("DOMContentLoaded", function (event) {
+                if (getInversionStatus(dimensions[i]) == "ascending") {
+                    inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
+                }
+                else {
+                    inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
+                }
             })
         }
     });
@@ -353,7 +354,7 @@ function generateDropdownForMove() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        getAllVisibleDimensionNames().forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function (dimension) {
             let dimensionLabel = document.createElement('div');
             dimensionLabel.className = 'dropdownLabel';
             dimensionLabel.id = 'move';
@@ -363,12 +364,12 @@ function generateDropdownForMove() {
             arrowLeft.innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
             arrowLeft.addEventListener('click', () => {
                 const value = arrowLeft.id.replace('moveleft_', '');
-                if(value != undefined) {
+                if (value != undefined) {
                     moveDimensionData = value;
                     moveDimensionLeft();
                     disableLeftAndRightButton();
                 }
-            });         
+            });
             let arrowRight = document.createElement('button');
             arrowRight.className = 'inputButtonMoveRight';
             arrowRight.id = 'moveright_' + dimension;
@@ -376,12 +377,12 @@ function generateDropdownForMove() {
             arrowRight.style.paddingRight = '0.5rem';
             arrowRight.addEventListener('click', () => {
                 const value = arrowRight.id.replace('moveright_', '');
-                if(value != undefined) {
+                if (value != undefined) {
                     moveDimensionData = value;
                     moveDimensionRight();
                     disableLeftAndRightButton();
                 }
-            });    
+            });
             let textLabel = document.createElement('label');
             textLabel.textContent = dimension;
             textLabel.id = 'moveLabel';
@@ -401,26 +402,26 @@ function generateDropdownForMove() {
 
 function calcDDBehaviour(dimensionContainer, selectButton) {
     const dropdownHeight = dimensionContainer.clientHeight;
-        const windowHeight = window.innerHeight;
-        const dropdownTop = selectButton.getBoundingClientRect().top;
+    const windowHeight = window.innerHeight;
+    const dropdownTop = selectButton.getBoundingClientRect().top;
 
-        if (windowHeight - dropdownTop < dropdownHeight) {
-            dimensionContainer.style.bottom = '100%';
-            dimensionContainer.style.top = 'auto';
-        }
-        else {
-            dimensionContainer.style.bottom = 'auto';
-            dimensionContainer.style.top = '100%';
-        }
+    if (windowHeight - dropdownTop < dropdownHeight) {
+        dimensionContainer.style.bottom = '100%';
+        dimensionContainer.style.top = 'auto';
+    }
+    else {
+        dimensionContainer.style.bottom = 'auto';
+        dimensionContainer.style.top = '100%';
+    }
 }
 
-function moveDimensionLeft() {  
+function moveDimensionLeft() {
     moveByOne(moveDimensionData, 'left');
     disableLeftAndRightButton();
 }
 
 function moveDimensionRight() {
-    moveByOne(moveDimensionData, 'right');  
+    moveByOne(moveDimensionData, 'right');
     disableLeftAndRightButton();
 }
 
@@ -466,22 +467,22 @@ function generateDropdownForFilter() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        getAllVisibleDimensionNames().forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function (dimension) {
             if (!isDimensionCategorical(dimension)) {
-            let dimensionLabel = document.createElement('label');
-            dimensionLabel.className = 'dropdownLabel';
-            dimensionLabel.id = 'filterLabel';
-            let filterInput = document.createElement('input');
-            filterInput.className = 'inputText';
-            filterInput.type = 'image';
-            filterInput.name = 'dimension';
-            filterInput.value = dimension;
-            filterInput.src = './svg/dropdown-symbol.svg';
-            filterInput.id = 'filter_' + dimension;
-            filterInput.style.height = '0rem';
-            dimensionLabel.appendChild(filterInput);
-            dimensionLabel.appendChild(document.createTextNode(dimension));
-            dimensionContainer.appendChild(dimensionLabel);
+                let dimensionLabel = document.createElement('label');
+                dimensionLabel.className = 'dropdownLabel';
+                dimensionLabel.id = 'filterLabel';
+                let filterInput = document.createElement('input');
+                filterInput.className = 'inputText';
+                filterInput.type = 'image';
+                filterInput.name = 'dimension';
+                filterInput.value = dimension;
+                filterInput.src = './svg/dropdown-symbol.svg';
+                filterInput.id = 'filter_' + dimension;
+                filterInput.style.height = '0rem';
+                dimensionLabel.appendChild(filterInput);
+                dimensionLabel.appendChild(document.createTextNode(dimension));
+                dimensionContainer.appendChild(dimensionLabel);
             }
         });
         showOptions('filterOptions', 'filterButton');
@@ -493,17 +494,17 @@ function generateDropdownForFilter() {
     dimensionContainer.name = 'filterOptions';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    
+
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
-   
+
     dimensionContainer.addEventListener('click', (event) => {
-        if(event.target.value != undefined) {
+        if (event.target.value != undefined) {
             filterDimensionData = event.target.value;
             generateModuleForSetFilter();
             dimensionContainer.style.display == 'none' ? dimensionContainer.style.display = 'block' :
-            dimensionContainer.style.display = 'none';
+                dimensionContainer.style.display = 'none';
         }
     });
 
@@ -511,11 +512,12 @@ function generateDropdownForFilter() {
     container.appendChild(dimensionContainer);
 }
 
-// TODO
 function generateModuleForSetFilter() {
 
+    const inversionstatus = getInversionStatus(filterDimensionData);
+
     let section = document.getElementById('bottom-controls');
-    
+
     let popupWindowFilter = document.createElement('div');
     popupWindowFilter.id = 'filterContainer';
     popupWindowFilter.style.visibility = 'visible';
@@ -524,12 +526,12 @@ function generateModuleForSetFilter() {
     popupWindowFilter.style.height = 8 + 'rem';
     popupWindowFilter.style.backgroundColor = 'white';
     popupWindowFilter.style.border = '1px solid black';
-    
+
     section.appendChild(popupWindowFilter);
 
     let headerFilter = document.createElement('div');
     headerFilter.id = 'filterHeader';
-    const newText = filterDimensionData.length > 25 ? filterDimensionData.substr(0,25) + '...' : filterDimensionData;
+    const newText = filterDimensionData.length > 25 ? filterDimensionData.substr(0, 25) + '...' : filterDimensionData;
     headerFilter.textContent = 'Set Filter for\r\n' + newText;
     headerFilter.style.whiteSpace = 'pre';
     headerFilter.style.paddingLeft = 0.5 + 'rem';
@@ -542,7 +544,7 @@ function generateModuleForSetFilter() {
     closeButtonFilter.textContent = 'x';
     closeButtonFilter.style.position = 'relative';
     closeButtonFilter.style.right = -18.5 + 'rem';
-    closeButtonFilter.style.top = -4 + 'rem';    
+    closeButtonFilter.style.top = -4 + 'rem';
     closeButtonFilter.style.width = 2.5 + 'rem';
     closeButtonFilter.style.height = 2.5 + 'rem';
     closeButtonFilter.style.opacity = 0.3;
@@ -566,7 +568,7 @@ function generateModuleForSetFilter() {
     inputMinFilter.id = 'filterMinValue';
     inputMinFilter.style.width = 2 + 'rem';
     inputMinFilter.style.marginLeft = 0.5 + 'rem';
-    inputMinFilter.value = currentFilters[1].toFixed(0);
+    inputMinFilter.value = inversionstatus == "descending" ? currentFilters[0].toFixed(0) : currentFilters[1].toFixed(0);
     popupWindowFilter.appendChild(inputMinFilter);
 
     inputMinFilter.onkeydown = (event) => {
@@ -586,7 +588,7 @@ function generateModuleForSetFilter() {
     inputMaxFilter.id = 'filterMaxValue';
     inputMaxFilter.style.width = 2 + 'rem';
     inputMaxFilter.style.marginLeft = 0.5 + 'rem';
-    inputMaxFilter.value = currentFilters[0].toFixed(0);
+    inputMaxFilter.value = inversionstatus == "descending" ? currentFilters[1].toFixed(0) : currentFilters[0].toFixed(0);
     popupWindowFilter.appendChild(inputMaxFilter);
 
     inputMaxFilter.onkeydown = (event) => {
@@ -620,87 +622,42 @@ function generateModuleForSetFilter() {
         let topLimit = limit[1];
         let bottomLimit = limit[0];
 
-        if (inversionstatus == "ascending") {
+        if (inversionstatus === "descending") {
             if (min < topLimit) {
                 min = topLimit;
-                popupWindowFilterError.textContent = `Min value is smaller than 
-                ${getMinValue(filterDimensionData)}, filter is set to min.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
+                showError(`Min value is smaller than ${getMinValue(filterDimensionData)}.`);
             }
             if (max > bottomLimit) {
                 max = bottomLimit;
-                popupWindowFilterError.textContent = `Max value is bigger than 
-                ${getMaxValue(filterDimensionData)}, filter is set to max.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
+                showError(`Max value is bigger than ${getMaxValue(filterDimensionData)}.`);
             }
-            if (max > min) {
-                popupWindowFilterError.textContent = `Attention: Min value ${max} is bigger 
-                than max value ${min}.
-                Please enter values between ${topLimit} and ${bottomLimit}.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
-            }
-        }
-        else {
+        } else {
             if (min < bottomLimit) {
                 min = bottomLimit;
-                popupWindowFilterError.textContent = `Min value is smaller than 
-                ${getMinValue(filterDimensionData)}, filter is set to min.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
+                showError(`Min value is smaller than ${getMinValue(filterDimensionData)}.`);
             }
             if (max > topLimit) {
                 max = topLimit;
-                popupWindowFilterError.textContent = `Max value is bigger than 
-                ${getMaxValue(filterDimensionData)}, filter is set to max.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
-            }
-            if (min > max) {
-                popupWindowFilterError.textContent = `Attention: Min value ${max} is bigger 
-                than max value ${min}.
-                Please enter values between ${bottomLimit} and ${topLimit}.`;
-                popupWindowFilterError.style.display = 'block';
-                popupWindowFilterError.style.paddingLeft = 0.5 + 'rem';
-                popupWindowFilterError.style.paddingTop = 0.5 + 'rem';
-                popupWindowFilterError.style.color = 'red';
-                popupWindowFilterError.style.fontSize = 'x-small';
-                isOk = false;
+                showError(`Max value is bigger than ${getMaxValue(filterDimensionData)}.`);
             }
         }
-        
+
         if (isOk) {
-            if (inversionstatus == "ascending") {
-                setFilter(filterDimensionData, min, max);
-            }
-            else {
-                setFilter(filterDimensionData, max, min);
-            }
+            inversionstatus === "descending" ? setFilter(filterDimensionData, min, max) : setFilter(filterDimensionData, max, min);
             popupWindowFilter.remove();
         }
     }
+}
+
+function showError(message) {
+    const popupWindowFilterError = document.getElementById('filterError');
+    popupWindowFilterError.textContent = message;
+    popupWindowFilterError.style.display = 'block';
+    popupWindowFilterError.style.paddingLeft = '0.5rem';
+    popupWindowFilterError.style.paddingTop = '0.5rem';
+    popupWindowFilterError.style.color = 'red';
+    popupWindowFilterError.style.fontSize = 'x-small';
+    isOk = false;
 }
 
 function generateDropdownForRange() {
@@ -720,22 +677,22 @@ function generateDropdownForRange() {
 
     selectButton.addEventListener('click', () => {
         dimensionContainer.innerHTML = '';
-        getAllVisibleDimensionNames().forEach(function(dimension) {
+        getAllVisibleDimensionNames().forEach(function (dimension) {
             if (!isDimensionCategorical(dimension)) {
-            let dimensionLabel = document.createElement('label');
-            dimensionLabel.className = 'dropdownLabel';
-            dimensionLabel.id = 'rangeLabel';
-            let rangeInput = document.createElement('input');
-            rangeInput.className = 'inputText';
-            rangeInput.type = 'image';
-            rangeInput.name = 'dimension';
-            rangeInput.value = dimension;
-            rangeInput.src = './svg/dropdown-symbol.svg';
-            rangeInput.id = 'range_' + dimension;
-            rangeInput.style.height = '0rem';
-            dimensionLabel.appendChild(rangeInput);
-            dimensionLabel.appendChild(document.createTextNode(dimension));
-            dimensionContainer.appendChild(dimensionLabel);
+                let dimensionLabel = document.createElement('label');
+                dimensionLabel.className = 'dropdownLabel';
+                dimensionLabel.id = 'rangeLabel';
+                let rangeInput = document.createElement('input');
+                rangeInput.className = 'inputText';
+                rangeInput.type = 'image';
+                rangeInput.name = 'dimension';
+                rangeInput.value = dimension;
+                rangeInput.src = './svg/dropdown-symbol.svg';
+                rangeInput.id = 'range_' + dimension;
+                rangeInput.style.height = '0rem';
+                dimensionLabel.appendChild(rangeInput);
+                dimensionLabel.appendChild(document.createTextNode(dimension));
+                dimensionContainer.appendChild(dimensionLabel);
             }
         });
         showOptions('rangeOptions', 'rangeButton');
@@ -747,17 +704,17 @@ function generateDropdownForRange() {
     dimensionContainer.name = 'rangeOptions';
     dimensionContainer.className = 'ddList';
     dimensionContainer.style.display = 'none';
-    
+
     if (dimensions.length > 10) {
         dimensionContainer.style.height = '12.5rem';
     }
-   
+
     dimensionContainer.addEventListener('click', (event) => {
-        if(event.target.value != undefined) {
+        if (event.target.value != undefined) {
             rangeDimensionData = event.target.value;
             generateModuleForRangeSettings();
             dimensionContainer.style.display == 'none' ? dimensionContainer.style.display = 'block' :
-            dimensionContainer.style.display = 'none';
+                dimensionContainer.style.display = 'none';
         }
     });
 
@@ -769,7 +726,7 @@ function generateDropdownForRange() {
 function generateModuleForRangeSettings() {
 
     let section = document.getElementById('bottom-controls');
-    
+
     let popupWindowRange = document.createElement('div');
     popupWindowRange.id = 'rangeContainer';
     popupWindowRange.style.visibility = 'visible';
@@ -783,14 +740,14 @@ function generateModuleForRangeSettings() {
 
     let headerRange = document.createElement('div');
     headerRange.id = 'rangeHeader';
-    const newText = rangeDimensionData.length > 25 ? rangeDimensionData.substr(0,25) + '...' : rangeDimensionData;
+    const newText = rangeDimensionData.length > 25 ? rangeDimensionData.substr(0, 25) + '...' : rangeDimensionData;
     headerRange.textContent = 'Set Range for\r\n' + newText;//.replace(/(\S+\s*){1,3}/g, "$&\n");
     headerRange.style.whiteSpace = 'pre';
     headerRange.style.paddingLeft = 0.5 + 'rem';
     headerRange.style.paddingTop = 0.5 + 'rem';
     headerRange.style.fontSize = 'large';
     popupWindowRange.appendChild(headerRange);
-    
+
     let closeButtonRange = document.createElement('a');
     closeButtonRange.id = 'rangeCloseButton';
     closeButtonRange.textContent = 'x';
@@ -808,8 +765,8 @@ function generateModuleForRangeSettings() {
         popupWindowRange.remove();
     };
 
-    var resultMin = (getCurrentMinRange(rangeDimensionData) - Math. floor(getCurrentMinRange(rangeDimensionData))) !== 0;
-    var resultMax = (getCurrentMaxRange(rangeDimensionData) - Math. floor(getCurrentMaxRange(rangeDimensionData))) !== 0;
+    var resultMin = (getCurrentMinRange(rangeDimensionData) - Math.floor(getCurrentMinRange(rangeDimensionData))) !== 0;
+    var resultMax = (getCurrentMaxRange(rangeDimensionData) - Math.floor(getCurrentMaxRange(rangeDimensionData))) !== 0;
     let minValue = String(getCurrentMinRange(rangeDimensionData));
     let maxValue = String(getCurrentMaxRange(rangeDimensionData));
     if (resultMin && !resultMax) {
@@ -828,7 +785,7 @@ function generateModuleForRangeSettings() {
     infoRange.style.paddingLeft = 0.5 + 'rem';
     infoRange.style.paddingTop = 1 + 'rem';
     infoRange.style.width = 17.3 + 'rem';
-    infoRange.textContent = 'The current range of ' + rangeDimensionData + ' is between ' + 
+    infoRange.textContent = 'The current range of ' + rangeDimensionData + ' is between ' +
         minValue + ' and ' + maxValue + '.';
     popupWindowRange.appendChild(infoRange);
 
@@ -839,7 +796,7 @@ function generateModuleForRangeSettings() {
     infoRange2.style.paddingLeft = 0.5 + 'rem';
     infoRange2.style.paddingTop = 1 + 'rem';
     infoRange2.style.width = 17.3 + 'rem';
-    infoRange2.textContent = 'The original range of ' + rangeDimensionData + ' is between ' + 
+    infoRange2.textContent = 'The original range of ' + rangeDimensionData + ' is between ' +
         getMinValue(rangeDimensionData) + ' and ' + getMaxValue(rangeDimensionData) + '.';
     popupWindowRange.appendChild(infoRange2);
 
@@ -888,7 +845,7 @@ function generateModuleForRangeSettings() {
     popupWindowRangeError.id = 'rangeError';
     popupWindowRangeError.style.position = 'absolute';
     popupWindowRange.appendChild(popupWindowRangeError);
-    
+
     let rangeButton = document.createElement('button');
     rangeButton.id = 'onrangeButton';
     rangeButton.textContent = 'Save';
@@ -904,22 +861,22 @@ function generateModuleForRangeSettings() {
 
         const inversionStatus = getInversionStatus(rangeDimensionData);
         let isOk = true;
-                        
-        if (inversionStatus == "ascending") {
+
+        if (inversionStatus == "descending") {
             if (isNaN(min) || isNaN(max)) {
                 alert(`Attention: Values are not numbers!`);
                 isOk = false;
             }
-            if (max < getMinValue(rangeDimensionData) || 
+            if (max < getMinValue(rangeDimensionData) ||
                 min > getMaxValue(rangeDimensionData)) {
                 popupWindowRangeError.textContent = `The range has to be bigger than 
                     ${minValue} and ${maxValue}.`;
-                    popupWindowRangeError.style.display = 'block';
-                    popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
-                    popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
-                    popupWindowRangeError.style.color = 'red';
-                    popupWindowRangeError.style.fontSize = 'x-small';
-                    isOk = false;
+                popupWindowRangeError.style.display = 'block';
+                popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
+                popupWindowRangeError.style.color = 'red';
+                popupWindowRangeError.style.fontSize = 'x-small';
+                isOk = false;
             }
         }
         else {
@@ -928,20 +885,20 @@ function generateModuleForRangeSettings() {
                 isOk = false;
             }
 
-            if (min > getMinValue(rangeDimensionData) || 
+            if (min > getMinValue(rangeDimensionData) ||
                 max < getMaxValue(rangeDimensionData)) {
-                    popupWindowRangeError.textContent = `The range has to be bigger than 
+                popupWindowRangeError.textContent = `The range has to be bigger than 
                         ${minValue} and ${maxValue}.`;
-                        popupWindowRangeError.style.display = 'block';
-                        popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
-                        popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
-                        popupWindowRangeError.style.paddingBottom = 0.5 + 'rem';
-                        popupWindowRangeError.style.paddingRight = 0.5 + 'rem';
-                        popupWindowRangeError.style.color = 'red';
-                        popupWindowRangeError.style.fontSize = 'x-small';
-                        isOk = false;
-                        }
-                    }
+                popupWindowRangeError.style.display = 'block';
+                popupWindowRangeError.style.paddingLeft = 0.5 + 'rem';
+                popupWindowRangeError.style.paddingTop = 0.5 + 'rem';
+                popupWindowRangeError.style.paddingBottom = 0.5 + 'rem';
+                popupWindowRangeError.style.paddingRight = 0.5 + 'rem';
+                popupWindowRangeError.style.color = 'red';
+                popupWindowRangeError.style.fontSize = 'x-small';
+                isOk = false;
+            }
+        }
         if (isOk) {
             popupWindowRangeError.style.display = 'none';
             setDimensionRange(rangeDimensionData, min, max);
@@ -955,7 +912,7 @@ function generateModuleForRangeSettings() {
 
 function resetToOriginalRange() {
     const dimensions = getAllDimensionNames();
-    dimensions.forEach(function(dimension) {
+    dimensions.forEach(function (dimension) {
         if (!isNaN(getMinValue(dimension))) {
             let min = getMinValue(dimension);
             let max = getMaxValue(dimension);
@@ -966,7 +923,7 @@ function resetToOriginalRange() {
 
 function resetToRoundedRange() {
     const dimensions = getAllDimensionNames();
-    dimensions.forEach(function(dimension) {
+    dimensions.forEach(function (dimension) {
         if (!isNaN(getMinValue(dimension))) {
             let min = getMinValue(dimension);
             let max = getMaxValue(dimension);
@@ -981,9 +938,9 @@ function resetAll() {
 }
 
 function generateDropdownForSelectRecords() {
-    
+
     let records = getAllRecords();
-    
+
     const container = document.getElementById('selRecordsContainer');
     container.style.position = 'relative';
 
@@ -1005,16 +962,16 @@ function generateDropdownForSelectRecords() {
     recordsContainer.name = 'options_r';
     recordsContainer.className = 'ddList';
     recordsContainer.style.display = 'none';
-    
+
     if (records.length > 10) {
         recordsContainer.style.height = '12.5rem';
     }
-   
+
     recordsContainer.addEventListener('change', (event) => {
         toggleSelection(event.target.value);
     });
 
-    records.forEach(function(record) {
+    records.forEach(function (record) {
         let label = document.createElement('div');
         label.className = 'dropdownLabel';
         label.id = 'selectLabel';
