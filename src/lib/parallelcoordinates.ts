@@ -90,7 +90,7 @@ export function show(dimension: string): void {
     window.parcoords.xScales.domain(window.parcoords.newFeatures);
 
     d3.selectAll('.dimensions')
-    .filter(d => (typeof d === "object" ? d.name : d) === dimension)
+        .filter(d => (typeof d === "object" ? d.name : d) === dimension)
         .style('opacity', 1)
         .transition()
         .duration(500)
@@ -261,11 +261,10 @@ export function moveByOne(dimension: string, direction: string): void {
 
     const neighbour = parcoords.newFeatures[indexOfNeighbor];
 
-    const width = window.width;
     const pos = parcoords.xScales(dimension);
     const posNeighbour = parcoords.xScales(neighbour);
 
-    const distance = 93.5; //(width-window.paddingXaxis)/parcoords.newFeatures.length;
+    const distance = parcoords.xScales.step();
 
     parcoords.dragging[dimension] = direction == 'right' ? pos + distance :
         pos - distance;
@@ -389,84 +388,66 @@ export function getDimensionRange(dimension: string): any {
 
 export function setDimensionRange(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
+    type Feature = { name: string };
+    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
+
+    const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
     if (inverted) {
-        window.parcoords.yScales[dimension].domain([max, min]);
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
-            window.parcoords.newDataset);
+        yScalesNew[dimension].domain([max, min]);
+        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
     }
     else {
-        window.parcoords.yScales[dimension].domain([min, max]);
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
-            window.parcoords.newDataset);
+        yScalesNew[dimension].domain([min, max]);
+        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
     }
 
     addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
     addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
-    // draw active lines
     d3.select('#dimension_axis_' + utils.cleanString(dimension))
-        .call(yAxis[dimension])
         .transition()
         .duration(1000)
-        .ease(ease.easeCubic);
+        .ease(ease.easeCubic)
+        .call(window.yAxis[dimension]);
 
-    let active = d3.select('g.active')
+    d3.select('g.active')
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', (d) => {
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
-        })
+        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
         .ease(ease.easeCubic);
-
-    active.each(function (d) {
-        d3.select(this)
-            .transition()
-            .duration(1000)
-            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
-            .ease(ease.easeCubic);
-    });
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
+    type Feature = { name: string };
+    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
+
+    const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
     if (inverted) {
-        window.parcoords.yScales[dimension].domain([max, min]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
-            window.parcoords.newDataset);
+        yScalesNew[dimension].domain([max, min]).nice();
+        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
     }
     else {
-        window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.features, window.parcoords.yScales,
-            window.parcoords.newDataset);
+        yScalesNew[dimension].domain([min, max]).nice();
+        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
     }
 
     addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
     addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
-    // draw active lines
     d3.select('#dimension_axis_' + utils.cleanString(dimension))
-        .call(yAxis[dimension])
         .transition()
         .duration(1000)
-        .ease(ease.easeCubic);
+        .ease(ease.easeCubic)
+        .call(window.yAxis[dimension]);
 
-    let active = d3.select('g.active')
+    d3.select('g.active')
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', (d) => {
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
-        })
+        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
         .ease(ease.easeCubic);
-
-    active.each(function (d) {
-        d3.select(this)
-            .transition()
-            .duration(1000)
-            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
-            .ease(ease.easeCubic);
-    });
 }
 
 export function getMinValue(dimension: any): number {
@@ -677,7 +658,7 @@ export function reset() {
 
     let toggleButton = d3.select('#toggleButton');
     toggleButton.attr('title', 'Collapse toolbar');
-    
+
     toggleButton.html(icon.getCollapseToolbarIcon());
 }
 
@@ -929,9 +910,12 @@ export function createSvgString(): any {
     let height = window.height;
     let width = window.width;
 
-    let yScalesForDownload = helper.setupYScales(400, window.padding, window.parcoords.features, window.parcoords.newDataset);
-    let yAxisForDownload = helper.setupYAxis(window.parcoords.features, yScalesForDownload, window.parcoords.newDataset);
-    let xScalesForDownload = helper.setupXScales(window.width, window.paddingXaxis, parcoords.features);
+    type Feature = { name: string };
+    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
+
+    let yScalesForDownload = helper.setupYScales(400, window.padding, window.window.parcoords.features, window.parcoords.newDataset);
+    let yAxisForDownload = helper.setupYAxis(orderedFeatures, yScalesForDownload, window.parcoords.newDataset);
+    let xScalesForDownload = helper.setupXScales(window.width, window.paddingXaxis, orderedFeatures);
 
     let svg = d3.create('svg')
         .attr("xmlns", "http://www.w3.org/2000/svg")

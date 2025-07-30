@@ -911,7 +911,7 @@ function generateModuleForRangeSettings() {
 }
 
 function resetToOriginalRange() {
-    const dimensions = getAllDimensionNames();
+    const dimensions = getAllVisibleDimensionNames();
     dimensions.forEach(function (dimension) {
         if (!isNaN(getMinValue(dimension))) {
             let min = getMinValue(dimension);
@@ -922,7 +922,7 @@ function resetToOriginalRange() {
 }
 
 function resetToRoundedRange() {
-    const dimensions = getAllDimensionNames();
+    const dimensions = getAllVisibleDimensionNames();
     dimensions.forEach(function (dimension) {
         if (!isNaN(getMinValue(dimension))) {
             let min = getMinValue(dimension);

@@ -49,8 +49,7 @@ export function setupXScales(width: any, padding: any, features: any): any {
         .range([width - padding, padding]);
 }
 
-export function setupYAxis(features: any[], yScales: any, newDataset: any): any {
-
+export function setupYAxis(features: any[], yScales: any, newDataset: any): any {  
     const limit = 30;
     let counter = 0;
     let yAxis = {};

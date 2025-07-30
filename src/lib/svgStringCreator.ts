@@ -1,10 +1,7 @@
 import * as d3 from 'd3-selection';
-import { format } from 'd3-format';
 import * as helper from './helper';
 import * as utils from './utils';
 import * as pc from './parallelcoordinates';
-
-const formatFloat = format(".4f");
 
 export function setActivePathLinesToDownload(svg: any, parcoords: any, key: string,) {
 
@@ -47,8 +44,13 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
 export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
     parcoords: any, padding: any, xScales: any): void {
 
+    type Feature = { name: string };
+    const orderedFeatures: Feature[] = parcoords.newFeatures.map(name => ({ name }));
+
+    console.log(orderedFeatures);
+
     let featureAxis = svg.selectAll('g.feature')
-        .data(parcoords.features)
+        .data(orderedFeatures)
         .enter()
         .append('g')
         .attr('transform', d => ('translate(' + xScales(d.name)) + ')');
@@ -58,11 +60,14 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
             const ranges = pc.getDimensionRange(d.name);
+            console.log(ranges);
+            console.log(pc.getMaxValue(d.name));
+            console.log(pc.getMinValue(d.name));
             if (!pc.isDimensionCategorical(d.name)) {
                 const status = pc.getInversionStatus(d.name);
                 if (status == 'ascending') {
                     yScales[d.name].domain([ranges[0], ranges[1]]);
-                    yAxis = helper.setupYAxis(parcoords.features, yScales,
+                    yAxis = helper.setupYAxis(orderedFeatures, yScales,
                         parcoords.newDataset);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
@@ -73,7 +78,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
                 }
                 else {
                     yScales[d.name].domain([ranges[1], ranges[0]]);
-                    yAxis = helper.setupYAxis(parcoords.features, yScales,
+                    yAxis = helper.setupYAxis(orderedFeatures, yScales,
                         parcoords.newDataset);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
