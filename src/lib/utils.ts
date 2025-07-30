@@ -1,9 +1,8 @@
 export function cleanString(stringValue: string): string {
     let value = stringValue
-        .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
     if (/^[0-9]/.test(value)) {

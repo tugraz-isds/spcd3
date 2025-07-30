@@ -973,8 +973,7 @@ function generateDropdownForSelectRecords() {
         const element = line[0];
         const computedStyle = window.getComputedStyle(element);
         const strokeColor = computedStyle.stroke;
-        console.log(strokeColor);
-        if (strokeColor != rgb(211, 211, 211)) {
+        if (strokeColor !== 'rgb(211, 211, 211)') {
             toggleSelection(event.target.value);
         }
     });
