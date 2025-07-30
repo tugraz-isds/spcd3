@@ -59,14 +59,12 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         .append('g')
         .each(function (d) {
             const processedDimensionName = utils.cleanString(d.name);
-            const ranges = pc.getDimensionRange(d.name);
-            console.log(ranges);
-            console.log(pc.getMaxValue(d.name));
-            console.log(pc.getMinValue(d.name));
+            const max = pc.getCurrentMaxRange(d.name);
+            const min = pc.getCurrentMinRange(d.name);
             if (!pc.isDimensionCategorical(d.name)) {
                 const status = pc.getInversionStatus(d.name);
                 if (status == 'ascending') {
-                    yScales[d.name].domain([ranges[0], ranges[1]]);
+                    yScales[d.name].domain([min, max]);
                     yAxis = helper.setupYAxis(orderedFeatures, yScales,
                         parcoords.newDataset);
                     d3.select(this)
@@ -77,7 +75,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
                                     .domain())));
                 }
                 else {
-                    yScales[d.name].domain([ranges[1], ranges[0]]);
+                    yScales[d.name].domain([max, min]);
                     yAxis = helper.setupYAxis(orderedFeatures, yScales,
                         parcoords.newDataset);
                     d3.select(this)

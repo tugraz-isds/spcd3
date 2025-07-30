@@ -393,29 +393,39 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
 
     const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
     if (inverted) {
-        yScalesNew[dimension].domain([max, min]);
-        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
+        window.parcoords.yScales[dimension].domain([max, min]);
+        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
     }
     else {
-        yScalesNew[dimension].domain([min, max]);
-        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
+        window.parcoords.yScales[dimension].domain([min, max]);
+        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
     }
 
     addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
     addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     d3.select('#dimension_axis_' + utils.cleanString(dimension))
+        .call(yAxis[dimension])
         .transition()
         .duration(1000)
-        .ease(ease.easeCubic)
-        .call(window.yAxis[dimension]);
-
-    d3.select('g.active')
+        .ease(ease.easeCubic);
+        
+    let active = d3.select('g.active')
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
+        .attr('d', (d) => {
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
+        })
         .ease(ease.easeCubic);
+
+    active.each(function (d) {
+        d3.select(this)
+            .transition()
+            .duration(1000)
+            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
+            .ease(ease.easeCubic);
+    });
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -425,29 +435,39 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
 
     const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
     if (inverted) {
-        yScalesNew[dimension].domain([max, min]).nice();
-        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
+        window.parcoords.yScales[dimension].domain([max, min]).nice();
+        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
     }
     else {
-        yScalesNew[dimension].domain([min, max]).nice();
-        window.yAxis = helper.setupYAxis(orderedFeatures, yScalesNew, window.parcoords.newDataset);
+        window.parcoords.yScales[dimension].domain([min, max]).nice();
+        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
     }
 
-    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
-    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
+    addRange(Math.floor(min), window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+    addRange(Math.ceil(max), window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     d3.select('#dimension_axis_' + utils.cleanString(dimension))
+        .call(yAxis[dimension])
         .transition()
         .duration(1000)
-        .ease(ease.easeCubic)
-        .call(window.yAxis[dimension]);
+        .ease(ease.easeCubic);
 
-    d3.select('g.active')
+    let active = d3.select('g.active')
         .selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
+        .attr('d', (d) => {
+            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
+        })
         .ease(ease.easeCubic);
+
+    active.each(function (d) {
+        d3.select(this)
+            .transition()
+            .duration(1000)
+            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
+            .ease(ease.easeCubic);
+    });
 }
 
 export function getMinValue(dimension: any): number {

@@ -154,7 +154,7 @@ export function createToolTipForValues(recordData): void {
                 .style('visibility', 'hidden');
 
             const scale = parcoords.yScales[dimension];
-           
+
             let value = scale(recordData[dimension]);
 
             const x = rectLeft + counter * range;
@@ -195,8 +195,8 @@ export function createTooltipForPathLine(tooltipText, tooltipPath, event) {
     if (!tooltipText || tooltipText.length === 0) return;
     const [x, y] = utils.getMouseCoords(event);
     let tempText = tooltipText.toString();
-        tempText = tempText.split(',').join('\r\n');
-        tooltipPath.text(tempText)
+    tempText = tempText.split(',').join('\r\n');
+    tooltipPath.text(tempText)
         .style('visibility', 'visible')
         .style('top', y / 16 + 'rem')
         .style('left', x / 16 + 0.5 + 'rem');
