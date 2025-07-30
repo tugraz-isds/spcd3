@@ -939,6 +939,7 @@ function resetAll() {
 
 function generateDropdownForSelectRecords() {
 
+    // TODO Show only active records
     let records = getAllRecords();
 
     const container = document.getElementById('selRecordsContainer');
@@ -968,7 +969,14 @@ function generateDropdownForSelectRecords() {
     }
 
     recordsContainer.addEventListener('change', (event) => {
-        toggleSelection(event.target.value);
+        var line = document.getElementsByClassName(event.target.value);
+        const element = line[0];
+        const computedStyle = window.getComputedStyle(element);
+        const strokeColor = computedStyle.stroke;
+        console.log(strokeColor);
+        if (strokeColor != rgb(211, 211, 211)) {
+            toggleSelection(event.target.value);
+        }
     });
 
     records.forEach(function (record) {
