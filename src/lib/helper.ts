@@ -49,45 +49,52 @@ export function setupXScales(width: any, padding: any, features: any): any {
         .range([width - padding, padding]);
 }
 
-export function setupYAxis(features: any[], yScales: any, newDataset: any): any {  
+function isLinearScale(scale: any): scale is d3.ScaleLinear<number, number> {
+    return typeof (scale as any).ticks === 'function';
+}
+
+export function setupYAxis(yScales: any, newDataset: any, hiddenDims: any): any {
     const limit = 30;
-    let counter = 0;
-    let yAxis = {};
+    const yAxis = {};
 
-    Object.entries(yScales).map(key => {
-        let tempFeatures = Array.from(features.values()).map(c => c.name);
-        let tempValues = newDataset.map(o => o[tempFeatures[counter]]);
-        let labels = [];
-        tempValues.forEach(function (element) {
-            labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
-        });
-        counter = counter + 1;
+    Object.entries(yScales).forEach(([key, scale]) => {
+        if (hiddenDims.includes(key)) return;
 
-        if (isNaN(labels[0])) {
-            let uniqueArray = labels.filter(function (item, index, self) {
-                return index === self.indexOf(item);
-            })
-            if (uniqueArray.length > limit) {
-                let filteredArray = labels.filter(function (value, index, array) {
-                    return index % 4 == 0;
-                });
-                yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(filteredArray);
+        const sample = newDataset[0][key];
+        const isNumeric = !isNaN(+sample);
+
+        if (!isNumeric) {
+            const rawLabels = newDataset.map(d => d[key]);
+            const shortenedLabels = rawLabels.map(val =>
+                typeof val === 'string' && val.length > 10 ? val.substr(0, 10) + '...' : val
+            );
+            const uniqueLabels = Array.from(new Set(shortenedLabels));
+
+            const ticks = uniqueLabels.length > limit
+                ? uniqueLabels.filter((_, i) => i % 4 === 0)
+                : uniqueLabels;
+
+            yAxis[key] = axis.axisLeft(scale).tickValues(ticks);
+        } else if (isLinearScale(scale)) {
+            const ticks: number[] = scale.ticks(5).concat(scale.domain());
+            const sorted: number[] = Array.from(new Set(ticks)).sort((a, b) => a - b);
+
+            if (sorted.length >= 2) {
+                const diffStart = sorted[1] - sorted[0];
+                if (diffStart < 5) {
+                    sorted.splice(1, 1);
+                }
+
+                const len = sorted.length;
+                const last = sorted[len - 1];
+                const secondLast = sorted[len - 2];
+                const diffEnd = last - secondLast;
+
+                if (diffEnd < 5) {
+                    sorted.splice(len - 2, 1);
+                }
             }
-            else {
-                yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(labels);
-            }
-        }
-        else {
-            let ranges = yScales[key[0]].ticks(5).concat(yScales[key[0]].domain());
-            let sortRanges = ranges.sort(function (a, b) { return a - b });
-            let uniqueRanges = [...new Set(sortRanges)];
-            if (Number(uniqueRanges[1]) - 5 < Number(uniqueRanges[0])) {
-                uniqueRanges.splice(1, 1);
-            }
-            if (Number(uniqueRanges[uniqueRanges.length - 1]) - 5 < Number(uniqueRanges[uniqueRanges.length - 2])) {
-                uniqueRanges.splice(uniqueRanges.length - 2, 1);
-            }
-            yAxis[key[0]] = axis.axisLeft(key[1]).tickValues(uniqueRanges);
+            yAxis[key] = axis.axisLeft(scale).tickValues(sorted);
         }
     });
     return yAxis;

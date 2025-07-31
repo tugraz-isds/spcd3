@@ -388,17 +388,15 @@ export function getDimensionRange(dimension: string): any {
 
 export function setDimensionRange(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
-    type Feature = { name: string };
-    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
-
-    const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
+    const hiddenDims = getAllHiddenDimensionNames();
+    
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
-        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
+        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]);
-        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
+        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
     }
 
     addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
@@ -430,17 +428,14 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
-    type Feature = { name: string };
-    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
-
-    const yScalesNew = helper.setupYScales(400, 80, orderedFeatures, window.parcoords.newDataset);
+    const hiddenDims = getAllHiddenDimensionNames();
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]).nice();
-        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
+        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
     }
     else {
         window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = helper.setupYAxis(orderedFeatures, window.parcoords.yScales, window.parcoords.newDataset);
+        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
     }
 
     addRange(Math.floor(min), window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
@@ -899,9 +894,10 @@ function setUpParcoordData(data: any, newFeatures: any): any {
             }
         );
     }
+    const hiddenDims = getAllHiddenDimensionNames();
 
     window.yAxis = {};
-    window.yAxis = helper.setupYAxis(parcoords.features, parcoords.yScales, parcoords.newDataset);
+    window.yAxis = helper.setupYAxis(parcoords.yScales, parcoords.newDataset, hiddenDims);
 
     let counter = 0;
     window.parcoords.features.map(x => {
@@ -933,8 +929,10 @@ export function createSvgString(): any {
     type Feature = { name: string };
     const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
 
-    let yScalesForDownload = helper.setupYScales(400, window.padding, window.window.parcoords.features, window.parcoords.newDataset);
-    let yAxisForDownload = helper.setupYAxis(orderedFeatures, yScalesForDownload, window.parcoords.newDataset);
+    const hiddenDims = getAllHiddenDimensionNames();
+
+    let yScalesForDownload = helper.setupYScales(window.height, window.padding, window.window.parcoords.features, window.parcoords.newDataset);
+    let yAxisForDownload = helper.setupYAxis(yScalesForDownload, window.parcoords.newDataset, hiddenDims);
     let xScalesForDownload = helper.setupXScales(window.width, window.paddingXaxis, orderedFeatures);
 
     let svg = d3.create('svg')

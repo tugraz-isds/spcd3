@@ -47,7 +47,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
     type Feature = { name: string };
     const orderedFeatures: Feature[] = parcoords.newFeatures.map(name => ({ name }));
 
-    console.log(orderedFeatures);
+    const hiddenDims = pc.getAllHiddenDimensionNames();
 
     let featureAxis = svg.selectAll('g.feature')
         .data(orderedFeatures)
@@ -65,8 +65,8 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
                 const status = pc.getInversionStatus(d.name);
                 if (status == 'ascending') {
                     yScales[d.name].domain([min, max]);
-                    yAxis = helper.setupYAxis(orderedFeatures, yScales,
-                        parcoords.newDataset);
+                    yAxis = helper.setupYAxis(yScales,
+                        parcoords.newDataset, hiddenDims);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
                         .call(yAxis[d.name]
@@ -76,8 +76,8 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
                 }
                 else {
                     yScales[d.name].domain([max, min]);
-                    yAxis = helper.setupYAxis(orderedFeatures, yScales,
-                        parcoords.newDataset);
+                    yAxis = helper.setupYAxis(yScales,
+                        parcoords.newDataset,hiddenDims);
                     d3.select(this)
                         .attr('id', 'dimension_axis_' + processedDimensionName)
                         .call(yAxis[d.name]
