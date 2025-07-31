@@ -409,7 +409,7 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         .transition()
         .duration(1000)
         .ease(ease.easeCubic);
-        
+
     let active = d3.select('g.active')
         .selectAll('path')
         .transition()
@@ -1405,16 +1405,6 @@ function clearSelection(): void {
 }
 
 
-// Inverting
-
-function onInvert(): any {
-    {
-        return function invertDim(event, d) {
-            invert(d.name);
-        };
-    }
-}
-
 function setInvertIcon(featureAxis: any, padding: any): void {
     let value = (padding / 1.5).toFixed(4);
 
@@ -1435,7 +1425,10 @@ function setInvertIcon(featureAxis: any, padding: any): void {
                 .text('up')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         })
-        .on('click', onInvert());
+        .on('click', (event, d) => {
+            invert(d.name);
+            event.stopPropagation();
+        });
 }
 
 function setMarker(featureAxis: any): void {
