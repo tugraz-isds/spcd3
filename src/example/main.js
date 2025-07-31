@@ -514,8 +514,6 @@ function generateDropdownForFilter() {
 
 function generateModuleForSetFilter() {
 
-    const inversionstatus = getInversionStatus(filterDimensionData);
-
     let section = document.getElementById('bottom-controls');
 
     let popupWindowFilter = document.createElement('div');
@@ -568,7 +566,7 @@ function generateModuleForSetFilter() {
     inputMinFilter.id = 'filterMinValue';
     inputMinFilter.style.width = 2 + 'rem';
     inputMinFilter.style.marginLeft = 0.5 + 'rem';
-    inputMinFilter.value = inversionstatus == "descending" ? currentFilters[0].toFixed(0) : currentFilters[1].toFixed(0);
+    inputMinFilter.value = currentFilters[0].toFixed(0);
     popupWindowFilter.appendChild(inputMinFilter);
 
     inputMinFilter.onkeydown = (event) => {
@@ -588,7 +586,7 @@ function generateModuleForSetFilter() {
     inputMaxFilter.id = 'filterMaxValue';
     inputMaxFilter.style.width = 2 + 'rem';
     inputMaxFilter.style.marginLeft = 0.5 + 'rem';
-    inputMaxFilter.value = inversionstatus == "descending" ? currentFilters[1].toFixed(0) : currentFilters[0].toFixed(0);
+    inputMaxFilter.value = currentFilters[1].toFixed(0);
     popupWindowFilter.appendChild(inputMaxFilter);
 
     inputMaxFilter.onkeydown = (event) => {

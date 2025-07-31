@@ -36,7 +36,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         yPosRect = event.y + 10;
     }
 
-    addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
+    addPosition(yPosRect, parcoords.currentPosOfDims, d.name, 'top');
 
     if (yPosTop == 70 && yPosBottom == 320) {
         d3.select('#rect_' + cleanDimensionName)
@@ -146,7 +146,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         yPosRect = yPosTop + 10;
     }
 
-    addPosition(topToAdd, parcoords.currentPosOfDims, d.name, 'top');
+    addPosition(yPosRect, parcoords.currentPosOfDims, d.name, 'top');
     addPosition(yPosRect + rectHeight, parcoords.currentPosOfDims, d.name, 'bottom');
 
     if (rectHeight < 240) {
@@ -654,35 +654,52 @@ function makeInactive(currentLineName: any, dimensionName: any): void {
         .text(dimensionName);
 }
 
-export function addSettingsForBrushing(dimensionName: any, parcoords: any): void {
-    const processedDimensionName = helper.cleanString(dimensionName);
-    const rectHeight = Number(d3.select('#rect_' + processedDimensionName).node().getBoundingClientRect().height);
-    const yPosRectTop = Number(d3.select('#rect_' + processedDimensionName).attr('y'));
-    const yPosRectBottom = yPosRectTop + rectHeight;
+export function addSettingsForBrushing(dimensionName: string, parcoords: any): void {
+    const processedName = helper.cleanString(dimensionName);
+    const rect = d3.select('#rect_' + processedName);
+    const triDown = d3.select('#triangle_down_' + processedName);
+    const triUp = d3.select('#triangle_up_' + processedName);
 
-    if (yPosRectTop > 80 && yPosRectBottom < 320) {
-        const distanceBottom = 320 - d3.select('#triangle_up_' + processedDimensionName).attr('y');
-        d3.select('#rect_' + processedDimensionName).attr('y', 80 + distanceBottom);
-        d3.select('#triangle_down_' + processedDimensionName).attr('y', 80 + distanceBottom);
-        d3.select('#triangle_up_' + processedDimensionName).attr('y', 80 + distanceBottom + rectHeight);
-        addPosition(80 + distanceBottom, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(80 + distanceBottom + rectHeight, parcoords.currentPosOfDims, dimensionName, 'bottom');
-    }
-    else if (yPosRectTop > 80 && yPosRectBottom >= 320) {
-        d3.select('#rect_' + processedDimensionName).attr('y', 80);
-        d3.select('#rect_' + processedDimensionName).attr('height', 240 - (yPosRectTop - 80));
-        d3.select('#triangle_down_' + processedDimensionName).attr('y', 80);
-        d3.select('#triangle_up_' + processedDimensionName).attr('y', 320 - (yPosRectTop - 80));
-        addPosition(80, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(320 - (yPosRectTop - 80), parcoords.currentPosOfDims, dimensionName, 'bottom');
-    }
-    else if (yPosRectTop <= 80 && yPosRectBottom < 320) {
-        d3.select('#rect_' + processedDimensionName).attr('y', 320 - rectHeight);
-        d3.select('#rect_' + processedDimensionName).attr('height', 240 - (320 - yPosRectBottom));
-        d3.select('#triangle_down_' + processedDimensionName).attr('y', 80 + (320 - yPosRectBottom) - 10);
-        d3.select('#triangle_up_' + processedDimensionName).attr('y', 320);
-        addPosition(80 + (320 - yPosRectBottom) - 10, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(320, parcoords.currentPosOfDims, dimensionName, 'bottom');
+    const rectNode = rect.node();
+    if (!rectNode) return;
+
+    const rectHeight = Number(rectNode.getBoundingClientRect().height);
+    const yTop = Number(rect.attr('y'));
+    const yBottom = yTop + rectHeight;
+
+    const bounds = { top: 80, bottom: 320, height: 240 };
+
+    if (yTop > bounds.top && yBottom < bounds.bottom) {
+        const distBottom = bounds.bottom - Number(triUp.attr('y'));
+        const newY = bounds.top + distBottom;
+
+        rect.attr('y', newY);
+        triDown.attr('y', newY - 10);
+        triUp.attr('y', newY + rectHeight);
+
+        addPosition(newY, parcoords.currentPosOfDims, dimensionName, 'top');
+        addPosition(newY + rectHeight, parcoords.currentPosOfDims, dimensionName, 'bottom');
+
+    } else if (yTop > bounds.top && yBottom >= bounds.bottom) {
+        const newHeight = bounds.height - (yTop - bounds.top);
+
+        rect.attr('y', bounds.top).attr('height', newHeight);
+        triDown.attr('y', bounds.top - 10);
+        triUp.attr('y', bounds.bottom - (yTop - bounds.top));
+
+        addPosition(bounds.top, parcoords.currentPosOfDims, dimensionName, 'top');
+        addPosition(bounds.bottom - (yTop - bounds.top), parcoords.currentPosOfDims, dimensionName, 'bottom');
+
+    } else if (yTop <= bounds.top && yBottom < bounds.bottom) {
+        const newY = bounds.bottom - rectHeight;
+        const newHeight = bounds.height - (bounds.bottom - yBottom);
+
+        rect.attr('y', newY).attr('height', newHeight);
+        triDown.attr('y', bounds.top + (bounds.bottom - yBottom) - 10);
+        triUp.attr('y', bounds.bottom);
+
+        addPosition(bounds.top + (bounds.bottom - yBottom), parcoords.currentPosOfDims, dimensionName, 'top');
+        addPosition(bounds.bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
     }
 }
 

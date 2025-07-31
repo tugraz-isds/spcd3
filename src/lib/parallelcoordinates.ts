@@ -389,7 +389,7 @@ export function getDimensionRange(dimension: string): any {
 export function setDimensionRange(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
     const hiddenDims = getAllHiddenDimensionNames();
-    
+
     if (inverted) {
         window.parcoords.yScales[dimension].domain([max, min]);
         window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
@@ -495,19 +495,19 @@ function addRange(value: number, currentPosOfDims: any, dimensionName: any, key:
 
 //---------- Filter Functions ----------
 
-export function getFilter(dimension): any {
-    const invertStatus = helper.isInverted(dimension);
-    const dimensionRange = getDimensionRange(dimension);
-    const maxValue = invertStatus == false ? dimensionRange[1] : dimensionRange[0];
-    const minValue = invertStatus == false ? dimensionRange[0] : dimensionRange[1];
-    const range = maxValue - minValue;
+export function getFilter(dimension: string): [number, number] {
+    const yScale = parcoords.yScales[dimension];
+    const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
+    console.log(dimensionSettings);
+    if (!dimensionSettings || !yScale || typeof yScale.invert !== 'function') return [0, 0];
 
-    const dimensionSettings = window.parcoords.currentPosOfDims.find((obj) => obj.key == dimension);
-    const top = invertStatus == false ? maxValue - (dimensionSettings.top - 80) / (240 / range) :
-        (dimensionSettings.top - 80) / (240 / range) + minValue;
-    const bottom = invertStatus == false ? maxValue - (dimensionSettings.bottom - 80) / (240 / range) :
-        (dimensionSettings.bottom - 80) / (240 / range) + minValue;
-    return [top, bottom];
+    const valueTop = Math.round(yScale.invert(dimensionSettings.top));
+    const valueBottom = Math.round(yScale.invert(dimensionSettings.bottom));
+
+    const min = Math.min(valueTop, valueBottom);
+    const max = Math.max(valueTop, valueBottom);
+
+    return [min, max];
 }
 
 export function setFilter(dimension: string, min: number, max: number): void {

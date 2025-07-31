@@ -115,8 +115,8 @@ function filterMenu(values: any[], dimension: any) {
     if (!isNaN(values[0])) {
         let currentFilters = pc.getFilter(dimension);
         const inverted = temp.isInverted(dimension);
-        inverted ? d3.select('#maxFilterValue').property('value', currentFilters[1]) : d3.select('#maxFilterValue').property('value', currentFilters[0]);
-        inverted ? d3.select('#minFilterValue').property('value', currentFilters[0]) : d3.select('#minFilterValue').property('value', currentFilters[1]);
+        d3.select('#minFilterValue').property('value', currentFilters[0]);
+        d3.select('#maxFilterValue').property('value', currentFilters[1]);
         d3.select('#filterMenu')
             .style('border-top', '0.08rem lightgrey solid')
             .style('visibility', 'visible')
