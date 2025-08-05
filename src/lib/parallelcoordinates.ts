@@ -2,6 +2,8 @@ import 'd3-transition';
 import * as d3 from 'd3-selection';
 import * as drag from 'd3-drag';
 import * as ease from 'd3-ease';
+import * as shape from 'd3-shape';
+import * as interpolate from 'd3-interpolate-path';
 import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
@@ -49,19 +51,20 @@ export function hide(dimension: string): void {
     window.parcoords.features = featureSet;
     window.parcoords.newFeatures = newDimensions;
 
+    const oldxScales = window.parcoords.xScales.copy();
     window.parcoords.xScales.domain(newDimensions);
 
     d3.selectAll('.dimensions')
         .filter(d => newDimensions.includes(d.name || d))
         .transition()
         .duration(1000)
-        .attr('transform', d =>
+        .attr('transform', (d: { name: any; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
         )
         .ease(ease.easeCubic);
 
     d3.selectAll('.dimensions')
-        .filter(d => d.name === dimension)
+        .filter((d: { name: string; }) => d.name === dimension)
         .transition()
         .duration(500)
         .style('opacity', 0)
@@ -72,10 +75,20 @@ export function hide(dimension: string): void {
     d3.select('g.active').selectAll('path')
         .transition()
         .duration(1000)
-        .attr('d', d => helper.linePath(d, newDimensions, parcoords))
-        .ease(ease.easeCubic);
+        .attrTween('d', (d: { [x: string]: any; }) => generateLineTween(oldxScales, window.parcoords.xScales, newDimensions, window.parcoords.yScales)(d)
+        );
 }
 
+function generateLineTween(oldXscales: (arg0: string | number) => any, newXscales: (arg0: string | number) => any, newDimensions: any[], yScales: { [x: string]: (arg0: any) => any; }) {
+    const line = shape.line().defined(d => d != null);
+
+    return function (d: { [x: string]: any; }) {
+        const oldPoints = newDimensions.map((dim: string | number) => [oldXscales(dim), yScales[dim](d[dim])]);
+        const newPoints = newDimensions.map((dim: string | number) => [newXscales(dim), yScales[dim](d[dim])]);
+
+        return interpolate.interpolatePath(line(oldPoints), line(newPoints));
+    };
+}
 
 export function show(dimension: string): void {
     if (window.parcoords.newFeatures.includes(dimension)) return;
@@ -90,28 +103,32 @@ export function show(dimension: string): void {
     window.parcoords.xScales.domain(window.parcoords.newFeatures);
 
     d3.selectAll('.dimensions')
-        .filter(d => (typeof d === "object" ? d.name : d) === dimension)
+        .filter((d: { name: any; }) => (typeof d === "object" ? d.name : d) === dimension)
         .style('opacity', 1)
         .transition()
         .duration(500)
         .attr('visibility', 'visible');;
 
     d3.selectAll('.dimensions')
-        .filter(d => window.parcoords.newFeatures.includes(
+        .filter((d: { name: any; }) => window.parcoords.newFeatures.includes(
             typeof d === "object" ? d.name : d
         ))
         .transition()
         .duration(1000)
-        .attr('transform', d =>
+        .attr('transform', (d: { name: any; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
         )
         .ease(ease.easeCubic);
 
     d3.select('g.active').selectAll('path')
-        .transition()
-        .duration(1000)
-        .attr('d', d => helper.linePath(d, window.parcoords.newFeatures, parcoords))
-        .ease(ease.easeCubic);
+        .attr('d', function (d: { [x: string]: any; }) {
+            const points = window.parcoords.newFeatures.map(p => {
+                const x = window.parcoords.xScales(p);
+                const y = window.parcoords.yScales[p](d[p]);
+                return [x, y];
+            });
+            return shape.line()(points);
+        });
 }
 
 export function getHiddenStatus(dimension: string): string {
@@ -498,7 +515,6 @@ function addRange(value: number, currentPosOfDims: any, dimensionName: any, key:
 export function getFilter(dimension: string): [number, number] {
     const yScale = parcoords.yScales[dimension];
     const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
-    console.log(dimensionSettings);
     if (!dimensionSettings || !yScale || typeof yScale.invert !== 'function') return [0, 0];
 
     const valueTop = Math.round(yScale.invert(dimensionSettings.top));
