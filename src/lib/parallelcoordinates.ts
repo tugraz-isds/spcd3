@@ -174,7 +174,8 @@ export function invert(dimension: string): void {
             .ease(ease.easeCubic)
     });
 
-    brush.addSettingsForBrushing(dimension, parcoords);
+    const filter = getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
     if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
@@ -208,7 +209,8 @@ export function invertWoTransition(dimension: string): void {
             })
     });
 
-    brush.addSettingsForBrushing(dimension, parcoords);
+    const filter = getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
     if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
@@ -255,7 +257,8 @@ export function setInversionStatus(dimension: string, status: string): void {
             .ease(ease.easeCubic)
     });
 
-    brush.addSettingsForBrushing(dimension, parcoords);
+    const filter = getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
     if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
     }
@@ -642,7 +645,7 @@ export function drawChart(content: any): void {
         .style('display', 'flex')
         .style('flex-wrap', 'wrap')
         .style('align-items', 'center')
-        .style('margin-top', '1.5rem')
+        .style('margin-top', '1.2rem')
         .style('margin-left', '1rem')
         .style('margin-bottom', 0);
 

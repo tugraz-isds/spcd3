@@ -215,14 +215,14 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const yScale = parcoords.yScales[dimensionName];
     const [minValue, maxValue] = invertStatus ? yScale.domain().slice().reverse() : yScale.domain();
-    
+
     const scaleValue = (value: number) => {
         if (isNaN(value)) {
             return yScale(value);
         }
         const range = maxValue - minValue;
         return invertStatus ? 240 / range * (value - minValue) + 80 :
-               240 / range * (maxValue - value) + 80;
+            240 / range * (maxValue - value) + 80;
     };
 
     let topPosition = scaleValue(topValue);
@@ -234,19 +234,19 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
 
     d3.select('#rect_' + cleanDimensionName)
         .transition()
-        .duration(500)
+        .duration(300)
         .attr('y', topPosition)
         .attr('height', rectHeight)
         .style('opacity', 0.3);
 
     d3.select('#triangle_down_' + cleanDimensionName)
         .transition()
-        .duration(600)
+        .duration(300)
         .attr('y', topPosition - 10);
 
     d3.select('#triangle_up_' + cleanDimensionName)
         .transition()
-        .duration(600)
+        .duration(300)
         .attr('y', bottomPosition);
 
     let active = d3.select('g.active').selectAll('path');
@@ -459,7 +459,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesTop.text(Math.round(tooltipValueTop));
         tooltipValuesTop.style('visibility', 'visible');
-        tooltipValuesTop.style('top', Number(yPosTop+180) + 'px').style('left', window.event.clientX + 'px');
+        tooltipValuesTop.style('top', Number(yPosTop + 180) + 'px').style('left', window.event.clientX + 'px');
         tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -472,7 +472,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
-        tooltipValuesDown.style('top', Number(yPosBottom+180) + 'px').style('left', window.event.clientX + 'px');
+        tooltipValuesDown.style('top', Number(yPosBottom + 180) + 'px').style('left', window.event.clientX + 'px');
         tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -654,8 +654,24 @@ function makeInactive(currentLineName: any, dimensionName: any): void {
         .text(dimensionName);
 }
 
-export function addSettingsForBrushing(dimensionName: string, parcoords: any): void {
+export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {
     const processedName = helper.cleanString(dimensionName);
+    const yScale = parcoords.yScales[processedName];
+ 
+    const [minValue, maxValue] = invertStatus ? yScale.domain().slice().reverse() : yScale.domain();
+
+    const scaleValue = (value: number) => {
+        if (isNaN(value)) {
+            return yScale(value);
+        }
+        const range = maxValue - minValue;
+        return invertStatus ? 240 / range * (value - minValue) + 80 :
+            240 / range * (maxValue - value) + 80;
+    };
+
+    let topPosition = invertStatus ? scaleValue(filter[0]) : scaleValue(filter[1]);
+    let bottomPosition = invertStatus ? scaleValue(filter[1]) : scaleValue(filter[0]);
+    let rectHeight = bottomPosition - topPosition;
     const rect = d3.select('#rect_' + processedName);
     const triDown = d3.select('#triangle_down_' + processedName);
     const triUp = d3.select('#triangle_up_' + processedName);
@@ -663,42 +679,68 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any): v
     const rectNode = rect.node();
     if (!rectNode) return;
 
-    const rectHeight = Number(rectNode.getBoundingClientRect().height);
-    const yTop = Number(rect.attr('y'));
-    const yBottom = yTop + rectHeight;
-
     const bounds = { top: 80, bottom: 320, height: 240 };
 
-    if (yTop > bounds.top && yBottom < bounds.bottom) {
+    if (topPosition > bounds.top && bottomPosition < bounds.bottom) {
         const distBottom = bounds.bottom - Number(triUp.attr('y'));
         const newY = bounds.top + distBottom;
 
-        rect.attr('y', newY);
-        triDown.attr('y', newY - 10);
-        triUp.attr('y', newY + rectHeight);
+        rect.transition()
+            .duration(300)
+            .attr('y', newY)
+            .attr('height', rectHeight)
+            .style('opacity', 0.3);
+
+        triDown.transition()
+            .duration(300)
+            .attr('y', newY - 10);
+
+        triUp.transition()
+            .duration(300)
+            .attr('y', bottomPosition);
 
         addPosition(newY, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(newY + rectHeight, parcoords.currentPosOfDims, dimensionName, 'bottom');
+        addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, 'bottom');
 
-    } else if (yTop > bounds.top && yBottom >= bounds.bottom) {
-        const newHeight = bounds.height - (yTop - bounds.top);
+    } else if (topPosition > bounds.top && bottomPosition >= bounds.bottom) {
+        const newHeight = bounds.height - (topPosition - bounds.top);
 
-        rect.attr('y', bounds.top).attr('height', newHeight);
-        triDown.attr('y', bounds.top - 10);
-        triUp.attr('y', bounds.bottom - (yTop - bounds.top));
+        rect.transition()
+            .duration(300)
+            .attr('y', bounds.top)
+            .attr('height', newHeight)
+            .style('opacity', 0.3);
+
+        triDown.transition()
+            .duration(300)
+            .attr('y', bounds.top - 10);
+
+        triUp.transition()
+            .duration(300)
+            .attr('y', bounds.bottom - (topPosition - bounds.top));
 
         addPosition(bounds.top, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(bounds.bottom - (yTop - bounds.top), parcoords.currentPosOfDims, dimensionName, 'bottom');
+        addPosition(bounds.bottom - (topPosition - bounds.top), parcoords.currentPosOfDims, dimensionName, 'bottom');
 
-    } else if (yTop <= bounds.top && yBottom < bounds.bottom) {
+    } else if (topPosition <= bounds.top && bottomPosition < bounds.bottom) {
         const newY = bounds.bottom - rectHeight;
-        const newHeight = bounds.height - (bounds.bottom - yBottom);
+        const newHeight = bounds.height - (bounds.bottom - bottomPosition);
+ 
+        rect.transition()
+            .duration(300)
+            .attr('y', newY)
+            .attr('height', newHeight)
+            .style('opacity', 0.3);
 
-        rect.attr('y', newY).attr('height', newHeight);
-        triDown.attr('y', bounds.top + (bounds.bottom - yBottom) - 10);
-        triUp.attr('y', bounds.bottom);
+        triDown.transition()
+            .duration(300)
+            .attr('y', bounds.top + (bounds.bottom - bottomPosition) - 10);
 
-        addPosition(bounds.top + (bounds.bottom - yBottom), parcoords.currentPosOfDims, dimensionName, 'top');
+        triUp.transition()
+            .duration(300)
+            .attr('y', bounds.bottom);
+
+        addPosition(bounds.top + (bounds.bottom - bottomPosition), parcoords.currentPosOfDims, dimensionName, 'top');
         addPosition(bounds.bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
     }
 }
@@ -724,4 +766,3 @@ const delay = 50;
 export const throttleBrushDown = helper.throttle(brushDown, delay);
 export const throttleBrushUp = helper.throttle(brushUp, delay);
 export const throttleDragAndBrush = helper.throttle(dragAndBrush, delay);
-
