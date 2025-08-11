@@ -70,6 +70,7 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
             filterMenu(values, dimension);
             resetFilterMenu(values, dimension);
             showAllMenu();
+            copyDimensionName(dimension);
             event.preventDefault();
         });
 }
@@ -77,6 +78,16 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
 let scrollXPos;
 let timer;
 const paddingXaxis = 75;
+
+function copyDimensionName(dimension: string) {
+    d3.select('#copyDimensionName')
+        .style('visibility', 'visible')
+        .on('click', async (event) => {
+            await navigator.clipboard.writeText(dimension)
+            d3.select('#contextmenu').style('display', 'none');
+            event.stopPropagation();
+        });
+}
 
 function showAllMenu() {
     d3.select('#showAllMenu')
@@ -131,7 +142,7 @@ function filterMenu(values: any[], dimension: any) {
                     let min = d3.select('#minFilterValue').node().value;
                     let max = d3.select('#maxFilterValue').node().value;
                     const ranges = pc.getDimensionRange(dimension);
-                   
+
                     let isOk = true;
 
                     if (inverted) {
@@ -183,7 +194,7 @@ function filterMenu(values: any[], dimension: any) {
                         }
                     }
                     inverted ? pc.setFilter(dimension, min, max) :
-                    pc.setFilter(dimension, max, min);
+                        pc.setFilter(dimension, max, min);
                     if (isOk) {
                         d3.select('#errorFilter').style('display', 'none');
                         d3.select('#modalFilter').style('display', 'none');
@@ -364,6 +375,7 @@ function invertDimensionMenu(dimension: any) {
 
 function hideDimensionMenu(dimension: any) {
     d3.select('#hideMenu')
+        .style('border-top', '0.08rem lightgrey solid')
         .on('click', (event) => {
             pc.hide(dimension);
             d3.select('#contextmenu').style('display', 'none');
@@ -499,6 +511,10 @@ function createContextMenu() {
         .style('position', 'absolute')
         .style('display', 'none');
 
+    contextMenu.append('div')
+        .attr('id', 'copyDimensionName')
+        .attr('class', 'contextmenu')
+        .text('Copy Name')
     contextMenu.append('div')
         .attr('id', 'hideMenu')
         .attr('class', 'contextmenu')

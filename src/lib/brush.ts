@@ -43,7 +43,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 15)}') 8 8, auto`)
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
     }
 
     d3.select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
@@ -93,7 +93,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 15)}') 8 8, auto`)
+        d3.select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
     }
 
     d3.select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);

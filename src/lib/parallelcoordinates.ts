@@ -675,6 +675,9 @@ export function drawChart(content: any): void {
         })
         .on("click", function () {
             clearSelection();
+        })
+        .on("mousedown.selection", function (event) {
+        event.preventDefault();
         });
 
     window.onclick = (event) => {
@@ -1493,7 +1496,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('y', 80)
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.4')
-                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 12)}') 8 8, auto`)
+                .style('cursor', 'default')
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
