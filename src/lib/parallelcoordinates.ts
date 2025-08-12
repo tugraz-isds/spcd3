@@ -45,8 +45,8 @@ declare const window: any;
 //---------- Show and Hide Functions ----------
 
 export function hide(dimension: string): void {
-    const newDimensions = window.parcoords.newFeatures.filter(d => d !== dimension);
-    const featureSet = window.parcoords.features.filter(d => d.name !== dimension);
+    const newDimensions = window.parcoords.newFeatures.filter((d: string) => d !== dimension);
+    const featureSet = window.parcoords.features.filter((d: { name: string; }) => d.name !== dimension);
 
     window.parcoords.features = featureSet;
     window.parcoords.newFeatures = newDimensions;
@@ -55,10 +55,10 @@ export function hide(dimension: string): void {
     window.parcoords.xScales.domain(newDimensions);
 
     d3.selectAll('.dimensions')
-        .filter(d => newDimensions.includes(d.name || d))
+        .filter((d: { name: string; }) => newDimensions.includes(d.name || d))
         .transition()
         .duration(1000)
-        .attr('transform', (d: { name: any; }) =>
+        .attr('transform', (d: { name: string; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
         )
         .ease(ease.easeCubic);
@@ -103,19 +103,19 @@ export function show(dimension: string): void {
     window.parcoords.xScales.domain(window.parcoords.newFeatures);
 
     d3.selectAll('.dimensions')
-        .filter((d: { name: any; }) => (typeof d === "object" ? d.name : d) === dimension)
+        .filter((d: { name: string; }) => (typeof d === "object" ? d.name : d) === dimension)
         .style('opacity', 1)
         .transition()
         .duration(500)
         .attr('visibility', 'visible');;
 
     d3.selectAll('.dimensions')
-        .filter((d: { name: any; }) => window.parcoords.newFeatures.includes(
+        .filter((d: { name: string; }) => window.parcoords.newFeatures.includes(
             typeof d === "object" ? d.name : d
         ))
         .transition()
         .duration(1000)
-        .attr('transform', (d: { name: any; }) =>
+        .attr('transform', (d: { name: string; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
         )
         .ease(ease.easeCubic);
@@ -444,6 +444,46 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
             .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
+    setFilterAfterSettingRanges(dimension, inverted);
+}
+
+function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void {
+        const rect = d3.select('#rect_' + dimension);
+    const triDown = d3.select('#triangle_down_' + dimension);
+    const triUp = d3.select('#triangle_up_' + dimension);
+
+    const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
+
+    const yScale = parcoords.yScales[dimension];
+ 
+    const [minValue, maxValue] = inverted ? yScale.domain().slice().reverse() : yScale.domain();
+
+    const scaleValue = (value: number) => {
+        if (isNaN(value)) {
+            return yScale(value);
+        }
+        const range = maxValue - minValue;
+        return inverted ? 240 / range * (value - minValue) + 80 :
+            240 / range * (maxValue - value) + 80;
+    };
+
+    var top = inverted ? scaleValue(dimensionSettings.Top) : scaleValue(dimensionSettings.currentFilterBottom);
+    var bottom = inverted ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
+    var rectH = inverted ? top - bottom : bottom - top;
+
+    rect.transition()
+        .duration(300)
+        .attr('y', top)
+        .attr('height', rectH)
+        .style('opacity', 0.3);
+
+    triDown.transition()
+            .duration(300)
+            .attr('y', top - 10);
+
+    triUp.transition()
+            .duration(300)
+            .attr('y', bottom);
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -530,6 +570,8 @@ export function getFilter(dimension: string): [number, number] {
 }
 
 export function setFilter(dimension: string, min: number, max: number): void {
+    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
+    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
     brush.filter(dimension, min, max, parcoords);
 }
 
@@ -646,7 +688,7 @@ export function drawChart(content: any): void {
         .style('flex-wrap', 'wrap')
         .style('align-items', 'center')
         .style('margin-top', '1.2rem')
-        .style('margin-left', '1rem')
+        .style('margin-left', '1.8rem')
         .style('margin-bottom', 0);
 
     toolbar.createToolbar(window.parcoords.newDataset);
@@ -677,7 +719,7 @@ export function drawChart(content: any): void {
             clearSelection();
         })
         .on("mousedown.selection", function (event) {
-        event.preventDefault();
+            event.preventDefault();
         });
 
     window.onclick = (event) => {
