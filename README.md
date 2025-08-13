@@ -118,7 +118,25 @@ numerical. Three example datasets can be found in folder
 [data](./src/example/data/). Other datasets should have the same
 structure.
 
+
+
 ## License
 
 SPCD3 is distributed under the MIT License. See [LICENSE](LICENSE) for
 more information.
+
+
+
+
+## Contributors
+
+- Keith Andrews [kandrews@iicm.edu](mailto:kandrews@iicm.edu?subject=Rslidy)  
+  Project Leader
+
+- Romana Gruber  
+  Master's Thesis, main developer
+
+- Philipp Drescher, Jeremias Kleinschuster, Sebastian Schreiner, Burim Vrella  
+  InfoVis SS 2023 G1
+
+
