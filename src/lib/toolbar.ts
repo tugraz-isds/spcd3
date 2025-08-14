@@ -158,7 +158,7 @@ function showModalWithData(dataset) {
     scrollWrapper.style.width = '100%';
     scrollWrapper.style.overflowY = 'auto';
     scrollWrapper.style.whiteSpace = 'nowrap';
-    scrollWrapper.style.maxHeight = '70vh';
+    scrollWrapper.style.maxHeight = '60vh';
 
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';

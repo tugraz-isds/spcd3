@@ -657,7 +657,7 @@ function makeInactive(currentLineName: any, dimensionName: any): void {
 export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {
     const processedName = helper.cleanString(dimensionName);
     const yScale = parcoords.yScales[processedName];
- 
+
     const [minValue, maxValue] = invertStatus ? yScale.domain().slice().reverse() : yScale.domain();
 
     const scaleValue = (value: number) => {
@@ -668,10 +668,11 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any, in
         return invertStatus ? 240 / range * (value - minValue) + 80 :
             240 / range * (maxValue - value) + 80;
     };
+    const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === processedName);
+    var top = invertStatus ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
+    var bottom = invertStatus ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
+    var rectH = bottom - top;
 
-    let topPosition = invertStatus ? scaleValue(filter[0]) : scaleValue(filter[1]);
-    let bottomPosition = invertStatus ? scaleValue(filter[1]) : scaleValue(filter[0]);
-    let rectHeight = bottomPosition - topPosition;
     const rect = d3.select('#rect_' + processedName);
     const triDown = d3.select('#triangle_down_' + processedName);
     const triUp = d3.select('#triangle_up_' + processedName);
@@ -679,70 +680,22 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any, in
     const rectNode = rect.node();
     if (!rectNode) return;
 
-    const bounds = { top: 80, bottom: 320, height: 240 };
+    rect.transition()
+        .duration(300)
+        .attr('y', top)
+        .attr('height', rectH)
+        .style('opacity', 0.3);
 
-    if (topPosition > bounds.top && bottomPosition < bounds.bottom) {
-        const distBottom = bounds.bottom - Number(triUp.attr('y'));
-        const newY = bounds.top + distBottom;
+    triDown.transition()
+        .duration(300)
+        .attr('y', top - 10);
 
-        rect.transition()
-            .duration(300)
-            .attr('y', newY)
-            .attr('height', rectHeight)
-            .style('opacity', 0.3);
+    triUp.transition()
+        .duration(300)
+        .attr('y', bottom);
 
-        triDown.transition()
-            .duration(300)
-            .attr('y', newY - 10);
-
-        triUp.transition()
-            .duration(300)
-            .attr('y', bottomPosition);
-
-        addPosition(newY, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, 'bottom');
-
-    } else if (topPosition > bounds.top && bottomPosition >= bounds.bottom) {
-        const newHeight = bounds.height - (topPosition - bounds.top);
-
-        rect.transition()
-            .duration(300)
-            .attr('y', bounds.top)
-            .attr('height', newHeight)
-            .style('opacity', 0.3);
-
-        triDown.transition()
-            .duration(300)
-            .attr('y', bounds.top - 10);
-
-        triUp.transition()
-            .duration(300)
-            .attr('y', bounds.bottom - (topPosition - bounds.top));
-
-        addPosition(bounds.top, parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(bounds.bottom - (topPosition - bounds.top), parcoords.currentPosOfDims, dimensionName, 'bottom');
-
-    } else if (topPosition <= bounds.top && bottomPosition < bounds.bottom) {
-        const newY = bounds.bottom - rectHeight;
-        const newHeight = bounds.height - (bounds.bottom - bottomPosition);
- 
-        rect.transition()
-            .duration(300)
-            .attr('y', newY)
-            .attr('height', newHeight)
-            .style('opacity', 0.3);
-
-        triDown.transition()
-            .duration(300)
-            .attr('y', bounds.top + (bounds.bottom - bottomPosition) - 10);
-
-        triUp.transition()
-            .duration(300)
-            .attr('y', bounds.bottom);
-
-        addPosition(bounds.top + (bounds.bottom - bottomPosition), parcoords.currentPosOfDims, dimensionName, 'top');
-        addPosition(bounds.bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
-    }
+    addPosition(top, parcoords.currentPosOfDims, dimensionName, 'top');
+    addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
 }
 
 function getInvertStatus(key: any, currentPosOfDims: any): boolean {

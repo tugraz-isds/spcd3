@@ -448,14 +448,14 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
 }
 
 function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void {
-        const rect = d3.select('#rect_' + dimension);
+    const rect = d3.select('#rect_' + dimension);
     const triDown = d3.select('#triangle_down_' + dimension);
     const triUp = d3.select('#triangle_up_' + dimension);
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
 
     const yScale = parcoords.yScales[dimension];
- 
+
     const [minValue, maxValue] = inverted ? yScale.domain().slice().reverse() : yScale.domain();
 
     const scaleValue = (value: number) => {
@@ -467,7 +467,7 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
             240 / range * (maxValue - value) + 80;
     };
 
-    var top = inverted ? scaleValue(dimensionSettings.Top) : scaleValue(dimensionSettings.currentFilterBottom);
+    var top = inverted ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
     var bottom = inverted ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
     var rectH = inverted ? top - bottom : bottom - top;
 
@@ -478,12 +478,12 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
         .style('opacity', 0.3);
 
     triDown.transition()
-            .duration(300)
-            .attr('y', top - 10);
+        .duration(300)
+        .attr('y', top - 10);
 
     triUp.transition()
-            .duration(300)
-            .attr('y', bottom);
+        .duration(300)
+        .attr('y', bottom);
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -954,7 +954,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         window.parcoords.currentPosOfDims.push(
             {
                 key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
-                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0]
+                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: max, currentFilterTop: min
             }
         );
     }
@@ -1539,6 +1539,9 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.4')
                 .style('cursor', 'default')
+                .on('mousedown.selection', function (event) {
+                    event.preventDefault();
+                })
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {
@@ -1582,14 +1585,18 @@ function setBrushUp(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
-                .call(drag.drag().on('drag', (event, d) => {
-                    if (parcoords.newFeatures.length > 25) {
-                        brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
-                    }
-                    else {
-                        brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
-                    }
+                .on('mousedown.selection', function (event) {
+                    event.preventDefault();
                 })
+                .call(drag.drag()
+                    .on('drag', (event, d) => {
+                        if (parcoords.newFeatures.length > 25) {
+                            brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                        }
+                        else {
+                            brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                        }
+                    })
                     .on('end', () => {
                         tooltipValues.style('visibility', 'hidden');
                     }));
@@ -1616,6 +1623,9 @@ function setBrushDown(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
+                .on('mousedown.selection', function (event) {
+                    event.preventDefault();
+                })
                 .call(drag.drag()
                     .on('drag', (event, d) => {
                         if (parcoords.newFeatures.length > 25) {

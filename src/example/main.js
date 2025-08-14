@@ -937,7 +937,6 @@ function resetAll() {
 
 function generateDropdownForSelectRecords() {
 
-    // TODO Show only active records
     let records = getAllRecords();
 
     const container = document.getElementById('selRecordsContainer');
