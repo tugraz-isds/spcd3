@@ -8,8 +8,8 @@ import * as icon from './icons/icons';
 
 export function setContextMenu(featureAxis: any, padding: any, parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[]
-}, active: any, width: any): void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any
+    }, width: any): void {
 
     createContextMenu()
     createModalToSetRange();
@@ -31,9 +31,8 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .style('font-size', '0.7rem')
         .call(drag.drag()
             .on('start', onDragStartEventHandler(parcoords))
-            .on('drag', onDragEventHandler(parcoords, featureAxis, active,
-                width))
-            .on('end', onDragEndEventHandler(parcoords, featureAxis, active))
+            .on('drag', onDragEventHandler(parcoords, featureAxis, width))
+            .on('end', onDragEndEventHandler(parcoords, featureAxis))
         )
         .on('mouseover', function () {
             return tooltipFeatures.style('visibility', 'visible');
@@ -384,9 +383,14 @@ function hideDimensionMenu(dimension: any) {
 }
 
 function styleContextMenu(event: any) {
+    const container = document.querySelector("#parallelcoords");
+    const rect = container.getBoundingClientRect();
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
     d3.select('#contextmenu')
-        .style('left', event.clientX / 16 + 'rem')
-        .style('top', 13.6 + 'rem')
+        .style('left', x + 'px')
+        .style('top', y + 'px')
         .style('display', 'block')
         .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.3 + 'rem').style('margin', 0.5 + 'rem')
@@ -432,8 +436,7 @@ function onDragStartEventHandler(parcoords: any): any {
     }
 }
 
-function onDragEventHandler(parcoords: any, featureAxis: any, active: any,
-    width: any): any {
+function onDragEventHandler(parcoords: any, featureAxis: any, width: any): any {
     {
         return function onDrag(d) {
 
@@ -446,6 +449,7 @@ function onDragEventHandler(parcoords: any, featureAxis: any, active: any,
             parcoords.dragging[(d.subject).name] = Math.min(width - paddingXaxis,
                 Math.max(paddingXaxis, this.__origin__ += d.x));
 
+            let active = d3.select('g.active').selectAll('path');
             active.each(function (d) {
                 d3.select(this)
                     .attr('d', temp.linePath(d, parcoords.newFeatures, parcoords))
@@ -465,7 +469,7 @@ function onDragEventHandler(parcoords: any, featureAxis: any, active: any,
     }
 }
 
-function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): any {
+function onDragEndEventHandler(parcoords: any, featureAxis: any): any {
     {
         return function onDragEnd(d) {
             const width = parcoords.width;
@@ -485,6 +489,8 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any, active: any): a
             delete this.__origin__;
             delete parcoords.dragging[(d.subject).name];
             delete parcoords.dragPosStart[(d.subject).name];
+
+            let active = d3.select('g.active').selectAll('path');
 
             temp.trans(active).each(function (d) {
                 d3.select(this)

@@ -64,6 +64,18 @@ function setOptionsAndDownload(svgString: string) {
   title.style.marginBottom = '0.5rem';
   title.style.background = 'lightgrey';
   title.style.textAlign =  'left';
+
+  const closeButton = document.createElement('span');
+  closeButton.innerHTML = '&times;';
+  closeButton.style.padding = '0.5rem';
+  closeButton.style.marginBottom = '0.5rem';
+  closeButton.style.marginLeft = '9rem';
+  closeButton.style.cursor = 'pointer';
+  closeButton.style.fontWeight = 'bold';
+  closeButton.style.fontSize = '1.25rem';
+  closeButton.style.textAlign = 'right';
+  title.append(closeButton);
+
   modal.append(title);
 
   const form = document.createElement('div');
@@ -166,6 +178,10 @@ function setOptionsAndDownload(svgString: string) {
     if (e.target === modalOverlay) {
       document.body.removeChild(modalOverlay);
     }
+  });
+
+  closeButton.addEventListener('click', () => {
+    document.body.removeChild(modalOverlay);
   });
 }
 

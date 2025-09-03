@@ -164,7 +164,7 @@ export function createToolTipForValues(recordData): void {
 
             let value = scale(recordData[dimension]);
 
-            const x = rectLeft + counter * range;
+            const x = d3.select('#rect_' + utils.cleanString(dimension))?.node()?.getBoundingClientRect().left;
             const y = rectTop + value - 100;
 
             tooltipValues.text(recordData[dimension].toString())

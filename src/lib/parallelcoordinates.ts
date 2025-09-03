@@ -57,16 +57,15 @@ export function hide(dimension: string): void {
     d3.selectAll('.dimensions')
         .filter((d: { name: string; }) => newDimensions.includes(d.name || d))
         .transition()
-        .duration(1000)
+        .duration(1500)
         .attr('transform', (d: { name: string; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
-        )
-        .ease(ease.easeCubic);
+        );
 
     d3.selectAll('.dimensions')
         .filter((d: { name: string; }) => d.name === dimension)
         .transition()
-        .duration(500)
+        .duration(1500)
         .style('opacity', 0)
         .on('end', function () {
             d3.select(this).attr('visibility', 'hidden');
@@ -74,7 +73,7 @@ export function hide(dimension: string): void {
 
     d3.select('g.active').selectAll('path')
         .transition()
-        .duration(1000)
+        .duration(1500)
         .attrTween('d', (d: { [x: string]: any; }) => generateLineTween(oldxScales, window.parcoords.xScales, newDimensions, window.parcoords.yScales)(d)
         );
 }
@@ -104,21 +103,22 @@ export function show(dimension: string): void {
 
     d3.selectAll('.dimensions')
         .filter((d: { name: string; }) => (typeof d === "object" ? d.name : d) === dimension)
-        .style('opacity', 1)
+        .style('opacity', 0)
         .transition()
-        .duration(500)
-        .attr('visibility', 'visible');;
+        .attr('visibility', 'visible')
+        .duration(1500)
+        .style('opacity', 1);        
 
     d3.selectAll('.dimensions')
         .filter((d: { name: string; }) => window.parcoords.newFeatures.includes(
             typeof d === "object" ? d.name : d
         ))
         .transition()
-        .duration(1000)
+        .duration(1500)
         .attr('transform', (d: { name: string; }) =>
             'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
         )
-        .ease(ease.easeCubic);
+        .style('opacity', 1);
 
     d3.select('g.active').selectAll('path')
         .attr('d', function (d: { [x: string]: any; }) {
@@ -386,8 +386,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
         .duration(1000)
         .attr('d', (d) => {
             return helper.linePath(d, parcoords.newFeatures, parcoords);
-        })
-        .ease(ease.easeCubic);
+        });
 
     featureAxis.transition()
         .duration(1000)
@@ -703,9 +702,9 @@ export function drawChart(content: any): void {
 
     setDefsForIcons();
 
-    window.active = setActivePathLines(svg, content, window.parcoords);
-
     setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
+
+    window.active = setActivePathLines(svg, content, window.parcoords);
 
     window.svg
         .on("contextmenu", function (event) {
@@ -1228,8 +1227,8 @@ const delay1 = 50;
 export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
 
 function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any) {
-    contextMenu.style('left', event.clientX / 16 + 'rem')
-        .style('top', event.clientY / 16 + 'rem')
+    contextMenu.style('left', event.clientX + 'px')
+        .style('top', event.clientY + 'px')
         .style('display', 'block')
         .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
@@ -1349,15 +1348,15 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    setBrushDown(featureAxis, parcoords, active, tooltipValues);
+    setBrushDown(featureAxis, parcoords, tooltipValues);
 
-    setBrushUp(featureAxis, parcoords, active, tooltipValues);
+    setBrushUp(featureAxis, parcoords, tooltipValues);
 
-    setRectToDrag(featureAxis, svg, parcoords, active, tooltipValuesTop, tooltipValuesDown);
+    setRectToDrag(featureAxis, svg, parcoords, tooltipValuesTop, tooltipValuesDown);
 
     setMarker(featureAxis);
 
-    context.setContextMenu(featureAxis, padding, parcoords, active, width);
+    context.setContextMenu(featureAxis, padding, parcoords, width);
 
     setInvertIcon(featureAxis, padding);
 }
@@ -1519,8 +1518,7 @@ function setMarker(featureAxis: any): void {
 function setRectToDrag(featureAxis: any, svg: any, parcoords: {
     xScales: any; yScales: {};
     dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any;
-    features: any[]; newDataset: any[];
-}, active: any, tooltipValuesTop: any,
+    features: any[]; newDataset: any[]; }, tooltipValuesTop: any,
     tooltipValuesDown: any): void {
 
     let delta: any;
@@ -1567,9 +1565,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
 
 function setBrushUp(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[];
-    newDataset: any[];
-}, active: any, tooltipValues: any): void {
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, tooltipValues: any): void {
 
     featureAxis
         .each(function (d) {
@@ -1605,9 +1601,7 @@ function setBrushUp(featureAxis: any, parcoords: {
 
 function setBrushDown(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[];
-    newDataset: any[];
-}, active: any, tooltipValues: any): void {
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, tooltipValues: any): void {
 
     featureAxis
         .each(function (d) {

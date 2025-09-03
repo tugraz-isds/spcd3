@@ -12,6 +12,7 @@ use the library and its steerable API. A live version of the latest
 deployment can be found at
 [https://tugraz-isds.github.io/spcd3](https://tugraz-isds.github.io/spcd3).
 
+![screenshot](exampleSpcD3.png)
 
 ## Dependencies
 

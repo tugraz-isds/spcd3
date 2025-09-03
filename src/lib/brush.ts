@@ -59,7 +59,7 @@ export function brushDown(cleanDimensionName: any, event: any, d: any,
         setToolTipBrush(tooltipValues, d, event, parcoords, window, true);
     }
 
-    updateLines(parcoords, active, d.name, cleanDimensionName);
+    updateLines(parcoords, d.name, cleanDimensionName);
 }
 
 export function brushUp(cleanDimensionName: any, event: any, d: any,
@@ -108,7 +108,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
         setToolTipBrush(tooltipValues, d, event, parcoords, window, false);
     }
 
-    updateLines(parcoords, active, d.name, cleanDimensionName);
+    updateLines(parcoords, d.name, cleanDimensionName);
 }
 
 export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: any,
@@ -188,7 +188,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
             const emptyString = '';
             if (value < yPosRect || value > yPosRect + rectHeight) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 300);
             }
             else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
                 let checkedLines = [];
@@ -199,7 +199,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
                     }
                 });
                 if (!checkedLines.includes(currentLine)) {
-                    makeActive(currentLine);
+                    makeActive(currentLine, 300);
                 }
             }
             else {
@@ -234,19 +234,19 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
 
     d3.select('#rect_' + cleanDimensionName)
         .transition()
-        .duration(300)
+        .duration(1000)
         .attr('y', topPosition)
         .attr('height', rectHeight)
         .style('opacity', 0.3);
 
     d3.select('#triangle_down_' + cleanDimensionName)
         .transition()
-        .duration(300)
+        .duration(1000)
         .attr('y', topPosition - 10);
 
     d3.select('#triangle_up_' + cleanDimensionName)
         .transition()
-        .duration(300)
+        .duration(1000)
         .attr('y', bottomPosition);
 
     let active = d3.select('g.active').selectAll('path');
@@ -273,17 +273,17 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
 
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 1000);
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 1000);
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 1000);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -297,7 +297,7 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
                 }
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine);
+                makeActive(currentLine, 1000);
             }
         }
         else {
@@ -350,7 +350,7 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
         }
 
         if (value < topPosition || value > bottomPosition) {
-            makeInactive(currentLine, dimension);
+            makeInactive(currentLine, dimension, 1000);
         }
         else if (dimNameToCheck == dimension && dimNameToCheck != emptyString) {
             let checkedLines = [];
@@ -360,7 +360,7 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
 
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine);
+                makeActive(currentLine, 1500);
             }
         }
     });
@@ -420,7 +420,7 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, parcoords: any,
     const digs = getSigDig(d.name, parcoords.currentPosOfDims);
     tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB') * 10) / 10);
     tooltipValues.style('visibility', 'visible');
-    tooltipValues.style('top', window.event.clientY + 'px').style('left', window.event.clientX + 'px');
+    tooltipValues.style('top', window.event.pageY + 'px').style('left', window.event.pageX + 'px');
     tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -459,7 +459,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesTop.text(Math.round(tooltipValueTop));
         tooltipValuesTop.style('visibility', 'visible');
-        tooltipValuesTop.style('top', Number(yPosTop + 180) + 'px').style('left', window.event.clientX + 'px');
+        tooltipValuesTop.style('top', Number(yPosTop + 180) + 'px').style('left', window.event.pageX + 'px');
         tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -472,7 +472,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
-        tooltipValuesDown.style('top', Number(yPosBottom + 180) + 'px').style('left', window.event.clientX + 'px');
+        tooltipValuesDown.style('top', Number(yPosBottom + 180) + 'px').style('left', window.event.pageX + 'px');
         tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -482,9 +482,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
 
 function updateLines(parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
-},
-    active: any, dimensionName: any, cleanDimensionName: any): void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, dimensionName: any, cleanDimensionName: any): void {
 
     const rangeTop = Number(d3.select('#triangle_down_' + cleanDimensionName).attr('y'));
     const rangeBottom = Number(d3.select('#triangle_up_' + cleanDimensionName).attr('y'));
@@ -497,6 +495,8 @@ function updateLines(parcoords: {
         parcoords.yScales[dimensionName].domain()[1];
 
     const range = maxValue - minValue;
+
+    let active = d3.select('g.active').selectAll('path');
 
     active.each(function (d) {
         let value: any;
@@ -516,17 +516,17 @@ function updateLines(parcoords: {
 
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 300);
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 300);
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName);
+                makeInactive(currentLine, dimensionName, 300);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -540,7 +540,7 @@ function updateLines(parcoords: {
                 }
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine);
+                makeActive(currentLine, 300);
             }
         }
         else {
@@ -623,11 +623,11 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
     }
 }
 
-function makeActive(currentLineName: any): void {
+function makeActive(currentLineName: string, duration: number): void {
     if (d3.select('.' + currentLineName).classed('selected')) {
         d3.select('.' + currentLineName)
             .transition()
-            .duration(300)
+            .duration(duration)
             .style('pointer-events', 'stroke')
             .style('stroke', 'rgb(255, 165, 0)')
             .style('opacity', '1')
@@ -636,7 +636,7 @@ function makeActive(currentLineName: any): void {
     else {
         d3.select('.' + currentLineName)
             .transition()
-            .duration(300)
+            .duration(duration)
             .style('pointer-events', 'stroke')
             .style('stroke', 'rgb(0, 129, 175)')
             .style('opacity', '0.5')
@@ -644,10 +644,10 @@ function makeActive(currentLineName: any): void {
     }
 }
 
-function makeInactive(currentLineName: any, dimensionName: any): void {
+function makeInactive(currentLineName: string, dimensionName: string, duration: number): void {
     d3.select('.' + currentLineName)
         .transition()
-        .duration(300)
+        .duration(duration)
         .style('pointer-events', 'none')
         .style('stroke', 'lightgrey')
         .style('opacity', '0.4')
@@ -695,7 +695,7 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any, in
         .attr('y', bottom);
 
     addPosition(top, parcoords.currentPosOfDims, dimensionName, 'top');
-    addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
+    addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');   
 }
 
 function getInvertStatus(key: any, currentPosOfDims: any): boolean {
