@@ -138,49 +138,37 @@ function getAllVisibleDimensionNames(): string[] {
 
 export function createToolTipForValues(recordData): void {
     const dimensions = getAllVisibleDimensionNames();
-    let counter = 0;
 
-    const rectLeft = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().left;
-
-    const rectTop = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().top;
-
-    const rectBottom = d3.select('#rect_' + utils.cleanString(dimensions[0]))?.node()?.getBoundingClientRect().bottom;
-
-    const xScale1 = parcoords.xScales(dimensions[0]);
-    const xScale2 = parcoords.xScales(dimensions[1]);
-    const range = xScale2 - xScale1;
+    const svg = d3.select('#pc_svg').node() as SVGSVGElement;
 
     dimensions.forEach(dimension => {
         const cleanString = utils.cleanString(dimension);
 
         if (utils.isElementVisible(d3.select('#rect_' + cleanString))) {
-            const tooltipValues = d3.select('#parallelcoords')
-                .append('g')
-                .attr('class', 'tooltip')
+            const yScale = parcoords.yScales[dimension];
+
+            const x = parcoords.xScales(dimension);
+            const y = yScale(recordData[dimension]);
+
+            const pt = svg.createSVGPoint();
+            pt.x = x;
+            pt.y = y;
+            const screenPoint = pt.matrixTransform(svg.getScreenCTM());
+
+            d3.select('body')
+                .append('div')
+                .attr('class', 'tooltip-div')
                 .style('position', 'absolute')
-                .style('visibility', 'hidden');
-
-            const scale = parcoords.yScales[dimension];
-
-            let value = scale(recordData[dimension]);
-
-            const x = d3.select('#rect_' + utils.cleanString(dimension))?.node()?.getBoundingClientRect().left;
-            const y = rectTop + value - 100;
-
-            tooltipValues.text(recordData[dimension].toString())
-                .style('visibility', 'visible')
-                .style('top', `${y}px`)
-                .style('left', `${x}px`)
+                .style('left', `${screenPoint.x}px`)
+                .style('top', `${screenPoint.y}px`)
                 .style('font-size', '0.65rem')
                 .style('margin', '0.5rem')
                 .style('color', 'red')
                 .style('background-color', '#d3d3d3ad')
                 .style('font-weight', 'bold')
                 .style('padding', '0.12rem')
-                .style('white-space', 'pre-line')
-                .style('margin-left', '0.5rem');
-
-            counter++;
+                .style('white-space', 'nowrap')
+                .text(recordData[dimension].toString());
         }
     });
 }
@@ -222,6 +210,5 @@ export function position(dimensionName: any, dragging: any, xScales: any): any {
 }
 
 export function cleanTooltip() {
-    d3.selectAll(".tooltip")
-        .remove();
+    d3.selectAll('.tooltip-div').remove();
 }

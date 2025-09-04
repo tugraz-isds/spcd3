@@ -107,7 +107,7 @@ export function show(dimension: string): void {
         .transition()
         .attr('visibility', 'visible')
         .duration(1500)
-        .style('opacity', 1);        
+        .style('opacity', 1);
 
     d3.selectAll('.dimensions')
         .filter((d: { name: string; }) => window.parcoords.newFeatures.includes(
@@ -679,26 +679,45 @@ export function drawChart(content: any): void {
 
     const height = 360;
 
-    const wrapper = d3.select('#parallelcoords');
+    const wrapper = d3.select('#parallelcoords')
+        .style('display', 'block')
+        .style('width', '100%')
+        .style('margin', '0')
+        .style('padding', '0')
+        .style('text-align', 'left')
+        .style('justify-content', 'flex-start')
+        .style('align-items', 'flex-start');
 
-    wrapper.append('div')
+    const chartWrapper = wrapper.append('div')
+        .attr('id', 'chartWrapper')
+        .style('display', 'block')
+        .style('width', '100%')
+        .style('margin', '0')
+        .style('padding', '0')
+        .style('text-align', 'left');
+
+    chartWrapper.append('div')
         .attr('id', 'toolbarRow')
         .style('display', 'flex')
         .style('flex-wrap', 'wrap')
         .style('align-items', 'center')
+        .style('justify-content', 'flex-start')
         .style('margin-top', '1.2rem')
-        .style('margin-left', '1.8rem')
+        .style('margin-left', '1rem')
         .style('margin-bottom', 0);
 
     toolbar.createToolbar(window.parcoords.newDataset);
 
-    window.svg = wrapper
-        .append('svg')
+    window.svg = chartWrapper.append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [-10, 20, window.width, height])
+        .attr('preserveAspectRatio', 'xMinYMin meet')
         .attr('font-family', 'Verdana, sans-serif')
         .attr('user-select', 'none')
-        .style('margin-top', 0);
+        .style('display', 'block')
+        .style('width', '100%')
+        .style('margin-top', 0)
+        .style('margin-left', 0);
 
     setDefsForIcons();
 
@@ -1227,8 +1246,13 @@ const delay1 = 50;
 export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
 
 function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any) {
-    contextMenu.style('left', event.clientX + 'px')
-        .style('top', event.clientY + 'px')
+    const container = document.querySelector("#parallelcoords");
+    const rect = container.getBoundingClientRect();
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    contextMenu.style('left', x + 'px')
+        .style('top', y + 'px')
         .style('display', 'block')
         .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
@@ -1518,7 +1542,8 @@ function setMarker(featureAxis: any): void {
 function setRectToDrag(featureAxis: any, svg: any, parcoords: {
     xScales: any; yScales: {};
     dragging: {}; dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any;
-    features: any[]; newDataset: any[]; }, tooltipValuesTop: any,
+    features: any[]; newDataset: any[];
+}, tooltipValuesTop: any,
     tooltipValuesDown: any): void {
 
     let delta: any;
@@ -1565,7 +1590,8 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
 
 function setBrushUp(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, tooltipValues: any): void {
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+}, tooltipValues: any): void {
 
     featureAxis
         .each(function (d) {
@@ -1601,7 +1627,8 @@ function setBrushUp(featureAxis: any, parcoords: {
 
 function setBrushDown(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
-    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, tooltipValues: any): void {
+    dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+}, tooltipValues: any): void {
 
     featureAxis
         .each(function (d) {

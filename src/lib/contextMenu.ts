@@ -217,6 +217,7 @@ function filterMenu(values: any[], dimension: any) {
                     d3.select('#modalFilter').style('display', 'none');
                     d3.select('#modalOverlayFilter').style('display', 'none');
                 });
+                d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
@@ -354,6 +355,7 @@ function setRangeMenu(values: any[], dimension: any) {
                     d3.select('#modalSetRange').style('display', 'none');
                     d3.select('#modalOverlaySetRange').style('display', 'none');
                 });
+                d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
@@ -368,6 +370,7 @@ function invertDimensionMenu(dimension: any) {
     d3.select('#invertMenu')
         .on('click', (event) => {
             pc.invert(dimension);
+            d3.select('#contextmenu').style('display', 'none');
             event.stopPropagation();
         });
 }
