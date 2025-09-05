@@ -975,7 +975,6 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         }
         else {
             max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
-            console.log(max);
             min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
         }
         const ranges = getDimensionRange(newFeatures[i]);

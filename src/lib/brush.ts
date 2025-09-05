@@ -188,7 +188,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
 
             const emptyString = '';
             if (value < yPosRect || value > yPosRect + rectHeight) {
-                makeInactive(currentLine, dimensionName, 300);
+                makeInactive(currentLine, dimensionName, 100);
             }
             else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
                 let checkedLines = [];
@@ -482,7 +482,8 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
 
 function updateLines(parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
-    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];}, dimensionName: any, cleanDimensionName: any): void {
+    currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
+}, dimensionName: any, cleanDimensionName: any): void {
 
     const rangeTop = Number(d3.select('#triangle_down_' + cleanDimensionName).attr('y'));
     const rangeBottom = Number(d3.select('#triangle_up_' + cleanDimensionName).attr('y'));
@@ -516,17 +517,17 @@ function updateLines(parcoords: {
 
         if (value < rangeTop + 10 || value > rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName, 300);
+                makeInactive(currentLine, dimensionName, 100);
             }
         }
         else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName, 300);
+                makeInactive(currentLine, dimensionName, 100);
             }
         }
         else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
             if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName, 300);
+                makeInactive(currentLine, dimensionName, 100);
             }
         }
         else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
@@ -626,21 +627,21 @@ function checkAllPositionsBottom(positionItem: any, dimensionName: any, parcoord
 function makeActive(currentLineName: string, duration: number): void {
     if (d3.select('.' + currentLineName).classed('selected')) {
         d3.select('.' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .text('')
             .transition()
             .duration(duration)
-            .style('pointer-events', 'stroke')
             .style('stroke', 'rgb(255, 165, 0)')
-            .style('opacity', '1')
-            .text('');
+            .style('opacity', '1');
     }
     else {
         d3.select('.' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .text('')
             .transition()
             .duration(duration)
-            .style('pointer-events', 'stroke')
             .style('stroke', 'rgb(0, 129, 175)')
-            .style('opacity', '0.5')
-            .text('');
+            .style('opacity', '0.5');
     }
 }
 
@@ -648,10 +649,12 @@ function makeInactive(currentLineName: string, dimensionName: string, duration: 
     d3.select('.' + currentLineName)
         .transition()
         .duration(duration)
-        .style('pointer-events', 'none')
         .style('stroke', 'lightgrey')
-        .style('opacity', '0.4')
-        .text(dimensionName);
+        .style('opacity', 0.4)
+        .on('end', function () {
+            d3.select(this).style('pointer-events', 'none')
+                .text(dimensionName);
+        });
 }
 
 export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {
@@ -695,7 +698,7 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any, in
         .attr('y', bottom);
 
     addPosition(top, parcoords.currentPosOfDims, dimensionName, 'top');
-    addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');   
+    addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');
 }
 
 function getInvertStatus(key: any, currentPosOfDims: any): boolean {
