@@ -966,8 +966,18 @@ function setUpParcoordData(data: any, newFeatures: any): any {
     window.parcoords.data = data;
 
     for (let i = 0; i < newFeatures.length; i++) {
-        const max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
-        const min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
+        let max;
+        let min;
+        if (isNaN(Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]])))) {
+            const sorted = [...window.parcoords.newDataset.map(o => o[newFeatures[i]])].sort((a, b) => a.localeCompare(b));
+            min = sorted[sorted.length - 1];
+            max = sorted[0];
+        }
+        else {
+            max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
+            console.log(max);
+            min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
+        }
         const ranges = getDimensionRange(newFeatures[i]);
         window.parcoords.currentPosOfDims.push(
             {
