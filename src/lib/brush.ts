@@ -646,15 +646,30 @@ function makeActive(currentLineName: string, duration: number): void {
 }
 
 function makeInactive(currentLineName: string, dimensionName: string, duration: number): void {
-    d3.select('.' + currentLineName)
-        .transition()
+    const line = d3.select('.' + currentLineName);
+
+    const bbox = line.node().getBBox();
+
+    const overlay = d3.select(line.node().parentNode)
+        .append('rect')
+        .attr('class', 'hover-blocker')
+        .attr('x', bbox.x)
+        .attr('y', bbox.y)
+        .attr('width', bbox.width)
+        .attr('height', bbox.height)
+        .style('fill', 'transparent')
+        .style('pointer-events', 'all');
+
+    line.transition()
+        .text(dimensionName)
         .duration(duration)
         .style('stroke', 'lightgrey')
         .style('opacity', 0.4)
         .on('end', function () {
-            d3.select(this).style('pointer-events', 'none')
-                .text(dimensionName);
+            overlay.remove();
+            d3.select(this).style('pointer-events', 'none');
         });
+
 }
 
 export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {
