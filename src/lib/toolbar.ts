@@ -23,7 +23,6 @@ export function createToolbar(dataset) {
     .style('padding', '0.2em')
     .style('width', '2em')
     .style('height', '2em')
-    .style('background', 'transparent')
     .style('cursor', 'pointer');
 
   const toolbar = toolbarRow.append('div')
