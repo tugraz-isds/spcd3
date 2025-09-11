@@ -47,33 +47,33 @@ export function getArrowUpCursor(): string {
 }
 
 export function getRefreshIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18"><polyline points="6.5 4 8.5 4 8.5 2" fill="none" stroke="black" stroke-width="1"/><path d="M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5" fill="none" stroke="black" stroke-width="1"/><polyline points="3.5 6 1.5 6 1.5 8" fill="none" stroke="black" stroke-width="1"/><path d="M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7" fill="none" stroke="black" stroke-width="1"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><polyline points="6.5 4 8.5 4 8.5 2" fill="none" stroke="black" stroke-width="1"/><path d="M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5" fill="none" stroke="black" stroke-width="1"/><polyline points="3.5 6 1.5 6 1.5 8" fill="none" stroke="black" stroke-width="1"/><path d="M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7" fill="none" stroke="black" stroke-width="1"/></svg>';
 }
 
 export function getTableIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" fill="none" /><line x1="0.5" y1="3.3" x2="9.5" y2="3.3" stroke="black" stroke-width="1"/><line x1="0.5" y1="6.6" x2="9.5" y2="6.6" stroke="black" stroke-width="1"/><line x1="3.3" y1="0.5" x2="3.3" y2="9.5" stroke="black" stroke-width="1"/><line x1="6.6" y1="0.5" x2="6.6" y2="9.5" stroke="black" stroke-width="1"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" fill="none" /><line x1="0.5" y1="3.3" x2="9.5" y2="3.3" stroke="black" stroke-width="1"/><line x1="0.5" y1="6.6" x2="9.5" y2="6.6" stroke="black" stroke-width="1"/><line x1="3.3" y1="0.5" x2="3.3" y2="9.5" stroke="black" stroke-width="1"/><line x1="6.6" y1="0.5" x2="6.6" y2="9.5" stroke="black" stroke-width="1"/></svg>';
 }
 
 export function getSelectionIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="black" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
 }
 
 export function getSelectionActiveIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8" width="15" height="18" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="orange" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" fill="currentColor"><rect x="0.5" y="0.5" width="9" height="9" rx="1" ry="1" stroke="orange" stroke-width="1" stroke-dasharray="0.5,0.5" fill="none" /></svg>';
 }
 
 export function getExpandToolbarIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" width="15" height="18"><polyline points="1.5 0.75 3 2.75 1.5 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="3.5 0.75 5 2.75 3.5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6"><polyline points="1.5 0.75 3 2.75 1.5 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="3.5 0.75 5 2.75 3.5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
 }
 
 export function getCollapseToolbarIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" width="15" height="18"> <polyline points="3 0.75 1.5 2.75 3 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="5 0.75 3.5 2.75 5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6"> <polyline points="3 0.75 1.5 2.75 3 4.75" fill="none" stroke="black" stroke-width="0.5"/><polyline points="5 0.75 3.5 2.75 5 4.75" fill="none" stroke="black" stroke-width="0.5"/></svg>';
 }
 
 export function getResetIcon(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12" width="15" height="18"><path d="M8 4 A4 4 0 1 1 2 4" fill="none" stroke="black" stroke-width="1"/><polyline points="3 5.5 2 4 0 4" fill="none" stroke="black" stroke-width="1"/><path d="M 5 1 L 5 6.5 z" fill="none" stroke="black" stroke-width="1"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 12"><path d="M8 4 A4 4 0 1 1 2 4" fill="none" stroke="black" stroke-width="1"/><polyline points="3 5.5 2 4 0 4" fill="none" stroke="black" stroke-width="1"/><path d="M 5 1 L 5 6.5 z" fill="none" stroke="black" stroke-width="1"/></svg>';
 }
 
 export function getDownloadButton(): string {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 7" width="15" height="18"><path d="M 2.5 5 L 2.5 1 L 3 1 L 3 5 z"/><polyline points="0.75 3.5 2.75 5 4.75 3.5" fill="none" stroke="black" stroke-width="0.5"/><path d="M 0 6 L 6 6 L 6 6.5 L 0 6.5 z"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 7"><path d="M 2.5 5 L 2.5 1 L 3 1 L 3 5 z"/><polyline points="0.75 3.5 2.75 5 4.75 3.5" fill="none" stroke="black" stroke-width="0.5"/><path d="M 0 6 L 6 6 L 6 6.5 L 0 6.5 z"/></svg>';
 }
