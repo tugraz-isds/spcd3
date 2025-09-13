@@ -466,8 +466,8 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
             240 / range * (maxValue - value) + 80;
     };
 
-    var top = inverted ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
-    var bottom = inverted ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
+    var top = inverted ? scaleValue(dimensionSettings.currentRangeBottom) : scaleValue(dimensionSettings.currentRangeTop);
+    var bottom = inverted ? scaleValue(dimensionSettings.currentRangeTop) : scaleValue(dimensionSettings.currentRangeBottom);
     var rectH = inverted ? top - bottom : bottom - top;
 
     rect.transition()

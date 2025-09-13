@@ -157,55 +157,10 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
         d3.select('#triangle_up_' + cleanDimensionName)
             .attr('y', yPosRect + rectHeight);
 
-        const dimensionName = d.name;
-        const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
-        const maxValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[1] :
-            parcoords.yScales[dimensionName].domain()[0];
-
-        const minValue = invertStatus == false ? parcoords.yScales[dimensionName].domain()[0] :
-            parcoords.yScales[dimensionName].domain()[1];
-
-        const range = maxValue - minValue;
-
         if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
             setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, parcoords, window, true, yPosTop, yPosRect + rectHeight);
         }
-
-        active.each(function (d) {
-            const currentLine = getLineName(d);
-
-            let value: any;
-            if (invertStatus) {
-                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                    240 / range * (d[dimensionName] - minValue) + 80;
-            }
-            else {
-                value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                    240 / range * (maxValue - d[dimensionName]) + 80;
-            }
-
-            const dimNameToCheck = d3.select('.' + currentLine).text();
-
-            const emptyString = '';
-            if (value < yPosRect || value > yPosRect + rectHeight) {
-                makeInactive(currentLine, dimensionName, 100);
-            }
-            else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
-                let checkedLines = [];
-                parcoords.currentPosOfDims.forEach(function (item) {
-                    if (item.top != 80 && item.bottom != 320) {
-                        checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                        checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
-                    }
-                });
-                if (!checkedLines.includes(currentLine)) {
-                    makeActive(currentLine, 300);
-                }
-            }
-            else {
-                // do nothing
-            }
-        });
+        updateLines(parcoords, d.name, cleanDimensionName);
     }
 }
 
@@ -360,7 +315,7 @@ export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, 
 
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine, 1500);
+                makeActive(currentLine, 1000);
             }
         }
     });
@@ -648,28 +603,15 @@ function makeActive(currentLineName: string, duration: number): void {
 function makeInactive(currentLineName: string, dimensionName: string, duration: number): void {
     const line = d3.select('.' + currentLineName);
 
-    const bbox = line.node().getBBox();
-
-    const overlay = d3.select(line.node().parentNode)
-        .append('rect')
-        .attr('class', 'hover-blocker')
-        .attr('x', bbox.x)
-        .attr('y', bbox.y)
-        .attr('width', bbox.width)
-        .attr('height', bbox.height)
-        .style('fill', 'transparent')
-        .style('pointer-events', 'all');
-
-    line.transition()
-        .text(dimensionName)
-        .duration(duration)
-        .style('stroke', 'lightgrey')
-        .style('opacity', 0.4)
-        .on('end', function () {
-            overlay.remove();
-            d3.select(this).style('pointer-events', 'none');
-        });
-
+  line
+    .text(dimensionName)
+    .transition()
+    .duration(duration)
+    .style('stroke', 'lightgrey')
+    .style('opacity', 0.4)
+    .on('end', function () {
+      d3.select(this).style('pointer-events', 'none');
+    });
 }
 
 export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {

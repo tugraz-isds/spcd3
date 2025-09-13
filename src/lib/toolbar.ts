@@ -8,8 +8,8 @@ export function createToolbar(dataset) {
     .style('display', 'flex')
     .style('flex-wrap', 'wrap')
     .style('align-items', 'center')
-    .style('font-size', '1.1vw')
-    .style('margin-top', '1.2rem')
+    .style('font-size', '1vw')
+    .style('margin-top', '1rem')
     .style('margin-left', '1rem')
     .style('margin-bottom', '0');
 
@@ -19,7 +19,7 @@ export function createToolbar(dataset) {
     .html(icon.getExpandToolbarIcon())
     .style('margin', '0')
     .style('border', 'none')
-    .style('border-radius', '0')
+    .style('border-radius', '10%')
     .style('padding', '0.2em')
     .style('width', '2em')
     .style('height', '2em')
@@ -40,8 +40,8 @@ export function createToolbar(dataset) {
     .html(icon.getTableIcon())
     .style('margin', '0')
     .style('border', 'none')
-    .style('border-radius', '0')
-    .style('padding', '0.2em')
+    .style('border-radius', '5%')
+    .style('padding', '0.3em')
     .style('width', '2em')
     .style('height', '2em')
     .on('click', () => showModalWithData(dataset));
@@ -52,8 +52,8 @@ export function createToolbar(dataset) {
     .html(icon.getDownloadButton())
     .style('margin', '0')
     .style('border', 'none')
-    .style('border-radius', '0')
-    .style('padding', '0.2em')
+    .style('border-radius', '5%')
+    .style('padding', '0.3em')
     .style('width', '2em')
     .style('height', '2em')
     .on('click', io.saveAsSvg);
@@ -64,8 +64,8 @@ export function createToolbar(dataset) {
     .html(icon.getRefreshIcon())
     .style('margin', '0')
     .style('border', 'none')
-    .style('border-radius', '0')
-    .style('padding', '0.2em')
+    .style('border-radius', '5%')
+    .style('padding', '0.3em')
     .style('width', '2em')
     .style('height', '2em')
     .on('click', pc.refresh);
@@ -76,8 +76,8 @@ export function createToolbar(dataset) {
     .html(icon.getResetIcon())
     .style('margin', '0')
     .style('border', 'none')
-    .style('border-radius', '0')
-    .style('padding', '0.2em')
+    .style('border-radius', '5%')
+    .style('padding', '0.3em')
     .style('width', '2em')
     .style('height', '2em')
     .on('click', pc.reset);
@@ -134,12 +134,17 @@ function showModalWithData(dataset) {
         .style('max-height', '80vh')
         .style('max-width', '90vw')
         .style('z-index', '1000')
-        .style('display', 'block');
+        .style('display', 'flex')
+        .style('flex-direction', 'column')
+        .style('overflow', 'hidden');
 
     const saveAsCSV = document.createElement('button');
     saveAsCSV.id = 'saveAsCsv';
     saveAsCSV.textContent = 'Save as CSV';
     saveAsCSV.style.marginBottom = '3rem';
+    saveAsCSV.style.alignSelf = 'flex-start';
+    saveAsCSV.style.width = 'auto';
+    saveAsCSV.style.display = 'inline-block';
     modal.append(() => saveAsCSV);
 
     saveAsCSV.addEventListener('click', () => {
@@ -162,10 +167,11 @@ function showModalWithData(dataset) {
     modal.append(() => closeButton);
 
     const scrollWrapper = document.createElement('div');
-    scrollWrapper.style.width = '100%';
+    scrollWrapper.style.flex = '1 1 auto';
+    scrollWrapper.style.minHeight = '0';
     scrollWrapper.style.overflowY = 'auto';
-    scrollWrapper.style.whiteSpace = 'nowrap';
-    scrollWrapper.style.maxHeight = '60vh';
+    scrollWrapper.style.overflowX = 'auto';
+    scrollWrapper.style.width = '100%';
 
     const tableContainer = document.createElement('table');
     tableContainer.style.width = '100%';
@@ -206,6 +212,9 @@ function generateTable(dataArray, table) {
         th.style.top = '0';
         th.style.zIndex = '1';
         th.style.textAlign = 'left';
+        th.style.whiteSpace = 'nowrap';
+        th.style.overflow = 'hidden';
+        th.style.textOverflow = 'ellipsis'; 
         headRow.appendChild(th);
     });
 
