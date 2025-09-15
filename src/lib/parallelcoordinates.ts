@@ -466,9 +466,17 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
             240 / range * (maxValue - value) + 80;
     };
 
-    var top = inverted ? scaleValue(dimensionSettings.currentRangeBottom) : scaleValue(dimensionSettings.currentRangeTop);
-    var bottom = inverted ? scaleValue(dimensionSettings.currentRangeTop) : scaleValue(dimensionSettings.currentRangeBottom);
-    var rectH = inverted ? top - bottom : bottom - top;
+    var newMin = dimensionSettings.currentRangeBottom > dimensionSettings.currentFilterBottom ? dimensionSettings.currentRangeBottom : dimensionSettings.currentFilterBottom;
+    var newMax = dimensionSettings.currentRangeTop < dimensionSettings.currentFilterTop ? dimensionSettings.currentRangeTop : dimensionSettings.currentFilterTop;
+    var top = inverted ? scaleValue(newMin) : scaleValue(newMax);
+    var bottom = inverted ? scaleValue(newMax) : scaleValue(newMin);
+    var rectH = bottom - top;
+
+    const storeBottom = Math.min(newMin, newMax);
+    const storeTop = Math.max(newMin, newMax);
+
+    addRange(storeBottom, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
+    addRange(storeTop, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
 
     rect.transition()
         .duration(300)
@@ -569,8 +577,10 @@ export function getFilter(dimension: string): [number, number] {
 }
 
 export function setFilter(dimension: string, min: number, max: number): void {
-    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
-    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
+    const filterTop = Math.max(min, max);
+    const filterBottom = Math.min(min, max);
+    addRange(filterBottom, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
+    addRange(filterTop, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
     brush.filter(dimension, min, max, parcoords);
 }
 
@@ -981,7 +991,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         window.parcoords.currentPosOfDims.push(
             {
                 key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
-                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: max, currentFilterTop: min
+                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: min, currentFilterTop: max
             }
         );
     }

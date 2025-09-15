@@ -109,7 +109,14 @@ function resetFilterMenu(values: any[], dimension: any) {
             .style('color', 'black')
             .on('click', (event) => {
                 const range = pc.getDimensionRange(dimension);
-                pc.setFilter(dimension, range[1], range[0]);
+                const inverted = temp.isInverted(dimension);
+                if (inverted) {
+                    pc.setFilter(dimension, range[0], range[1]);
+                }
+                else {
+                    pc.setFilter(dimension, range[1], range[0]);
+                }
+               
                 d3.select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });

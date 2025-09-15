@@ -629,8 +629,8 @@ export function addSettingsForBrushing(dimensionName: string, parcoords: any, in
             240 / range * (maxValue - value) + 80;
     };
     const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === processedName);
-    var top = invertStatus ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
-    var bottom = invertStatus ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
+    var bottom = invertStatus ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
+    var top = invertStatus ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
     var rectH = bottom - top;
 
     const rect = d3.select('#rect_' + processedName);
