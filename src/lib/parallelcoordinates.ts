@@ -1391,9 +1391,17 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    setBrushDown(featureAxis, parcoords, tooltipValues);
+    const brushOverlay = window.svg.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", window.width)
+        .attr("height", height)
+        .style("fill", "transparent")
+        .style("pointer-events", "none");
 
-    setBrushUp(featureAxis, parcoords, tooltipValues);
+    setBrushDown(featureAxis, parcoords, tooltipValues, brushOverlay);
+
+    setBrushUp(featureAxis, parcoords, tooltipValues, brushOverlay);
 
     setRectToDrag(featureAxis, svg, parcoords, tooltipValuesTop, tooltipValuesDown);
 
@@ -1549,10 +1557,9 @@ function setMarker(featureAxis: any): void {
                 .attr('x', -22)
                 .attr('y', 30)
                 .attr('fill', 'none')
-                .attr('stroke', 'red')
-                .attr('stroke-width', '0.15rem')
+                .attr('stroke', "rgb(228, 90, 15)")
+                .attr('stroke-width', '0.1rem')
                 .attr('opacity', '0')
-
         });
 }
 
@@ -1610,7 +1617,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
 function setBrushUp(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
     dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
-}, tooltipValues: any): void {
+}, tooltipValues: any, brushOverlay: any): void {
 
     featureAxis
         .each(function (d) {
@@ -1631,6 +1638,7 @@ function setBrushUp(featureAxis: any, parcoords: {
                 })
                 .call(drag.drag()
                     .on('drag', (event, d) => {
+                        brushOverlay.raise().style("pointer-events", "all");
                         if (parcoords.newFeatures.length > 25) {
                             brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                         }
@@ -1639,6 +1647,7 @@ function setBrushUp(featureAxis: any, parcoords: {
                         }
                     })
                     .on('end', () => {
+                        brushOverlay.style("pointer-events", "none");
                         tooltipValues.style('visibility', 'hidden');
                     }));
         });
@@ -1647,7 +1656,7 @@ function setBrushUp(featureAxis: any, parcoords: {
 function setBrushDown(featureAxis: any, parcoords: {
     xScales: any; yScales: {}; dragging: {};
     dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
-}, tooltipValues: any): void {
+}, tooltipValues: any, brushOverlay: any): void {
 
     featureAxis
         .each(function (d) {
@@ -1668,6 +1677,7 @@ function setBrushDown(featureAxis: any, parcoords: {
                 })
                 .call(drag.drag()
                     .on('drag', (event, d) => {
+                        brushOverlay.raise().style("pointer-events", "all");
                         if (parcoords.newFeatures.length > 25) {
                             brush.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
                         }
@@ -1676,6 +1686,7 @@ function setBrushDown(featureAxis: any, parcoords: {
                         }
                     })
                     .on('end', () => {
+                        brushOverlay.style("pointer-events", "none");
                         tooltipValues.style('visibility', 'hidden');
                     }));
         });
