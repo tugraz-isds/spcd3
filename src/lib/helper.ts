@@ -35,9 +35,16 @@ export function setupYScales(height: any, padding: any, features: any, newDatase
         else {
             const max = Math.max(...newDataset.map(o => o[x.name]));
             const min = Math.min(...newDataset.map(o => o[x.name]));
-            yScales[x.name] = scale.scaleLinear()
+            if (min === max) {
+                const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
+                yScales[x.name] = scale.scaleLinear()
+                .domain([min - epsilon, max + epsilon])
+                .range([height - padding, padding]);
+            } else {
+                yScales[x.name] = scale.scaleLinear()
                 .domain([min, max])
                 .range([height - padding, padding]);
+            }
         }
     });
     return yScales;

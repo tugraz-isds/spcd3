@@ -455,42 +455,38 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
 
     const yScale = parcoords.yScales[dimension];
 
-    const [minValue, maxValue] = inverted ? yScale.domain().slice().reverse() : yScale.domain();
+    const newMin = Math.max(dimensionSettings.currentRangeBottom, dimensionSettings.currentFilterBottom);
+    const newMax = Math.min(dimensionSettings.currentRangeTop, dimensionSettings.currentFilterTop);
 
-    const scaleValue = (value: number) => {
-        if (isNaN(value)) {
-            return yScale(value);
-        }
-        const range = maxValue - minValue;
-        return inverted ? 240 / range * (value - minValue) + 80 :
-            240 / range * (maxValue - value) + 80;
-    };
+    let top = yScale(newMax);
+    let bottom = yScale(newMin);
 
-    var newMin = dimensionSettings.currentRangeBottom > dimensionSettings.currentFilterBottom ? dimensionSettings.currentRangeBottom : dimensionSettings.currentFilterBottom;
-    var newMax = dimensionSettings.currentRangeTop < dimensionSettings.currentFilterTop ? dimensionSettings.currentRangeTop : dimensionSettings.currentFilterTop;
-    var top = inverted ? scaleValue(newMin) : scaleValue(newMax);
-    var bottom = inverted ? scaleValue(newMax) : scaleValue(newMin);
-    var rectH = bottom - top;
+    if (inverted) {
+        [top, bottom] = [bottom, top];
+    }
+
+    const rectY = Math.min(top, bottom);
+    const rectH = Math.abs(bottom - top);
 
     const storeBottom = Math.min(newMin, newMax);
     const storeTop = Math.max(newMin, newMax);
 
-    addRange(storeBottom, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
-    addRange(storeTop, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
+    addRange(storeBottom, parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
+    addRange(storeTop, parcoords.currentPosOfDims, dimension, 'currentFilterTop');
 
     rect.transition()
         .duration(300)
-        .attr('y', top)
+        .attr('y', rectY)
         .attr('height', rectH)
         .style('opacity', 0.3);
 
     triDown.transition()
         .duration(300)
-        .attr('y', top - 10);
+        .attr('y', rectY - 10);
 
     triUp.transition()
         .duration(300)
-        .attr('y', bottom);
+        .attr('y', rectY + rectH);
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -530,6 +526,7 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
             .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
             .ease(ease.easeCubic);
     });
+    setFilterAfterSettingRanges(dimension, inverted);
 }
 
 export function getMinValue(dimension: any): number {
@@ -558,7 +555,6 @@ function addRange(value: number, currentPosOfDims: any, dimensionName: any, key:
     const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
     Object.assign(target, newObject);
 }
-
 
 //---------- Filter Functions ----------
 
@@ -991,7 +987,7 @@ function setUpParcoordData(data: any, newFeatures: any): any {
         window.parcoords.currentPosOfDims.push(
             {
                 key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
-                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: min, currentFilterTop: max
+                min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: ranges[0], currentFilterTop: ranges[1]
             }
         );
     }

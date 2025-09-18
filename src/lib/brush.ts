@@ -1,6 +1,7 @@
 import * as d3 from 'd3-selection';
 import * as icon from './icons/icons';
 import * as helper from './utils';
+import { isDimensionCategorical } from './parallelcoordinates';
 
 export function brushDown(cleanDimensionName: any, event: any, d: any,
     parcoords: {
@@ -164,25 +165,20 @@ export function dragAndBrush(cleanDimensionName: any, d: any, svg: any, event: a
     }
 }
 
-export function filter(dimensionName: any, topValue: any, bottomValue: any, parcoords: any): void {
+export function filter(dimensionName: any, min: any, max: any, parcoords: any): void {
 
     const cleanDimensionName = helper.cleanString(dimensionName);
     const invertStatus = getInvertStatus(dimensionName, parcoords.currentPosOfDims);
     const yScale = parcoords.yScales[dimensionName];
-    const [minValue, maxValue] = invertStatus ? yScale.domain().slice().reverse() : yScale.domain();
 
-    const scaleValue = (value: number) => {
-        if (isNaN(value)) {
-            return yScale(value);
-        }
-        const range = maxValue - minValue;
-        return invertStatus ? 240 / range * (value - minValue) + 80 :
-            240 / range * (maxValue - value) + 80;
-    };
+    let topPosition = yScale(min);
+    let bottomPosition = yScale(max);
 
-    let topPosition = scaleValue(topValue);
-    let bottomPosition = scaleValue(bottomValue);
-    let rectHeight = bottomPosition - topPosition;
+    if (invertStatus) {
+        [topPosition, bottomPosition] = [bottomPosition, topPosition];
+    }
+    const rectY = Math.min(topPosition, bottomPosition);
+    const rectHeight = Math.abs(bottomPosition - topPosition);
 
     addPosition(topPosition, parcoords.currentPosOfDims, dimensionName, 'top');
     addPosition(bottomPosition, parcoords.currentPosOfDims, dimensionName, 'bottom');
@@ -190,75 +186,62 @@ export function filter(dimensionName: any, topValue: any, bottomValue: any, parc
     d3.select('#rect_' + cleanDimensionName)
         .transition()
         .duration(1000)
-        .attr('y', topPosition)
+        .attr('y', rectY)
         .attr('height', rectHeight)
         .style('opacity', 0.3);
 
     d3.select('#triangle_down_' + cleanDimensionName)
         .transition()
         .duration(1000)
-        .attr('y', topPosition - 10);
+        .attr('y', rectY - 10);
 
     d3.select('#triangle_up_' + cleanDimensionName)
         .transition()
         .duration(1000)
-        .attr('y', bottomPosition);
+        .attr('y', rectY + rectHeight);
 
     let active = d3.select('g.active').selectAll('path');
 
-    const rangeTop = topPosition - 10;
-    const rangeBottom = bottomPosition;
-    const range = maxValue - minValue;
+    const rectTop = Math.min(topPosition, bottomPosition);
+    const rectBottom = Math.max(topPosition, bottomPosition);
+
+    if (isDimensionCategorical(dimensionName)) {
+        const selectedCategories = yScale.domain().filter(cat => {
+            const pos = yScale(cat)!;
+            return pos >= rectTop && pos <= rectBottom;
+        });
+        addRange(selectedCategories, parcoords.currentPosOfDims, dimensionName, "currentFilterCategories");
+    }
+    else {
+        addRange(yScale.invert(rectBottom), parcoords.currentPosOfDims, dimensionName, "currentFilterBottom");
+        addRange(yScale.invert(rectTop), parcoords.currentPosOfDims, dimensionName, "currentFilterTop");
+    }
 
     active.each(function (d) {
-        let value: any;
-        if (invertStatus) {
-            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / range * (d[dimensionName] - minValue) + 80;
-        }
-        else {
-            value = isNaN(maxValue) ? parcoords.yScales[dimensionName](d[dimensionName]) :
-                240 / range * (maxValue - d[dimensionName]) + 80;
-        }
+        const value = yScale(d[dimensionName]);
 
         const currentLine = getLineName(d);
         const dimNameToCheck = d3.select('.' + currentLine).text();
 
         const emptyString = '';
-
-        if (value < rangeTop + 10 || value > rangeBottom) {
-            if (dimNameToCheck == emptyString) {
+        if (value < rectTop || value > rectBottom) {
+            if (dimNameToCheck === emptyString) {
                 makeInactive(currentLine, dimensionName, 1000);
             }
         }
-        else if (value == 320 && value == rangeTop + 10 && value == rangeBottom) {
-            if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName, 1000);
-            }
-        }
-        else if (value == 80 && value == rangeTop + 10 && value == rangeBottom) {
-            if (dimNameToCheck == emptyString) {
-                makeInactive(currentLine, dimensionName, 1000);
-            }
-        }
-        else if (dimNameToCheck == dimensionName && dimNameToCheck != emptyString) {
-            let checkedLines = [];
+        else if (dimNameToCheck === dimensionName && dimNameToCheck !== emptyString) {
+            let checkedLines: string[] = [];
             parcoords.currentPosOfDims.forEach(function (item) {
-                if (item.top != 80 || item.bottom != 320) {
-                    checkAllPositionsTop(item, dimensionName, parcoords, d,
-                        checkedLines, currentLine);
-                    checkAllPositionsBottom(item, dimensionName, parcoords, d,
-                        checkedLines, currentLine);
+                if (item.top != yScale.range()[1] || item.bottom != yScale.range()[0]) {
+                    checkAllPositionsTop(item, dimensionName, parcoords, d, checkedLines, currentLine);
+                    checkAllPositionsBottom(item, dimensionName, parcoords, d, checkedLines, currentLine);
                 }
             });
             if (!checkedLines.includes(currentLine)) {
                 makeActive(currentLine, 1000);
             }
         }
-        else {
-            // do nothing
-        }
-    })
+    });
 }
 
 export function filterWithCoords(topPosition, bottomPosition, currentPosOfDims, dimension) {
@@ -452,6 +435,18 @@ function updateLines(parcoords: {
 
     const range = maxValue - minValue;
 
+    if (isDimensionCategorical(dimensionName)) {
+        const selectedCategories = parcoords.yScales[dimensionName].domain().filter(cat => {
+            const pos = parcoords.yScales[dimensionName](cat)!;
+            return pos >= rangeTop && pos <= rangeBottom;
+        });
+        addRange(selectedCategories, parcoords.currentPosOfDims, dimensionName, "currentFilterCategories");
+    }
+    else {
+        addRange(parcoords.yScales[dimensionName].invert(rangeBottom), parcoords.currentPosOfDims, dimensionName, "currentFilterBottom");
+        addRange(parcoords.yScales[dimensionName].invert(rangeTop), parcoords.currentPosOfDims, dimensionName, "currentFilterTop");
+    }
+
     let active = d3.select('g.active').selectAll('path');
 
     active.each(function (d) {
@@ -504,6 +499,28 @@ function updateLines(parcoords: {
         }
     });
 }
+
+function addRange(value: any, dims: any[], dimensionName: string, property: string): void {
+    const dimSettings = dims.find(d => d.key === dimensionName);
+    if (!dimSettings) return;
+
+    const yScale = parcoords.yScales[dimensionName];
+    const domain = yScale.domain();
+
+    if (typeof domain[0] === "number") {
+        dimSettings.type = "numeric";
+        if (property === "currentFilterTop" || property === "currentFilterBottom") {
+            dimSettings[property] = value;
+        }
+    } 
+    else {
+        dimSettings.type = "categorical";
+        if (property === "currentFilterCategories") {
+            dimSettings.currentFilterCategories = value;
+        }
+    }
+}
+
 
 function checkAllPositionsTop(positionItem: any, dimensionName: any, parcoords: {
     xScales: any;
@@ -603,56 +620,59 @@ function makeActive(currentLineName: string, duration: number): void {
 function makeInactive(currentLineName: string, dimensionName: string, duration: number): void {
     const line = d3.select('.' + currentLineName);
 
-  line
-    .text(dimensionName)
-    .transition()
-    .duration(duration)
-    .style('stroke', 'lightgrey')
-    .style('opacity', 0.4)
-    .on('end', function () {
-      d3.select(this).style('pointer-events', 'none');
-    });
+    line
+        .text(dimensionName)
+        .transition()
+        .duration(duration)
+        .style('stroke', 'lightgrey')
+        .style('opacity', 0.4)
+        .on('end', function () {
+            d3.select(this).style('pointer-events', 'none');
+        });
 }
 
-export function addSettingsForBrushing(dimensionName: string, parcoords: any, invertStatus: boolean, filter: [number, number]): void {
+export function addSettingsForBrushing(dimensionName: string, parcoords: any,
+    invertStatus: boolean, filter: [number, number]): void {
     const processedName = helper.cleanString(dimensionName);
     const yScale = parcoords.yScales[processedName];
 
-    const [minValue, maxValue] = invertStatus ? yScale.domain().slice().reverse() : yScale.domain();
-
-    const scaleValue = (value: number) => {
-        if (isNaN(value)) {
-            return yScale(value);
-        }
-        const range = maxValue - minValue;
-        return invertStatus ? 240 / range * (value - minValue) + 80 :
-            240 / range * (maxValue - value) + 80;
-    };
     const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === processedName);
-    var bottom = invertStatus ? scaleValue(dimensionSettings.currentFilterTop) : scaleValue(dimensionSettings.currentFilterBottom);
-    var top = invertStatus ? scaleValue(dimensionSettings.currentFilterBottom) : scaleValue(dimensionSettings.currentFilterTop);
-    var rectH = bottom - top;
+    let top, bottom;
+    if (isDimensionCategorical(dimensionName)) {
+        let categories = dimensionSettings.currentFilterCategories;
+        let positions = categories.map(cat => yScale(cat));
+        top = d3.min(positions);
+        bottom = d3.max(positions);
+    }
+    else {
+        top = yScale(dimensionSettings.currentFilterTop);
+        bottom = yScale(dimensionSettings.currentFilterBottom);
+    }
+    
+    if (invertStatus) {
+        [top, bottom] = [bottom, top];
+    }
+
+    const rectY = Math.min(top, bottom);
+    const rectH = Math.abs(bottom - top);
 
     const rect = d3.select('#rect_' + processedName);
     const triDown = d3.select('#triangle_down_' + processedName);
     const triUp = d3.select('#triangle_up_' + processedName);
 
-    const rectNode = rect.node();
-    if (!rectNode) return;
-
     rect.transition()
         .duration(300)
-        .attr('y', top)
+        .attr('y', rectY)
         .attr('height', rectH)
         .style('opacity', 0.3);
 
     triDown.transition()
         .duration(300)
-        .attr('y', top - 10);
+        .attr('y', rectY - 10);
 
     triUp.transition()
         .duration(300)
-        .attr('y', bottom);
+        .attr('y', rectY + rectH);
 
     addPosition(top, parcoords.currentPosOfDims, dimensionName, 'top');
     addPosition(bottom, parcoords.currentPosOfDims, dimensionName, 'bottom');

@@ -9,7 +9,7 @@ import * as icon from './icons/icons';
 export function setContextMenu(featureAxis: any, padding: any, parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any
-    }, width: any): void {
+}, width: any): void {
 
     createContextMenu()
     createModalToSetRange();
@@ -145,62 +145,47 @@ function filterMenu(values: any[], dimension: any) {
                 const header = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
                 d3.select('#headerDimensionFilter').text(header);
                 d3.select('#buttonFilter').on('click', () => {
-                    let min = d3.select('#minFilterValue').node().value;
-                    let max = d3.select('#maxFilterValue').node().value;
+                    let min = Number(d3.select('#minFilterValue').node().value);
+                    let max = Number(d3.select('#maxFilterValue').node().value);
                     const ranges = pc.getDimensionRange(dimension);
 
-                    let isOk = true;
+                    let isOk = false;
 
-                    if (inverted) {
-                        if (min < ranges[1]) {
-                            min = ranges[1];
-                            d3.select('#errorFilter').text(`Min value is smaller than 
-                                    ${pc.getMinValue(dimension)}, filter is set to min.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                            isOk = false;
-                        }
-                        if (max > ranges[0]) {
-                            max = ranges[0];
-                            d3.select('#errorFilter').text(`Max value is bigger than 
-                                    ${pc.getMaxValue(dimension)}, filter is set to max.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                            isOk = false;
-                        }
+                    let errorMessage = d3.select('#errorFilter')
+                        .style('display', 'block')
+                        .style('padding-left', 0.5 + 'rem')
+                        .style('padding-top', 0.5 + 'rem')
+                        .style('color', 'red')
+                        .style('font-size', 'x-small');
+
+                    const minRange = inverted ? ranges[1] : ranges[0];
+                    const maxRange = inverted ? ranges[0] : ranges[1];
+
+                    if (max < min) {
+                        max = maxRange;
+                        errorMessage.text(`Max value is smaller than min value, filter is set to min.`);
+                    }
+                    else if (min < minRange) {
+                        min = minRange;
+                        errorMessage.text(`Min value is smaller than ${pc.getMinValue(dimension)}, filter is set to min.`);
+                    }
+                    else if (min > maxRange) {
+                        min = maxRange;
+                        errorMessage.text(`Min value is bigger than max range value, filter is set to max.`);
+                    }
+                    else if (max > maxRange) {
+                        max = maxRange;
+                        errorMessage.text(`Max value is bigger than ${pc.getMaxValue(dimension)}, filter is set to max.`);
+                    }
+                    else if (max < minRange) {
+                        max = minRange;
+                        d3.select('#errorFilter').text(`Max value is smaller than min range value, filter is set to min.`);
                     }
                     else {
-                        if (min < ranges[0]) {
-                            min = ranges[0];
-                            d3.select('#errorFilter').text(`Min value is smaller than 
-                                    ${pc.getMinValue(dimension)}, filter is set to min.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                            isOk = false;
-                        }
-                        if (max > ranges[1]) {
-                            max = ranges[1];
-                            d3.select('#errorFilter').text(`Max value is bigger than 
-                                    ${pc.getMaxValue(dimension)}, filter is set to max.`)
-                                .style('display', 'block')
-                                .style('padding-left', 0.5 + 'rem')
-                                .style('padding-top', 0.5 + 'rem')
-                                .style('color', 'red')
-                                .style('font-size', 'x-small');
-                            isOk = false;
-                        }
+                        isOk = true;
                     }
-                    inverted ? pc.setFilter(dimension, min, max) :
-                        pc.setFilter(dimension, max, min);
+                    pc.setFilter(dimension, max, min);
+                    
                     if (isOk) {
                         d3.select('#errorFilter').style('display', 'none');
                         d3.select('#modalFilter').style('display', 'none');
