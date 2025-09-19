@@ -8,7 +8,7 @@ export function createToolbar(dataset) {
     .style('display', 'flex')
     .style('flex-wrap', 'wrap')
     .style('align-items', 'center')
-    .style('font-size', '1vw')
+    .style('font-size', '0.8vw')
     .style('margin-top', '1rem')
     .style('margin-left', '1rem')
     .style('margin-bottom', '0');

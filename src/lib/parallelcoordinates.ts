@@ -501,8 +501,9 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
         window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
     }
 
-    addRange(Math.floor(min), window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
-    addRange(Math.ceil(max), window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
+    const roundedRanges = window.parcoords.yScales[dimension].domain();
+    addRange(roundedRanges[0], window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+    addRange(roundedRanges[1], window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
     d3.select('#dimension_axis_' + utils.cleanString(dimension))
         .call(yAxis[dimension])

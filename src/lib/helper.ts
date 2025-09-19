@@ -182,6 +182,7 @@ export function createToolTipForValues(recordData): void {
 
 export function getAllPointerEventsData(event: any, hoverlabel: string): any {
     const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
+    if (selection == null) return;
     const object = selection._groups;
     const data = [];
     for (let i = 0; i < object[0].length; i++) {
