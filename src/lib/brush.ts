@@ -603,8 +603,7 @@ function makeActive(currentLineName: string, duration: number): void {
             .text('')
             .transition()
             .duration(duration)
-            .style('stroke', 'rgb(255, 165, 0)')
-            .style('opacity', '1');
+            .style('stroke', 'rgba(255, 165, 0, 1)');
     }
     else {
         d3.select('.' + currentLineName)
@@ -612,8 +611,7 @@ function makeActive(currentLineName: string, duration: number): void {
             .text('')
             .transition()
             .duration(duration)
-            .style('stroke', 'rgb(0, 129, 175)')
-            .style('opacity', '0.5');
+            .style('stroke', 'rgba(0, 129, 175, 0.5)');
     }
 }
 
@@ -624,8 +622,7 @@ function makeInactive(currentLineName: string, dimensionName: string, duration: 
         .text(dimensionName)
         .transition()
         .duration(duration)
-        .style('stroke', 'lightgrey')
-        .style('opacity', 0.4)
+        .style('stroke', 'rgba(211, 211, 211, 0.4')
         .on('end', function () {
             d3.select(this).style('pointer-events', 'none');
         });

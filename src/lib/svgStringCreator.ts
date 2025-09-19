@@ -8,7 +8,7 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
     svg.append('g')
         .attr('class', 'active')
         .style('opacity', '0.5')
-        .style('stroke', 'rgb(0, 129, 175)')
+        .style('stroke', 'rgba(0, 129, 175, 0.5)')
         .style('stroke-width', '0.1rem')
         .style('fill', 'none')
         .selectAll('path')

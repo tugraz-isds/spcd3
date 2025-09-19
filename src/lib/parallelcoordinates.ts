@@ -602,8 +602,7 @@ export function setSelection(records: string[]): void {
             d3.select('#' + utils.cleanString(records[i]))
                 .classed('selected', true)
                 .transition()
-                .style('stroke', 'rgb(255, 165, 0)')
-                .style('opacity', '1');
+                .style('stroke', 'rgba(255, 165, 0, 1)');
         }
     }
 }
@@ -632,8 +631,14 @@ export function setUnselected(record: string): void {
     d3.selectAll('#' + utils.cleanString(record))
         .classed('selected', false)
         .transition()
-        .style('opacity', '0.5')
-        .style('stroke', 'rgb(0, 129, 175)');
+        .style('stroke', 'rgba(0, 129, 175, 0.5)');
+}
+
+export function isRecordInactive(record: string): boolean {
+    const stroke = d3.select('#' + utils.cleanString(record));
+    let node = stroke.node();
+    let style = node.style.stroke;
+    return style === 'rgba(211, 211, 211, 0.4)' ? true : false;
 }
 
 //---------- Selection Functions With IDs ----------
@@ -1215,10 +1220,9 @@ function setActivePathLines(svg: any, content: any,
             d3.select(this)
                 .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         })
-        .style('opacity', '0.5')
         .style('pointer-events', 'stroke')
-        .style('stroke', 'rgb(0, 129, 175)')
-        .style('stroke-width', '0.1rem')
+        .style('stroke', 'rgba(0, 129, 175, 0.5)')
+        .style('stroke-width', '0.12rem')
         .style('fill', 'none')
         .on('pointerenter', handlePointerEnter)
         .on('pointerleave', handlePointerLeaveOrOut)
@@ -1466,8 +1470,7 @@ function highlight(data) {
         d3.select('#' + item)
             .transition()
             .duration(5)
-            .style('opacity', '0.7')
-            .style('stroke', 'rgb(200, 28, 38)');
+            .style('stroke', 'rgba(200, 28, 38, 0.7)');
     });
 }
 
@@ -1479,13 +1482,11 @@ function doNotHighlight() {
         const line = d3.select('#' + item);
         if (line.classed('selected')) {
             line.transition()
-                .style('stroke', 'rgb(255, 165, 0)')
-                .style('opacity', '1');
+                .style('stroke', 'rgba(255, 165, 0, 1)');
         }
         else {
             line.transition()
-                .style('stroke', 'rgb(0, 129, 175)')
-                .style('opacity', '0.5');
+                .style('stroke', 'rgba(0, 129, 175, 0.5)');
         }
     });
 
@@ -1506,9 +1507,7 @@ function clearSelection(): void {
         d3.select('#' + utils.cleanString(element))
             .classed('selected', false)
             .transition()
-            .style('stroke', 'rgb(0, 129, 175)')
-            .style('opacity', '0.5');
-
+            .style('stroke', 'rgba(0, 129, 175, 0.5)')
     });
 }
 
