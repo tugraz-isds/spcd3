@@ -1,9 +1,9 @@
 import * as d3 from 'd3-selection';
 import * as helper from './helper';
 import * as utils from './utils';
-import * as pc from './parallelcoordinates';
+import * as api from './helperApiFunc';
 
-export function setActivePathLinesToDownload(svg: any, parcoords: any, key: string,) {
+export function setActivePathLinesToDownload(svg: any, parcoords: any, key: string): void {
 
     svg.append('g')
         .attr('class', 'active')
@@ -15,18 +15,18 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
         .data(parcoords.data)
         .enter()
         .append('path')
-        .attr('id', (d) => {
+        .attr('id', (d: { [x: string]: string; }) => {
             return utils.cleanString(d[key]);
         })
-        .each(function (d) {
+        .each(function (d: any) {
             d3.select(this)
                 .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
         });
 
-    const records = pc.getAllRecords();
+    const records = api.getAllRecords();
     records.forEach(element => {
         const cleanRecord = utils.cleanString(element);
-        const isSelected = pc.isSelected(cleanRecord);
+        const isSelected = api.isSelected(cleanRecord);
         if (isSelected) {
             svg.select('#' + cleanRecord)
                 .style('stroke', 'rgb(255, 165, 0)')
@@ -42,27 +42,27 @@ export function setActivePathLinesToDownload(svg: any, parcoords: any, key: stri
 }
 
 export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
-    parcoords: any, padding: any, xScales: any): void {
+    parcoords: any, padding: number, xScales: any): void {
 
     type Feature = { name: string };
-    const orderedFeatures: Feature[] = parcoords.newFeatures.map(name => ({ name }));
+    const orderedFeatures: Feature[] = parcoords.newFeatures.map((name: any) => ({ name }));
 
-    const hiddenDims = pc.getAllHiddenDimensionNames();
+    const hiddenDims = api.getAllHiddenDimensionNames();
 
     let featureAxis = svg.selectAll('g.feature')
         .data(orderedFeatures)
         .enter()
         .append('g')
-        .attr('transform', d => ('translate(' + xScales(d.name)) + ')');
+        .attr('transform', (d: { name: any; }) => ('translate(' + xScales(d.name)) + ')');
 
     featureAxis
         .append('g')
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            const max = pc.getCurrentMaxRange(d.name);
-            const min = pc.getCurrentMinRange(d.name);
-            if (!pc.isDimensionCategorical(d.name)) {
-                const status = pc.getInversionStatus(d.name);
+            const max = api.getCurrentMaxRange(d.name);
+            const min = api.getCurrentMinRange(d.name);
+            if (!api.isDimensionCategorical(d.name)) {
+                const status = api.getInversionStatus(d.name);
                 if (status == 'ascending') {
                     yScales[d.name].domain([min, max]);
                     yAxis = helper.setupYAxis(yScales,
@@ -97,7 +97,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         .append('text')
         .attr('text-anchor', 'middle')
         .attr('y', (padding / 1.7).toFixed(4))
-        .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
+        .text((d: { name: string; }) => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
         .style('font-size', '0.7rem');
 
     setBrushDownToDownload(featureAxis, parcoords);
@@ -109,9 +109,9 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
 function setBrushDownToDownload(featureAxis: any, parcoords: any): void {
 
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
+            const item = parcoords.currentPosOfDims.find((object: { key: any; }) => object.key == d.name);
             d3.select(this)
                 .append('g')
                 .append('use')
@@ -127,9 +127,9 @@ function setBrushDownToDownload(featureAxis: any, parcoords: any): void {
 function setBrushUpToDownload(featureAxis: any, parcoords: any): void {
 
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
+            const item = parcoords.currentPosOfDims.find((object: { key: any; }) => object.key == d.name);
             d3.select(this)
                 .append('g')
                 .append('use')
@@ -145,9 +145,9 @@ function setBrushUpToDownload(featureAxis: any, parcoords: any): void {
 function setRectToDragToDownload(featureAxis: any, parcoords: any): void {
 
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            const item = parcoords.currentPosOfDims.find((object) => object.key == d.name);
+            const item = parcoords.currentPosOfDims.find((object: { key: any; }) => object.key == d.name);
             let height = item.bottom - item.top;
             d3.select(this)
                 .append('g')
@@ -175,9 +175,9 @@ function setInvertIconToDownload(featureAxis: any, padding: any): void {
         .attr('height', 12)
         .attr('y', 0)
         .attr('x', 0)
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            if (pc.getInversionStatus(processedDimensionName) == 'descending') {
+            if (api.getInversionStatus(processedDimensionName) == 'descending') {
                 d3.select(this)
                     .attr('href', '#arrow_image_down')
             }

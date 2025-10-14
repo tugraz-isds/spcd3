@@ -30,7 +30,7 @@ export function throttle<Params extends any[]>(func: (...args: Params) => any,
     };
 }
 
-export function digits(value) {
+export function digits(value: number): number {
     return value
         .toString()
         .length
@@ -44,7 +44,7 @@ export function addNumberOfDigs(number: any, currentPosOfDims: any, dimensionNam
 }
 
 //https://stackoverflow.com/questions/123999/how-can-i-tell-if-a-dom-element-is-visible-in-the-current-viewport
-export function isElementVisible(element) {
+export function isElementVisible(element: { node: () => { (): any; new(): any; getBoundingClientRect: { (): any; new(): any; }; contains: { (arg0: Element): any; new(): any; }; }; }) {
     let rect = element.node().getBoundingClientRect(),
         vWidth = window.innerWidth || document.documentElement.clientWidth,
         vHeight = window.innerHeight || document.documentElement.clientHeight,
@@ -62,7 +62,7 @@ export function isElementVisible(element) {
     );
 }
 
-export function getMouseCoords(event, targetContainer = document.body) {
+export function getMouseCoords(event: { clientX: number; clientY: number; }, targetContainer = document.body) {
     if (targetContainer === document.body) {
       return [event.clientX + window.scrollX, event.clientY + window.scrollY];
     } else {
@@ -70,13 +70,3 @@ export function getMouseCoords(event, targetContainer = document.body) {
       return [event.clientX - rect.left, event.clientY - rect.top];
     }
 }
-
-/*export function getMouseCoords(event, targetContainer = document.body) {
-    if (targetContainer === document.body) {
-        return [event.clientX + window.scrollX, event.clientY + window.scrollY];
-    } else {
-        const rect = targetContainer.getBoundingClientRect();
-        return [event.clientX - rect.left, event.clientY - rect.top];
-    }
-}*/
-

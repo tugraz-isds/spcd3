@@ -1,21 +1,21 @@
 import 'd3-transition';
-import * as d3 from 'd3-selection';
-import * as drag from 'd3-drag';
+import { select, selectAll } from 'd3-selection';
+import { drag } from 'd3-drag';
 import * as utils from './utils';
 import * as temp from './helper';
-import * as pc from './parallelcoordinates';
+import * as api from './helperApiFunc';
 import * as icon from './icons/icons';
 
 export function setContextMenu(featureAxis: any, padding: any, parcoords: {
     xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
     currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any
-}, width: any): void {
+}, width: number): void {
 
     createContextMenu()
     createModalToSetRange();
     createModalToFilter();
 
-    let tooltipFeatures = d3.select('body')
+    let tooltipFeatures = select('body')
         .append('div')
         .attr('id', 'tooltip')
         .style('position', 'absolute')
@@ -27,9 +27,9 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .attr('class', 'dimension')
         .attr('text-anchor', 'middle')
         .attr('y', (padding / 1.7).toFixed(4))
-        .text(d => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
+        .text((d: { name: string; }) => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
         .style('font-size', '0.7rem')
-        .call(drag.drag()
+        .call(drag()
             .on('start', onDragStartEventHandler(parcoords))
             .on('drag', onDragEventHandler(parcoords, featureAxis, width))
             .on('end', onDragEndEventHandler(parcoords, featureAxis))
@@ -37,7 +37,7 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .on('mouseover', function () {
             return tooltipFeatures.style('visibility', 'visible');
         })
-        .on('mousemove', (event, d) => {
+        .on('mousemove', (event: { clientX: number; clientY: number; }, d: { name: any; }) => {
             setCursorForDimensions(d, featureAxis, parcoords, event);
             const [x, y] = utils.getMouseCoords(event);
             tooltipFeatures.text(d.name);
@@ -56,9 +56,9 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         .on('mouseout', function () {
             return tooltipFeatures.style('visibility', 'hidden');
         })
-        .on('contextmenu', function (event, d) {
+        .on('contextmenu', function (event: { preventDefault: () => void; }, d: { name: any; }) {
             const dimension = d.name;
-            const values = parcoords.newDataset.map(o => o[dimension]);
+            const values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
 
             styleContextMenu(event);
             hideDimensionMenu(dimension);
@@ -74,92 +74,92 @@ export function setContextMenu(featureAxis: any, padding: any, parcoords: {
         });
 }
 
-let scrollXPos;
-let timer;
-const paddingXaxis = 75;
+let scrollXPos: number;
+let timer: string | number | NodeJS.Timeout;
+const paddingXaxis = 60;
 
-function copyDimensionName(dimension: string) {
-    d3.select('#copyDimensionName')
+function copyDimensionName(dimension: string): void {
+    select('#copyDimensionName')
         .style('visibility', 'visible')
-        .on('click', async (event) => {
+        .on('click', async (event: { stopPropagation: () => void; }) => {
             await navigator.clipboard.writeText(dimension)
-            d3.select('#contextmenu').style('display', 'none');
+            select('#contextmenu').style('display', 'none');
             event.stopPropagation();
         });
 }
 
-function showAllMenu() {
-    d3.select('#showAllMenu')
+function showAllMenu(): void {
+    select('#showAllMenu')
         .style('visibility', 'visible')
         .style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
-            const hiddenDimensions = pc.getAllHiddenDimensionNames();
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            const hiddenDimensions = api.getAllHiddenDimensionNames();
             for (let i = 0; i < hiddenDimensions.length; i++) {
-                pc.show(hiddenDimensions[i]);
-                d3.select('#contextmenu').style('display', 'none');
+                api.show(hiddenDimensions[i]);
+                select('#contextmenu').style('display', 'none');
             }
             event.stopPropagation();
         });
 }
 
-function resetFilterMenu(values: any[], dimension: any) {
+function resetFilterMenu(values: any[], dimension: string): void {
     if (!isNaN(values[0])) {
-        d3.select('#resetfilterMenu')
+        select('#resetfilterMenu')
             .style('visibility', 'visible')
             .style('color', 'black')
-            .on('click', (event) => {
-                const range = pc.getDimensionRange(dimension);
+            .on('click', (event: { stopPropagation: () => void; }) => {
+                const range = api.getDimensionRange(dimension);
                 const inverted = temp.isInverted(dimension);
                 if (inverted) {
-                    pc.setFilter(dimension, range[0], range[1]);
+                    api.setFilter(dimension, Number(range[0]), Number(range[1]));
                 }
                 else {
-                    pc.setFilter(dimension, range[1], range[0]);
+                    api.setFilter(dimension, Number(range[1]), Number(range[0]));
                 }
-               
-                d3.select('#contextmenu').style('display', 'none');
+
+                select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
     else {
-        d3.select('#resetfilterMenu')
+        select('#resetfilterMenu')
             .style('display', 'false')
             .style('color', 'lightgrey');
     }
 }
 
-function filterMenu(values: any[], dimension: any) {
+function filterMenu(values: any[], dimension: string): void {
     if (!isNaN(values[0])) {
-        let currentFilters = pc.getFilter(dimension);
+        let currentFilters = api.getFilter(dimension);
         const inverted = temp.isInverted(dimension);
-        d3.select('#minFilterValue').property('value', currentFilters[0]);
-        d3.select('#maxFilterValue').property('value', currentFilters[1]);
-        d3.select('#filterMenu')
+        select('#minFilterValue').property('value', currentFilters[0]);
+        select('#maxFilterValue').property('value', currentFilters[1]);
+        select('#filterMenu')
             .style('border-top', '0.08rem lightgrey solid')
             .style('visibility', 'visible')
             .style('color', 'black')
-            .on('click', (event) => {
-                d3.select('#modalOverlayFilter').style('display', 'block');
-                d3.select('#modalFilter').style('display', 'block');
-                d3.select('#contextmenu').style('display', 'none');
+            .on('click', (event: { stopPropagation: () => void; }) => {
+                select('#modalOverlayFilter').style('display', 'block');
+                select('#modalFilter').style('display', 'block');
+                select('#contextmenu').style('display', 'none');
                 const header = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
-                d3.select('#headerDimensionFilter').text(header);
-                d3.select('#buttonFilter').on('click', () => {
-                    let min = Number(d3.select('#minFilterValue').node().value);
-                    let max = Number(d3.select('#maxFilterValue').node().value);
-                    const ranges = pc.getDimensionRange(dimension);
+                select('#headerDimensionFilter').text(header);
+                select('#buttonFilter').on('click', () => {
+                    let min = Number(select('#minFilterValue').node().value);
+                    let max = Number(select('#maxFilterValue').node().value);
+                    const ranges = api.getDimensionRange(dimension);
 
                     let isOk = false;
 
-                    let errorMessage = d3.select('#errorFilter')
+                    let errorMessage = select('#errorFilter')
                         .style('display', 'block')
                         .style('padding-left', 0.5 + 'rem')
                         .style('padding-top', 0.5 + 'rem')
                         .style('color', 'red')
                         .style('font-size', 'x-small');
 
-                    const minRange = inverted ? ranges[1] : ranges[0];
-                    const maxRange = inverted ? ranges[0] : ranges[1];
+                    const minRange = Number(inverted ? ranges[1] : ranges[0]);
+                    const maxRange = Number(inverted ? ranges[0] : ranges[1]);
 
                     if (max < min) {
                         max = maxRange;
@@ -167,7 +167,7 @@ function filterMenu(values: any[], dimension: any) {
                     }
                     else if (min < minRange) {
                         min = minRange;
-                        errorMessage.text(`Min value is smaller than ${pc.getMinValue(dimension)}, filter is set to min.`);
+                        errorMessage.text(`Min value is smaller than ${api.getMinValue(dimension)}, filter is set to min.`);
                     }
                     else if (min > maxRange) {
                         min = maxRange;
@@ -175,95 +175,95 @@ function filterMenu(values: any[], dimension: any) {
                     }
                     else if (max > maxRange) {
                         max = maxRange;
-                        errorMessage.text(`Max value is bigger than ${pc.getMaxValue(dimension)}, filter is set to max.`);
+                        errorMessage.text(`Max value is bigger than ${api.getMaxValue(dimension)}, filter is set to max.`);
                     }
                     else if (max < minRange) {
                         max = minRange;
-                        d3.select('#errorFilter').text(`Max value is smaller than min range value, filter is set to min.`);
+                        select('#errorFilter').text(`Max value is smaller than min range value, filter is set to min.`);
                     }
                     else {
                         isOk = true;
                     }
-                    pc.setFilter(dimension, max, min);
-                    
+                    api.setFilter(dimension, max, min);
+
                     if (isOk) {
-                        d3.select('#errorFilter').style('display', 'none');
-                        d3.select('#modalFilter').style('display', 'none');
-                        d3.select('#modalOverlayFilter').style('display', 'none');
+                        select('#errorFilter').style('display', 'none');
+                        select('#modalFilter').style('display', 'none');
+                        select('#modalOverlayFilter').style('display', 'none');
                     }
                 });
-                d3.select('#maxFilterValue').on('keypress', (event) => {
+                select('#maxFilterValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
                         document.getElementById("buttonFilter").click();
                     }
                 });
-                d3.select('#minFilterValue').on('keypress', (event) => {
+                select('#minFilterValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
                         document.getElementById("buttonFilter").click();
                     }
                 });
-                d3.select('#closeButtonFilter').on('click', () => {
-                    d3.select('#errorFilter').style('display', 'none');
-                    d3.select('#modalFilter').style('display', 'none');
-                    d3.select('#modalOverlayFilter').style('display', 'none');
+                select('#closeButtonFilter').on('click', () => {
+                    select('#errorFilter').style('display', 'none');
+                    select('#modalFilter').style('display', 'none');
+                    select('#modalOverlayFilter').style('display', 'none');
                 });
-                d3.select('#contextmenu').style('display', 'none');
+                select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
     else {
-        d3.select('#filterMenu').style('display', 'false')
+        select('#filterMenu').style('display', 'false')
             .style('color', 'lightgrey')
             .style('border-top', '0.08rem lightgrey solid');
     }
 }
 
-function resetRoundRangeMenu(values: any[], dimension: any) {
+function resetRoundRangeMenu(values: any[], dimension: string): void {
     if (!isNaN(values[0])) {
-        d3.select('#resetRoundRangeMenu')
+        select('#resetRoundRangeMenu')
             .style('visibility', 'visible')
             .style('color', 'black')
-            .on('click', (event) => {
-                pc.setDimensionRangeRounded(dimension, pc.getMinValue(dimension), pc.getMaxValue(dimension));
-                d3.select('#contextmenu').style('display', 'none');
+            .on('click', (event: { stopPropagation: () => void; }) => {
+                api.setDimensionRangeRounded(dimension, api.getMinValue(dimension), api.getMaxValue(dimension));
+                select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
     else {
-        d3.select('#resetRoundRangeMenu')
+        select('#resetRoundRangeMenu')
             .style('display', 'false')
             .style('color', 'lightgrey');
     }
 }
 
-function resetRangeMenu(values: any[], dimension: any) {
+function resetRangeMenu(values: any[], dimension: string): void {
     if (!isNaN(values[0])) {
-        d3.select('#resetRangeMenu')
+        select('#resetRangeMenu')
             .style('visibility', 'visible')
             .style('color', 'black')
-            .on('click', (event) => {
-                pc.setDimensionRange(dimension, pc.getMinValue(dimension), pc.getMaxValue(dimension));
-                d3.select('#contextmenu').style('display', 'none');
+            .on('click', (event: { stopPropagation: () => void; }) => {
+                api.setDimensionRange(dimension, api.getMinValue(dimension), api.getMaxValue(dimension));
+                select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
     else {
-        d3.select('#resetRangeMenu').style('display', 'false')
+        select('#resetRangeMenu').style('display', 'false')
             .style('color', 'lightgrey');
     }
 }
 
-function setRangeMenu(values: any[], dimension: any) {
+function setRangeMenu(values: any[], dimension: string): void {
     if (!isNaN(values[0])) {
-        d3.select('#rangeMenu')
+        select('#rangeMenu')
             .style('border-top', '0.08rem lightgrey solid')
             .style('visibility', 'visible')
             .style('color', 'black')
-            .on('click', (event) => {
-                let minRange = pc.getCurrentMinRange(dimension);
-                let maxRange = pc.getCurrentMaxRange(dimension);
+            .on('click', (event: { stopPropagation: () => void; }) => {
+                let minRange = api.getCurrentMinRange(dimension);
+                let maxRange = api.getCurrentMaxRange(dimension);
                 var resultMin = (minRange - Math.floor(minRange)) !== 0;
                 var resultMax = (maxRange - Math.floor(maxRange)) !== 0;
                 let minValue = String(minRange);
@@ -276,29 +276,29 @@ function setRangeMenu(values: any[], dimension: any) {
                     const count = maxValue.split('.')[1].length;
                     minValue = minRange.toFixed(count);
                 }
-                d3.select('#minRangeValue').property('value', minValue);
-                d3.select('#maxRangeValue').property('value', maxValue);
-                d3.select('#contextmenu').style('display', 'none');
-                d3.select('#modalOverlaySetRange').style('display', 'block');
-                d3.select('#modalSetRange').style('display', 'block');
+                select('#minRangeValue').property('value', minValue);
+                select('#maxRangeValue').property('value', maxValue);
+                select('#contextmenu').style('display', 'none');
+                select('#modalOverlaySetRange').style('display', 'block');
+                select('#modalSetRange').style('display', 'block');
                 const newText = dimension.length > 25 ? dimension.substr(0, 25) + '...' : dimension;
-                d3.select('#headerDimensionRange').text(newText);
-                d3.select('#infoRange').text('The current range of ' + dimension + ' is between ' +
+                select('#headerDimensionRange').text(newText);
+                select('#infoRange').text('The current range of ' + dimension + ' is between ' +
                     minValue + ' and ' +
                     maxValue + '.');
-                d3.select('#infoRange2').text('The original range of ' + dimension + ' is between ' +
-                    pc.getMinValue(dimension) + ' and ' +
-                    pc.getMaxValue(dimension) + '.');
-                d3.select('#buttonRange').on('click', () => {
-                    let min = d3.select('#minRangeValue').node().value;
-                    let max = d3.select('#maxRangeValue').node().value;
+                select('#infoRange2').text('The original range of ' + dimension + ' is between ' +
+                    api.getMinValue(dimension) + ' and ' +
+                    api.getMaxValue(dimension) + '.');
+                select('#buttonRange').on('click', () => {
+                    let min = select('#minRangeValue').node().value;
+                    let max = select('#maxRangeValue').node().value;
                     const inverted = temp.isInverted(dimension);
                     let isOk = true;
 
                     if (inverted) {
-                        if (max < pc.getMinValue(dimension) ||
-                            min > pc.getMaxValue(dimension)) {
-                            d3.select('#errorRange').text(`The range has to be bigger than 
+                        if (max < api.getMinValue(dimension) ||
+                            min > api.getMaxValue(dimension)) {
+                            select('#errorRange').text(`The range has to be bigger than 
                                 ${minValue} and 
                                 ${maxValue}.`)
                                 .style('display', 'block')
@@ -310,9 +310,9 @@ function setRangeMenu(values: any[], dimension: any) {
                         }
                     }
                     else {
-                        if (min > pc.getMinValue(dimension) ||
-                            max < pc.getMaxValue(dimension)) {
-                            d3.select('#errorRange').text(`The range has to be bigger than 
+                        if (min > api.getMinValue(dimension) ||
+                            max < api.getMaxValue(dimension)) {
+                            select('#errorRange').text(`The range has to be bigger than 
                                 ${minValue} and 
                                 ${maxValue}.`)
                                 .style('display', 'block')
@@ -324,66 +324,66 @@ function setRangeMenu(values: any[], dimension: any) {
                         }
                     }
                     if (isOk) {
-                        d3.select('#errorRange').style('display', 'none');
-                        pc.setDimensionRange(dimension, min, max);
-                        d3.select('#modalSetRange').style('display', 'none');
-                        d3.select('#modalOverlaySetRange').style('display', 'none');
+                        select('#errorRange').style('display', 'none');
+                        api.setDimensionRange(dimension, min, max);
+                        select('#modalSetRange').style('display', 'none');
+                        select('#modalOverlaySetRange').style('display', 'none');
                     }
 
                 });
-                d3.select('#maxRangeValue').on('keypress', (event) => {
+                select('#maxRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
                         document.getElementById("buttonRange").click();
                     }
                 });
-                d3.select('#minRangeValue').on('keypress', (event) => {
+                select('#minRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
                         document.getElementById("buttonRange").click();
                     }
                 });
-                d3.select('#closeButtonRange').on('click', () => {
-                    d3.select('#modalSetRange').style('display', 'none');
-                    d3.select('#modalOverlaySetRange').style('display', 'none');
+                select('#closeButtonRange').on('click', () => {
+                    select('#modalSetRange').style('display', 'none');
+                    select('#modalOverlaySetRange').style('display', 'none');
                 });
-                d3.select('#contextmenu').style('display', 'none');
+                select('#contextmenu').style('display', 'none');
                 event.stopPropagation();
             });
     }
     else {
-        d3.select('#rangeMenu').style('display', 'false')
+        select('#rangeMenu').style('display', 'false')
             .style('color', 'lightgrey')
             .style('border-top', '0.08rem lightgrey solid');
     }
 }
 
-function invertDimensionMenu(dimension: any) {
-    d3.select('#invertMenu')
-        .on('click', (event) => {
-            pc.invert(dimension);
-            d3.select('#contextmenu').style('display', 'none');
+function invertDimensionMenu(dimension: string): void {
+    select('#invertMenu')
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            api.invert(dimension);
+            select('#contextmenu').style('display', 'none');
             event.stopPropagation();
         });
 }
 
-function hideDimensionMenu(dimension: any) {
-    d3.select('#hideMenu')
+function hideDimensionMenu(dimension: string): void {
+    select('#hideMenu')
         .style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
-            pc.hide(dimension);
-            d3.select('#contextmenu').style('display', 'none');
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            api.hide(dimension);
+            select('#contextmenu').style('display', 'none');
             event.stopPropagation();
         });
 }
 
-function styleContextMenu(event: any) {
+function styleContextMenu(event: any): void {
     const container = document.querySelector("#parallelcoords");
     const rect = container.getBoundingClientRect();
 
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    d3.select('#contextmenu')
+    select('#contextmenu')
         .style('left', x + 'px')
         .style('top', y + 'px')
         .style('display', 'block')
@@ -392,23 +392,23 @@ function styleContextMenu(event: any) {
         .style('padding', 0.35 + 'rem')
         .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
         .style('cursor', 'pointer').style('minWidth', 15 + 'rem')
-        .on('click', (event) => {
+        .on('click', (event: { stopPropagation: () => void; }) => {
             event.stopPropagation();
         });
-    d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
+    selectAll('.contextmenu').style('padding', 0.35 + 'rem');
 }
 
 function setCursorForDimensions(d: any, featureAxis: any, parcoords: {
     xScales: any;
     yScales: {}; dragging: {}; dragPosStart: {}; currentPosOfDims: any[];
     newFeatures: any; features: any[]; newDataset: any[];
-}, event: any) {
-    if (pc.getDimensionPosition(d.name) == 0) {
+}, event: any): void {
+    if (api.getDimensionPosition(d.name) == 0) {
         featureAxis
             .select('.dimension')
             .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`);
     } else if
-        (pc.getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
+        (api.getDimensionPosition(d.name) == parcoords.newFeatures.length - 1) {
         featureAxis
             .select('.dimension')
             .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowLeft()), 12)}') 8 8, auto`);
@@ -421,7 +421,7 @@ function setCursorForDimensions(d: any, featureAxis: any, parcoords: {
 
 function onDragStartEventHandler(parcoords: any): any {
     {
-        return function onDragStart(d) {
+        return function onDragStart(d: { subject: any; }) {
             this.__origin__ = parcoords.xScales((d.subject).name);
             parcoords.dragging[(d.subject).name] = this.__origin__;
             parcoords.dragPosStart[(d.subject).name] = this.__origin__;
@@ -431,9 +431,9 @@ function onDragStartEventHandler(parcoords: any): any {
     }
 }
 
-function onDragEventHandler(parcoords: any, featureAxis: any, width: any): any {
+function onDragEventHandler(parcoords: any, featureAxis: any, width: number): any {
     {
-        return function onDrag(d) {
+        return function onDrag(d: { subject: any; x: any; }) {
 
             if (timer !== null) {
                 clearInterval(timer);
@@ -444,20 +444,20 @@ function onDragEventHandler(parcoords: any, featureAxis: any, width: any): any {
             parcoords.dragging[(d.subject).name] = Math.min(width - paddingXaxis,
                 Math.max(paddingXaxis, this.__origin__ += d.x));
 
-            let active = d3.select('g.active').selectAll('path');
-            active.each(function (d) {
-                d3.select(this)
-                    .attr('d', temp.linePath(d, parcoords.newFeatures, parcoords))
+            let active = select('g.active').selectAll('path');
+            active.each(function (d: any) {
+                select(this)
+                    .attr('d', temp.linePath(d, parcoords.newFeatures))
             });
 
-            parcoords.newFeatures.sort((a, b) => {
+            parcoords.newFeatures.sort((a: any, b: any) => {
                 return temp.position(b, parcoords.dragging, parcoords.xScales)
                     - temp.position(a, parcoords.dragging, parcoords.xScales) - 1;
             });
 
             parcoords.xScales.domain(parcoords.newFeatures);
 
-            featureAxis.attr('transform', (d) => {
+            featureAxis.attr('transform', (d: { name: any; }) => {
                 return 'translate(' + temp.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
             });
         }
@@ -466,18 +466,18 @@ function onDragEventHandler(parcoords: any, featureAxis: any, width: any): any {
 
 function onDragEndEventHandler(parcoords: any, featureAxis: any): any {
     {
-        return function onDragEnd(d) {
+        return function onDragEnd(d: { subject: any; }) {
             const width = parcoords.width;
             const distance = (width - 80) / parcoords.newFeatures.length;
             const init = parcoords.dragPosStart[(d.subject).name];
 
             if (parcoords.dragPosStart[(d.subject).name] > parcoords.dragging[(d.subject).name]) {
-                featureAxis.attr('transform', (d) => {
+                featureAxis.attr('transform', (d: { name: any; }) => {
                     return 'translate(' + temp.position(d.name, init - distance, parcoords.xScales) + ')';
                 })
             }
             else {
-                featureAxis.attr('transform', (d) => {
+                featureAxis.attr('transform', (d: { name: any; }) => {
                     return 'translate(' + temp.position(d.name, init + distance, parcoords.xScales) + ')';
                 })
             }
@@ -485,17 +485,17 @@ function onDragEndEventHandler(parcoords: any, featureAxis: any): any {
             delete parcoords.dragging[(d.subject).name];
             delete parcoords.dragPosStart[(d.subject).name];
 
-            let active = d3.select('g.active').selectAll('path');
+            let active = select('g.active').selectAll('path');
 
-            temp.trans(active).each(function (d) {
-                d3.select(this)
-                    .attr('d', temp.linePath(d, parcoords.newFeatures, parcoords))
+            temp.trans(active).each(function (d: any) {
+                select(this)
+                    .attr('d', temp.linePath(d, parcoords.newFeatures))
             });
         };
     }
 }
 
-function scroll(parcoords, d) {
+function scroll(parcoords: { dragPosStart: { [x: string]: number; }; dragging: { [x: string]: number; }; }, d: { subject: any; }) {
     const element = document.getElementById("parallelcoords");
     if (parcoords.dragPosStart[(d.subject).name] < parcoords.dragging[(d.subject).name]) {
         element.scrollLeft += 5;
@@ -505,8 +505,8 @@ function scroll(parcoords, d) {
     }
 }
 
-function createContextMenu() {
-    let contextMenu = d3.select('#parallelcoords')
+function createContextMenu(): void {
+    let contextMenu = select('#parallelcoords')
         .append('g')
         .attr('id', 'contextmenu')
         .style('position', 'absolute')
@@ -550,9 +550,9 @@ function createContextMenu() {
         .text('Show All');
 }
 
-function createModalToSetRange() {
+function createModalToSetRange(): void {
 
-    d3.select('body')
+    select('body')
         .append('div')
         .attr('id', 'modalOverlaySetRange')
         .style('position', 'fixed')
@@ -564,12 +564,12 @@ function createModalToSetRange() {
         .style('display', 'none')
         .style('z-index', '999');
 
-    d3.select('#modalOverlaySetRange').on('click', () => {
-        d3.select('#modalSetRange').style('display', 'none');
-        d3.select('#modalOverlaySetRange').style('display', 'none');
+    select('#modalOverlaySetRange').on('click', () => {
+        select('#modalSetRange').style('display', 'none');
+        select('#modalOverlaySetRange').style('display', 'none');
     });
 
-    const modalSetRange = d3.select('body')
+    const modalSetRange = select('body')
         .append('div')
         .attr('id', 'modalSetRange')
         .style('position', 'fixed')
@@ -594,9 +594,9 @@ function createModalToSetRange() {
     createErrorMessage(modalSetRange, 'errorRange');
 }
 
-function createModalToFilter() {
+function createModalToFilter(): void {
 
-    d3.select('body')
+    select('body')
         .append('div')
         .attr('id', 'modalOverlayFilter')
         .style('position', 'fixed')
@@ -608,12 +608,12 @@ function createModalToFilter() {
         .style('display', 'none')
         .style('z-index', '999');
 
-    d3.select('#modalOverlayFilter').on('click', () => {
-        d3.select('#modalFilter').style('display', 'none');
-        d3.select('#modalOverlayFilter').style('display', 'none');
+    select('#modalOverlayFilter').on('click', () => {
+        select('#modalFilter').style('display', 'none');
+        select('#modalOverlayFilter').style('display', 'none');
     });
 
-    const modalFilter = d3.select('body')
+    const modalFilter = select('body')
         .append('div')
         .attr('id', 'modalFilter')
         .style('position', 'fixed')
@@ -636,7 +636,7 @@ function createModalToFilter() {
     createErrorMessage(modalFilter, 'errorFilter');
 }
 
-function createModalTitle(modal: any, modalTitel: string) {
+function createModalTitle(modal: any, modalTitel: string): void {
     const title = document.createElement('div');
     title.textContent = modalTitel;
     title.style.paddingLeft = '0.5rem';
@@ -644,7 +644,7 @@ function createModalTitle(modal: any, modalTitel: string) {
     modal.append(() => title);
 }
 
-function createHeader(modal: any, id: string) {
+function createHeader(modal: any, id: string): void {
     const header = document.createElement('div');
     header.id = id;
     header.style.paddingLeft = '0.5rem';
@@ -652,7 +652,7 @@ function createHeader(modal: any, id: string) {
     modal.append(() => header);
 }
 
-function createInfoMessage(modal: any, id: string) {
+function createInfoMessage(modal: any, id: string): void {
     const infoMessage = document.createElement('div');
     infoMessage.id = id;
     infoMessage.style.color = 'grey';
@@ -663,13 +663,14 @@ function createInfoMessage(modal: any, id: string) {
     modal.append(() => infoMessage);
 }
 
-function createInputFieldWithLabel(modal: any, text: string, inputId: string) {
+function createInputFieldWithLabel(modal: any, text: string, inputId: string): void {
     const label = document.createElement('label');
     label.textContent = text;
     label.style.padding = '0.5rem';
     modal.append(() => label);
 
     const input = document.createElement('input');
+    input.type = 'number';
     input.id = inputId;
     input.style.width = '3rem';
     input.style.border = '0.1rem solid lightgrey';
@@ -677,7 +678,7 @@ function createInputFieldWithLabel(modal: any, text: string, inputId: string) {
     modal.append(() => input);
 }
 
-function createButton(modal: any, id: string) {
+function createButton(modal: any, id: string): void {
     const button = document.createElement('button');
     button.id = id;
     button.textContent = 'Save';
@@ -687,7 +688,7 @@ function createButton(modal: any, id: string) {
     modal.append(() => button);
 }
 
-function createCloseButton(modal: any, id: string) {
+function createCloseButton(modal: any, id: string): void {
     const closeButton = document.createElement('span');
     closeButton.id = id;
     closeButton.innerHTML = '&times;';
@@ -700,7 +701,7 @@ function createCloseButton(modal: any, id: string) {
     modal.append(() => closeButton);
 }
 
-function createErrorMessage(modal: any, id: string) {
+function createErrorMessage(modal: any, id: string): void {
     const errorMessage = document.createElement('div');
     errorMessage.id = id;
     errorMessage.style.position = 'relative';

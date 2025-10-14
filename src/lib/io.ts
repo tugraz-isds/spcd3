@@ -1,9 +1,64 @@
 import xmlFormat from 'xml-formatter';
 import * as icon from './icons/icons';
-import * as pc from './parallelcoordinates';
+import * as svgcreator from './svgStringCreator';
+import * as api from './helperApiFunc';
+import * as helper from './helper';
+import { create } from 'd3-selection';
+import { parcoords, height, padding, width, paddingXaxis, key } from './globals';
+
+export function createSvgString(): string {
+
+    type Feature = { name: string };
+    const orderedFeatures: Feature[] = parcoords.newFeatures.map((name: any) => ({ name }));
+
+    const hiddenDims = api.getAllHiddenDimensionNames();
+
+    let yScalesForDownload = helper.setupYScales(height, padding, parcoords.features, parcoords.newDataset);
+    let yAxisForDownload = helper.setupYAxis(yScalesForDownload, parcoords.newDataset, hiddenDims);
+    let xScalesForDownload = helper.setupXScales(width, paddingXaxis, orderedFeatures);
+
+    let svg = create('svg')
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        .attr('viewBox', [0, 0, width, height])
+        .attr('font-family', 'Verdana, sans-serif');
+
+    let defs = svg.append('defs');
+
+    defs.append('image')
+        .attr('id', 'arrow_image_up')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
+
+    defs.append('image')
+        .attr('id', 'arrow_image_down')
+        .attr('width', 12)
+        .attr('height', 12)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
+
+    defs.append('image')
+        .attr('id', 'brush_image_top')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
+
+    defs.append('image')
+        .attr('id', 'brush_image_bottom')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
+
+
+    svgcreator.setActivePathLinesToDownload(svg, parcoords, key);
+
+    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, parcoords, padding, xScalesForDownload);
+
+    return svg.node().outerHTML;
+}
 
 export function saveAsSvg(): void {
-  let svgString = pc.createSvgString();
+  let svgString = createSvgString();
 
   let svgArrowUp = encodeURIComponent(icon.getArrowUp());
   let svgArrowDown = encodeURIComponent(icon.getArrowDown());
@@ -189,7 +244,7 @@ function getImageTag(key: string, svg: string): string {
   return `<image id="${key}" width="12" height="12" href="data:image/svg+xml,${svg}">`;
 }
 
-function roundDecimals(svgString, decimals) {
+function roundDecimals(svgString: string, decimals: number): string {
   return svgString.replace(/(\d*\.\d+)/g, (match) => {
     return parseFloat(match).toFixed(decimals);
   });

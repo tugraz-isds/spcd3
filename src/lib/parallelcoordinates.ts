@@ -1,194 +1,29 @@
 import 'd3-transition';
-import * as d3 from 'd3-selection';
-import * as drag from 'd3-drag';
-import * as ease from 'd3-ease';
-import * as shape from 'd3-shape';
-import * as interpolate from 'd3-interpolate-path';
+import { select, selectAll} from 'd3-selection';
+import { drag } from 'd3-drag';
+import { easeCubic } from 'd3-ease';
 import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as context from './contextMenu';
-import * as svgcreator from './svgStringCreator';
 import * as icon from './icons/icons';
 import * as toolbar from './toolbar';
-
-declare global {
-    let padding: any;
-    let paddingXaxis: any;
-    let width: any;
-    let height: any;
-    let yAxis: {};
-    let selected: [];
-    let parcoords: {
-        xScales: any,
-        yScales: {},
-        dragging: {},
-        dragPosStart: {},
-        currentPosOfDims: any,
-        newFeatures: any,
-        features: any[],
-        newDataset: any,
-        data: any
-    };
-    let active: any;
-    let key: string;
-    let svg: any;
-    let hoverlabel: string;
-    let refreshData: any;
-    let initDimension: any;
-}
+import * as api from './helperApiFunc';
+import { yAxis, parcoords, width, svg, height, active, setYaxis, setRefreshData, setSvg, padding, refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension, setActive, setYScales, setData, setFeatures, setParcoords, setNewDataset, setNewFeatures, setCurrentPosOfDims, setDragPosStart, setDragging, setXScales, setHoverLabel, paddingXaxis, key, hoverlabel, setKey } from './globals';
 
 declare const window: any;
 
 //******** API ********//
 
-//---------- Show and Hide Functions ----------
-
-export function hide(dimension: string): void {
-    const newDimensions = window.parcoords.newFeatures.filter((d: string) => d !== dimension);
-    const featureSet = window.parcoords.features.filter((d: { name: string; }) => d.name !== dimension);
-
-    window.parcoords.features = featureSet;
-    window.parcoords.newFeatures = newDimensions;
-
-    const oldxScales = window.parcoords.xScales.copy();
-    window.parcoords.xScales.domain(newDimensions);
-
-    d3.selectAll('.dimensions')
-        .filter((d: { name: string; }) => newDimensions.includes(d.name || d))
-        .transition()
-        .duration(1500)
-        .attr('transform', (d: { name: string; }) =>
-            'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
-        );
-
-    d3.selectAll('.dimensions')
-        .filter((d: { name: string; }) => d.name === dimension)
-        .transition()
-        .duration(1500)
-        .style('opacity', 0)
-        .on('end', function () {
-            d3.select(this).attr('visibility', 'hidden');
-        });
-
-    d3.select('g.active').selectAll('path')
-        .transition()
-        .duration(1500)
-        .attrTween('d', (d: { [x: string]: any; }) => generateLineTween(oldxScales, window.parcoords.xScales, newDimensions, window.parcoords.yScales)(d)
-        );
-}
-
-function generateLineTween(oldXscales: (arg0: string | number) => any, newXscales: (arg0: string | number) => any, newDimensions: any[], yScales: { [x: string]: (arg0: any) => any; }) {
-    const line = shape.line().defined(d => d != null);
-
-    return function (d: { [x: string]: any; }) {
-        const oldPoints = newDimensions.map((dim: string | number) => [oldXscales(dim), yScales[dim](d[dim])]);
-        const newPoints = newDimensions.map((dim: string | number) => [newXscales(dim), yScales[dim](d[dim])]);
-
-        return interpolate.interpolatePath(line(oldPoints), line(newPoints));
-    };
-}
-
-export function show(dimension: string): void {
-    if (window.parcoords.newFeatures.includes(dimension)) return;
-
-    const existingIndex = window.initDimension.indexOf(dimension);
-    if (existingIndex !== -1) {
-        window.parcoords.newFeatures.splice(existingIndex, 0, dimension);
-        const removedItem = { name: dimension };
-        window.parcoords.features.splice(existingIndex, 0, removedItem);
-    }
-
-    window.parcoords.xScales.domain(window.parcoords.newFeatures);
-
-    d3.selectAll('.dimensions')
-        .filter((d: { name: string; }) => (typeof d === "object" ? d.name : d) === dimension)
-        .style('opacity', 0)
-        .transition()
-        .attr('visibility', 'visible')
-        .duration(1500)
-        .style('opacity', 1);
-
-    d3.selectAll('.dimensions')
-        .filter((d: { name: string; }) => window.parcoords.newFeatures.includes(
-            typeof d === "object" ? d.name : d
-        ))
-        .transition()
-        .duration(1500)
-        .attr('transform', (d: { name: string; }) =>
-            'translate(' + helper.position(d.name || d, parcoords.dragging, parcoords.xScales) + ')'
-        )
-        .style('opacity', 1);
-
-    d3.select('g.active').selectAll('path')
-        .attr('d', function (d: { [x: string]: any; }) {
-            const points = window.parcoords.newFeatures.map(p => {
-                const x = window.parcoords.xScales(p);
-                const y = window.parcoords.yScales[p](d[p]);
-                return [x, y];
-            });
-            return shape.line()(points);
-        });
-}
-
-export function getHiddenStatus(dimension: string): string {
-    const index = parcoords.newFeatures.indexOf(dimension);
-    if (index != -1) {
-        return "shown";
-    }
-    else {
-        return "hidden";
-    }
-}
-
 //---------- Invert Functions ----------
 
-export function invert(dimension: string): void {
-    const cleanDimensionName = utils.cleanString(dimension);
-    const invertId = '#dimension_invert_' + cleanDimensionName;
-    const dimensionId = '#dimension_axis_' + cleanDimensionName;
-    const textElement = d3.select(invertId);
-    const currentArrowStatus = textElement.text();
-    const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
-    const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
-    textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
-    textElement.attr('href', arrow);
-    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
-    d3.select(dimensionId)
-        .transition()
-        .duration(1000)
-        .call(yAxis[dimension]
-            .scale(parcoords.yScales[dimension]
-                .domain(parcoords.yScales[dimension]
-                    .domain().reverse())))
-        .ease(ease.easeCubic);
-
-    helper.trans(window.active).each(function (d) {
-        d3.select(this)
-            .transition()
-            .duration(1000)
-            .attr('d', (d) => {
-                return helper.linePath(d, parcoords.newFeatures, parcoords);
-            })
-            .ease(ease.easeCubic)
-    });
-
-    const filter = getFilter(dimension);
-    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
-    if (helper.isInverted(dimension)) {
-        brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
-    }
-    else {
-        brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
-    }
-}
 
 export function invertWoTransition(dimension: string): void {
     const cleanDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + cleanDimensionName;
     const dimensionId = '#dimension_axis_' + cleanDimensionName;
-    const textElement = d3.select(invertId);
+    const textElement = select(invertId);
     const currentArrowStatus = textElement.text();
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
@@ -196,74 +31,69 @@ export function invertWoTransition(dimension: string): void {
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
-    d3.select(dimensionId)
+    select(dimensionId)
         .call(yAxis[dimension]
             .scale(parcoords.yScales[dimension]
                 .domain(parcoords.yScales[dimension]
                     .domain().reverse())));
 
-    helper.trans(window.active).each(function (d) {
-        d3.select(this)
-            .attr('d', (d) => {
-                return helper.linePath(d, parcoords.newFeatures, parcoords);
+    helper.trans(active).each(function (d: any) {
+        select(this)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
             })
     });
 
-    const filter = getFilter(dimension);
-    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
+    const filter = api.getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
     if (helper.isInverted(dimension)) {
-        brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
+        brush.addInvertStatus(true, dimension, "isInverted");
     }
     else {
-        brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
+        brush.addInvertStatus(false, dimension, "isInverted");
     }
 }
 
-export function getInversionStatus(dimension: string): string {
-    const invertId = '#dimension_invert_' + utils.cleanString(dimension);
-    const element = d3.select(invertId);
-    const arrowStatus = element.text();
-    return arrowStatus == 'up' ? 'ascending' : 'descending';
-}
+
 
 export function setInversionStatus(dimension: string, status: string): void {
     const cleanDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + cleanDimensionName;
     const dimensionId = '#dimension_axis_' + cleanDimensionName;
-    const textElement = d3.select(invertId);
+    const textElement = select(invertId);
     const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = status === 'ascending' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
-    d3.select(dimensionId)
+    select(dimensionId)
         .transition()
         .duration(1000)
         .call(yAxis[dimension]
             .scale(parcoords.yScales[dimension]
                 .domain(parcoords.yScales[dimension]
                     .domain().reverse())))
-        .ease(ease.easeCubic);
+        .ease(easeCubic);
 
 
-    helper.trans(window.active).each(function (d) {
-        d3.select(this)
+    helper.trans(active).each(function (d: any) {
+        select(this)
             .transition()
             .duration(1000)
-            .attr('d', (d) => {
-                return helper.linePath(d, parcoords.newFeatures, parcoords);
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
             })
-            .ease(ease.easeCubic)
+            .ease(easeCubic)
     });
 
-    const filter = getFilter(dimension);
-    brush.addSettingsForBrushing(dimension, parcoords, helper.isInverted(dimension), filter);
+    const filter = api.getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
     if (helper.isInverted(dimension)) {
-        brush.addInvertStatus(true, parcoords.currentPosOfDims, dimension, "isInverted");
+        brush.addInvertStatus(true, dimension, "isInverted");
     }
     else {
-        brush.addInvertStatus(false, parcoords.currentPosOfDims, dimension, "isInverted");
+        brush.addInvertStatus(false, dimension, "isInverted");
     }
 }
 
@@ -271,8 +101,6 @@ export function setInversionStatus(dimension: string, status: string): void {
 //---------- Move Functions ----------
 
 export function moveByOne(dimension: string, direction: string): void {
-
-    let parcoords = window.parcoords;
 
     const indexOfDimension = parcoords.newFeatures.indexOf(dimension);
 
@@ -303,32 +131,30 @@ export function moveByOne(dimension: string, direction: string): void {
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
-    let active = d3.select('g.active').selectAll('path');
-    let featureAxis = d3.selectAll('.dimensions');
+    let active = select('g.active').selectAll('path');
+    let featureAxis = selectAll('.dimensions');
 
     active.transition()
         .duration(1000)
-        .attr('d', function (d) {
-            return helper.linePath(d, parcoords.newFeatures, parcoords);
+        .attr('d', function (d: any) {
+            return helper.linePath(d, parcoords.newFeatures);
         })
-        .ease(ease.easeCubic);
+        .ease(easeCubic);
 
     featureAxis.transition()
         .duration(1000)
-        .attr('transform', function (d) {
+        .attr('transform', function (d: { name: any; }) {
             return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
-        .ease(ease.easeCubic);
+        .ease(easeCubic);
 
     delete parcoords.dragging[dimension];
     delete parcoords.dragging[neighbour];
 }
 
 export function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void {
-    let parcoords = window.parcoords;
-
-    const indexOfDimensionA = getDimensionPosition(dimensionA);
-    const indexOfDimensionB = getDimensionPosition(dimensionB);
+    const indexOfDimensionA = api.getDimensionPosition(dimensionA);
+    const indexOfDimensionB = api.getDimensionPosition(dimensionB);
 
     if (toRightOf) {
         if (indexOfDimensionA > indexOfDimensionB) {
@@ -363,7 +189,6 @@ export function move(dimensionA: string, toRightOf: boolean, dimensionB: string)
 }
 
 export function swap(dimensionA: string, dimensionB: string): void {
-    let parcoords = window.parcoords;
 
     const positionA = parcoords.xScales(dimensionA);
     const positionB = parcoords.xScales(dimensionB);
@@ -379,216 +204,34 @@ export function swap(dimensionA: string, dimensionB: string): void {
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
-    let active = d3.select('g.active').selectAll('path');
-    let featureAxis = d3.selectAll('.dimensions');
+    let active = select('g.active').selectAll('path');
+    let featureAxis = selectAll('.dimensions');
 
     active.transition()
         .duration(1000)
-        .attr('d', (d) => {
-            return helper.linePath(d, parcoords.newFeatures, parcoords);
+        .attr('d', (d: any) => {
+            return helper.linePath(d, parcoords.newFeatures);
         });
 
     featureAxis.transition()
         .duration(1000)
-        .attr('transform', (d) => {
+        .attr('transform', (d: { name: any; }) => {
             return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
-        .ease(ease.easeCubic);
+        .ease(easeCubic);
 
     delete parcoords.dragging[dimensionA];
     delete parcoords.dragging[dimensionB];
 }
 
-//---------- Range Functions ----------
-
-export function getDimensionRange(dimension: string): any {
-    return parcoords.yScales[dimension].domain();
-}
-
-export function setDimensionRange(dimension: string, min: number, max: number): void {
-    const inverted = helper.isInverted(dimension);
-    const hiddenDims = getAllHiddenDimensionNames();
-
-    if (inverted) {
-        window.parcoords.yScales[dimension].domain([max, min]);
-        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
-    }
-    else {
-        window.parcoords.yScales[dimension].domain([min, max]);
-        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
-    }
-
-    addRange(min, window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
-    addRange(max, window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
-
-    d3.select('#dimension_axis_' + utils.cleanString(dimension))
-        .call(yAxis[dimension])
-        .transition()
-        .duration(1000)
-        .ease(ease.easeCubic);
-
-    let active = d3.select('g.active')
-        .selectAll('path')
-        .transition()
-        .duration(1000)
-        .attr('d', (d) => {
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
-        })
-        .ease(ease.easeCubic);
-
-    active.each(function (d) {
-        d3.select(this)
-            .transition()
-            .duration(1000)
-            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
-            .ease(ease.easeCubic);
-    });
-    setFilterAfterSettingRanges(dimension, inverted);
-}
-
-function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void {
-    const rect = d3.select('#rect_' + dimension);
-    const triDown = d3.select('#triangle_down_' + dimension);
-    const triUp = d3.select('#triangle_up_' + dimension);
-
-    const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
-
-    const yScale = parcoords.yScales[dimension];
-
-    const newMin = Math.max(dimensionSettings.currentRangeBottom, dimensionSettings.currentFilterBottom);
-    const newMax = Math.min(dimensionSettings.currentRangeTop, dimensionSettings.currentFilterTop);
-
-    let top = yScale(newMax);
-    let bottom = yScale(newMin);
-
-    if (inverted) {
-        [top, bottom] = [bottom, top];
-    }
-
-    const rectY = Math.min(top, bottom);
-    const rectH = Math.abs(bottom - top);
-
-    const storeBottom = Math.min(newMin, newMax);
-    const storeTop = Math.max(newMin, newMax);
-
-    addRange(storeBottom, parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
-    addRange(storeTop, parcoords.currentPosOfDims, dimension, 'currentFilterTop');
-
-    rect.transition()
-        .duration(300)
-        .attr('y', rectY)
-        .attr('height', rectH)
-        .style('opacity', 0.3);
-
-    triDown.transition()
-        .duration(300)
-        .attr('y', rectY - 10);
-
-    triUp.transition()
-        .duration(300)
-        .attr('y', rectY + rectH);
-}
-
-export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
-    const inverted = helper.isInverted(dimension);
-    const hiddenDims = getAllHiddenDimensionNames();
-    if (inverted) {
-        window.parcoords.yScales[dimension].domain([max, min]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
-    }
-    else {
-        window.parcoords.yScales[dimension].domain([min, max]).nice();
-        window.yAxis = helper.setupYAxis(window.parcoords.yScales, window.parcoords.newDataset, hiddenDims);
-    }
-
-    const roundedRanges = window.parcoords.yScales[dimension].domain();
-    addRange(roundedRanges[0], window.parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
-    addRange(roundedRanges[1], window.parcoords.currentPosOfDims, dimension, 'currentRangeTop');
-
-    d3.select('#dimension_axis_' + utils.cleanString(dimension))
-        .call(yAxis[dimension])
-        .transition()
-        .duration(1000)
-        .ease(ease.easeCubic);
-
-    let active = d3.select('g.active')
-        .selectAll('path')
-        .transition()
-        .duration(1000)
-        .attr('d', (d) => {
-            return helper.linePath(d, window.parcoords.newFeatures, window.parcoords);
-        })
-        .ease(ease.easeCubic);
-
-    active.each(function (d) {
-        d3.select(this)
-            .transition()
-            .duration(1000)
-            .attr('d', helper.linePath(d, window.parcoords.newFeatures, window.parcoords))
-            .ease(ease.easeCubic);
-    });
-    setFilterAfterSettingRanges(dimension, inverted);
-}
-
-export function getMinValue(dimension: any): number {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
-    return item.min;
-}
-
-export function getMaxValue(dimension: any): number {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
-    return item.max;
-}
-
-export function getCurrentMinRange(dimension: any): number {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
-    return item.currentRangeBottom;
-}
-
-export function getCurrentMaxRange(dimension: any): number {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.key == dimension);
-    return item.currentRangeTop;
-}
-
-function addRange(value: number, currentPosOfDims: any, dimensionName: any, key: any): void {
-    let newObject = {};
-    newObject[key] = Number(value);
-    const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
-    Object.assign(target, newObject);
-}
-
-//---------- Filter Functions ----------
-
-export function getFilter(dimension: string): [number, number] {
-    const yScale = parcoords.yScales[dimension];
-    const dimensionSettings = parcoords.currentPosOfDims.find((d) => d.key === dimension);
-    if (!dimensionSettings || !yScale || typeof yScale.invert !== 'function') return [0, 0];
-
-    const valueTop = Math.round(yScale.invert(dimensionSettings.top));
-    const valueBottom = Math.round(yScale.invert(dimensionSettings.bottom));
-
-    const min = Math.min(valueTop, valueBottom);
-    const max = Math.max(valueTop, valueBottom);
-
-    return [min, max];
-}
-
-export function setFilter(dimension: string, min: number, max: number): void {
-    const filterTop = Math.max(min, max);
-    const filterBottom = Math.min(min, max);
-    addRange(filterBottom, window.parcoords.currentPosOfDims, dimension, 'currentFilterBottom');
-    addRange(filterTop, window.parcoords.currentPosOfDims, dimension, 'currentFilterTop');
-    brush.filter(dimension, min, max, parcoords);
-}
-
 //---------- Selection Functions ----------
 
-export function getSelected(): any[] {
+export function getSelected(): string[] {
     let selected = [];
 
-    const records = getAllRecords();
+    const records = api.getAllRecords();
     for (let i = 0; i < records.length; i++) {
-        let isselected = isSelected(records[i]);
+        let isselected = api.isSelected(records[i]);
         if (isselected) {
             selected.push(records[i]);
         }
@@ -598,9 +241,9 @@ export function getSelected(): any[] {
 
 export function setSelection(records: string[]): void {
     for (let i = 0; i < records.length; i++) {
-        let stroke = d3.select('#' + utils.cleanString(records[i])).style('stroke');
+        let stroke = select('#' + utils.cleanString(records[i])).style('stroke');
         if (stroke !== 'lightgrey') {
-            d3.select('#' + utils.cleanString(records[i]))
+            select('#' + utils.cleanString(records[i]))
                 .classed('selected', true)
                 .transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
@@ -608,12 +251,8 @@ export function setSelection(records: string[]): void {
     }
 }
 
-export function isSelected(record: string): boolean {
-    return d3.select('#' + utils.cleanString(record)).classed('selected');
-}
-
 export function toggleSelection(record: string): void {
-    const selected = isSelected(record);
+    const selected = api.isSelected(record);
     if (selected) {
         setUnselected(record);
     }
@@ -629,14 +268,14 @@ export function setSelected(record: string): void {
 }
 
 export function setUnselected(record: string): void {
-    d3.selectAll('#' + utils.cleanString(record))
+    selectAll('#' + utils.cleanString(record))
         .classed('selected', false)
         .transition()
         .style('stroke', 'rgba(0, 129, 175, 0.5)');
 }
 
 export function isRecordInactive(record: string): boolean {
-    const stroke = d3.select('#' + utils.cleanString(record));
+    const stroke = select('#' + utils.cleanString(record));
     let node = stroke.node();
     let style = node.style.stroke;
     return style === 'rgba(211, 211, 211, 0.4)' ? true : false;
@@ -644,7 +283,7 @@ export function isRecordInactive(record: string): boolean {
 
 //---------- Selection Functions With IDs ----------
 
-export function setSelectionWithId(recordIds: []): void {
+export function setSelectionWithId(recordIds: string[]): void {
     let records: string[] = [];
     for (let i = 0; i < recordIds.length; i++) {
         let record = getRecordWithId(recordIds[i]);
@@ -653,35 +292,35 @@ export function setSelectionWithId(recordIds: []): void {
     setSelection(records);
 }
 
-export function isSelectedWithRecordId(recordId: number): boolean {
+export function isSelectedWithRecordId(recordId: string): boolean {
     let record = getRecordWithId(recordId);
-    return isSelected(record);
+    return api.isSelected(record);
 }
 
-export function getRecordWithId(recordId: any): string {
-    const item = window.parcoords.currentPosOfDims.find((object) => object.recordId == recordId);
+export function getRecordWithId(recordId: string): string {
+    const item = parcoords.currentPosOfDims.find((object: { recordId: string; }) => object.recordId == recordId);
     return item.key;
 }
 
-export function toggleSelectionWithId(recordId: number): void {
+export function toggleSelectionWithId(recordId: string): void {
     const record = getRecordWithId(recordId);
     toggleSelection(record);
 }
 
-export function setSelectedWithId(recordId: number): void {
+export function setSelectedWithId(recordId: string): void {
     const record = getRecordWithId(recordId);
     setSelected(record);
 }
 
-export function setUnselectedWithId(recordId: number): void {
+export function setUnselectedWithId(recordId: string): void {
     const record = getRecordWithId(recordId);
     setUnselected(record);
 }
 
 //---------- IO Functions ----------
 
-export function drawChart(content: any): void {
-    window.refreshData = structuredClone(content);
+export function drawChart(content: []): void {
+    setRefreshData(structuredClone(content));
 
     deleteChart();
 
@@ -691,14 +330,14 @@ export function drawChart(content: any): void {
 
     const height = 360;
 
-    const wrapper = d3.select('#parallelcoords')
+    const wrapper = select('#parallelcoords')
         .style('display', 'block')
         .style('width', '100%')
         .style('margin', '0')
         .style('padding', '0')
         .style('text-align', 'left')
-        .style('justify-content', 'flex-start')
-        .style('align-items', 'flex-start');
+        .style('justify-content', 'center')
+        .style('align-items', 'center');
 
     const chartWrapper = wrapper.append('div')
         .attr('id', 'chartWrapper')
@@ -718,27 +357,21 @@ export function drawChart(content: any): void {
         .style('margin-left', '1rem')
         .style('margin-bottom', 0);
 
-    toolbar.createToolbar(window.parcoords.newDataset);
+    toolbar.createToolbar(parcoords.newDataset);
 
-    window.svg = chartWrapper.append('svg')
+    setSvg(chartWrapper.append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [-10, 20, window.width, height])
-        .attr('preserveAspectRatio', 'xMinYMin meet')
-        .attr('font-family', 'Verdana, sans-serif')
-        .attr('user-select', 'none')
-        .style('display', 'block')
-        .style('width', '100%')
-        .style('margin-top', 0)
-        .style('margin-left', 0);
+        .attr('viewBox', [0, 0, width, height])
+        .attr('font-family', 'Verdana, sans-serif'));
 
     setDefsForIcons();
 
-    setFeatureAxis(svg, yAxis, window.active, window.parcoords, width, window.padding);
+    setFeatureAxis(svg, yAxis, parcoords, width, padding);
 
-    window.active = setActivePathLines(svg, content, window.parcoords);
+    setActive(setActivePathLines(svg, content, parcoords));
 
-    window.svg
-        .on("contextmenu", function (event) {
+    svg
+        .on("contextmenu", function (event: any) {
             event.stopPropagation();
             event.preventDefault();
         })
@@ -748,208 +381,64 @@ export function drawChart(content: any): void {
         .on("click", function () {
             clearSelection();
         })
-        .on("mousedown.selection", function (event) {
+        .on("mousedown.selection", function (event: any) {
             event.preventDefault();
         });
 
-    window.onclick = (event) => {
-        d3.select('#contextmenu').style('display', 'none');
-        d3.select('#contextmenuRecords').style('display', 'none');
+    window.onclick = () => {
+        select('#contextmenu').style('display', 'none');
+        select('#contextmenuRecords').style('display', 'none');
     }
 }
 
 export function reset() {
-    drawChart(window.refreshData);
-    let toolbar = d3.select('#toolbar');
+    drawChart(refreshData);
+    let toolbar = select('#toolbar');
     toolbar.style('max-width', '12.5rem')
         .style('opacity', '1')
         .style('pointer-events', 'auto');
 
-    let toggleButton = d3.select('#toggleButton');
+    let toggleButton = select('#toggleButton');
     toggleButton.attr('title', 'Collapse toolbar');
 
     toggleButton.html(icon.getCollapseToolbarIcon());
 }
 
 
-export function refresh() {
-    const dimensions = getAllVisibleDimensionNames();
+export function refresh(): void {
+    const dimensions = api.getAllVisibleDimensionNames();
     for (let i = 0; i < dimensions.length; i++) {
-        show(dimensions[i]);
+        api.show(dimensions[i]);
     }
 }
 
 export function deleteChart(): void {
-    d3.select('#pc_svg').remove();
-    d3.select('#contextmenu').remove();
-    d3.select('#contextmenuRecords').remove();
-    d3.select('#modalFilter').remove();
-    d3.select('#modalRange').remove();
-    d3.select('#refreshButton').remove();
-    d3.select('#showData').remove();
-    d3.select('#toolbarRow').remove();
-}
-
-let isSelectionMode = false;
-
-function selectionWithRectangle(enable: boolean): void {
-
-    const svg = window.svg;
-
-    svg.on('.selection', null);
-
-    if (!enable) return;
-
-    let selectionRect = svg.append('rect')
-        .style('fill', 'none')
-        .style('stroke', 'black')
-        .style('stroke-dasharray', '3')
-        .style('visibility', 'hidden')
-        .style('pointer-events', 'none');
-
-    let isSelecting = false;
-    let startX;
-    let startY;
-
-    svg.on('mousedown.selection', function (event) {
-        event.preventDefault();
-        isSelecting = true;
-        const [x, y] = d3.pointer(event);
-        startX = x;
-        startY = y;
-
-        selectionRect
-            .attr('x', startX)
-            .attr('y', startY)
-            .attr('width', 0)
-            .attr('height', 0)
-            .style('visibility', 'visible');
-    });
-
-    svg.on('mousemove.selection', function (event) {
-        if (!isSelecting) return;
-        const [x, y] = d3.pointer(event);
-        const width = Math.abs(x - startX);
-        const height = Math.abs(y - startY);
-
-        selectionRect
-            .attr('x', Math.min(x, startX))
-            .attr('y', Math.min(y, startY))
-            .attr('width', width)
-            .attr('height', height);
-    });
-
-    svg.on('mouseup.selection', function () {
-        if (!isSelecting) return;
-        isSelecting = false;
-
-        const x1 = parseFloat(selectionRect.attr('x'));
-        const y1 = parseFloat(selectionRect.attr('y'));
-        const x2 = x1 + parseFloat(selectionRect.attr('width'));
-        const y2 = y1 + parseFloat(selectionRect.attr('height'));
-
-        svg.selectAll('g.active path')
-            .each(function (d) {
-                const path = d3.select(this).node();
-                const pathData = path.getAttribute('d');
-
-                const pathCoords = pathData.match(/[ML]\s*(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/g);
-
-                let isInSelection = false;
-
-                if (pathCoords) {
-                    pathCoords.forEach(function (coord) {
-                        const matches = coord.match(/[-+]?\d*\.?\d+/g);
-                        const [x, y] = matches.map(Number);
-
-                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                            isInSelection = true;
-                        }
-                    });
-                }
-
-                if (isInSelection) {
-                    d3.select(this)
-                        .each(function () {
-                            const pathElement = d3.select(this);
-                            const pathId = pathElement.attr('id');
-                            setSelected(pathId);
-                        });
-                }
-            });
-        selectionRect.style('visibility', 'hidden');
-    });
-
+    select('#pc_svg').remove();
+    select('#contextmenu').remove();
+    select('#contextmenuRecords').remove();
+    select('#modalFilter').remove();
+    select('#modalRange').remove();
+    select('#refreshButton').remove();
+    select('#showData').remove();
+    select('#toolbarRow').remove();
 }
 
 //---------- Helper Functions ----------
 
-export function getAllRecords(): any[] {
-    const selection = window.active;
-    const object = selection._groups;
-    const data = [];
-    for (let i = 0; i < object[0].length; i++) {
-        const items = object.map(item => item[i]);
-        const keys = Object.keys(items);
-        const text = items[keys[0]].id;
-        data.push(text);
-    }
-    return data;
-}
-
-export function getAllVisibleDimensionNames(): string[] {
-    let listOfDimensions = parcoords.newFeatures.slice();
-    return listOfDimensions.reverse();
-}
-
-export function getAllDimensionNames(): string[] {
-    return window.parcoords.data['columns'];
-}
-
-export function getAllHiddenDimensionNames(): string[] {
-    const dimensions = getAllDimensionNames();
-    const hiddenDimensions = [];
-    for (let i = 0; i < dimensions.length; i++) {
-        if (getHiddenStatus(dimensions[i]) == 'hidden') {
-            hiddenDimensions.push(dimensions[i]);
-        }
-    }
-    return hiddenDimensions;
-}
-
-export function getNumberOfDimensions(): number {
-    return parcoords.newFeatures.length;
-}
-
-export function getDimensionPosition(dimension: string): number {
-    return parcoords.newFeatures.indexOf(dimension);
-}
-
-export function isDimensionCategorical(dimension: string): boolean {
-    let values = window.parcoords.newDataset.map(o => o[dimension]);
-    if (isNaN(values[0])) {
-        return true;
-    }
-    return false;
-}
-
-export function setDimensionForHovering(dimension: string): void {
-    window.hoverlabel = dimension;
-}
 
 // ---------- Needed for Built-In Interactivity Functions ---------- //
 
-function setUpParcoordData(data: any, newFeatures: any): any {
+function setUpParcoordData(data: any, newFeatures: []): void {
 
-    window.padding = 80;
-    window.paddingXaxis = 75;
-    window.width = newFeatures.length * 100;
-    window.height = 400;
-    window.initDimension = newFeatures;
+    setPadding(80);
+    setPaddingXaxis(60);
+    setWidth(newFeatures.length * 100);
+    setHeight(400);
+    setInitDimension(newFeatures);
 
     const label = newFeatures[newFeatures.length - 1];
 
-    data.sort((a, b) => {
+    data.sort((a: { [x: string]: any; }, b: { [x: string]: any; }) => {
         const item1 = a[label];
         const item2 = b[label];
 
@@ -964,48 +453,42 @@ function setUpParcoordData(data: any, newFeatures: any): any {
 
     let dataset = helper.prepareData(data, newFeatures);
 
-    window.parcoords = {};
-    window.parcoords.features = dataset[0];
-    window.parcoords.newDataset = dataset[1];
+    setFeatures(dataset[0]);
+    setNewDataset(dataset[1]);
 
-    window.parcoords.xScales = helper.setupXScales(window.width, window.paddingXaxis, dataset[0]);
-    window.parcoords.yScales = helper.setupYScales(window.height, window.padding, dataset[0], dataset[1]);
-    window.parcoords.dragging = {};
-    window.parcoords.dragPosStart = {};
-    window.parcoords.currentPosOfDims = [];
-    window.parcoords.newFeatures = newFeatures;
-
-    window.parcoords.data = data;
+    setXScales(helper.setupXScales(width, paddingXaxis, dataset[0]));
+    setYScales(helper.setupYScales(height, padding, dataset[0], dataset[1]));
+    setNewFeatures(newFeatures);
+    setData(data);
 
     for (let i = 0; i < newFeatures.length; i++) {
-        let max;
-        let min;
-        if (isNaN(Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]])))) {
-            const sorted = [...window.parcoords.newDataset.map(o => o[newFeatures[i]])].sort((a, b) => a.localeCompare(b));
+        let max: number;
+        let min: number;
+        if (isNaN(Math.max(...parcoords.newDataset.map((o: { [x: string]: any; }) => o[newFeatures[i]])))) {
+            const sorted = [...parcoords.newDataset.map((o: { [x: string]: any; }) => o[newFeatures[i]])].sort((a, b) => a.localeCompare(b));
             min = sorted[sorted.length - 1];
             max = sorted[0];
         }
         else {
-            max = Math.max(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
-            min = Math.min(...window.parcoords.newDataset.map(o => o[newFeatures[i]]));
+            max = Math.max(...parcoords.newDataset.map((o: { [x: string]: any; }) => o[newFeatures[i]]));
+            min = Math.min(...parcoords.newDataset.map((o: { [x: string]: any; }) => o[newFeatures[i]]));
         }
-        const ranges = getDimensionRange(newFeatures[i]);
-        window.parcoords.currentPosOfDims.push(
+        const ranges = api.getDimensionRange(newFeatures[i]);
+        parcoords.currentPosOfDims.push(
             {
                 key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
                 min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], currentFilterBottom: ranges[0], currentFilterTop: ranges[1]
             }
         );
     }
-    const hiddenDims = getAllHiddenDimensionNames();
+    const hiddenDims = api.getAllHiddenDimensionNames();
 
-    window.yAxis = {};
-    window.yAxis = helper.setupYAxis(parcoords.yScales, parcoords.newDataset, hiddenDims);
+    setYaxis(helper.setupYAxis(parcoords.yScales, parcoords.newDataset, hiddenDims));
 
     let counter = 0;
-    window.parcoords.features.map(x => {
+    parcoords.features.map((x: { name: string | number; }) => {
         let numberOfDigs = 0
-        let values = window.parcoords.newDataset.map(o => o[x.name]);
+        let values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[x.name]);
         for (let i = 0; i < values.length; i++) {
             if (!isNaN(values[i])) {
                 const tempNumberOfDigs = utils.digits(Number(values[i]));
@@ -1017,68 +500,17 @@ function setUpParcoordData(data: any, newFeatures: any): any {
                 continue;
             }
         }
-        utils.addNumberOfDigs(numberOfDigs, window.parcoords.currentPosOfDims, x.name, 'sigDig');
-        utils.addNumberOfDigs(counter, window.parcoords.currentPosOfDims, x.name, 'recordId');
+        utils.addNumberOfDigs(numberOfDigs, parcoords.currentPosOfDims, x.name, 'sigDig');
+        utils.addNumberOfDigs(counter, parcoords.currentPosOfDims, x.name, 'recordId');
         counter = counter + 1;
     });
 
-    window.hoverlabel = getAllVisibleDimensionNames()[0];
+    setHoverLabel(api.getAllVisibleDimensionNames()[0]);
 }
 
-export function createSvgString(): any {
-    let height = window.height;
-    let width = window.width;
-
-    type Feature = { name: string };
-    const orderedFeatures: Feature[] = window.parcoords.newFeatures.map(name => ({ name }));
-
-    const hiddenDims = getAllHiddenDimensionNames();
-
-    let yScalesForDownload = helper.setupYScales(window.height, window.padding, window.window.parcoords.features, window.parcoords.newDataset);
-    let yAxisForDownload = helper.setupYAxis(yScalesForDownload, window.parcoords.newDataset, hiddenDims);
-    let xScalesForDownload = helper.setupXScales(window.width, window.paddingXaxis, orderedFeatures);
-
-    let svg = d3.create('svg')
-        .attr("xmlns", "http://www.w3.org/2000/svg")
-        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-        .attr('viewBox', [0, 0, width, height])
-        .attr('font-family', 'Verdana, sans-serif');
-
-    let defs = svg.append('defs');
-
-    defs.append('image')
-        .attr('id', 'arrow_image_up')
-        .attr('width', 12)
-        .attr('height', 12)
-        .attr('href', 'data:image/svg+xml;,' + icon.getArrowUp());
-
-    defs.append('image')
-        .attr('id', 'arrow_image_down')
-        .attr('width', 12)
-        .attr('height', 12)
-        .attr('href', 'data:image/svg+xml;,' + icon.getArrowDown());
-
-    defs.append('image')
-        .attr('id', 'brush_image_top')
-        .attr('width', 14)
-        .attr('height', 10)
-        .attr('href', 'data:image/svg+xml;,' + icon.getArrowTop());
-
-    defs.append('image')
-        .attr('id', 'brush_image_bottom')
-        .attr('width', 14)
-        .attr('height', 10)
-        .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
 
 
-    svgcreator.setActivePathLinesToDownload(svg, window.parcoords, window.key);
-
-    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, window.parcoords, window.padding, xScalesForDownload);
-
-    return svg.node().outerHTML;
-}
-
-const tooltipPath = d3.select('body')
+const tooltipPath = select('body')
     .append('div')
     .style('position', 'absolute')
     .style('visibility', 'hidden')
@@ -1090,7 +522,7 @@ const tooltipPath = d3.select('body')
     .style('font-size', '0.75rem')
     .style('z-index', '1000');
 
-const tooltipTest = d3.select('body')
+const tooltipTest = select('body')
     .append('div')
     .attr('id', 'tooltipTest')
     .style('position', 'absolute')
@@ -1114,22 +546,21 @@ const clearExistingDelay = () => {
     }
 };
 
-const handlePointerEnter = (event, d) => {
-    if (isSelectionMode) return;
+const handlePointerEnter = (event: any, d: any) => {
     clearExistingDelay();
     doNotHighlight();
 
-    const data = helper.getAllPointerEventsData(event, window.hoverlabel);
+    const data = helper.getAllPointerEventsData(event, hoverlabel);
 
     highlight(data);
     helper.createTooltipForPathLine(data, tooltipTest, event);
 
     const datasetMap = new Map();
-    parcoords.newDataset.forEach((record) => {
-        datasetMap.set(record[window.hoverlabel], record);
+    parcoords.newDataset.forEach((record: { [x: string]: any; }) => {
+        datasetMap.set(record[hoverlabel], record);
     });
 
-    data.forEach((item) => {
+    data.forEach((item: any) => {
         const matchingRecord = datasetMap.get(item);
         if (matchingRecord) {
             helper.createToolTipForValues(matchingRecord);
@@ -1142,17 +573,17 @@ const handlePointerLeaveOrOut = () => {
     doNotHighlight();
     clearExistingDelay();
     tooltipPath.style('visibility', 'hidden');
-    d3.select('#tooltipTest').style('visibility', 'hidden');
+    select('#tooltipTest').style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
-d3.select('#pc_svg').on('mouseleave', () => {
+select('#pc_svg').on('mouseleave', () => {
     if (cleanupTimeout) clearTimeout(cleanupTimeout);
     cleanupTimeout = setTimeout(() => {
         doNotHighlight();
         clearExistingDelay();
         tooltipPath.style('visibility', 'hidden');
-        d3.select('#tooltipTest').style('visibility', 'hidden');
+        select('#tooltipTest').style('visibility', 'hidden');
         helper.cleanTooltip();
     }, 100);
 });
@@ -1175,7 +606,7 @@ function setActivePathLines(svg: any, content: any,
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
     }): any {
 
-    let contextMenu = d3.select('#parallelcoords')
+    let contextMenu = select('#parallelcoords')
         .append('g')
         .attr('id', 'contextmenuRecords')
         .style('position', 'absolute')
@@ -1208,18 +639,18 @@ function setActivePathLines(svg: any, content: any,
         .data(content)
         .enter()
         .append('path')
-        .attr('class', (d) => {
+        .attr('class', (d: { [x: string]: string; }) => {
             const keys = Object.keys(d);
-            window.key = keys[0];
-            const selected_value = utils.cleanString(d[window.key]);
+            setKey(keys[0]);
+            const selected_value = utils.cleanString(d[key]);
             return 'line ' + selected_value;
         })
-        .attr('id', (d) => {
-            return utils.cleanString(d[window.key]);
+        .attr('id', (d: { [x: string]: string; }) => {
+            return utils.cleanString(d[key]);
         })
-        .each(function (d) {
-            d3.select(this)
-                .attr('d', helper.linePath(d, parcoords.newFeatures, parcoords));
+        .each(function (d: any) {
+            select(this)
+                .attr('d', helper.linePath(d, parcoords.newFeatures));
         })
         .style('pointer-events', 'stroke')
         .style('stroke', 'rgba(0, 129, 175, 0.5)')
@@ -1231,31 +662,31 @@ function setActivePathLines(svg: any, content: any,
         .on('mouseenter', handlePointerEnter)
         .on('mouseout', handlePointerLeaveOrOut)
         .on('mouseleave', handlePointerLeaveOrOut)
-        .on('click', function (event, d) {
-            const data = helper.getAllPointerEventsData(event, window.hoverlabel);
+        .on('click', function (event: { metaKey: any; shiftKey: any; ctrlKey: any; stopPropagation: () => void; }, d: any) {
+            const data = helper.getAllPointerEventsData(event, hoverlabel);
             const selectedRecords = getSelected();
 
             if (event.metaKey || event.shiftKey) {
-                data.forEach(record => {
+                data.forEach((record: string) => {
                     if (selectedRecords.includes(record)) {
                         setUnselected(record);
                     } else {
-                        select([record]);
+                        selectRecord([record]);
                     }
                 });
             }
             else if (event.ctrlKey) {
-                data.forEach(record => {
+                data.forEach((record: string) => {
                     toggleSelection(record);
                 })
             }
             else {
                 clearSelection();
-                select(data);
+                selectRecord(data);
             }
             event.stopPropagation();
         })
-        .on('contextmenu', function (event, d) {
+        .on('contextmenu', function (event: any, d: any) {
             setContextMenuForActiceRecords(contextMenu, event, d);
         });
 
@@ -1265,7 +696,7 @@ function setActivePathLines(svg: any, content: any,
 const delay1 = 50;
 export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
 
-function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any) {
+function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any):void {
     const container = document.querySelector("#parallelcoords");
     const rect = container.getBoundingClientRect();
 
@@ -1279,54 +710,54 @@ function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any) {
         .style('padding', 0.35 + 'rem')
         .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
         .style('cursor', 'pointer')
-        .on('click', (event) => {
+        .on('click', (event: { stopPropagation: () => void; }) => {
             event.stopPropagation();
         });
 
-    d3.select('#selectRecord')
-        .on('click', (event) => {
-            setSelected(d[window.hoverlabel]);
+    select('#selectRecord')
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            setSelected(d[hoverlabel]);
             event.stopPropagation();
-            d3.select('#contextmenuRecords').style('display', 'none');
+            select('#contextmenuRecords').style('display', 'none');
         });
 
-    d3.select('#unSelectRecord')
-        .on('click', (event) => {
-            setUnselected(d[window.hoverlabel]);
+    select('#unSelectRecord')
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            setUnselected(d[hoverlabel]);
             event.stopPropagation();
-            d3.select('#contextmenuRecords').style('display', 'none');
+            select('#contextmenuRecords').style('display', 'none');
         });
 
-    d3.select('#toggleRecord')
+    select('#toggleRecord')
         .style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
-            toggleSelection(d[window.hoverlabel]);
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            toggleSelection(d[hoverlabel]);
             event.stopPropagation();
-            d3.select('#contextmenuRecords').style('display', 'none');
+            select('#contextmenuRecords').style('display', 'none');
         });
 
-    d3.select('#addSelection')
+    select('#addSelection')
         .style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
+        .on('click', (event: { stopPropagation: () => void; }) => {
             let selectedRecords = [];
             selectedRecords = getSelected();
-            selectedRecords.push(d[window.hoverlabel]);
+            selectedRecords.push(d[hoverlabel]);
             setSelection(selectedRecords);
             event.stopPropagation();
-            d3.select('#contextmenuRecords').style('display', 'none');
+            select('#contextmenuRecords').style('display', 'none');
         });
 
-    d3.select('#removeSelection')
-        .on('click', (event) => {
-            setUnselected(d[window.hoverlabel]);
+    select('#removeSelection')
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            setUnselected(d[hoverlabel]);
             event.stopPropagation();
-            d3.select('#contextmenuRecords').style('display', 'none');
+            select('#contextmenuRecords').style('display', 'none');
         });
-    d3.selectAll('.contextmenu').style('padding', 0.35 + 'rem');
+    selectAll('.contextmenu').style('padding', 0.35 + 'rem');
     event.preventDefault();
 }
 
-function setFeatureAxis(svg: any, yAxis: any, active: any,
+function setFeatureAxis(svg: any, yAxis: any,
     parcoords: {
         xScales: any; yScales: {}; dragging: {}; dragPosStart: {};
         currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
@@ -1338,18 +769,18 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         .enter()
         .append('g')
         .attr('class', 'dimensions')
-        .attr('transform', d => ('translate(' + parcoords.xScales(d.name) + ')'));
+        .attr('transform', (d: { name: any; }) => ('translate(' + parcoords.xScales(d.name) + ')'));
 
-    let tooltipValuesLabel = d3.select('body')
+    let tooltipValuesLabel = select('body')
         .append('g')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
     featureAxis
         .append('g')
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name])
                 /*.on('mouseenter', function (event, d) {
@@ -1377,25 +808,25 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
         }
     });
 
-    let tooltipValues = d3.select('body')
+    let tooltipValues = select('body')
         .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesTop = d3.select('#parallelcoords')
+    let tooltipValuesTop = select('#parallelcoords')
         .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    let tooltipValuesDown = d3.select('#parallelcoords')
+    let tooltipValuesDown = select('#parallelcoords')
         .append('div')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
-    const brushOverlay = window.svg.append("rect")
+    const brushOverlay = svg.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", window.width)
+        .attr("width", width)
         .attr("height", height)
         .style("fill", "transparent")
         .style("pointer-events", "none");
@@ -1413,18 +844,18 @@ function setFeatureAxis(svg: any, yAxis: any, active: any,
     setInvertIcon(featureAxis, padding);
 }
 
-export function showMarker(dimension) {
+export function showMarker(dimension: string) {
     const cleanDimensionName = utils.cleanString(dimension);
-    d3.select('#marker_' + cleanDimensionName).attr('opacity', 1);
+    select('#marker_' + cleanDimensionName).attr('opacity', 1);
 }
 
-export function hideMarker(dimension) {
+export function hideMarker(dimension: string) {
     const cleanDimensionName = utils.cleanString(dimension);
-    d3.select('#marker_' + cleanDimensionName).attr('opacity', 0);
+    select('#marker_' + cleanDimensionName).attr('opacity', 0);
 }
 
 function setDefsForIcons(): void {
-    const svgContainer = window.svg;
+    const svgContainer = svg;
     let defs = svgContainer.select('defs');
     defs = svgContainer.append('defs');
 
@@ -1457,18 +888,16 @@ function setDefsForIcons(): void {
 
 let currentlyHighlightedItems = [];
 
-function highlight(data) {
+function highlight(data: any[]) {
 
-    if (isSelectionMode) return;
-
-    const cleanedItems = data.map(item =>
+    const cleanedItems = data.map((item: string) =>
         utils.cleanString(item).replace(/[.,]/g, '')
     );
 
     currentlyHighlightedItems = [...cleanedItems];
 
-    cleanedItems.forEach(item => {
-        d3.select('#' + item)
+    cleanedItems.forEach((item: string) => {
+        select('#' + item)
             .transition()
             .duration(5)
             .style('stroke', 'rgba(200, 28, 38, 0.7)');
@@ -1480,7 +909,7 @@ function doNotHighlight() {
     if (!currentlyHighlightedItems.length) return;
 
     currentlyHighlightedItems.forEach(item => {
-        const line = d3.select('#' + item);
+        const line = select('#' + item);
         if (line.classed('selected')) {
             line.transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
@@ -1496,7 +925,7 @@ function doNotHighlight() {
 
 // Selecting
 
-function select(linePaths: any): void {
+function selectRecord(linePaths: any): void {
     for (let i = 0; i < linePaths.length; i++) {
         setSelected(linePaths[i]);
     }
@@ -1505,7 +934,7 @@ function select(linePaths: any): void {
 function clearSelection(): void {
     const selectedRecords = getSelected();
     selectedRecords.forEach(element => {
-        d3.select('#' + utils.cleanString(element))
+        select('#' + utils.cleanString(element))
             .classed('selected', false)
             .transition()
             .style('stroke', 'rgba(0, 129, 175, 0.5)')
@@ -1513,7 +942,7 @@ function clearSelection(): void {
 }
 
 
-function setInvertIcon(featureAxis: any, padding: any): void {
+function setInvertIcon(featureAxis: any, padding: number): void {
     let value = (padding / 1.5).toFixed(4);
 
     featureAxis
@@ -1526,24 +955,24 @@ function setInvertIcon(featureAxis: any, padding: any): void {
         .attr('y', 0)
         .attr('x', 0)
         .attr('href', '#arrow_image_up')
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
                 .text('up')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         })
-        .on('click', (event, d) => {
-            invert(d.name);
+        .on('click', (event: { stopPropagation: () => void; }, d: { name: string; }) => {
+            api.invert(d.name);
             event.stopPropagation();
         });
 }
 
 function setMarker(featureAxis: any): void {
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .append('g')
                 .attr('class', 'marker')
                 .append('rect')
@@ -1570,9 +999,9 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
 
     let delta: any;
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .append('g')
                 .attr('class', 'rect')
                 .append('rect')
@@ -1584,23 +1013,23 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.4')
                 .style('cursor', 'default')
-                .on('mousedown.selection', function (event) {
+                .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
-                .call(drag.drag()
-                    .on('drag', (event, d) => {
+                .call(drag()
+                    .on('drag', (event: any, d: any) => {
                         if (parcoords.newFeatures.length > 25) {
-                            brush.throttleDragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta,
+                            brush.throttleDragAndBrush(processedDimensionName, d, event, delta,
                                 tooltipValuesTop, tooltipValuesDown, window);
                         }
                         else {
-                            brush.dragAndBrush(processedDimensionName, d, svg, event, parcoords, active, delta,
+                            brush.dragAndBrush(processedDimensionName, d, event, delta,
                                 tooltipValuesTop, tooltipValuesDown, window);
                         }
 
                     })
-                    .on('start', (event, d) => {
-                        let current = d3.select("#rect_" + processedDimensionName);
+                    .on('start', (event: { y: number; }, d: any) => {
+                        let current = select("#rect_" + processedDimensionName);
                         delta = current.attr("y") - event.y;
                     })
                     .on('end', () => {
@@ -1616,9 +1045,9 @@ function setBrushUp(featureAxis: any, parcoords: {
 }, tooltipValues: any, brushOverlay: any): void {
 
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
                 .append('use')
@@ -1629,17 +1058,17 @@ function setBrushUp(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
-                .on('mousedown.selection', function (event) {
+                .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
-                .call(drag.drag()
-                    .on('drag', (event, d) => {
+                .call(drag()
+                    .on('drag', (event: any, d: any) => {
                         brushOverlay.raise().style("pointer-events", "all");
                         if (parcoords.newFeatures.length > 25) {
-                            brush.throttleBrushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            brush.throttleBrushUp(processedDimensionName, event, d, tooltipValues, window);
                         }
                         else {
-                            brush.brushUp(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            brush.brushUp(processedDimensionName, event, d, tooltipValues, window);
                         }
                     })
                     .on('end', () => {
@@ -1655,9 +1084,9 @@ function setBrushDown(featureAxis: any, parcoords: {
 }, tooltipValues: any, brushOverlay: any): void {
 
     featureAxis
-        .each(function (d) {
+        .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
-            d3.select(this)
+            select(this)
                 .append('g')
                 .attr('class', 'brush_' + processedDimensionName)
                 .append('use')
@@ -1668,17 +1097,17 @@ function setBrushDown(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
-                .on('mousedown.selection', function (event) {
+                .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
-                .call(drag.drag()
-                    .on('drag', (event, d) => {
+                .call(drag()
+                    .on('drag', (event: any, d: any) => {
                         brushOverlay.raise().style("pointer-events", "all");
                         if (parcoords.newFeatures.length > 25) {
-                            brush.throttleBrushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            brush.throttleBrushDown(processedDimensionName, event, d, tooltipValues, window);
                         }
                         else {
-                            brush.brushDown(processedDimensionName, event, d, parcoords, active, tooltipValues, window);
+                            brush.brushDown(processedDimensionName, event, d, tooltipValues, window);
                         }
                     })
                     .on('end', () => {

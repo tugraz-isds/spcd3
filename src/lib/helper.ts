@@ -1,14 +1,15 @@
-import * as d3 from 'd3-selection';
-import * as scale from 'd3-scale';
-import * as axis from 'd3-axis';
-import * as path from 'd3-shape';
+import { select, selectAll, ScaleLinear } from 'd3-selection';
+import { scalePoint, scaleLinear } from 'd3-scale';
+import { axisLeft } from 'd3-axis';
+import { line } from 'd3-shape';
 import * as utils from './utils';
+import { parcoords } from './globals';
 
 export function prepareData(data: any, newFeatures: any): any {
     let newDataset = [];
-    data.forEach(obj => {
+    data.forEach((obj: { [x: string]: any; }) => {
         let newdata = {};
-        newFeatures.forEach(feature => {
+        newFeatures.forEach((feature: string | number) => {
             newdata[feature] = obj[feature];
         });
         newDataset.push(newdata);
@@ -18,30 +19,30 @@ export function prepareData(data: any, newFeatures: any): any {
     return [features, newDataset];
 }
 
-export function setupYScales(height: any, padding: any, features: any, newDataset: any): any {
+export function setupYScales(height: number, padding: number, features: any, newDataset: any): any {
     let yScales = {};
-    features.map(x => {
-        const values = newDataset.map(o => o[x.name]);
+    features.map((x: { name: string | number; }) => {
+        const values = newDataset.map((o: { [x: string]: any; }) => o[x.name]);
         let labels = [];
         if (isNaN(values[0]) !== false) {
-            values.forEach(function (element) {
+            values.forEach(function (element: string) {
                 labels.push(element.length > 10 ? element.substr(0, 10) + '...' : element);
             });
-            yScales[x.name] = scale.scalePoint()
+            yScales[x.name] = scalePoint()
                 .domain(labels)
                 .range([padding, height - padding])
                 .padding(0.2);
         }
         else {
-            const max = Math.max(...newDataset.map(o => o[x.name]));
-            const min = Math.min(...newDataset.map(o => o[x.name]));
+            const max = Math.max(...newDataset.map((o: { [x: string]: any; }) => o[x.name]));
+            const min = Math.min(...newDataset.map((o: { [x: string]: any; }) => o[x.name]));
             if (min === max) {
                 const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
-                yScales[x.name] = scale.scaleLinear()
+                yScales[x.name] = scaleLinear()
                 .domain([min - epsilon, max + epsilon])
                 .range([height - padding, padding]);
             } else {
-                yScales[x.name] = scale.scaleLinear()
+                yScales[x.name] = scaleLinear()
                 .domain([min, max])
                 .range([height - padding, padding]);
             }
@@ -50,13 +51,13 @@ export function setupYScales(height: any, padding: any, features: any, newDatase
     return yScales;
 }
 
-export function setupXScales(width: any, padding: any, features: any): any {
-    return scale.scalePoint()
-        .domain(features.map(x => x.name))
+export function setupXScales(width: number, padding: number, features: any): any {
+    return scalePoint()
+        .domain(features.map((x: { name: any; }) => x.name))
         .range([width - padding, padding]);
 }
 
-function isLinearScale(scale: any): scale is d3.ScaleLinear<number, number> {
+function isLinearScale(scale: any): scale is ScaleLinear<number, number> {
     return typeof (scale as any).ticks === 'function';
 }
 
@@ -71,8 +72,8 @@ export function setupYAxis(yScales: any, newDataset: any, hiddenDims: any): any 
         const isNumeric = !isNaN(+sample);
 
         if (!isNumeric) {
-            const rawLabels = newDataset.map(d => d[key]);
-            const shortenedLabels = rawLabels.map(val =>
+            const rawLabels = newDataset.map((d: { [x: string]: any; }) => d[key]);
+            const shortenedLabels = rawLabels.map((val: string) =>
                 typeof val === 'string' && val.length > 10 ? val.substr(0, 10) + '...' : val
             );
             const uniqueLabels = Array.from(new Set(shortenedLabels));
@@ -81,7 +82,7 @@ export function setupYAxis(yScales: any, newDataset: any, hiddenDims: any): any 
                 ? uniqueLabels.filter((_, i) => i % 4 === 0)
                 : uniqueLabels;
 
-            yAxis[key] = axis.axisLeft(scale).tickValues(ticks);
+            yAxis[key] = axisLeft(scale).tickValues(ticks).tickFormat((d: any) => d);
         } else if (isLinearScale(scale)) {
             const ticks: number[] = scale.ticks(5).concat(scale.domain());
             const sorted: number[] = Array.from(new Set(ticks)).sort((a, b) => a - b);
@@ -101,18 +102,18 @@ export function setupYAxis(yScales: any, newDataset: any, hiddenDims: any): any 
                     sorted.splice(len - 2, 1);
                 }
             }
-            yAxis[key] = axis.axisLeft(scale).tickValues(sorted);
+            yAxis[key] = axisLeft(scale).tickValues(sorted).tickFormat((d: any) => d);
         }
     });
     return yAxis;
 }
 
-export function linePath(d: any, newFeatures: any, parcoords: any): any {
-    const lineGenerator = path.line();
+export function linePath(d: any, newFeatures: any): any {
+    const lineGenerator = line();
     const tempdata = Object.entries(d).filter(x => x[0]);
     const points = [];
 
-    newFeatures.forEach(newFeature => {
+    newFeatures.forEach((newFeature: string) => {
         const valueEntry = tempdata.find(x => x[0] === newFeature);
         if (valueEntry) {
             const name = newFeature;
@@ -133,7 +134,7 @@ export function linePath(d: any, newFeatures: any, parcoords: any): any {
 
 export function isInverted(dimension: string): boolean {
     const invertId = '#dimension_invert_' + utils.cleanString(dimension);
-    const element = d3.select(invertId);
+    const element = select(invertId);
     const arrowStatus = element.text();
     return arrowStatus == 'down' ? true : false;
 }
@@ -143,26 +144,26 @@ function getAllVisibleDimensionNames(): string[] {
     return listOfDimensions.reverse();
 }
 
-export function createToolTipForValues(recordData): void {
+export function createToolTipForValues(records: { [x: string]: { toString: () => any; }; }): void {
     const dimensions = getAllVisibleDimensionNames();
 
-    const svg = d3.select('#pc_svg').node() as SVGSVGElement;
+    const svg = select('#pc_svg').node() as SVGSVGElement;
 
     dimensions.forEach(dimension => {
         const cleanString = utils.cleanString(dimension);
 
-        if (utils.isElementVisible(d3.select('#rect_' + cleanString))) {
+        if (utils.isElementVisible(select('#rect_' + cleanString))) {
             const yScale = parcoords.yScales[dimension];
 
             const x = parcoords.xScales(dimension);
-            const y = yScale(recordData[dimension]);
+            const y = yScale(records[dimension]);
 
             const pt = svg.createSVGPoint();
             pt.x = x;
             pt.y = y;
             const screenPoint = pt.matrixTransform(svg.getScreenCTM());
 
-            d3.select('body')
+            select('body')
                 .append('div')
                 .attr('class', 'tooltip-div')
                 .style('position', 'absolute')
@@ -175,18 +176,18 @@ export function createToolTipForValues(recordData): void {
                 .style('font-weight', 'bold')
                 .style('padding', '0.12rem')
                 .style('white-space', 'nowrap')
-                .text(recordData[dimension].toString());
+                .text(records[dimension].toString());
         }
     });
 }
 
 export function getAllPointerEventsData(event: any, hoverlabel: string): any {
-    const selection = d3.selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
+    const selection = selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
     if (selection == null) return;
     const object = selection._groups;
     const data = [];
     for (let i = 0; i < object[0].length; i++) {
-        const items = object.map(item => item[i]);
+        const items = object.map((item: any[]) => item[i]);
         const itemsdata = items[0].__data__;
         const text = itemsdata[hoverlabel];
         data.push(text);
@@ -194,7 +195,7 @@ export function getAllPointerEventsData(event: any, hoverlabel: string): any {
     return data;
 }
 
-export function createTooltipForPathLine(tooltipText, tooltipPath, event) {
+export function createTooltipForPathLine(tooltipText: string | any[], tooltipPath: { text: (arg0: any) => { (): any; new(): any; style: { (arg0: string, arg1: string): { (): any; new(): any; style: { (arg0: string, arg1: string): { (): any; new(): any; style: { (arg0: string, arg1: string): void; new(): any; }; }; new(): any; }; }; new(): any; }; }; }, event: { clientX: number; clientY: number; }) {
     if (!tooltipText || tooltipText.length === 0) return;
     const [x, y] = utils.getMouseCoords(event);
     let tempText = tooltipText.toString();
@@ -217,6 +218,6 @@ export function position(dimensionName: any, dragging: any, xScales: any): any {
     return value == null ? xScales(dimensionName) : value;
 }
 
-export function cleanTooltip() {
-    d3.selectAll('.tooltip-div').remove();
+export function cleanTooltip(): void {
+    selectAll('.tooltip-div').remove();
 }

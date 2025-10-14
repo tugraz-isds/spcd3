@@ -3,84 +3,84 @@ import * as icon from './icons/icons';
 import * as pc from './parallelcoordinates';
 import * as io from './io';
 
-export function createToolbar(dataset) {
-  const toolbarRow = d3.select('#toolbarRow')
-    .style('display', 'flex')
-    .style('flex-wrap', 'wrap')
-    .style('align-items', 'center')
-    .style('font-size', '0.8vw')
-    .style('margin-top', '1rem')
-    .style('margin-left', '1rem')
-    .style('margin-bottom', '0');
+export function createToolbar(dataset: any[]): void {
+    const toolbarRow = d3.select('#toolbarRow')
+        .style('display', 'flex')
+        .style('flex-wrap', 'wrap')
+        .style('align-items', 'center')
+        .style('font-size', '0.8vw')
+        .style('margin-top', '1rem')
+        .style('margin-left', '1rem')
+        .style('margin-bottom', '0');
 
-  const toggleButton = toolbarRow.append('button')
-    .attr('id', 'toggleButton')
-    .attr('title', 'Expand toolbar')
-    .html(icon.getExpandToolbarIcon())
-    .style('margin', '0')
-    .style('border', 'none')
-    .style('border-radius', '10%')
-    .style('padding', '0.2em')
-    .style('width', '2em')
-    .style('height', '2em')
-    .style('cursor', 'pointer');
+    const toggleButton = toolbarRow.append('button')
+        .attr('id', 'toggleButton')
+        .attr('title', 'Expand toolbar')
+        .html(icon.getExpandToolbarIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '10%')
+        .style('padding', '0.2em')
+        .style('width', '2em')
+        .style('height', '2em')
+        .style('cursor', 'pointer');
 
-  const toolbar = toolbarRow.append('div')
-    .attr('id', 'toolbar')
-    .style('display', 'flex')
-    .style('overflow', 'hidden')
-    .style('max-width', '0')
-    .style('opacity', '0')
-    .style('transition', 'max-width 0.3s ease, opacity 0.3s ease')
-    .style('pointer-events', 'none');
+    const toolbar = toolbarRow.append('div')
+        .attr('id', 'toolbar')
+        .style('display', 'flex')
+        .style('overflow', 'hidden')
+        .style('max-width', '0')
+        .style('opacity', '0')
+        .style('transition', 'max-width 0.3s ease, opacity 0.3s ease')
+        .style('pointer-events', 'none');
 
-  toolbar.append('button')
-    .attr('id', 'showData')
-    .attr('title', 'Show table')
-    .html(icon.getTableIcon())
-    .style('margin', '0')
-    .style('border', 'none')
-    .style('border-radius', '5%')
-    .style('padding', '0.3em')
-    .style('width', '2em')
-    .style('height', '2em')
-    .on('click', () => showModalWithData(dataset));
+    toolbar.append('button')
+        .attr('id', 'showData')
+        .attr('title', 'Show table')
+        .html(icon.getTableIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '5%')
+        .style('padding', '0.3em')
+        .style('width', '2em')
+        .style('height', '2em')
+        .on('click', () => showModalWithData(dataset));
 
-  toolbar.append('button')
-    .attr('id', 'downloadButton')
-    .attr('title', 'Download SVG')
-    .html(icon.getDownloadButton())
-    .style('margin', '0')
-    .style('border', 'none')
-    .style('border-radius', '5%')
-    .style('padding', '0.3em')
-    .style('width', '2em')
-    .style('height', '2em')
-    .on('click', io.saveAsSvg);
+    toolbar.append('button')
+        .attr('id', 'downloadButton')
+        .attr('title', 'Download SVG')
+        .html(icon.getDownloadButton())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '5%')
+        .style('padding', '0.3em')
+        .style('width', '2em')
+        .style('height', '2em')
+        .on('click', io.saveAsSvg);
 
-  toolbar.append('button')
-    .attr('id', 'refreshButton')
-    .attr('title', 'Refresh')
-    .html(icon.getRefreshIcon())
-    .style('margin', '0')
-    .style('border', 'none')
-    .style('border-radius', '5%')
-    .style('padding', '0.3em')
-    .style('width', '2em')
-    .style('height', '2em')
-    .on('click', pc.refresh);
+    toolbar.append('button')
+        .attr('id', 'refreshButton')
+        .attr('title', 'Refresh')
+        .html(icon.getRefreshIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '5%')
+        .style('padding', '0.3em')
+        .style('width', '2em')
+        .style('height', '2em')
+        .on('click', pc.refresh);
 
-  toolbar.append('button')
-    .attr('id', 'resetButton')
-    .attr('title', 'Reset')
-    .html(icon.getResetIcon())
-    .style('margin', '0')
-    .style('border', 'none')
-    .style('border-radius', '5%')
-    .style('padding', '0.3em')
-    .style('width', '2em')
-    .style('height', '2em')
-    .on('click', pc.reset);
+    toolbar.append('button')
+        .attr('id', 'resetButton')
+        .attr('title', 'Reset')
+        .html(icon.getResetIcon())
+        .style('margin', '0')
+        .style('border', 'none')
+        .style('border-radius', '5%')
+        .style('padding', '0.3em')
+        .style('width', '2em')
+        .style('height', '2em')
+        .on('click', pc.reset);
 
     toggleButton.on('click', () => {
         let isExpanded = toolbar.style('max-width') !== '0px';
@@ -90,7 +90,7 @@ export function createToolbar(dataset) {
         toolbar.style('max-width', expanded ? '12.5rem' : '0')
             .style('opacity', expanded ? '1' : '0')
             .style('pointer-events', expanded ? 'auto' : 'none');
-            
+
         toggleButton.attr('title', expanded ? 'Collapse toolbar' : 'Expand toolbar');
 
         toggleButton.html(
@@ -100,7 +100,7 @@ export function createToolbar(dataset) {
 
 }
 
-function showModalWithData(dataset) {
+function showModalWithData(dataset: any[]): void {
 
     const overlay = d3.select('body')
         .append('div')
@@ -148,7 +148,7 @@ function showModalWithData(dataset) {
     modal.append(() => saveAsCSV);
 
     saveAsCSV.addEventListener('click', () => {
-        const reservedArray = dataset.map(entry => {
+        const reservedArray = dataset.map((entry: { [s: string]: unknown; } | ArrayLike<unknown>) => {
             const entries = Object.entries(entry).reverse();
             return Object.fromEntries(entries);
         });
@@ -188,12 +188,12 @@ function showModalWithData(dataset) {
     });
 }
 
-function generateTable(dataArray, table) {
+function generateTable(dataset: any[], table: HTMLTableElement) {
     table.innerHTML = '';
     table.style.borderCollapse = 'collapse';
     table.style.width = '100%';
 
-    const reservedArray = dataArray.map(entry => {
+    const reservedArray = dataset.map((entry: { [s: string]: unknown; } | ArrayLike<unknown>) => {
         const entries = Object.entries(entry).reverse();
         return Object.fromEntries(entries);
     });
@@ -211,10 +211,17 @@ function generateTable(dataArray, table) {
         th.style.position = 'sticky';
         th.style.top = '0';
         th.style.zIndex = '1';
-        th.style.textAlign = 'left';
         th.style.whiteSpace = 'nowrap';
         th.style.overflow = 'hidden';
-        th.style.textOverflow = 'ellipsis'; 
+        th.style.textOverflow = 'ellipsis';
+
+        const isNumericCol = reservedArray.every((row: { [x: string]: any; }) => {
+            const val = row[header];
+            return !isNaN(parseFloat(val)) && isFinite(val);
+        });
+
+        th.style.textAlign = isNumericCol ? 'right' : 'left';
+
         headRow.appendChild(th);
     });
 
@@ -223,7 +230,7 @@ function generateTable(dataArray, table) {
 
     const tbody = document.createElement('tbody');
 
-    reservedArray.forEach(obj => {
+    reservedArray.forEach((obj: { [x: string]: any; }) => {
         const row = document.createElement('tr');
         headers.forEach(key => {
             const td = document.createElement('td');
@@ -247,16 +254,16 @@ function generateTable(dataArray, table) {
     table.appendChild(tbody);
 }
 
-function downloadCSV(dataArray, filename = 'data.csv') {
-    if (!dataArray || !dataArray.length) return;
+function downloadCSV(dataset: any[], filename = 'data.csv') {
+    if (!dataset || !dataset.length) return;
 
-    const keys = Object.keys(dataArray[0]);
+    const keys = Object.keys(dataset[0]);
 
     const csvRows = [];
 
     csvRows.push(keys.join(','));
 
-    dataArray.forEach(row => {
+    dataset.forEach((row: { [x: string]: any; }) => {
         const values = keys.map(k => {
             const value = row[k];
             return typeof value === 'string' && value.includes(',')
