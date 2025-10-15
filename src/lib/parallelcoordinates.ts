@@ -141,7 +141,7 @@ export function moveByOne(dimension: string, direction: string): void {
     featureAxis.transition()
         .duration(1000)
         .attr('transform', function (d: { name: any; }) {
-            return 'translate(' + helper.position(d.name) + ')';
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(easeCubic);
 
@@ -213,7 +213,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
     featureAxis.transition()
         .duration(1000)
         .attr('transform', (d: { name: any; }) => {
-            return 'translate(' + helper.position(d.name) + ')';
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
         })
         .ease(easeCubic);
 
