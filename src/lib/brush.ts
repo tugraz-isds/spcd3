@@ -3,6 +3,7 @@ import { min, max } from 'd3-array';
 import * as icon from './icons/icons';
 import * as helper from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
+import * as api from './helperApiFunc';
 import { parcoords } from './globals';
 
 export function brushDown(cleanDimensionName: string, event: any, d: any,
@@ -414,13 +415,13 @@ function updateLines(dimension: string, cleanDimensionName: string): void {
     const rangeBottom = Number(select('#triangle_up_' + cleanDimensionName).attr('y'));
 
     const invertStatus = getInvertStatus(dimension);
-    const maxValue = invertStatus == false ? parcoords.yScales[dimension].domain()[1] :
-        parcoords.yScales[dimension].domain()[0];
+    const maxValue = invertStatus == false ? parcoords.yScales[dimension].domain()[1] : parcoords.yScales[dimension].domain()[0];
 
-    const minValue = invertStatus == false ? parcoords.yScales[dimension].domain()[0] :
-        parcoords.yScales[dimension].domain()[1];
+    const minValue = invertStatus == false ? parcoords.yScales[dimension].domain()[0] : parcoords.yScales[dimension].domain()[1];
 
     const range = maxValue - minValue;
+
+    let currentFilters = api.getFilter(dimension);
 
     if (isDimensionCategorical(dimension)) {
         const selectedCategories = parcoords.yScales[dimension].domain().filter((cat: any) => {
@@ -430,8 +431,8 @@ function updateLines(dimension: string, cleanDimensionName: string): void {
         addRange(selectedCategories, parcoords.currentPosOfDims, dimension, "currentFilterCategories");
     }
     else {
-        addRange(parcoords.yScales[dimension].invert(rangeBottom), parcoords.currentPosOfDims, dimension, "currentFilterBottom");
-        addRange(parcoords.yScales[dimension].invert(rangeTop), parcoords.currentPosOfDims, dimension, "currentFilterTop");
+        addRange(currentFilters[0], parcoords.currentPosOfDims, dimension, "currentFilterBottom");
+        addRange(currentFilters[1], parcoords.currentPosOfDims, dimension, "currentFilterTop");
     }
 
     let active = select('g.active').selectAll('path');

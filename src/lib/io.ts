@@ -4,7 +4,7 @@ import * as svgcreator from './svgStringCreator';
 import * as api from './helperApiFunc';
 import * as helper from './helper';
 import { create } from 'd3-selection';
-import { parcoords, height, padding, width, paddingXaxis, key } from './globals';
+import { parcoords, height, padding, width, key } from './globals';
 
 export function createSvgString(): string {
 
@@ -13,9 +13,9 @@ export function createSvgString(): string {
 
     const hiddenDims = api.getAllHiddenDimensionNames();
 
-    let yScalesForDownload = helper.setupYScales(height, padding, parcoords.features, parcoords.newDataset);
+    let yScalesForDownload = helper.setupYScales(parcoords.features, parcoords.newDataset);
     let yAxisForDownload = helper.setupYAxis(yScalesForDownload, parcoords.newDataset, hiddenDims);
-    let xScalesForDownload = helper.setupXScales(width, paddingXaxis, orderedFeatures);
+    let xScalesForDownload = helper.setupXScales(orderedFeatures);
 
     let svg = create('svg')
         .attr("xmlns", "http://www.w3.org/2000/svg")
@@ -49,10 +49,9 @@ export function createSvgString(): string {
         .attr('height', 10)
         .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
 
+    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, xScalesForDownload);
 
-    svgcreator.setActivePathLinesToDownload(svg, parcoords, key);
-
-    svgcreator.setFeatureAxisToDownload(svg, yAxisForDownload, yScalesForDownload, parcoords, padding, xScalesForDownload);
+    svgcreator.setActivePathLinesToDownload(svg);
 
     return svg.node().outerHTML;
 }

@@ -172,14 +172,14 @@ function filterMenu(dimension: string): void {
       const header = dimension.length > 25 ? dimension.substr(0, 25) + '...' : 
       dimension;
       select('#headerDimensionFilter').text(header);
-      
-      select('#buttonFilter').on('click', () => {
-        handleFilterButton(dimension);
-        select('#closeButtonFilter').on('click', () => {
+      select('#closeButtonFilter').on('click', () => {
         select('#errorFilter').style('display', 'none');
         select('#modalFilter').style('display', 'none');
         select('#modalOverlayFilter').style('display', 'none');
       });
+      
+      select('#buttonFilter').on('click', () => {
+        handleFilterButton(dimension);
       select('#contextmenu').style('display', 'none');
       event.stopPropagation();
     });
@@ -468,8 +468,7 @@ function onDragEventHandler(featureAxis: any): any {
       parcoords.xScales.domain(parcoords.newFeatures);
 
       featureAxis.attr('transform', (d: { name: any; }) => {
-        return 'translate(' + helper.position(d.name, parcoords.dragging, 
-          parcoords.xScales) + ')';
+        return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
       });
     }
   }
@@ -484,13 +483,12 @@ function onDragEndEventHandler(featureAxis: any): any {
       if (parcoords.dragPosStart[(d.subject).name] > parcoords.dragging[(d.
         subject).name]) {
         featureAxis.attr('transform', (d: { name: any; }) => {
-          return 'translate(' + helper.position(d.name, init - distance, 
-          parcoords.xScales) + ')';
+          return 'translate(' + helper.position(d.name, init - distance, parcoords.xScales) + ')';
         })
       }
       else {
         featureAxis.attr('transform', (d: { name: any; }) => {
-          return 'translate(' + helper.position(d.name, init + distance, parcoords.xScales) + ')';
+          return 'translate(' + helper.position(d.name, init - distance, parcoords.xScales) + ')';
         })
       }
       delete this.__origin__;

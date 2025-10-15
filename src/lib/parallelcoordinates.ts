@@ -141,7 +141,7 @@ export function moveByOne(dimension: string, direction: string): void {
     featureAxis.transition()
         .duration(1000)
         .attr('transform', function (d: { name: any; }) {
-            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+            return 'translate(' + helper.position(d.name) + ')';
         })
         .ease(easeCubic);
 
@@ -213,7 +213,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
     featureAxis.transition()
         .duration(1000)
         .attr('transform', (d: { name: any; }) => {
-            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+            return 'translate(' + helper.position(d.name) + ')';
         })
         .ease(easeCubic);
 
@@ -453,8 +453,8 @@ function setUpParcoordData(data: any, newFeatures: []): void {
     setFeatures(dataset[0]);
     setNewDataset(dataset[1]);
 
-    setXScales(helper.setupXScales(width, paddingXaxis, dataset[0]));
-    setYScales(helper.setupYScales(height, padding, dataset[0], dataset[1]));
+    setXScales(helper.setupXScales(dataset[0]));
+    setYScales(helper.setupYScales(dataset[0], dataset[1]));
     setNewFeatures(newFeatures);
     setData(data);
 
@@ -547,7 +547,7 @@ const handlePointerEnter = (event: any, d: any) => {
     clearExistingDelay();
     doNotHighlight();
 
-    const data = helper.getAllPointerEventsData(event, hoverlabel);
+    const data = helper.getAllPointerEventsData(event);
 
     highlight(data);
     helper.createTooltipForPathLine(data, tooltipTest, event);
@@ -660,7 +660,7 @@ function setActivePathLines(svg: any, content: any,
         .on('mouseout', handlePointerLeaveOrOut)
         .on('mouseleave', handlePointerLeaveOrOut)
         .on('click', function (event: { metaKey: any; shiftKey: any; ctrlKey: any; stopPropagation: () => void; }, d: any) {
-            const data = helper.getAllPointerEventsData(event, hoverlabel);
+            const data = helper.getAllPointerEventsData(event);
             const selectedRecords = getSelected();
 
             if (event.metaKey || event.shiftKey) {
