@@ -17,8 +17,6 @@ declare const window: any;
 
 //---------- Invert Functions ----------
 
-
-
 export function invertWoTransition(dimension: string): void {
     const cleanDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + cleanDimensionName;
@@ -53,7 +51,6 @@ export function invertWoTransition(dimension: string): void {
         brush.addInvertStatus(false, dimension, "isInverted");
     }
 }
-
 
 
 export function setInversionStatus(dimension: string, status: string): void {
@@ -839,7 +836,7 @@ function setFeatureAxis(svg: any, yAxis: any,
 
     setMarker(featureAxis);
 
-    context.setContextMenu(featureAxis, padding, parcoords, width);
+    context.setContextMenu(featureAxis);
 
     setInvertIcon(featureAxis, padding);
 }
