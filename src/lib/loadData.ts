@@ -6,7 +6,30 @@ export function loadCSV(csv: string): any {
     csv = removeDuplicateColumnNames(csv);
   }
   let tempData = csvParse(csv);
+  
+  let isComplete = checkDatasetCompleteness(tempData);
+  if (!isComplete) return;
+
   return tempData.sort((a: { Name: number; }, b: { Name: number; }) => a.Name > b.Name ? 1 : -1);
+}
+
+function checkDatasetCompleteness(tempData: any): boolean {
+    const invalidRows = tempData.filter(d =>
+    tempData.columns.some(col => d[col] === "" || d[col] == null || d[col].trim() === "")
+  );
+
+  const box = document.getElementById("parallelcoords");
+
+  if (invalidRows.length > 0) {
+    box.innerHTML = `Dataset is incomplete!<br>
+      <strong style="color:#e74c3c;">⚠️ ${invalidRows.length} row(s) affected:</strong>
+      <pre>${JSON.stringify(invalidRows.slice(0, 5), null, 2)}</pre>
+    `;
+    box.style.marginLeft = "2em";
+    box.style.paddingTop = "2em";
+    return false;
+  }
+  return true;
 }
 
 function removeDuplicateColumnNames(value: string): any {

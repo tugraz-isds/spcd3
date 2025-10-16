@@ -470,7 +470,7 @@ function updateLines(dimension: string, cleanDimensionName: string): void {
         }
         else if (dimNameToCheck == dimension && dimNameToCheck != emptyString) {
             let checkedLines = [];
-            parcoords.currentPosOfDims.forEach(function (item) {
+            parcoords.currentPosOfDims.forEach(function (item: { top: number; bottom: number; }) {
                 if (item.top != 80 || item.bottom != 320) {
                     checkAllPositionsTop(item, dimension, d,
                         checkedLines, currentLine);
@@ -613,13 +613,16 @@ export function addSettingsForBrushing(dimension: string,
     const processedName = helper.cleanString(dimension);
     const yScale = parcoords.yScales[processedName];
 
-    const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === processedName);
+    const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
     let top: number, bottom: number;
+    console.log(parcoords.currentPosOfDims);
     if (isDimensionCategorical(dimension)) {
-        let categories = dimensionSettings.currentFilterCategories;
-        let positions = categories.map((cat: any) => yScale(cat));
-        top = min(positions);
-        bottom = max(positions);
+        const domain = yScale.domain();
+        const sorted = domain.slice().sort((a: any, b: any) => yScale(a) - yScale(b));
+        const topCategory = sorted[0];
+        const bottomCategory = sorted[sorted.length - 1];
+        top = yScale(topCategory);
+        bottom = yScale(bottomCategory);
     }
     else {
         top = yScale(dimensionSettings.currentFilterTop);
@@ -653,6 +656,7 @@ export function addSettingsForBrushing(dimension: string,
 
     addPosition(top, dimension, 'top');
     addPosition(bottom, dimension, 'bottom');
+    console.log(parcoords.currentPosOfDims);
 }
 
 function getInvertStatus(key: any): boolean {

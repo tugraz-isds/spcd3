@@ -318,7 +318,6 @@ export function setUnselectedWithId(recordId: string): void {
 
 export function drawChart(content: []): void {
     setRefreshData(structuredClone(content));
-
     deleteChart();
 
     let newFeatures = content['columns'].reverse();
@@ -327,7 +326,14 @@ export function drawChart(content: []): void {
 
     const height = 360;
 
-    const wrapper = select('#parallelcoords')
+    let wrapper = select('#parallelcoords');
+
+    if (wrapper === null)
+        wrapper = select<HTMLBodyElement, unknown>(document.body)
+        .append<HTMLDivElement>("div")
+        .attr('id', 'parallelcoords');
+
+    wrapper
         .style('display', 'block')
         .style('width', '100%')
         .style('margin', '0')
@@ -418,6 +424,7 @@ export function deleteChart(): void {
     select('#refreshButton').remove();
     select('#showData').remove();
     select('#toolbarRow').remove();
+    parcoords.currentPosOfDims.length = 0;
 }
 
 //---------- Helper Functions ----------

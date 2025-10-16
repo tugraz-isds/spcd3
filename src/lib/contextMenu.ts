@@ -107,7 +107,6 @@ function showAllMenu(): void {
 function resetFilterMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
     select('#resetfilterMenu')
-      .style('visibility', 'hidden')
       .style('color', 'lightgrey');
     return;
   }
@@ -135,8 +134,7 @@ function filterMenu(dimension: string): void {
   filterMenu.style('border-top', '0.08rem lightgrey solid');
 
   if (api.isDimensionCategorical(dimension)) {
-    filterMenu.style('visibility', 'hidden')
-      .style('color', 'lightgrey');
+    filterMenu.style('color', 'lightgrey');
       return;
   }
         
@@ -239,7 +237,6 @@ function handleFilterButton(dimension: string): void {
 function resetRoundRangeMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
     select('#resetRoundRangeMenu')
-      .style('visibility', 'hidden')
       .style('color', 'lightgrey');
     return;
   }
@@ -278,8 +275,7 @@ function setRangeMenu(dimension: string): void {
   rangeMenu.style('border-top', '0.08rem lightgrey solid');
 
   if (api.isDimensionCategorical(dimension)) {
-    rangeMenu.style('visibility', 'hidden')
-      .style('color', 'lightgrey')
+    rangeMenu.style('color', 'lightgrey')
     return;
   }
         
