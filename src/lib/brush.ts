@@ -43,7 +43,17 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
             .style('cursor', 'default');
     }
     else {
-        select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
+        select('#rect_' + cleanDimensionName)
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
+    }
+
+    if (yPosTop == 70) {
+         select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom');
+    }
+    else {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom_active');
     }
 
     select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
@@ -86,10 +96,22 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
 
     if (yPosTop == 70 && yPosBottom == 320) {
         select('#rect_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active')
             .style('cursor', 'default');
     }
     else {
-        select('#rect_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
+        select('#rect_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active')
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
+    }
+
+    if (yPosBottom == 320) {
+         select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top');
+    }
+    else {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active');
     }
 
     select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
@@ -142,6 +164,24 @@ export function dragAndBrush(cleanDimensionName: any, d: any, event: any,
     addPosition(yPosRect, d.name, 'top');
     addPosition(yPosRect + rectHeight, d.name, 'bottom');
 
+    if (yPosTop == 70) {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom');
+    }
+    else {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom_active');
+    }
+
+    if (yPosBottom == 320) {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top');
+    }
+    else {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active');
+    }
+
     if (rectHeight < 240) {
         select('#rect_' + cleanDimensionName)
             .attr('y', yPosRect);
@@ -191,6 +231,24 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .transition()
         .duration(1000)
         .attr('y', rectY + rectHeight);
+
+    if (topPosition == 80) {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom');
+    }
+    else {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom_active');
+    }
+
+    if (bottomPosition == 320) {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top');
+    }
+    else {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active');
+    }
 
     let active = select('g.active').selectAll('path');
 

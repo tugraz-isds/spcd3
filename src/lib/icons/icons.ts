@@ -6,6 +6,10 @@ export function getArrowBottom(): string {
     return '<?xml version="1.0" encoding="UTF-8"?>\r\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="yellow" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 0 L 6 0 L 3 5 z"/></svg>';
 }
 
+export function getArrowBottomActive(): string {
+    return '<?xml version="1.0" encoding="UTF-8"?>\r\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="red" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 0 L 6 0 L 3 5 z"/></svg>';
+}
+
 export function getArrowDown(): string {
     return '<?xml version="1.0" encoding="UTF-8"?>\r\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10"><path d="M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z"/></svg>';
 }
@@ -36,6 +40,10 @@ export function getArrowTopCursor(): string {
 
 export function getArrowTop(): string {
     return '<?xml version="1.0" encoding="UTF-8"?>\r\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="yellow" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 5 L 3 0 L 6 5 z"/></svg>';
+}
+
+export function getArrowTopActive(): string {
+    return '<?xml version="1.0" encoding="UTF-8"?>\r\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5"><path fill="red" fill-opacity="0.4" stroke="black" stroke-width="0.2" d="M 0 5 L 3 0 L 6 5 z"/></svg>';
 }
 
 export function getArrowUp(): string {

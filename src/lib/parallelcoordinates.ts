@@ -886,6 +886,18 @@ function setDefsForIcons(): void {
         .attr('width', 14)
         .attr('height', 10)
         .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottom());
+
+    defs.append('image')
+        .attr('id', 'brush_image_top_active')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowTopActive());
+
+    defs.append('image')
+        .attr('id', 'brush_image_bottom_active')
+        .attr('width', 14)
+        .attr('height', 10)
+        .attr('href', 'data:image/svg+xml;,' + icon.getArrowBottomActive());
 }
 
 // Hovering

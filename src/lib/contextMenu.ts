@@ -315,6 +315,7 @@ function handleRangeButton(dimension: string): void {
   const newText = dimension.length > 25 ? dimension.substr(0, 25) + '...' : 
   dimension;
   select('#headerDimensionRange').text(newText);
+  select('#infoRange3').text('Range values must be below the minimum and above the maximum data value.');
   select('#infoRange').text('The current range of ' + dimension + ' is between ' + minValue + ' and ' + maxValue + '.');
   select('#infoRange2').text('The original range of ' + dimension + ' is between ' + api.getMinValue(dimension) + ' and ' + api.getMaxValue(dimension) + '.');
   select('#buttonRange').on('click', () => {
@@ -590,6 +591,7 @@ function createModalToSetRange(): void {
   createModalTitle(modalSetRange, 'Set Range for ');
   createCloseButton(modalSetRange, 'closeButtonRange');
   createHeader(modalSetRange, 'headerDimensionRange');
+  createInfoMessage(modalSetRange, 'infoRange3');
   createInfoMessage(modalSetRange, 'infoRange');
   createInfoMessage(modalSetRange, 'infoRange2');
   createInputFieldWithLabel(modalSetRange, 'Min', 'minRangeValue');
