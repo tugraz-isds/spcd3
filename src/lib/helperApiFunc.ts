@@ -364,6 +364,7 @@ export function invert(dimension: string): void {
     const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
     const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
     textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
+    textElement.title('Invert');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 

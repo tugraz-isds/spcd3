@@ -976,7 +976,9 @@ function setInvertIcon(featureAxis: any, padding: number): void {
             select(this)
                 .attr('id', 'dimension_invert_' + processedDimensionName)
                 .text('up')
-                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
+                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`)
+                .append("title")
+                .text("Invert");
         })
         .on('click', (event: { stopPropagation: () => void; }, d: { name: string; }) => {
             api.invert(d.name);
@@ -1091,7 +1093,11 @@ function setBrushUp(featureAxis: any, parcoords: {
                         brushOverlay.style("pointer-events", "none");
                         tooltipValues.style('visibility', 'hidden');
                     }));
-        });
+                select('#triangle_up_' + processedDimensionName)
+                  .append('title')
+                  .text('Filter');
+            });
+        
 }
 
 function setBrushDown(featureAxis: any, parcoords: {
@@ -1113,6 +1119,8 @@ function setBrushDown(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
+                .append("title")
+                .text("Filter")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
@@ -1130,5 +1138,9 @@ function setBrushDown(featureAxis: any, parcoords: {
                         brushOverlay.style("pointer-events", "none");
                         tooltipValues.style('visibility', 'hidden');
                     }));
+                
+                select('#triangle_down_' + processedDimensionName)
+                  .append('title')
+                  .text('Filter');
         });
 }
