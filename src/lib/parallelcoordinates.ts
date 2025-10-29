@@ -1027,7 +1027,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('x', -6)
                 .attr('y', 80)
                 .attr('fill', 'rgb(255, 255, 0)')
-                .attr('opacity', '0.4')
+                .attr('opacity', '0.5')
                 .style('cursor', 'default')
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();

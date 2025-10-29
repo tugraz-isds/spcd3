@@ -50,10 +50,16 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
     if (yPosTop == 70) {
          select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.5');
     }
     else {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom_active');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(234, 234, 40)')
+            .attr('opacity', '0.5');
     }
 
     select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
