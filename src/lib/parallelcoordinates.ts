@@ -1,5 +1,5 @@
 import 'd3-transition';
-import { select, selectAll} from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { easeCubic } from 'd3-ease';
 import * as brush from './brush';
@@ -330,8 +330,8 @@ export function drawChart(content: []): void {
 
     if (wrapper === null)
         wrapper = select<HTMLBodyElement, unknown>(document.body)
-        .append<HTMLDivElement>("div")
-        .attr('id', 'parallelcoords');
+            .append<HTMLDivElement>("div")
+            .attr('id', 'parallelcoords');
 
     wrapper
         .style('display', 'block')
@@ -700,7 +700,7 @@ function setActivePathLines(svg: any, content: any,
 const delay1 = 50;
 export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
 
-function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any):void {
+function setContextMenuForActiceRecords(contextMenu: any, event: any, d: any): void {
     const container = document.querySelector("#parallelcoords");
     const rect = container.getBoundingClientRect();
 
@@ -1060,43 +1060,62 @@ function setBrushUp(featureAxis: any, parcoords: {
     dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
 }, tooltipValues: any, brushOverlay: any): void {
 
-    featureAxis
-        .each(function (d: { name: string; }) {
-            const processedDimensionName = utils.cleanString(d.name);
-            select(this)
-                .append('g')
-                .attr('class', 'brush_' + processedDimensionName)
-                .append('use')
-                .attr('id', 'triangle_up_' + processedDimensionName)
-                .attr('y', 320)
-                .attr('x', -7)
-                .attr('width', 14)
-                .attr('height', 10)
-                .attr('href', '#brush_image_top')
-                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
-                .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
-                    event.preventDefault();
+    featureAxis.each(function (d: { name: string }) {
+        const processedDimensionName = utils.cleanString(d.name);
+
+        const g = select(this)
+            .append('g')
+            .attr('class', 'brush_' + processedDimensionName);
+
+        g.append('use')
+            .attr('id', 'triangle_up_' + processedDimensionName)
+            .attr('x', -7)
+            .attr('y', 320)
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', '#brush_image_top')
+            .attr('pointer-events', 'none')
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+
+        const handle = g.append('rect')
+            .attr('x', -7)
+            .attr('y', 320)
+            .attr('width', 14)
+            .attr('height', 10)
+            .style('fill', 'transparent')
+            .style('pointer-events', 'all')
+            .style('touch-action', 'none')
+            .style('-webkit-user-select', 'none')
+            .style('user-select', 'none')
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+
+        handle.call(
+            drag()
+                .container(function () { return (this as any).ownerSVGElement || this; })
+                .on('start', (event: any) => {
+                    brushOverlay
+                        .raise()
+                        .style('pointer-events', 'all')
+                        .style('touch-action', 'none')
+                        .style('-webkit-user-select', 'none')
+                        .style('user-select', 'none');
+                    try { event.sourceEvent?.preventDefault?.(); } catch { }
                 })
-                .call(drag()
-                    .on('drag', (event: any, d: any) => {
-                        brushOverlay.raise()
-                        .style("pointer-events", "all")
-                        .style("touch-action", "none")
-                        .style("-webkit-user-select", "none")
-                        .style("user-select", "none");
-                        if (parcoords.newFeatures.length > 25) {
-                            brush.throttleBrushUp(processedDimensionName, event, d, tooltipValues, window);
-                        }
-                        else {
-                            brush.brushUp(processedDimensionName, event, d, tooltipValues, window);
-                        }
-                    })
-                    .on('end', () => {
-                        brushOverlay.style("pointer-events", "none");
-                        tooltipValues.style('visibility', 'hidden');
-                    }));
-            });
-        
+                .on('drag', (event: any, dd: any) => {
+                    if (parcoords.newFeatures.length > 25) {
+                        brush.throttleBrushUp(processedDimensionName, event, dd, tooltipValues, window);
+                    } else {
+                        brush.brushUp(processedDimensionName, event, dd, tooltipValues, window);
+                    }
+                })
+                .on('end', () => {
+                    brushOverlay.style('pointer-events', 'none');
+                    tooltipValues.style('visibility', 'hidden');
+                })
+        );
+    });
+
+
 }
 
 function setBrushDown(featureAxis: any, parcoords: {
@@ -1104,40 +1123,59 @@ function setBrushDown(featureAxis: any, parcoords: {
     dragPosStart: {}; currentPosOfDims: any[]; newFeatures: any; features: any[]; newDataset: any[];
 }, tooltipValues: any, brushOverlay: any): void {
 
-    featureAxis
-        .each(function (d: { name: string; }) {
-            const processedDimensionName = utils.cleanString(d.name);
-            select(this)
-                .append('g')
-                .attr('class', 'brush_' + processedDimensionName)
-                .append('use')
-                .attr('id', 'triangle_down_' + processedDimensionName)
-                .attr('y', 70)
-                .attr('x', -7)
-                .attr('width', 14)
-                .attr('height', 10)
-                .attr('href', '#brush_image_bottom')
-                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
-                .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
-                    event.preventDefault();
+    featureAxis.each(function (d: { name: string }) {
+        const processedDimensionName = utils.cleanString(d.name);
+
+        const g = select(this)
+            .append('g')
+            .attr('class', 'brush_' + processedDimensionName);
+
+        g.append('use')
+            .attr('id', 'triangle_down_' + processedDimensionName)
+            .attr('x', -7)
+            .attr('y', 70)
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', '#brush_image_bottom')
+            .attr('pointer-events', 'none');
+
+        const handle = g.append('rect')
+            .attr('x', -7)
+            .attr('y', 70)
+            .attr('width', 14)
+            .attr('height', 10)
+            .style('fill', 'transparent')
+            .style('pointer-events', 'all')
+            .style('touch-action', 'none')
+            .style('-webkit-user-select', 'none')
+            .style('user-select', 'none')
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+
+        handle.call(
+            drag()
+                .container(function () { return (this as any).ownerSVGElement || this; })
+                .on('start', (event: any, dd: any) => {
+                    brushOverlay
+                        .raise()
+                        .style('pointer-events', 'all')
+                        .style('touch-action', 'none')
+                        .style('-webkit-user-select', 'none')
+                        .style('user-select', 'none');
+
+                    try { event.sourceEvent?.preventDefault?.(); } catch { }
                 })
-                .call(drag()
-                    .on('drag', (event: any, d: any) => {
-                        brushOverlay.raise()
-                        .style("touch-action", "none")
-                        .style("-webkit-user-select", "none")
-                        .style("user-select", "none")
-                        .style("pointer-events", "all");
-                        if (parcoords.newFeatures.length > 25) {
-                            brush.throttleBrushDown(processedDimensionName, event, d, tooltipValues, window);
-                        }
-                        else {
-                            brush.brushDown(processedDimensionName, event, d, tooltipValues, window);
-                        }
-                    })
-                    .on('end', () => {
-                        brushOverlay.style("pointer-events", "none");
-                        tooltipValues.style('visibility', 'hidden');
-                    }));
-        });
+                .on('drag', (event: any, dd: any) => {
+                    if (parcoords.newFeatures.length > 25) {
+                        brush.throttleBrushDown(processedDimensionName, event, dd, tooltipValues, window);
+                    } else {
+                        brush.brushDown(processedDimensionName, event, dd, tooltipValues, window);
+                    }
+                })
+                .on('end', () => {
+                    brushOverlay.style('pointer-events', 'none');
+                    tooltipValues.style('visibility', 'hidden');
+                })
+        );
+    });
+
 }
