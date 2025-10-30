@@ -10,7 +10,6 @@ export function createToolbar(dataset: any[]): void {
         .style('align-items', 'center')
         .style('font-size', '0.8vw')
         .style('margin-top', '1rem')
-        .style('margin-left', '1rem')
         .style('margin-bottom', '0');
 
     const toggleButton = toolbarRow.append('button')

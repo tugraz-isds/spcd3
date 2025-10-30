@@ -434,7 +434,7 @@ export function deleteChart(): void {
 
 function setUpParcoordData(data: any, newFeatures: []): void {
 
-    setPadding(80);
+    setPadding(60);
     setPaddingXaxis(60);
     setWidth(newFeatures.length * 100);
     setHeight(400);
@@ -959,7 +959,7 @@ function clearSelection(): void {
 
 
 function setInvertIcon(featureAxis: any, padding: number): void {
-    let value = (padding / 1.5).toFixed(4);
+    let value = (80 / 1.5).toFixed(4);
 
     featureAxis
         .append('svg')
@@ -1029,6 +1029,10 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.5')
                 .style('cursor', 'default')
+                .style("touch-action", "none")
+                .style("-webkit-user-select", "none")
+                .style("user-select", "none")
+                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
@@ -1074,6 +1078,11 @@ function setBrushUp(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
+                .style('cursor', 'default')
+                .style("touch-action", "none")
+                .style("-webkit-user-select", "none")
+                .style("user-select", "none")
+                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
@@ -1114,6 +1123,11 @@ function setBrushDown(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
+                .style('cursor', 'default')
+                .style("touch-action", "none")
+                .style("-webkit-user-select", "none")
+                .style("user-select", "none")
+                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })

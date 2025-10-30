@@ -31,7 +31,7 @@ export function setupYScales(header: any, dataset: any): any {
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([padding, height - padding])
+        .range([80, height - 80])
         .padding(0.2);
       }
       else {
@@ -43,11 +43,11 @@ export function setupYScales(header: any, dataset: any): any {
           const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
           yScales[x.name] = scaleLinear()
             .domain([min - epsilon, max + epsilon])
-            .range([height - padding, padding]);
+            .range([height - 80, 80]);
         } else {
           yScales[x.name] = scaleLinear()
             .domain([min, max])
-            .range([height - padding, padding]);
+            .range([height - 80, 80]);
           }
       }
   });
