@@ -1029,10 +1029,6 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('fill', 'rgb(255, 255, 0)')
                 .attr('opacity', '0.5')
                 .style('cursor', 'default')
-                .style("touch-action", "none")
-                .style("-webkit-user-select", "none")
-                .style("user-select", "none")
-                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
@@ -1078,17 +1074,16 @@ function setBrushUp(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_top')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`)
-                .style('cursor', 'default')
-                .style("touch-action", "none")
-                .style("-webkit-user-select", "none")
-                .style("user-select", "none")
-                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
                 .call(drag()
                     .on('drag', (event: any, d: any) => {
-                        brushOverlay.raise().style("pointer-events", "all");
+                        brushOverlay.raise()
+                        .style("pointer-events", "all")
+                        .style("touch-action", "none")
+                        .style("-webkit-user-select", "none")
+                        .style("user-select", "none");
                         if (parcoords.newFeatures.length > 25) {
                             brush.throttleBrushUp(processedDimensionName, event, d, tooltipValues, window);
                         }
@@ -1123,17 +1118,16 @@ function setBrushDown(featureAxis: any, parcoords: {
                 .attr('height', 10)
                 .attr('href', '#brush_image_bottom')
                 .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`)
-                .style('cursor', 'default')
-                .style("touch-action", "none")
-                .style("-webkit-user-select", "none")
-                .style("user-select", "none")
-                .style("pointer-events", "all")
                 .on('mousedown.selection', function (event: { preventDefault: () => void; }) {
                     event.preventDefault();
                 })
                 .call(drag()
                     .on('drag', (event: any, d: any) => {
-                        brushOverlay.raise().style("pointer-events", "all");
+                        brushOverlay.raise()
+                        .style("touch-action", "none")
+                        .style("-webkit-user-select", "none")
+                        .style("user-select", "none")
+                        .style("pointer-events", "all");
                         if (parcoords.newFeatures.length > 25) {
                             brush.throttleBrushDown(processedDimensionName, event, d, tooltipValues, window);
                         }
