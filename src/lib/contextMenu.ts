@@ -677,7 +677,7 @@ function createInputFieldWithLabel(modal: any, text: string, inputId: string): v
   const input = document.createElement('input');
   input.type = 'number';
   input.id = inputId;
-  input.style.width = '3rem';
+  input.style.width = '4.5rem';
   input.style.border = '0.1rem solid lightgrey';
   input.style.borderRadius = "5%";
   modal.append(() => input);

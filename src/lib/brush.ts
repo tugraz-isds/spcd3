@@ -233,7 +233,17 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .duration(1000)
         .attr('y', rectY - 10);
 
+    select('#triangle_down_hit' + cleanDimensionName)
+        .transition()
+        .duration(1000)
+        .attr('y', rectY - 10);
+
     select('#triangle_up_' + cleanDimensionName)
+        .transition()
+        .duration(1000)
+        .attr('y', rectY + rectHeight);
+
+    select('#triangle_up_hit' + cleanDimensionName)
         .transition()
         .duration(1000)
         .attr('y', rectY + rectHeight);
@@ -241,6 +251,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
     if (topPosition == 80) {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
+
     }
     else {
         select('#triangle_down_' + cleanDimensionName)
@@ -679,7 +690,6 @@ export function addSettingsForBrushing(dimension: string,
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
     let top: number, bottom: number;
-    console.log(parcoords.currentPosOfDims);
     if (isDimensionCategorical(dimension)) {
         const domain = yScale.domain();
         const sorted = domain.slice().sort((a: any, b: any) => yScale(a) - yScale(b));
@@ -720,7 +730,6 @@ export function addSettingsForBrushing(dimension: string,
 
     addPosition(top, dimension, 'top');
     addPosition(bottom, dimension, 'bottom');
-    console.log(parcoords.currentPosOfDims);
 }
 
 function getInvertStatus(key: any): boolean {
