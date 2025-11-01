@@ -244,6 +244,8 @@ export function setSelection(records: string[]): void {
                 .classed('selected', true)
                 .transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
+        //const data = parcoords.data.find(d => d.Name === records[i]);
+        //helper.createToolTipForValues(data, String(i));
         }
     }
 }
@@ -989,27 +991,43 @@ function clearSelection(): void {
 function setInvertIcon(featureAxis: any, padding: number): void {
     let value = (80 / 1.5).toFixed(4);
 
-    featureAxis
-        .append('svg')
-        .attr('y', value)
-        .attr('x', -6)
-        .append('use')
-        .attr('width', 12)
-        .attr('height', 12)
-        .attr('y', 0)
-        .attr('x', 0)
-        .attr('href', '#arrow_image_up')
-        .each(function (d: { name: string; }) {
-            const processedDimensionName = utils.cleanString(d.name);
-            select(this)
-                .attr('id', 'dimension_invert_' + processedDimensionName)
-                .text('up')
-                .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
-        })
-        .on('click', (event: { stopPropagation: () => void; }, d: { name: string; }) => {
-            api.invert(d.name);
-            event.stopPropagation();
-        });
+  const svg = featureAxis
+    .append('svg')
+    .attr('x', -6 - 22)
+    .attr('y', Number(value) - 22)
+    .attr('width', 44)
+    .attr('height', 22)
+    .style('overflow', 'visible') 
+
+  svg.append('rect')
+    .attr('class', 'hitbox')
+    .attr('x', 6)
+    .attr('y', 20)
+    .attr('width', 44)
+    .attr('height', 22)
+    .attr('rx', 6)
+    .attr('ry', 6)
+    .attr('fill', 'transparent')
+    .style('pointer-events', 'all');
+
+  svg.append('use')
+    .attr('href', '#arrow_image_up')
+    .attr('width', 12)
+    .attr('height', 12)
+    .attr('x', 22.5)
+    .attr('y', Number(value)-33)
+    .each(function (d: { name: string }) {
+      const processed = utils.cleanString(d.name);
+      select(this)
+        .attr('id', 'dimension_invert_' + processed)
+        .text('up')
+        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
+    });
+
+  svg.on('click', (event: any, d: { name: string }) => {
+    api.invert(d.name);
+    event.stopPropagation();
+  });
 }
 
 function setMarker(featureAxis: any): void {
@@ -1104,16 +1122,15 @@ function setBrushUp(featureAxis: any, parcoords: {
       const hit = g.append('rect')
         .attr('class', 'handle-hitbox')
         .attr('id', 'triangle_up_hit' + processedDimensionName)
-        .attr('x', iconX)
+        .attr('x', -15)
         .attr('y', iconY)
-        .attr('width', iconW)
-        .attr('height', iconH)
+        .attr('width', 30)
+        .attr('height', 30)
         .style('fill', 'transparent')
         .style('pointer-events', 'all')
         .style('touch-action', 'none')
         .style('-webkit-user-select', 'none')
-        .style('user-select', 'none')
-        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+        .style('user-select', 'none');
 
       function cleanup() {
         brushOverlay.style('pointer-events', 'none').lower();
@@ -1176,16 +1193,15 @@ featureAxis.each(function (d: { name: string }) {
       const hit = g.append('rect')
         .attr('class', 'handle-hitbox')
         .attr('id', 'triangle_down_hit' + processedDimensionName)
-        .attr('x', iconX)
+        .attr('x', -15)
         .attr('y', iconY)
-        .attr('width', iconW)
-        .attr('height', iconH)
+        .attr('width', 30)
+        .attr('height', 30)
         .style('fill', 'transparent')
         .style('pointer-events', 'all')
         .style('touch-action', 'none')
         .style('-webkit-user-select', 'none')
-        .style('user-select', 'none')
-        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+        .style('user-select', 'none');
 
       function cleanup() {
         brushOverlay.style('pointer-events', 'none').lower();

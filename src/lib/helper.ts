@@ -212,8 +212,7 @@ export function createToolTipForValues(records: any, recKey?: string) {
       .style('z-index', '9999')
       .style('left', d => `${d.pageX}px`)
       .style('top',  d => `${d.pageY}px`)
-      .text(d => d.text),
-    update => update
+      .text(d => d.text), update => update
       .style('left', d => `${d.pageX}px`)
       .style('top',  d => `${d.pageY}px`)
       .text(d => d.text),
