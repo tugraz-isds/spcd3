@@ -104,11 +104,17 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
             .style('cursor', 'default');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(234, 234, 40)')
+            .attr('opacity', '0.5');
     }
     else {
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.5');
     }
 
     if (yPosBottom == 320) {

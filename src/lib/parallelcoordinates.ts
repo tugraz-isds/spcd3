@@ -1130,7 +1130,8 @@ function setBrushUp(featureAxis: any, parcoords: {
         .style('pointer-events', 'all')
         .style('touch-action', 'none')
         .style('-webkit-user-select', 'none')
-        .style('user-select', 'none');
+        .style('user-select', 'none')
+        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);;
 
       function cleanup() {
         brushOverlay.style('pointer-events', 'none').lower();
@@ -1201,7 +1202,8 @@ featureAxis.each(function (d: { name: string }) {
         .style('pointer-events', 'all')
         .style('touch-action', 'none')
         .style('-webkit-user-select', 'none')
-        .style('user-select', 'none');
+        .style('user-select', 'none')
+        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);;
 
       function cleanup() {
         brushOverlay.style('pointer-events', 'none').lower();
