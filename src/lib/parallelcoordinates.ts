@@ -1054,7 +1054,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('height', 240)
                 .attr('x', -6)
                 .attr('y', 80)
-                .attr('fill', 'rgb(255, 255, 0)')
+                .attr('fill', 'rgb(234, 234, 40)')
                 .attr('opacity', '0.5')
                 .style('cursor', 'default')
                 .call(drag()
