@@ -470,7 +470,6 @@ function setUpParcoordData(data: any, newFeatures: []): void {
     setPadding(60);
     setPaddingXaxis(60);
 
-    console.log(newFeatures.length)
     if (newFeatures.length <= 6) {
       setWidth(newFeatures.length * 180);
     } else {
@@ -1090,7 +1089,7 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('x', -6)
                 .attr('y', 80)
                 .attr('fill', 'rgb(242, 242, 76)')
-                .attr('opacity', '0.7')
+                .attr('opacity', '0.5')
                 .style('cursor', 'default')
                 .call(drag()
                     .on('drag', (event: any, d: any) => {

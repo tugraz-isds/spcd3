@@ -1,5 +1,4 @@
 import { select } from 'd3-selection';
-import { min, max } from 'd3-array';
 import * as icon from './icons/icons';
 import * as helper from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
@@ -113,8 +112,8 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
             .attr('href', '#brush_image_top_active')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
         select('#rect_' + cleanDimensionName)
-            .attr('fill', 'rgb(250 255 128)')
-            .attr('opacity', '0.5');
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.7');
     }
 
     if (yPosBottom == 320) {
