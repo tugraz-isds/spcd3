@@ -51,7 +51,7 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
          select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
         select('#rect_' + cleanDimensionName)
-            .attr('fill', 'rgb(234, 234, 40)')
+            .attr('fill', 'rgb(242, 242, 76)')
             .attr('opacity', '0.5');
     }
     else {
@@ -59,7 +59,7 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
             .attr('href', '#brush_image_bottom_active');
         select('#rect_' + cleanDimensionName)
             .attr('fill', 'rgb(255, 255, 0)')
-            .attr('opacity', '0.5');
+            .attr('opacity', '0.7');
     }
 
     select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
@@ -113,7 +113,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
             .attr('href', '#brush_image_top_active')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
         select('#rect_' + cleanDimensionName)
-            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('fill', 'rgb(250 255 128)')
             .attr('opacity', '0.5');
     }
 

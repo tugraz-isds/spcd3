@@ -29,6 +29,8 @@ export function invertWoTransition(dimension: string): void {
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
+    select('#invert_hitbox_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
     select(dimensionId)
         .call(yAxis[dimension]
             .scale(parcoords.yScales[dimension]
@@ -63,6 +65,8 @@ export function setInversionStatus(dimension: string, status: string): void {
     textElement.text(status === 'ascending' ? 'up' : 'down');
     textElement.attr('href', arrow);
     textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select('#invert_hitbox_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
     select(dimensionId)
         .transition()
@@ -320,17 +324,15 @@ export function setUnselectedWithId(recordId: string): void {
 
 function computeMargins(labels = [], {
   font = '12px Verdana, sans-serif',
-  top = 15,
-  bottom = 36,
+  top = 0,
+  bottom = 0,
   extraLeft = 0,
-  extraRight = 8
+  extraRight = 0
 } = {}) {
   const ctx = document.createElement('canvas').getContext('2d');
   ctx.font = font;
 
   let maxWidth = ctx.measureText(String(labels[labels.length-1])).width;
-
-  if (labels.length < 5) maxWidth = maxWidth + 100;
 
   const left = Math.ceil(maxWidth) + extraLeft;
   const right = Math.ceil(maxWidth / 2) + extraRight;
@@ -355,19 +357,30 @@ export function drawChart(content: []): void {
             .append<HTMLDivElement>("div")
             .attr('id', 'parallelcoords');
 
+    /*const margin = computeMargins(parcoords.newFeatures);
+
+    const chartWrapper = wrapper.append('div')
+      .attr('id', 'chartWrapper')
+      .style('--ml', `${margin.left}px`)
+      .style('--mr', `${margin.right}px`);
+
+    chartWrapper.append('div')
+      .attr('id', 'toolbarRow')
+      .style('margin-left', 'var(--ml)')
+      .style('margin-right', 'var(--mr)')
+      .style('width', 'calc(100% - var(--ml) - var(--mr))');*/
+
     wrapper
         .style('display', 'block')
         .style('width', '100%')
         .style('margin', '0')
         .style('padding', '0')
-        .style('text-align', 'left');
+        .style('text-align', 'left')
+        .style('justify-content', 'center')
+        .style('align-items', 'center');
 
     const chartWrapper = wrapper.append('div')
-        .attr('id', 'chartWrapper')
-        .style('display', 'block')
-        .style('width', '100%')
-        .style('margin', '0')
-        .style('padding', '0');
+        .attr('id', 'chartWrapper');
 
     chartWrapper.append('div')
         .attr('id', 'toolbarRow')
@@ -375,27 +388,17 @@ export function drawChart(content: []): void {
         .style('flex-wrap', 'wrap')
         .style('align-items', 'center')
         .style('justify-content', 'flex-start')
-        .style('margin-top', '1.2rem')
-        .style('margin-left', '1rem')
-        .style('margin-bottom', 0);
+        .style('margin-left', '2rem')
+        .style('font-size', '0.8vw');
 
     toolbar.createToolbar(parcoords.newDataset);
 
     setSvg(chartWrapper.append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, width, height])
-        .attr('font-family', 'Verdana, sans-serif'));
-
-    const margin = computeMargins(parcoords.newFeatures);
-
-    select('#chartWrapper')
-      .style('--ml', `${margin.left}px`)
-      .style('--mr', `${margin.right}px`);
+        .attr('font-family', 'Verdana, sans-serif'));      
 
     select('#toolbarRow')
-      .style('margin-left', 'var(--ml)')
-      .style('margin-right', 'var(--mr)')
-      .style('width', 'calc(100% - var(--ml) - var(--mr))');
 
     setDefsForIcons();
 
@@ -466,7 +469,14 @@ function setUpParcoordData(data: any, newFeatures: []): void {
 
     setPadding(60);
     setPaddingXaxis(60);
-    setWidth(newFeatures.length * 100);
+
+    console.log(newFeatures.length)
+    if (newFeatures.length <= 6) {
+      setWidth(newFeatures.length * 180);
+    } else {
+      setWidth(newFeatures.length * 100);
+    }
+
     setHeight(400);
     setInitDimension(newFeatures);
 
@@ -1000,15 +1010,22 @@ function setInvertIcon(featureAxis: any, padding: number): void {
     .style('overflow', 'visible') 
 
   svg.append('rect')
+    .attr('id', 'invert_hitbox')
     .attr('class', 'hitbox')
     .attr('x', 6)
     .attr('y', 20)
     .attr('width', 44)
-    .attr('height', 22)
+    .attr('height', 15)
     .attr('rx', 6)
     .attr('ry', 6)
     .attr('fill', 'transparent')
-    .style('pointer-events', 'all');
+    .style('pointer-events', 'all')
+     .each(function (d: { name: string }) {
+      const processed = utils.cleanString(d.name);
+      select(this)
+        .attr('id', 'invert_hitbox_' + processed)
+        .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
+    });
 
   svg.append('use')
     .attr('href', '#arrow_image_up')
@@ -1072,8 +1089,8 @@ function setRectToDrag(featureAxis: any, svg: any, parcoords: {
                 .attr('height', 240)
                 .attr('x', -6)
                 .attr('y', 80)
-                .attr('fill', 'rgb(234, 234, 40)')
-                .attr('opacity', '0.5')
+                .attr('fill', 'rgb(242, 242, 76)')
+                .attr('opacity', '0.7')
                 .style('cursor', 'default')
                 .call(drag()
                     .on('drag', (event: any, d: any) => {
