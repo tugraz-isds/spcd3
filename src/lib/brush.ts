@@ -62,6 +62,7 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
     }
 
     select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
+    select('#triangle_down_hit' + cleanDimensionName).attr('y', yPosTop);
 
     const heightTopRect = yPosRect - 80;
     const heightBottomRect = 320 - yPosBottom;
@@ -126,6 +127,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     }
 
     select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
+    select('#triangle_up_hit' + cleanDimensionName).attr('y', yPosBottom);
 
     const heightTopRect = yPosTop - 70;
     const heightBottomRect = 320 - yPosBottom;
@@ -200,6 +202,10 @@ export function dragAndBrush(cleanDimensionName: any, d: any, event: any,
             .attr('y', yPosTop);
         select('#triangle_up_' + cleanDimensionName)
             .attr('y', yPosRect + rectHeight);
+        select('#triangle_up_hit' + cleanDimensionName)
+            .attr('y', yPosRect + rectHeight);
+        select('#triangle_down_hit' + cleanDimensionName)
+            .attr('y', yPosTop);
 
         if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
             setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, window, true, yPosTop, yPosRect + rectHeight);
