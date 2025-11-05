@@ -481,23 +481,18 @@ export function setDimensionForHovering(dimension: string): void {
 }
 
 export function invert(dimension: string): void {
-  const cleanDimensionName = utils.cleanString(dimension);
-  const invertId = "#dimension_invert_" + cleanDimensionName;
-  const dimensionId = "#dimension_axis_" + cleanDimensionName;
-  const textElement = select(invertId);
-  const currentArrowStatus = textElement.text();
-  const arrow =
-    currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
-  const arrowStyle =
-    currentArrowStatus === "down"
-      ? utils.setSize(icon.getArrowDownCursor(), 12)
-      : utils.setSize(icon.getArrowUpCursor(), 12);
-  textElement.text(currentArrowStatus === "down" ? "up" : "down");
-  textElement.attr("href", arrow);
-  textElement.style(
-    "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`
-  );
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
+    const textElement = select(invertId);
+    const currentArrowStatus = textElement.text();
+    const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
+    const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
+    textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
+    textElement.attr('href', arrow);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select('#invert_hitbox_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
 
   select(dimensionId)
     .transition()

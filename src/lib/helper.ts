@@ -31,7 +31,7 @@ export function setupYScales(header: any, dataset: any): any {
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([padding, height - padding])
+        .range([80, height - 80])
         .padding(0.2);
       }
       else {
@@ -43,11 +43,11 @@ export function setupYScales(header: any, dataset: any): any {
           const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
           yScales[x.name] = scaleLinear()
             .domain([min - epsilon, max + epsilon])
-            .range([height - padding, padding]);
+            .range([height - 80, 80]);
         } else {
           yScales[x.name] = scaleLinear()
             .domain([min, max])
-            .range([height - padding, padding]);
+            .range([height - 80, 80]);
           }
       }
   });
@@ -55,9 +55,13 @@ export function setupYScales(header: any, dataset: any): any {
 }
 
 export function setupXScales(header: any): any {
+  const n = header.length;
+  const pad = (n <= 2) ? 0 : 0.2;
   return scalePoint()
     .domain(header.map((x: { name: any; }) => x.name))
-    .range([width - padding, padding]);
+    .range([width - padding, padding])
+    .padding(pad)
+    .align(0.5);
 }
 
 function isLinearScale(scale: any): scale is ScaleLinear<number, number> {
@@ -139,25 +143,65 @@ function getAllVisibleDimensionNames(): string[] {
   return listOfDimensions.reverse();
 }
 
-export function createToolTipForValues(records: { [x: string]: { toString: () => any; }; }): void {
+type TipDatum = {
+  dim: string;
+  pageX: number;
+  pageY: number;
+  text: string;
+};
+
+function recordIdOf(rec: any, fallback: string) {
+  return rec.id ?? rec._id ?? rec.key ?? fallback;
+}
+
+export function createToolTipForValues(records: any, recKey?: string) {
   const dimensions = getAllVisibleDimensionNames();
   const svg = select('#pc_svg').node() as SVGSVGElement;
-  dimensions.forEach(dimension => {
-  const cleanString = utils.cleanString(dimension);
-  if (utils.isElementVisible(select('#rect_' + cleanString))) {
-    const yScale = parcoords.yScales[dimension];
-    const x = parcoords.xScales(dimension);
-    const y = yScale(records[dimension]);
-    const pt = svg.createSVGPoint();
-    pt.x = x;
-    pt.y = y;
-    const screenPoint = pt.matrixTransform(svg.getScreenCTM());
-    select('body')
-      .append('div')
+  const plotG = (document.querySelector<SVGGElement>('#pc_svg g.plot') ?? svg);
+  const ctm = plotG.getScreenCTM();
+  if (!ctm) return;
+
+  const recordId = recordIdOf(records, String(recKey ?? Math.random()));
+
+  const layer = select('body')
+    .selectAll<HTMLDivElement, string>(`div.tip-layer[data-record="${recordId}"]`)
+    .data([recordId])
+    .join('div')
+    .attr('class', 'tip-layer')
+    .attr('data-record', recordId)
+    .style('position', 'absolute')
+    .style('left', '0px')
+    .style('top', '0px')
+    .style('pointer-events', 'none');
+
+  const data: TipDatum[] = dimensions
+    .filter(dim => utils.isElementVisible(select('#rect_' + utils.cleanString(dim))))
+    .map(dim => {
+      const yScale = parcoords.yScales[dim];
+      const x = parcoords.xScales(dim);
+      const y = yScale(records[dim]);
+
+      const pt = svg.createSVGPoint();
+      pt.x = x; pt.y = y;
+      const sp = pt.matrixTransform(ctm);
+
+      return {
+        dim,
+        pageX: sp.x + window.scrollX + 8,
+        pageY: sp.y + window.scrollY + 8,
+        text: String(records[dim]),
+      };
+    });
+
+  const tips = layer
+    .selectAll<HTMLDivElement, TipDatum>('div.tooltip-div')
+    .data(data, (d: any) => d.dim);
+
+  tips.join(
+    enter => enter.append('div')
       .attr('class', 'tooltip-div')
       .style('position', 'absolute')
-      .style('left', `${screenPoint.x}px`)
-      .style('top', `${screenPoint.y}px`)
+      .style('pointer-events', 'none')
       .style('font-size', '0.65rem')
       .style('margin', '0.5rem')
       .style('color', 'red')
@@ -165,9 +209,15 @@ export function createToolTipForValues(records: { [x: string]: { toString: () =>
       .style('font-weight', 'bold')
       .style('padding', '0.12rem')
       .style('white-space', 'nowrap')
-      .text(records[dimension].toString());
-    }
-  });
+      .style('z-index', '9999')
+      .style('left', d => `${d.pageX}px`)
+      .style('top',  d => `${d.pageY}px`)
+      .text(d => d.text), update => update
+      .style('left', d => `${d.pageX}px`)
+      .style('top',  d => `${d.pageY}px`)
+      .text(d => d.text),
+    exit => exit.remove()
+  );
 }
 
 export function getAllPointerEventsData(event: any): any {

@@ -1,5 +1,4 @@
 import { select } from 'd3-selection';
-import { min, max } from 'd3-array';
 import * as icon from './icons/icons';
 import * as helper from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
@@ -50,13 +49,20 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
     if (yPosTop == 70) {
          select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(242, 242, 76)')
+            .attr('opacity', '0.5');
     }
     else {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom_active');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.7');
     }
 
     select('#triangle_down_' + cleanDimensionName).attr('y', yPosTop);
+    select('#triangle_down_hit' + cleanDimensionName).attr('y', yPosTop);
 
     const heightTopRect = yPosRect - 80;
     const heightBottomRect = 320 - yPosBottom;
@@ -98,11 +104,17 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
             .style('cursor', 'default');
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(234, 234, 40)')
+            .attr('opacity', '0.5');
     }
     else {
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.7');
     }
 
     if (yPosBottom == 320) {
@@ -115,6 +127,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     }
 
     select('#triangle_up_' + cleanDimensionName).attr('y', yPosBottom);
+    select('#triangle_up_hit' + cleanDimensionName).attr('y', yPosBottom);
 
     const heightTopRect = yPosTop - 70;
     const heightBottomRect = 320 - yPosBottom;
@@ -189,6 +202,10 @@ export function dragAndBrush(cleanDimensionName: any, d: any, event: any,
             .attr('y', yPosTop);
         select('#triangle_up_' + cleanDimensionName)
             .attr('y', yPosRect + rectHeight);
+        select('#triangle_up_hit' + cleanDimensionName)
+            .attr('y', yPosRect + rectHeight);
+        select('#triangle_down_hit' + cleanDimensionName)
+            .attr('y', yPosTop);
 
         if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
             setToolTipDragAndBrush(tooltipValuesTop, tooltipValuesDown, d, window, true, yPosTop, yPosRect + rectHeight);
@@ -227,7 +244,17 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .duration(1000)
         .attr('y', rectY - 10);
 
+    select('#triangle_down_hit' + cleanDimensionName)
+        .transition()
+        .duration(1000)
+        .attr('y', rectY - 10);
+
     select('#triangle_up_' + cleanDimensionName)
+        .transition()
+        .duration(1000)
+        .attr('y', rectY + rectHeight);
+
+    select('#triangle_up_hit' + cleanDimensionName)
         .transition()
         .duration(1000)
         .attr('y', rectY + rectHeight);
@@ -235,6 +262,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
     if (topPosition == 80) {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
+
     }
     else {
         select('#triangle_down_' + cleanDimensionName)
@@ -673,7 +701,6 @@ export function addSettingsForBrushing(dimension: string,
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
     let top: number, bottom: number;
-    console.log(parcoords.currentPosOfDims);
     if (isDimensionCategorical(dimension)) {
         const domain = yScale.domain();
         const sorted = domain.slice().sort((a: any, b: any) => yScale(a) - yScale(b));
@@ -714,7 +741,6 @@ export function addSettingsForBrushing(dimension: string,
 
     addPosition(top, dimension, 'top');
     addPosition(bottom, dimension, 'bottom');
-    console.log(parcoords.currentPosOfDims);
 }
 
 function getInvertStatus(key: any): boolean {

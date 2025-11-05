@@ -62,8 +62,6 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
       const min = api.getCurrentMinRange(d.name);
       if (!api.isDimensionCategorical(d.name)) {
         const inversionStatus = api.getInversionStatus(d.name);
-        console.log(d.name);
-        console.log(inversionStatus);
         if (inversionStatus === 'ascending') {
           yScales[d.name].domain([min, max]);
           yAxis = helper.setupYAxis(yScales,
@@ -97,7 +95,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
     featureAxis
       .append('text')
       .attr('text-anchor', 'middle')
-      .attr('y', (padding / 1.7).toFixed(4))
+      .attr('y', (80 / 1.7).toFixed(4))
       .text((d: { name: string; }) => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
       .style('font-size', '0.7rem');
 
@@ -161,7 +159,7 @@ function setRectToDragToDownload(featureAxis: any): void {
 }
 
 function setInvertIconToDownload(featureAxis: any): void {
-  let value = (padding / 1.5).toFixed(4);
+  let value = (80 / 1.5).toFixed(4);
   featureAxis
     .append('svg')
     .attr('y', value)
