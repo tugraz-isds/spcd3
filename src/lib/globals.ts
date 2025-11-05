@@ -1,4 +1,3 @@
-
 export let padding: number;
 export let paddingXaxis: number;
 export let width: number;
@@ -32,6 +31,19 @@ export let svg: any;
 export let hoverlabel: string;
 export let refreshData: any;
 export let initDimension: any;
+export let canvasEl: HTMLCanvasElement | null = null;
+
+export type GraphicsWebTech = "Canvas2D" | "SVG-DOM" | "WebGL" | "WebGPU";
+
+export let currWebTech: GraphicsWebTech = "SVG-DOM";
+
+export function setCurrentWebTech(webTech: GraphicsWebTech) {
+  currWebTech = webTech;
+}
+
+export function setCanvasEl(newCanvasEl: HTMLCanvasElement) {
+  canvasEl = newCanvasEl;
+}
 
 export function setHoverLabel(label: string): void {
   hoverlabel = label;
@@ -42,35 +54,35 @@ export function setYaxis(axis: any): void {
 }
 
 export function setRefreshData(data: any): void {
-    refreshData = data;
+  refreshData = data;
 }
 
 export function setSvg(svgData: any): void {
-    svg = svgData;
+  svg = svgData;
 }
 
-export function setWidth(value: number):void {
-    width = value;
+export function setWidth(value: number): void {
+  width = value;
 }
 
-export function setHeight(value: number):void {
-    height = value;
+export function setHeight(value: number): void {
+  height = value;
 }
 
-export function setPadding(value: number):void {
-    padding = value;
+export function setPadding(value: number): void {
+  padding = value;
 }
 
-export function setPaddingXaxis(value: number):void {
-    paddingXaxis = value;
+export function setPaddingXaxis(value: number): void {
+  paddingXaxis = value;
 }
 
-export function setInitDimension(dimensions: any):void {
-    initDimension = dimensions;
+export function setInitDimension(dimensions: any): void {
+  initDimension = dimensions;
 }
 
 export function setActive(paths: any): void {
-    active = paths;
+  active = paths;
 }
 
 export function setParcoords(value: typeof parcoords) {
@@ -114,5 +126,5 @@ export function setData(value: any): void {
 }
 
 export function setKey(value: string): void {
-    key = value;
+  key = value;
 }
