@@ -14,7 +14,7 @@ import { yAxis, parcoords, width, svg, height, active, setYaxis, setRefreshData,
 declare const window: any;
 
 //******** API ********//
-
+//
 //---------- Invert Functions ----------
 
 export function invertWoTransition(dimension: string): void {
