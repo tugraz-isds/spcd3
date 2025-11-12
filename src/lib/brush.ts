@@ -697,7 +697,7 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
 export function addSettingsForBrushing(dimension: string,
     invertStatus: boolean): void {
     const processedName = helper.cleanString(dimension);
-    const yScale = parcoords.yScales[processedName];
+    const yScale = parcoords.yScales[dimension];
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
     let top: number, bottom: number;
