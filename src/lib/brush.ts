@@ -236,8 +236,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .transition()
         .duration(1000)
         .attr('y', rectY)
-        .attr('height', rectHeight)
-        .style('opacity', 0.3);
+        .attr('height', rectHeight);
 
     select('#triangle_down_' + cleanDimensionName)
         .transition()
@@ -728,8 +727,7 @@ export function addSettingsForBrushing(dimension: string,
     rect.transition()
         .duration(300)
         .attr('y', rectY)
-        .attr('height', rectH)
-        .style('opacity', 0.3);
+        .attr('height', rectH);
 
     triDown.transition()
         .duration(300)
@@ -738,6 +736,24 @@ export function addSettingsForBrushing(dimension: string,
     triUp.transition()
         .duration(300)
         .attr('y', rectY + rectH);
+
+    if (rectY-10 == 70) {
+        select('#triangle_down_' + processedName)
+            .attr('href', '#brush_image_bottom');
+    }
+    else {
+        select('#triangle_down_' + processedName)
+            .attr('href', '#brush_image_bottom_active');
+    }
+
+    if (rectY + rectH == 320) {
+        select('#triangle_up_' + processedName)
+            .attr('href', '#brush_image_top');
+    }
+    else {
+        select('#triangle_up_' + processedName)
+            .attr('href', '#brush_image_top_active');
+    }
 
     addPosition(top, dimension, 'top');
     addPosition(bottom, dimension, 'bottom');
