@@ -30,6 +30,7 @@ export function setContextMenu(featureAxis: any): void {
       resetFilterMenu(dimension);
       showAllMenu();
       copyDimensionName(dimension);
+      select('#contextmenuRecords').style('display', 'none');
       event.preventDefault();
     });
 }

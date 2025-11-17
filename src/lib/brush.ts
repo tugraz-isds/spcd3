@@ -261,7 +261,6 @@ export function filter(dimensionName: string, min: number, max: number): void {
     if (topPosition == 80) {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
-
     }
     else {
         select('#triangle_down_' + cleanDimensionName)

@@ -731,6 +731,7 @@ function setActivePathLines(svg: any, content: any,
         })
         .on('contextmenu', function (event: any, d: any) {
             setContextMenuForActiceRecords(contextMenu, event, d);
+            select('#contextmenu').style('display', 'none');
         });
 
     return active;

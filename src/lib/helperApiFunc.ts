@@ -9,6 +9,19 @@ import { interpolatePath } from 'd3-interpolate-path';
 import { easeCubic } from 'd3-ease';
 
 
+//---------- Color Records ----------
+export function colorRecord(record: string, color: string): void {
+    selectAll('#' + utils.cleanString(record))
+        .transition()
+        .style('stroke', color);
+}
+
+export function uncolorRecord(record: string): void {
+    selectAll('#' + utils.cleanString(record))
+        .transition()
+        .style('stroke', 'rgba(0, 129, 175, 0.5)');
+}
+
 //---------- Show and Hide Functions ----------
 export function hide(dimension: string): void {
     const newDimensions = parcoords.newFeatures.filter((d: string) => d !== dimension);
@@ -96,8 +109,6 @@ export function show(dimension: string): void {
             return line()(points);
         });
 }
-
-
 
 export function getAllRecords(): string[] {
     const selection = active;
