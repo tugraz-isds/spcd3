@@ -15,6 +15,8 @@ export function setSize(stringValue: string, size: number): string {
     return stringValue.replace('viewBox', `width="${size}" height="${size}" viewBox`);
 }
 
+
+
 export function throttle<Params extends any[]>(func: (...args: Params) => any,
     delay: number):
     (...args: Params) => void {
