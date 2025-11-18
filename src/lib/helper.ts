@@ -143,15 +143,15 @@ function getAllVisibleDimensionNames(): string[] {
   return listOfDimensions.reverse();
 }
 
-type TipDatum = {
+type ToolTipItem = {
   dim: string;
   pageX: number;
   pageY: number;
   text: string;
 };
 
-function recordIdOf(rec: any, fallback: string) {
-  return rec.id ?? rec._id ?? rec.key ?? fallback;
+function recordIdOf(rec: any) {
+  return rec.id ?? rec._id ?? rec.key;
 }
 
 export function createToolTipForValues(records: any, recKey?: string) {
@@ -161,7 +161,7 @@ export function createToolTipForValues(records: any, recKey?: string) {
   const ctm = plotG.getScreenCTM();
   if (!ctm) return;
 
-  const recordId = recordIdOf(records, String(recKey ?? Math.random()));
+  const recordId = recordIdOf(records);
 
   const layer = select('body')
     .selectAll<HTMLDivElement, string>(`div.tip-layer[data-record="${recordId}"]`)
@@ -174,7 +174,7 @@ export function createToolTipForValues(records: any, recKey?: string) {
     .style('top', '0px')
     .style('pointer-events', 'none');
 
-  const data: TipDatum[] = dimensions
+  const data: ToolTipItem[] = dimensions
     .filter(dim => utils.isElementVisible(select('#rect_' + utils.cleanString(dim))))
     .map(dim => {
       const yScale = parcoords.yScales[dim];
@@ -194,7 +194,7 @@ export function createToolTipForValues(records: any, recKey?: string) {
     });
 
   const tips = layer
-    .selectAll<HTMLDivElement, TipDatum>('div.tooltip-div')
+    .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-div')
     .data(data, (d: any) => d.dim);
 
   tips.join(
@@ -235,16 +235,16 @@ export function getAllPointerEventsData(event: any): any {
   return data;
 }
 
-export function createTooltipForPathLine(tooltipText: string | any[], tooltipPath: { text: (arg0: any) => { (): any; new(): any; style: { (arg0: string, arg1: string): { (): any; new(): any; style: { (arg0: string, arg1: string): { (): any; new(): any; style: { (arg0: string, arg1: string): void; new(): any; }; }; new(): any; }; }; new(): any; }; }; }, event: { clientX: number; clientY: number; }) {
+export function createTooltipForLabel(tooltipText, tooltipLabel, event) {
   if (!tooltipText || tooltipText.length === 0) return;
   const [x, y] = utils.getMouseCoords(event);
   let tempText = tooltipText.toString();
   tempText = tempText.split(',').join('\r\n');
-  tooltipPath.text(tempText)
+  tooltipLabel.text(tempText)
     .style('visibility', 'visible')
     .style('top', y / 16 + 'rem')
     .style('left', x / 16 + 0.5 + 'rem');
-  return tooltipPath;
+  return tooltipLabel;
 }
 
 export function trans(g: any): any {

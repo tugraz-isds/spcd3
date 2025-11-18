@@ -1,9 +1,198 @@
 import { select } from 'd3-selection';
+import { drag } from 'd3-drag';
 import * as icon from './icons/icons';
 import * as helper from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
 import * as api from './helperApiFunc';
 import { parcoords } from './globals';
+
+
+let tooltipValues = select('#parallelcoords')
+    .append('div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden');
+
+let tooltipValuesTop = select('#parallelcoords')
+    .append('div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden');
+
+let tooltipValuesDown = select('#parallelcoords')
+    .append('div')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden');
+
+// Brushing
+
+export function setRectToDrag(featureAxis): void {
+
+    let delta: any;
+    featureAxis.each(function (d: { name: string; }) {
+        const processedDimensionName = helper.cleanString(d.name);
+        select(this)
+            .append('g')
+            .attr('class', 'rect')
+            .append('rect')
+            .attr('id', 'rect_' + processedDimensionName)
+            .attr('width', 12)
+            .attr('height', 240)
+            .attr('x', -6)
+            .attr('y', 80)
+            .attr('fill', 'rgb(242, 242, 76)')
+            .attr('opacity', '0.5')
+            .style('cursor', 'default')
+            .call(drag()
+                .on('drag', (event: any, d: any) => {
+                    if (parcoords.newFeatures.length > 25) {
+                        throttleDragAndBrush(processedDimensionName, d, event, delta,
+                        tooltipValuesTop, tooltipValuesDown, window);
+                    }
+                    else {
+                        dragAndBrush(processedDimensionName, d, event, delta,
+                        tooltipValuesTop, tooltipValuesDown, window);
+                    }
+                })
+                .on('start', (event: { y: number; }, d: any) => {
+                    let current = select("#rect_" + processedDimensionName);
+                    delta = current.attr("y") - event.y;
+                })
+                .on('end', () => {
+                    tooltipValuesTop.style('visibility', 'hidden');
+                    tooltipValuesDown.style('visibility', 'hidden');
+                }));
+    });
+}
+
+export function setBrushUp(featureAxis, brushOverlay): void {
+
+    featureAxis.each(function (d: { name: string }) {
+        const processedDimensionName = helper.cleanString(d.name);
+        const g = select(this).append('g').attr('class', 'brush_' + processedDimensionName);
+
+        g.append('use')
+            .attr('id', 'triangle_up_' + processedDimensionName)
+            .attr('x', -7)
+            .attr('y', 320)
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', '#brush_image_top')
+            .attr('pointer-events', 'none')
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+
+        const hit = g.append('rect')
+            .attr('class', 'handle-hitbox')
+            .attr('id', 'triangle_up_hit' + processedDimensionName)
+            .attr('x', -15)
+            .attr('y', 320)
+            .attr('width', 30)
+            .attr('height', 30)
+            .style('fill', 'transparent')
+            .style('pointer-events', 'all')
+            .style('touch-action', 'none')
+            .style('-webkit-user-select', 'none')
+            .style('user-select', 'none')
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+
+        const makeDrag = () => drag()
+            .container(function () { return (this as any).ownerSVGElement || this; })
+            .on('start', () => {
+                brushOverlay.raise().style('pointer-events', 'all');
+                g.select('#triangle_up_' + processedDimensionName).raise();
+                g.selectAll('.handle-hitbox').raise();
+            })
+            .on('drag', (event: any, dd: any) => {
+                if (parcoords.newFeatures.length > 25) {
+                    throttleBrushUp(processedDimensionName, event, dd, tooltipValues, window);
+                } else {
+                    brushUp(processedDimensionName, event, dd, tooltipValues, window);
+                }
+
+                const yNow = g.select('#triangle_up_' + processedDimensionName).attr('y');
+                if (yNow != null) {
+                    hit.attr('y', +yNow);
+                }
+                g.selectAll('.handle-hitbox').raise();
+            })
+            .on('end', () => {
+                cleanup(brushOverlay, tooltipValues);
+                requestAnimationFrame(() => {
+                const newHit = g.select<SVGRectElement>('.handle-hitbox');
+                if (!newHit.empty()) {
+                    newHit.call(makeDrag());
+                }
+                });
+            });
+        hit.call(makeDrag());
+    });
+}
+
+export function setBrushDown(featureAxis, brushOverlay): void {
+
+    featureAxis.each(function (d: { name: string }) {
+        const processedDimensionName = helper.cleanString(d.name);
+        const g = select(this).append('g').attr('class', 'brush_' + processedDimensionName);
+
+        g.append('use')
+            .attr('id', 'triangle_down_' + processedDimensionName)
+            .attr('x', -7)
+            .attr('y', 70)
+            .attr('width', 14)
+            .attr('height', 10)
+            .attr('href', '#brush_image_bottom')
+            .attr('pointer-events', 'none')
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+
+        const hit = g.append('rect')
+            .attr('class', 'handle-hitbox')
+            .attr('id', 'triangle_down_hit' + processedDimensionName)
+            .attr('x', -15)
+            .attr('y', 70)
+            .attr('width', 30)
+            .attr('height', 30)
+            .style('fill', 'transparent')
+            .style('pointer-events', 'all')
+            .style('touch-action', 'none')
+            .style('-webkit-user-select', 'none')
+            .style('user-select', 'none')
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+
+        const makeDrag = () => drag()
+            .container(function () { return (this as any).ownerSVGElement || this; })
+            .on('start', () => {
+                brushOverlay.raise().style('pointer-events', 'all');
+                g.select('#triangle_down_' + processedDimensionName).raise();
+                g.selectAll('.handle-hitbox').raise();
+            })
+            .on('drag', (event: any, dd: any) => {
+                if (parcoords.newFeatures.length > 25) {
+                    throttleBrushDown(processedDimensionName, event, dd, tooltipValues, window);
+                } else {
+                    brushDown(processedDimensionName, event, dd, tooltipValues, window);
+                }
+
+                const yNow = g.select('#triangle_down_' + processedDimensionName).attr('y');
+                if (yNow != null) {
+                    hit.attr('y', +yNow);
+                }
+                g.selectAll('.handle-hitbox').raise();
+            })
+            .on('end', () => {
+                cleanup(brushOverlay, tooltipValues);
+                requestAnimationFrame(() => {
+                    const newHit = g.select<SVGRectElement>('.handle-hitbox');
+                    if (!newHit.empty()) {
+                        newHit.call(makeDrag());
+                    }
+                });
+            });    
+        hit.call(makeDrag());
+    });
+}
+
+function cleanup(brushOverlay, tooltipValues) {
+    brushOverlay.style('pointer-events', 'none').lower();
+    tooltipValues.style('visibility', 'hidden');
+}
 
 export function brushDown(cleanDimensionName: string, event: any, d: any,
     tooltipValues: any, window: any): void {

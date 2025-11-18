@@ -9,20 +9,8 @@ import { interpolatePath } from 'd3-interpolate-path';
 import { easeCubic } from 'd3-ease';
 
 
-//---------- Color Records ----------
-export function colorRecord(record: string, color: string): void {
-    selectAll('#' + utils.cleanString(record))
-        .transition()
-        .style('stroke', color);
-}
-
-export function uncolorRecord(record: string): void {
-    selectAll('#' + utils.cleanString(record))
-        .transition()
-        .style('stroke', 'rgba(0, 129, 175, 0.5)');
-}
-
 //---------- Show and Hide Functions ----------
+
 export function hide(dimension: string): void {
     const newDimensions = parcoords.newFeatures.filter((d: string) => d !== dimension);
     const featureSet = parcoords.features.filter((d: { name: string; }) => d.name !== dimension);
@@ -110,70 +98,130 @@ export function show(dimension: string): void {
         });
 }
 
-export function getAllRecords(): string[] {
-    const selection = active;
-    const object = selection._groups;
-    const data = [];
-    for (let i = 0; i < object[0].length; i++) {
-        const items = object.map((item: any[]) => item[i]);
-        const keys = Object.keys(items);
-        const text = items[keys[0]].id;
-        data.push(text);
-    }
-    return data;
-}
+//---------- Move Functions ----------
 
-export function getAllVisibleDimensionNames(): string[] {
-    let listOfDimensions = parcoords.newFeatures.slice();
-    return listOfDimensions.reverse();
-}
+export function moveByOne(dimension: string, direction: string): void {
 
-export function getAllDimensionNames(): string[] {
-    return parcoords.data['columns'];
-}
+    const indexOfDimension = parcoords.newFeatures.indexOf(dimension);
 
-export function getAllHiddenDimensionNames(): string[] {
-    const dimensions = getAllDimensionNames();
-    const hiddenDimensions = [];
-    for (let i = 0; i < dimensions.length; i++) {
-        if (getHiddenStatus(dimensions[i]) == 'hidden') {
-            hiddenDimensions.push(dimensions[i]);
-        }
-    }
-    return hiddenDimensions;
-}
+    const indexOfNeighbor = direction == 'right' ? indexOfDimension - 1
+        : indexOfDimension + 1;
 
-export function getHiddenStatus(dimension: string): string {
-    const index = parcoords.newFeatures.indexOf(dimension);
-    if (index != -1) {
-        return "shown";
+    const neighbour = parcoords.newFeatures[indexOfNeighbor];
+
+    const pos = parcoords.xScales(dimension);
+    const posNeighbour = parcoords.xScales(neighbour);
+
+    const distance = parcoords.xScales.step();
+
+    parcoords.dragging[dimension] = direction == 'right' ? pos + distance :
+        pos - distance;
+
+    parcoords.dragging[neighbour] = direction == 'right' ? posNeighbour - distance :
+        posNeighbour + distance;
+
+    if (direction == 'right') {
+        [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension - 1]] =
+            [parcoords.newFeatures[indexOfDimension - 1], parcoords.newFeatures[indexOfDimension]];
     }
     else {
-        return "hidden";
+        [parcoords.newFeatures[indexOfDimension + 1], parcoords.newFeatures[indexOfDimension]] =
+            [parcoords.newFeatures[indexOfDimension], parcoords.newFeatures[indexOfDimension + 1]];
+    }
+
+    parcoords.xScales.domain(parcoords.newFeatures);
+
+    let active = select('g.active').selectAll('path');
+    let featureAxis = selectAll('.dimensions');
+
+    active.transition()
+        .duration(1000)
+        .attr('d', function (d: any) {
+            return helper.linePath(d, parcoords.newFeatures);
+        })
+        .ease(easeCubic);
+
+    featureAxis.transition()
+        .duration(1000)
+        .attr('transform', function (d: { name: any; }) {
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        })
+        .ease(easeCubic);
+
+    delete parcoords.dragging[dimension];
+    delete parcoords.dragging[neighbour];
+}
+
+export function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void {
+    const indexOfDimensionA = getDimensionPosition(dimensionA);
+    const indexOfDimensionB = getDimensionPosition(dimensionB);
+
+    if (toRightOf) {
+        if (indexOfDimensionA > indexOfDimensionB) {
+            for (let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                if (i != indexOfDimensionB - 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i - 1]);
+                }
+            }
+        }
+        else {
+            for (let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                if (i != indexOfDimensionB - 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i + 1]);
+                }
+            }
+        }
+    }
+    else {
+        if (indexOfDimensionA > indexOfDimensionB) {
+            for (let i = indexOfDimensionA; i > indexOfDimensionB; i--) {
+                if (i != indexOfDimensionB + 1) {
+                    swap(parcoords.newFeatures[i], parcoords.newFeatures[i - 1]);
+                }
+            }
+        }
+        else {
+            for (let i = indexOfDimensionA; i < indexOfDimensionB; i++) {
+                swap(parcoords.newFeatures[i], parcoords.newFeatures[i + 1]);
+            }
+        }
     }
 }
 
-export function getInversionStatus(dimension: string): string {
-    const invertId = '#dimension_invert_' + utils.cleanString(dimension);
-    const element = select(invertId);
-    const arrowStatus = element.text();
-    return arrowStatus == 'up' ? 'ascending' : 'descending';
-}
+export function swap(dimensionA: string, dimensionB: string): void {
 
-export function getNumberOfDimensions(): number {
-    return parcoords.newFeatures.length;
-}
+    const positionA = parcoords.xScales(dimensionA);
+    const positionB = parcoords.xScales(dimensionB);
 
-export function getDimensionPosition(dimension: string): number {
-    return parcoords.newFeatures.indexOf(dimension);
-}
+    parcoords.dragging[dimensionA] = positionB;
+    parcoords.dragging[dimensionB] = positionA;
 
-export function isDimensionCategorical(dimension: string): boolean {
-    let values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
-    if (isNaN(values[0])) {
-        return true;
-    }
-    return false;
+    const indexOfDimensionA = parcoords.newFeatures.indexOf(dimensionA);
+    const indexOfDimensionB = parcoords.newFeatures.indexOf(dimensionB);
+
+    [parcoords.newFeatures[indexOfDimensionA], parcoords.newFeatures[indexOfDimensionB]] =
+        [parcoords.newFeatures[indexOfDimensionB], parcoords.newFeatures[indexOfDimensionA]];
+
+    parcoords.xScales.domain(parcoords.newFeatures);
+
+    let active = select('g.active').selectAll('path');
+    let featureAxis = selectAll('.dimensions');
+
+    active.transition()
+        .duration(1000)
+        .attr('d', (d: any) => {
+            return helper.linePath(d, parcoords.newFeatures);
+        });
+
+    featureAxis.transition()
+        .duration(1000)
+        .attr('transform', (d: { name: any; }) => {
+            return 'translate(' + helper.position(d.name, parcoords.dragging, parcoords.xScales) + ')';
+        })
+        .ease(easeCubic);
+
+    delete parcoords.dragging[dimensionA];
+    delete parcoords.dragging[dimensionB];
 }
 
 //---------- Filter Functions ----------
@@ -366,6 +414,88 @@ export function setDimensionForHovering(dimension: string): void {
     setHoverLabel(dimension);
 }
 
+//---------- Invert Functions ----------
+
+export function invertWoTransition(dimension: string): void {
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
+    const textElement = select(invertId);
+    const currentArrowStatus = textElement.text();
+    const arrow = currentArrowStatus === 'down' ? '#arrow_image_up' : '#arrow_image_down';
+    const arrowStyle = currentArrowStatus === 'down' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
+    textElement.text(currentArrowStatus === 'down' ? 'up' : 'down');
+    textElement.attr('href', arrow);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select('#invert_hitbox_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select(dimensionId)
+        .call(yAxis[dimension]
+            .scale(parcoords.yScales[dimension]
+                .domain(parcoords.yScales[dimension]
+                    .domain().reverse())));
+
+    helper.trans(active).each(function (d: any) {
+        select(this)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
+            })
+    });
+
+    brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
+    if (helper.isInverted(dimension)) {
+        brush.addInvertStatus(true, dimension, "isInverted");
+    }
+    else {
+        brush.addInvertStatus(false, dimension, "isInverted");
+    }
+}
+
+
+export function setInversionStatus(dimension: string, status: string): void {
+    const cleanDimensionName = utils.cleanString(dimension);
+    const invertId = '#dimension_invert_' + cleanDimensionName;
+    const dimensionId = '#dimension_axis_' + cleanDimensionName;
+    const textElement = select(invertId);
+    const arrow = status === 'ascending' ? '#arrow_image_up' : '#arrow_image_down';
+    const arrowStyle = status === 'ascending' ? utils.setSize(icon.getArrowDownCursor(), 12) : utils.setSize(icon.getArrowUpCursor(), 12);
+    textElement.text(status === 'ascending' ? 'up' : 'down');
+    textElement.attr('href', arrow);
+    textElement.style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select('#invert_hitbox_' + cleanDimensionName).style('cursor', `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`);
+
+    select(dimensionId)
+        .transition()
+        .duration(1000)
+        .call(yAxis[dimension]
+            .scale(parcoords.yScales[dimension]
+                .domain(parcoords.yScales[dimension]
+                    .domain().reverse())))
+        .ease(easeCubic);
+
+
+    helper.trans(active).each(function (d: any) {
+        select(this)
+            .transition()
+            .duration(1000)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
+            })
+            .ease(easeCubic)
+    });
+
+    const filter = getFilter(dimension);
+    brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
+    if (helper.isInverted(dimension)) {
+        brush.addInvertStatus(true, dimension, "isInverted");
+    }
+    else {
+        brush.addInvertStatus(false, dimension, "isInverted");
+    }
+}
+
 export function invert(dimension: string): void {
     const cleanDimensionName = utils.cleanString(dimension);
     const invertId = '#dimension_invert_' + cleanDimensionName;
@@ -407,4 +537,188 @@ export function invert(dimension: string): void {
     else {
         brush.addInvertStatus(false, dimension, "isInverted");
     }
+}
+
+//---------- Selection Functions ----------
+
+export function getSelected(): string[] {
+    let selected = [];
+
+    const records = getAllRecords();
+    for (let i = 0; i < records.length; i++) {
+        let isselected = isSelected(records[i]);
+        if (isselected) {
+            selected.push(records[i]);
+        }
+    }
+    return selected;
+}
+
+export function setSelection(records: string[]): void {
+    for (let i = 0; i < records.length; i++) {
+        let stroke = select('#' + utils.cleanString(records[i])).style('stroke');
+        if (stroke !== 'lightgrey') {
+            select('#' + utils.cleanString(records[i]))
+                .classed('selected', true)
+                .transition()
+                .style('stroke', 'rgba(255, 165, 0, 1)');
+        }
+    }
+}
+
+export function clearSelection(): void {
+    const selectedRecords = getSelected();
+    selectedRecords.forEach(element => {
+        select('#' + utils.cleanString(element))
+            .classed('selected', false)
+            .transition()
+            .style('stroke', 'rgba(0, 129, 175, 0.5)')
+    });
+}
+
+export function toggleSelection(record: string): void {
+    const selected = isSelected(record);
+    if (selected) {
+        setUnselected(record);
+    }
+    else {
+        setSelected(record);
+    }
+}
+
+export function setSelected(record: string): void {
+    let selectableLines = [];
+    selectableLines.push(record);
+    setSelection(selectableLines);
+}
+
+export function setUnselected(record: string): void {
+    selectAll('#' + utils.cleanString(record))
+        .classed('selected', false)
+        .transition()
+        .style('stroke', 'rgba(0, 129, 175, 0.5)');
+}
+
+export function isRecordInactive(record: string): boolean {
+    const stroke = select('#' + utils.cleanString(record));
+    let node = stroke.node();
+    let style = node.style.stroke;
+    return style === 'rgba(211, 211, 211, 0.4)' ? true : false;
+}
+
+//---------- Selection Functions With IDs ----------
+
+export function setSelectionWithId(recordIds: string[]): void {
+    let records: string[] = [];
+    for (let i = 0; i < recordIds.length; i++) {
+        let record = getRecordWithId(recordIds[i]);
+        records.push(record);
+    }
+    setSelection(records);
+}
+
+export function isSelectedWithRecordId(recordId: string): boolean {
+    let record = getRecordWithId(recordId);
+    return isSelected(record);
+}
+
+export function getRecordWithId(recordId: string): string {
+    const item = parcoords.currentPosOfDims.find((object: { recordId: string; }) => object.recordId == recordId);
+    return item.key;
+}
+
+export function toggleSelectionWithId(recordId: string): void {
+    const record = getRecordWithId(recordId);
+    toggleSelection(record);
+}
+
+export function setSelectedWithId(recordId: string): void {
+    const record = getRecordWithId(recordId);
+    setSelected(record);
+}
+
+export function setUnselectedWithId(recordId: string): void {
+    const record = getRecordWithId(recordId);
+    setUnselected(record);
+}
+
+//---------- Color Records ----------
+export function colorRecord(record: string, color: string): void {
+    selectAll('#' + utils.cleanString(record))
+        .transition()
+        .style('stroke', color);
+}
+
+export function uncolorRecord(record: string): void {
+    selectAll('#' + utils.cleanString(record))
+        .transition()
+        .style('stroke', 'rgba(0, 129, 175, 0.5)');
+}
+
+//---------- Helper Functions ----------
+
+export function getAllRecords(): string[] {
+    const selection = active;
+    const object = selection._groups;
+    const data = [];
+    for (let i = 0; i < object[0].length; i++) {
+        const items = object.map((item: any[]) => item[i]);
+        const keys = Object.keys(items);
+        const text = items[keys[0]].id;
+        data.push(text);
+    }
+    return data;
+}
+
+export function getAllVisibleDimensionNames(): string[] {
+    let listOfDimensions = parcoords.newFeatures.slice();
+    return listOfDimensions.reverse();
+}
+
+export function getAllDimensionNames(): string[] {
+    return parcoords.data['columns'];
+}
+
+export function getAllHiddenDimensionNames(): string[] {
+    const dimensions = getAllDimensionNames();
+    const hiddenDimensions = [];
+    for (let i = 0; i < dimensions.length; i++) {
+        if (getHiddenStatus(dimensions[i]) == 'hidden') {
+            hiddenDimensions.push(dimensions[i]);
+        }
+    }
+    return hiddenDimensions;
+}
+
+export function getHiddenStatus(dimension: string): string {
+    const index = parcoords.newFeatures.indexOf(dimension);
+    if (index != -1) {
+        return "shown";
+    }
+    else {
+        return "hidden";
+    }
+}
+
+export function getInversionStatus(dimension: string): string {
+    const invertId = '#dimension_invert_' + utils.cleanString(dimension);
+    const element = select(invertId);
+    const arrowStatus = element.text();
+    return arrowStatus == 'up' ? 'ascending' : 'descending';
+}
+
+export function getNumberOfDimensions(): number {
+    return parcoords.newFeatures.length;
+}
+
+export function getDimensionPosition(dimension: string): number {
+    return parcoords.newFeatures.indexOf(dimension);
+}
+
+export function isDimensionCategorical(dimension: string): boolean {
+    let values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
+    if (isNaN(values[0])) {
+        return true;
+    }
+    return false;
 }
