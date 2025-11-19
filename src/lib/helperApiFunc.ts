@@ -716,9 +716,7 @@ export function getDimensionPosition(dimension: string): number {
 }
 
 export function isDimensionCategorical(dimension: string): boolean {
-    let values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
-    if (isNaN(values[0])) {
-        return true;
-    }
-    return false;
+    const values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
+    const isAllNumeric = values.every(v => !isNaN(Number(v)));
+    return !isAllNumeric;
 }

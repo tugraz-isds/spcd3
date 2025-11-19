@@ -24,7 +24,8 @@ export function setupYScales(header: any, dataset: any): any {
   header.map((x: { name: string | number; }) => {
     const values = dataset.map((o: { [x: string]: any; }) => o[x.name]);
     let labels = [];
-    if (isNaN(values[0]) !== false) {
+    const numericValues = values.every(v => !isNaN(Number(v)));
+    if (!numericValues) {
       values.forEach(function (element: string) {
         labels.push(element.length > 10 ? element.substr(0, 10) + '...' :
         element);
@@ -34,22 +35,20 @@ export function setupYScales(header: any, dataset: any): any {
         .range([80, height - 80])
         .padding(0.2);
       }
-      else {
-        const max = Math.max(...dataset.map((o: { [x: string]: any; }) => o
-        [x.name]));
-        const min = Math.min(...dataset.map((o: { [x: string]: any; }) => o
-        [x.name]));
-        if (min === max) {
-          const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
-          yScales[x.name] = scaleLinear()
-            .domain([min - epsilon, max + epsilon])
-            .range([height - 80, 80]);
-        } else {
-          yScales[x.name] = scaleLinear()
-            .domain([min, max])
-            .range([height - 80, 80]);
-          }
-      }
+    else {
+      const max = Math.max(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
+      const min = Math.min(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
+      if (min === max) {
+        const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
+        yScales[x.name] = scaleLinear()
+          .domain([min - epsilon, max + epsilon])
+          .range([height - 80, 80]);
+      } else {
+        yScales[x.name] = scaleLinear()
+          .domain([min, max])
+          .range([height - 80, 80]);
+        }
+    }
   });
   return yScales;
 }
@@ -71,12 +70,10 @@ function isLinearScale(scale: any): scale is ScaleLinear<number, number> {
 export function setupYAxis(yScales: any, dataset: any, hiddenDims: any): any {
   const limit = 30;
   const yAxis = {};
-  
+
   Object.entries(yScales).forEach(([key, scale]) => {
     if (hiddenDims.includes(key)) return;
-      const sample = dataset[0][key];
-      const isNumeric = !isNaN(+sample);
-      if (!isNumeric) {
+      if (!isLinearScale(scale)) {
         const rawLabels = dataset.map((d: { [x: string]: any; }) => d[key]);
         const shortenedLabels = rawLabels.map((val: string) =>
           typeof val === 'string' && val.length > 10 ? val.substr(0, 10) + 
