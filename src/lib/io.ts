@@ -182,6 +182,27 @@ function setOptionsAndDownload(svgString: string) {
   rowKeepClasses.appendChild(labelKeepClasses);
   rowKeepClasses.appendChild(inputKeepClasses);
 
+  const rowRemoveUiControls = document.createElement('div');
+  rowRemoveUiControls.style.display = 'flex';
+  rowRemoveUiControls.style.alignItems = 'center';
+  rowRemoveUiControls.style.justifyContent = 'space-between';
+
+  const labelRemoveUiControls = document.createElement('label');
+  labelRemoveUiControls.textContent = 'Download without UI controls: ';
+  labelRemoveUiControls.style.padding = '0.35rem';
+  labelRemoveUiControls.style.flex = '1';
+  labelRemoveUiControls.style.textAlign = 'left';
+  labelRemoveUiControls.style.marginRight = '0.5rem';
+
+  const inputRemoveUiControls = document.createElement('input');
+  inputRemoveUiControls.type = 'checkbox';
+  inputRemoveUiControls.id = 'removeUiControlsInput';
+  inputRemoveUiControls.style.marginRight = '0.45rem';
+  inputRemoveUiControls.checked = true;
+
+  rowRemoveUiControls.appendChild(labelRemoveUiControls);
+  rowRemoveUiControls.appendChild(inputRemoveUiControls);
+
   const button = document.createElement('button');
   button.textContent = 'Download';
   button.style.cursor = 'pointer';
@@ -193,6 +214,7 @@ function setOptionsAndDownload(svgString: string) {
 
   form.appendChild(rowDecimals);
   form.appendChild(rowKeepClasses);
+  form.appendChild(rowRemoveUiControls);
   form.appendChild(button)
   modal.appendChild(form);
   modalOverlay.appendChild(modal);
@@ -212,6 +234,10 @@ function setOptionsAndDownload(svgString: string) {
 
     if (!inputKeepClasses.checked) {
       updatedSVG = removeClasses(updatedSVG);
+    }
+
+    if (inputRemoveUiControls.checked) {
+      updatedSVG = removeUiControls(updatedSVG);
     }
 
     let processedData = xmlFormat(updatedSVG, { indentation: '  ', collapseContent: true })
@@ -251,4 +277,12 @@ function roundDecimals(svgString: string, decimals: number): string {
 
 function removeClasses(svgString: string): string {
   return svgString.replace(/\sclass="[^"]*"/g, '');
+}
+
+function removeUiControls(svgString: string): string {
+  svgString = svgString.replace(/<defs[\s\S]*?<\/defs>/g, '');
+  svgString = svgString.replace(/<use[\s\S]*?<\/use>/g, '');
+  svgString = svgString.replace(/<rect[\s\S]*?<\/rect>/g, '');
+  svgString = svgString.replace(/y\s*=\s*["']?18["']?/g, 'y="29"');
+  return svgString;
 }
