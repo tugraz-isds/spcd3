@@ -197,7 +197,7 @@ function setUpParcoordData(data: any, newFeatures: []): void {
         const ranges = api.getDimensionRange(newFeatures[i]);
         parcoords.currentPosOfDims.push(
             {
-                key: newFeatures[i], top: 80, bottom: 320, isInverted: false, index: i,
+                key: newFeatures[i], top: 50, bottom: 350, isInverted: false, index: i,
                 min: min, max: max, sigDig: 0, currentRangeTop: ranges[1], currentRangeBottom: ranges[0], 
                 currentFilterBottom: ranges[0], currentFilterTop: ranges[1]
             }
@@ -534,7 +534,7 @@ function createImage(defs, id, width, height, image): void {
 }
 
 function setInvertIcon(featureAxis): void {
-    let value = (80 / 1.5).toFixed(4);
+    let value = (50 / 1.3).toFixed(4);
 
     const svg = featureAxis
         .append('svg')
@@ -548,7 +548,7 @@ function setInvertIcon(featureAxis): void {
         .attr('id', 'invert_hitbox')
         .attr('class', 'hitbox')
         .attr('x', 6)
-        .attr('y', 20)
+        .attr('y', Number(value)-33)
         .attr('width', 44)
         .attr('height', 15)
         .attr('rx', 6)

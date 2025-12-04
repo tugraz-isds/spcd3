@@ -344,7 +344,7 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
     triUpHit.attr('y', rectY + rectH);
 
 
-    if (rectY == 80) {
+    if (rectY == 50) {
         select('#triangle_down_' + cleanDimensionName)
             .attr('href', '#brush_image_bottom');
     }
@@ -353,7 +353,7 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
             .attr('href', '#brush_image_bottom_active');
     }
 
-    if (rectY + rectH == 320) {
+    if (rectY + rectH == 350) {
         select('#triangle_up_' + cleanDimensionName)
             .attr('href', '#brush_image_top'); 
     }
@@ -362,7 +362,7 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
             .attr('href', '#brush_image_top_active');  
     }
 
-    if (rectY != 80 || rectY + rectH != 320) {
+    if (rectY != 50 || rectY + rectH != 350) {
         select('#rect_' + cleanDimensionName)
             .attr('fill', 'rgb(255, 255, 0)')
             .attr('opacity', '0.7');

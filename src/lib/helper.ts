@@ -5,6 +5,8 @@ import { line } from 'd3-shape';
 import * as utils from './utils';
 import { parcoords, height, width, padding, hoverlabel } from './globals';
 
+const PADDING = 50;
+
 export function prepareData(data: [], dimensions: any): any {
   let dataset = [];
   data.forEach((item: { [x: string]: any; }) => {
@@ -32,7 +34,7 @@ export function setupYScales(header: any, dataset: any): any {
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([80, height - 80]);
+        .range([PADDING, height - PADDING])
       }
     else {
       const max = Math.max(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
@@ -41,11 +43,11 @@ export function setupYScales(header: any, dataset: any): any {
         const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
         yScales[x.name] = scaleLinear()
           .domain([min - epsilon, max + epsilon])
-          .range([height - 80, 80]);
+          .range([height - PADDING, PADDING]);
       } else {
         yScales[x.name] = scaleLinear()
           .domain([min, max])
-          .range([height - 80, 80]);
+          .range([height - PADDING, PADDING]);
         }
     }
   });
