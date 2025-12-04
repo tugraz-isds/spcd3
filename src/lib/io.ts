@@ -113,7 +113,7 @@ function setOptionsAndDownload(svgString: string) {
   modal.append(fakeheader);
 
   const title = document.createElement('div');
-  title.textContent = 'Download SVG';
+  title.textContent = 'Download Chart (SVG)';
   title.style.padding = '0.5rem';
   title.style.marginBottom = '0.5rem';
   title.style.background = 'lightgrey';

@@ -458,11 +458,22 @@ export function filter(dimensionName: string, min: number, max: number): void {
 
     if (bottomPosition == 320) {
         select('#triangle_up_' + cleanDimensionName)
-            .attr('href', '#brush_image_top');
+            .attr('href', '#brush_image_top'); 
     }
     else {
         select('#triangle_up_' + cleanDimensionName)
-            .attr('href', '#brush_image_top_active');
+            .attr('href', '#brush_image_top_active');  
+    }
+
+    if (topPosition != 80 || bottomPosition != 320) {
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.7');
+    }
+    else {
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(242, 242, 76)')
+            .attr('opacity', '0.5');
     }
 
     let active = select('g.active').selectAll('path');
@@ -857,6 +868,15 @@ function makeActive(currentLineName: string, duration: number): void {
             .transition()
             .duration(duration)
             .style('stroke', 'rgba(255, 165, 0, 1)');
+    }
+    else if (select('.' + currentLineName).classed('colored')) {
+        let color = select('.' + currentLineName).property('clusterColor');
+        select('.' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .text('')
+            .transition()
+            .duration(duration)
+            .style('stroke', color);
     }
     else {
         select('.' + currentLineName)

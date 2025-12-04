@@ -49,6 +49,7 @@
     "d3-transition": "^3.0.1",
     "d3-interpolate-path": "^2.3.0",
     "d3-array": "^3.2.4",
+    "d3-zoom": "^3.0.0",
     "mini-svg-data-uri": "^1.4.4",
     "xml-formatter": "^3.6.4"
   }

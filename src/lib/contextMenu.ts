@@ -554,7 +554,7 @@ function createContextMenu(): void {
   contextMenu.append('div')
     .attr('id', 'showAllMenu')
     .attr('class', 'contextmenu')
-    .text('Show All');
+    .text('Show All Dimensions');
 }
 
 function createModalToSetRange(): void {

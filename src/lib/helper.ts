@@ -32,8 +32,7 @@ export function setupYScales(header: any, dataset: any): any {
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([80, height - 80])
-        .padding(0.2);
+        .range([80, height - 80]);
       }
     else {
       const max = Math.max(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
@@ -166,9 +165,9 @@ export function createToolTipForValues(records: any, recKey?: string) {
     .join('div')
     .attr('class', 'tip-layer')
     .attr('data-record', recordId)
-    .style('position', 'absolute')
-    .style('left', '0px')
-    .style('top', '0px')
+    .style('position', 'fixed')
+    .style('left', '0')
+    .style('top', '0')
     .style('pointer-events', 'none');
 
   const data: ToolTipItem[] = dimensions
@@ -184,8 +183,8 @@ export function createToolTipForValues(records: any, recKey?: string) {
 
       return {
         dim,
-        pageX: sp.x + window.scrollX + 8,
-        pageY: sp.y + window.scrollY + 8,
+        pageX: sp.x + 8,
+        pageY: sp.y + 8,
         text: String(records[dim]),
       };
     });
@@ -234,13 +233,15 @@ export function getAllPointerEventsData(event: any): any {
 
 export function createTooltipForLabel(tooltipText, tooltipLabel, event) {
   if (!tooltipText || tooltipText.length === 0) return;
-  const [x, y] = utils.getMouseCoords(event);
+  const x = event.clientX;
+  const y = event.clientY;
   let tempText = tooltipText.toString();
   tempText = tempText.split(',').join('\r\n');
   tooltipLabel.text(tempText)
     .style('visibility', 'visible')
-    .style('top', y / 16 + 'rem')
-    .style('left', x / 16 + 0.5 + 'rem');
+    .style('position', 'fixed')
+    .style('top', `${y}px`)
+    .style('left', `${x}px`);
   return tooltipLabel;
 }
 

@@ -1,4 +1,5 @@
 import 'd3-transition';
+import { zoom } from 'd3-zoom';
 import { select, selectAll } from 'd3-selection';
 import * as brush from './brush';
 import * as utils from './utils';
@@ -59,13 +60,16 @@ export function drawChart(content: []): void {
     setSvg(chartWrapper.append('svg')
         .attr('id', 'pc_svg')
         .attr('viewBox', [0, 0, width, height])
-        .attr('font-family', 'Verdana, sans-serif'));      
+        .attr('font-family', 'Verdana, sans-serif'));
+
+    const plot = svg.append("g")
+        .attr("class", "plot");
 
     setDefsForIcons();
 
-    setFeatureAxis(svg, yAxis, parcoords, width, padding);
+    setFeatureAxis(plot, yAxis, parcoords, width, padding);
 
-    setActive(setActivePathLines(svg, content, parcoords));
+    setActive(setActivePathLines(plot, content, parcoords));
 
     svg.on("contextmenu", function (event: any) {
             event.stopPropagation();
@@ -80,6 +84,24 @@ export function drawChart(content: []): void {
         .on("mousedown.selection", function (event: any) {
             event.preventDefault();
         });
+
+        /*const zoomBehavior = zoom()
+            .scaleExtent([0.5, 20])
+            .translateExtent([[0, 0], [width * 3, height * 3]])
+            .on("zoom", (event) => {
+                plot.attr("transform", event.transform);
+            });
+
+
+        const identity = { k: 1, x: 0, y: 0 };
+        svg.call(zoomBehavior)
+            .on("dblclick.zoom", null)
+            .on("dblclick.reset", (event) => {
+                event.preventDefault();
+                svg.transition()
+                    .duration(400)
+                    .call(zoomBehavior.transform, identity);
+            });*/
 
     window.onclick = () => {
         select('#contextmenu').style('display', 'none');
@@ -589,6 +611,11 @@ function doNotHighlight() {
         if (line.classed('selected')) {
             line.transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
+        }
+        else if (line.classed('colored')) {
+          const color = line.property("clusterColor");
+          line.transition()
+            .style('stroke', color);
         }
         else {
             line.transition()

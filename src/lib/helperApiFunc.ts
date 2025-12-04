@@ -296,9 +296,12 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
 }
 
 function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void {
-    const rect = select('#rect_' + dimension);
-    const triDown = select('#triangle_down_' + dimension);
-    const triUp = select('#triangle_up_' + dimension);
+    const cleanDimensionName = utils.cleanString(dimension);
+    const rect = select('#rect_' + cleanDimensionName);
+    const triDown = select('#triangle_down_' + cleanDimensionName);
+    const triDownHit = select('#triangle_down_hit' + cleanDimensionName);
+    const triUp = select('#triangle_up_' + cleanDimensionName);
+    const triUpHit = select('#triangle_up_hit' + cleanDimensionName);
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
 
@@ -326,16 +329,50 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
     rect.transition()
         .duration(300)
         .attr('y', rectY)
-        .attr('height', rectH)
-        .style('opacity', 0.3);
+        .attr('height', rectH);
 
     triDown.transition()
         .duration(300)
         .attr('y', rectY - 10);
 
+    triDownHit.attr('y', rectY - 10);
+
     triUp.transition()
         .duration(300)
         .attr('y', rectY + rectH);
+    
+    triUpHit.attr('y', rectY + rectH);
+
+
+    if (rectY == 80) {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom');
+    }
+    else {
+        select('#triangle_down_' + cleanDimensionName)
+            .attr('href', '#brush_image_bottom_active');
+    }
+
+    if (rectY + rectH == 320) {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top'); 
+    }
+    else {
+        select('#triangle_up_' + cleanDimensionName)
+            .attr('href', '#brush_image_top_active');  
+    }
+
+    if (rectY != 80 || rectY + rectH != 320) {
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(255, 255, 0)')
+            .attr('opacity', '0.7');
+    }
+    else {
+        select('#rect_' + cleanDimensionName)
+            .attr('fill', 'rgb(242, 242, 76)')
+            .attr('opacity', '0.5');
+    }
+
 }
 
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
@@ -643,16 +680,25 @@ export function setUnselectedWithId(recordId: string): void {
 }
 
 //---------- Color Records ----------
-export function colorRecord(record: string, color: string): void {
-    selectAll('#' + utils.cleanString(record))
-        .transition()
-        .style('stroke', color);
+export function colorRecord(record, color) {
+  const path = selectAll('#' + utils.cleanString(record));
+
+  path.classed("colored", true)
+    .property("clusterColor", color);
+
+  path.transition()
+    .style('stroke', color);
 }
 
-export function uncolorRecord(record: string): void {
-    selectAll('#' + utils.cleanString(record))
-        .transition()
-        .style('stroke', 'rgba(0, 129, 175, 0.5)');
+export function uncolorRecord(record) {
+
+  const path = selectAll('#' + utils.cleanString(record));
+
+  path.classed("colored", false)
+    .property("clusterColor", "rgba(0, 129, 175, 0.5)");
+
+  path.transition()
+    .style('stroke', "rgba(0, 129, 175, 0.5)");
 }
 
 //---------- Helper Functions ----------

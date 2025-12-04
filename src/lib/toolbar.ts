@@ -41,7 +41,7 @@ export function createToolbar(dataset: any[]): void {
 
     toolbar.append('button')
         .attr('id', 'downloadButton')
-        .attr('title', 'Download SVG')
+        .attr('title', 'Download Chart (SVG)')
         .html(icon.getDownloadButton())
         .style('margin', '0')
         .style('border', 'none')
