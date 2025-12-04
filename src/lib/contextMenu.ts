@@ -522,38 +522,47 @@ function createContextMenu(): void {
   contextMenu.append('div')
     .attr('id', 'copyDimensionName')
     .attr('class', 'contextmenu')
+    .attr('title', 'Copy name of dimension')
     .text('Copy Name')
   contextMenu.append('div')
     .attr('id', 'hideMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Hide dimension')
     .text('Hide');
   contextMenu.append('div')
     .attr('id', 'invertMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Invert dimension')
     .text('Invert');
   contextMenu.append('div')
     .attr('id', 'rangeMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Set range on a dimension')
     .text('Set Range...');
   contextMenu.append('div')
     .attr('id', 'resetRangeMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Set range on a dimension from data')
     .text('Set Range from Data');
   contextMenu.append('div')
     .attr('id', 'resetRoundRangeMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Set rounded range on a dimension from data')
     .text('Set Rounded Range from Data');
   contextMenu.append('div')
     .attr('id', 'filterMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Set filter on a dimension')
     .text('Set Filter...');
   contextMenu.append('div')
     .attr('id', 'resetfilterMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Reset filter on a dimension')
     .text('Reset Filter');
   contextMenu.append('div')
     .attr('id', 'showAllMenu')
     .attr('class', 'contextmenu')
+    .attr('title', 'Show all dimensions')
     .text('Show All Dimensions');
 }
 

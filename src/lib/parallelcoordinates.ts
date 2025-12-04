@@ -395,6 +395,20 @@ function createContextMenuItem(contextMenu, id, className, text)
 function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
     const container = document.querySelector("#parallelcoords");
     const rect = container.getBoundingClientRect();
+    const data = helper.getAllPointerEventsData(event);
+    const cleanedItems = data.map((item: string) =>
+        utils.cleanString(item).replace(/[.,]/g, '')
+    );
+
+    if (cleanedItems.length > 1) {
+        select('#selectRecord').text('Select Records');
+        select('#unSelectRecord').text('Unselect Records');
+        select('#toggleRecord').text('Toggle Records');
+    } else {
+        select('#selectRecord').text('Select Record');
+        select('#unSelectRecord').text('Unselect Record');
+        select('#toggleRecord').text('Toggle Record');
+    }
 
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -411,20 +425,24 @@ function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
         });
 
     select('#selectRecord').on('click', (event) => {
-        api.setSelected(d[hoverlabel]);
+        api.setSelection(cleanedItems);
         event.stopPropagation();
         select('#contextmenuRecords').style('display', 'none');
     });
 
     select('#unSelectRecord').on('click', (event) => {
-        api.setUnselected(d[hoverlabel]);
+        cleanedItems.forEach(item => {
+            api.setUnselected(item);
+        });
         event.stopPropagation();
         select('#contextmenuRecords').style('display', 'none');
     });
 
     select('#toggleRecord').style('border-top', '0.08rem lightgrey solid')
         .on('click', (event) => {
-            api.toggleSelection(d[hoverlabel]);
+            cleanedItems.forEach(item => {
+                api.toggleSelection(item);
+            });
             event.stopPropagation();
             select('#contextmenuRecords').style('display', 'none');
         });
@@ -433,14 +451,16 @@ function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
         .on('click', (event) => {
             let selectedRecords = [];
             selectedRecords = api.getSelected();
-            selectedRecords.push(d[hoverlabel]);
-            api.setSelection(selectedRecords);
+            const records = [...selectedRecords , ...cleanedItems];
+            api.setSelection(records);
             event.stopPropagation();
             select('#contextmenuRecords').style('display', 'none');
         });
 
     select('#removeSelection').on('click', (event) => {
-        api.setUnselected(d[hoverlabel]);
+        cleanedItems.forEach(item => {
+            api.setUnselected(item);
+        });
         event.stopPropagation();
         select('#contextmenuRecords').style('display', 'none');
     });
