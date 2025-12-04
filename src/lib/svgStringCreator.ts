@@ -95,7 +95,7 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
     featureAxis
       .append('text')
       .attr('text-anchor', 'middle')
-      .attr('y', (80 / 1.7).toFixed(4))
+      .attr('y', 18)
       .text((d: { name: string; }) => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
       .style('font-size', '0.7rem');
 
@@ -114,7 +114,7 @@ function setBrushDownToDownload(featureAxis: any): void {
         .append('g')
         .append('use')
         .attr('id', 'triangle_down_' + processedDimensionName)
-        .attr('y', item.top == 80 ? 70 : item.top-10)
+        .attr('y', item.top == 50 ? 40 : item.top-10)
         .attr('x', -6)
         .attr('width', 14)
         .attr('height', 10)
@@ -159,10 +159,9 @@ function setRectToDragToDownload(featureAxis: any): void {
 }
 
 function setInvertIconToDownload(featureAxis: any): void {
-  let value = (80 / 1.5).toFixed(4);
   featureAxis
     .append('svg')
-    .attr('y', value)
+    .attr('y', 25)
     .attr('x', -6)
     .append('use')
     .attr('width', 12)
