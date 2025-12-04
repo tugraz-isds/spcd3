@@ -376,19 +376,20 @@ function createContextMenuForRecords(): any {
         .style('position', 'absolute')
         .style('display', 'none');
 
-    createContextMenuItem(contextMenu, 'selectRecord', 'contextmenu', 'Select Record');
-    createContextMenuItem(contextMenu, 'unSelectRecord', 'contextmenu', 'Unselect Record');
-    createContextMenuItem(contextMenu, 'toggleRecord', 'contextmenu', 'Toggle Record');
-    createContextMenuItem(contextMenu, 'addSelection', 'contextmenu', 'Add to Selection');
-    createContextMenuItem(contextMenu, 'removeSelection', 'contextmenu', 'Remove from Selection');
+    createContextMenuItem(contextMenu, 'selectRecord', 'contextmenu', 'Select Record', 'Select Record(s)');
+    createContextMenuItem(contextMenu, 'unSelectRecord', 'contextmenu', 'Unselect Record', 'Unselect Record(s)');
+    createContextMenuItem(contextMenu, 'toggleRecord', 'contextmenu', 'Toggle Record', 'Toggle Record(s)');
+    createContextMenuItem(contextMenu, 'addSelection', 'contextmenu', 'Add to Selection', 'Add to Selection');
+    createContextMenuItem(contextMenu, 'removeSelection', 'contextmenu', 'Remove from Selection', 'Remove from Selection');
     return contextMenu;
 }
 
-function createContextMenuItem(contextMenu, id, className, text)
+function createContextMenuItem(contextMenu, id, className, text, title)
 {
      contextMenu.append('div')
         .attr('id', id)
         .attr('class', className)
+        .attr('title', title)
         .text(text);
 }
 
