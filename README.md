@@ -100,12 +100,12 @@ As mentioned in the beginning, an example was implemented to show how
 the library works and what the parallel coordinate plot will look like
 in addition to the library.
 
-The [API Guide](./API.md) lists all available functions in SPCD3's
+The [API Guide](./README-API.md) lists all available functions in SPCD3's
 API.
 
 An example application was built to illustrate the use of the SPCD3
 library. It is described in the [Example Application
-Guide](./EXAMPLE.md).
+Guide](./README-EXAMPLE.md).
 
 
 
