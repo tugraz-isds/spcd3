@@ -318,7 +318,10 @@ select('#pc_svg').on('mouseleave', () => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    const chartBounds = document.querySelector('#pc_svg').getBoundingClientRect();
+    const chartSel = select('#pc_svg');
+    const chart = chartSel.node();
+    if (!chart) return;
+    const chartBounds = chart.getBoundingClientRect();
     if (
         e.clientX < chartBounds.left ||
         e.clientX > chartBounds.right ||
