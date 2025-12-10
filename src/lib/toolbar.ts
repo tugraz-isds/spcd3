@@ -275,4 +275,3 @@ function downloadCSV(dataset: any[], filename = 'data.csv') {
     link.click();
     document.body.removeChild(link);
 }
-

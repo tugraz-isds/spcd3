@@ -526,16 +526,6 @@ function setFeatureAxis(svg, yAxis, parcoords, width, padding): void {
     setInvertIcon(featureAxis);
 }
 
-export function showMarker(dimension: string) {
-    const cleanDimensionName = utils.cleanString(dimension);
-    select('#marker_' + cleanDimensionName).attr('opacity', 1);
-}
-
-export function hideMarker(dimension: string) {
-    const cleanDimensionName = utils.cleanString(dimension);
-    select('#marker_' + cleanDimensionName).attr('opacity', 0);
-}
-
 function setDefsForIcons(): void {
     const svgContainer = svg;
     let defs = svgContainer.select('defs');
@@ -649,8 +639,6 @@ function doNotHighlight() {
 
     currentlyHighlightedItems = [];
 }
-
-
 
 function setMarker(featureAxis: any): void {
     featureAxis

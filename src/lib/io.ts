@@ -80,8 +80,6 @@ export function saveAsSvg(): void {
   setOptionsAndDownload(svgString);
 }
 
-
-
 function setOptionsAndDownload(svgString: string) {
   let name = 'parcoords.svg';
   const modalOverlay = document.createElement('div');

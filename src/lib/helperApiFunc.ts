@@ -98,6 +98,16 @@ export function show(dimension: string): void {
         });
 }
 
+export function getHiddenStatus(dimension: string): string {
+    const index = parcoords.newFeatures.indexOf(dimension);
+    if (index != -1) {
+        return "shown";
+    }
+    else {
+        return "hidden";
+    }
+}
+
 //---------- Move Functions ----------
 
 export function moveByOne(dimension: string, direction: string): void {
@@ -680,7 +690,7 @@ export function setUnselectedWithId(recordId: string): void {
 }
 
 //---------- Color Records ----------
-export function colorRecord(record, color) {
+export function colorRecord(record: string, color: string): void {
   const path = selectAll('#' + utils.cleanString(record));
 
   path.classed("colored", true)
@@ -690,7 +700,7 @@ export function colorRecord(record, color) {
     .style('stroke', color);
 }
 
-export function uncolorRecord(record) {
+export function uncolorRecord(record: string): void {
 
   const path = selectAll('#' + utils.cleanString(record));
 
@@ -736,16 +746,6 @@ export function getAllHiddenDimensionNames(): string[] {
     return hiddenDimensions;
 }
 
-export function getHiddenStatus(dimension: string): string {
-    const index = parcoords.newFeatures.indexOf(dimension);
-    if (index != -1) {
-        return "shown";
-    }
-    else {
-        return "hidden";
-    }
-}
-
 export function getInversionStatus(dimension: string): string {
     const invertId = '#dimension_invert_' + utils.cleanString(dimension);
     const element = select(invertId);
@@ -765,4 +765,14 @@ export function isDimensionCategorical(dimension: string): boolean {
     const values = parcoords.newDataset.map((o: { [x: string]: any; }) => o[dimension]);
     const isAllNumeric = values.every(v => !isNaN(Number(v)));
     return !isAllNumeric;
+}
+
+export function showMarker(dimension: string) {
+    const cleanDimensionName = utils.cleanString(dimension);
+    select('#marker_' + cleanDimensionName).attr('opacity', 1);
+}
+
+export function hideMarker(dimension: string) {
+    const cleanDimensionName = utils.cleanString(dimension);
+    select('#marker_' + cleanDimensionName).attr('opacity', 0);
 }

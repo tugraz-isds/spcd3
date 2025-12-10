@@ -6,11 +6,7 @@ export function loadCSV(csv: string): any {
     csv = removeDuplicateColumnNames(csv);
   }
   let tempData = csvParse(csv);
-  console.log(tempData);
   let data = validateParsedCsv(tempData);
-
-  console.log(data.validData);
-  console.log(data.invalidRows);
 
   if (data.invalidRows.length !== 0)
     showInvalidRowsMessage(data.invalidRows, tempData.columns);
@@ -18,7 +14,7 @@ export function loadCSV(csv: string): any {
   return data.validData;
 }
 
-export function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
+function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
   overlay.style.top = "0";
@@ -67,8 +63,7 @@ export function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
   document.body.appendChild(overlay);
 }
 
-
-export function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
+function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
   overlay.style.top = "0";
@@ -133,8 +128,7 @@ export function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   document.body.appendChild(overlay);
 }
 
-
-export function renderInvalidTable(rows: any[], columns: string[]): string {
+function renderInvalidTable(rows: any[], columns: string[]): string {
   const headerHtml = `
     <thead>
       <tr>
@@ -177,20 +171,20 @@ export function renderInvalidTable(rows: any[], columns: string[]): string {
   return `${headerHtml}<tbody>${bodyHtml}</tbody>`;
 }
 
-export interface CsvRow {
+interface CsvRow {
   [key: string]: string;
 }
 
-export interface CsvData extends Array<CsvRow> {
+interface CsvData extends Array<CsvRow> {
   columns: string[];
 }
 
-export interface CsvValidationResult {
+interface CsvValidationResult {
   validData: CsvData;
   invalidRows: Array<any>;
 }
 
-export function validateParsedCsv(data: CsvData): CsvValidationResult {
+function validateParsedCsv(data: CsvData): CsvValidationResult {
   const columns = data.columns;
 
   const validData = [] as CsvData;

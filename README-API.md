@@ -46,6 +46,22 @@ Deletes the current parallel coordinates chart.
 
 <br/>
 
+#### refresh
+
+`function refresh(): void`
+
+Refreshes the current parallel coordinates chart.
+
+<br/>
+
+#### reset
+
+`function reset(): void`
+
+Resets the current parallel coordinates chart.
+
+<br/>
+
 #### saveAsSvg
 
 `function saveAsSvg(): void`
@@ -312,6 +328,22 @@ Returns an array of all dimensions names in order.
 
 <br/>
 
+#### getAllHiddenDimensionNames
+
+`function getAllHiddenDimensionNames(): string[]`
+
+Returns an array of all hidden dimensions names in order.
+
+<br/>
+
+#### getAllVisibleDimensionNames
+
+`function getAllVisibleDimensionNames(): string[]`
+
+Returns an array of all visible dimensions names in order.
+
+<br/>
+
 #### getAllRecords
 
 `function getAllRecords(): []`
@@ -330,7 +362,7 @@ Returns the number of dimensions.
 
 #### getDimensionPosition
 
-`function getDimensionPosition(dimensionName: string): number`
+`function getDimensionPosition(dimension: string): number`
 
 Returns the position of a dimension (0..𝑚 − 1).
 
@@ -338,7 +370,7 @@ Returns the position of a dimension (0..𝑚 − 1).
 
 #### isDimensionCategorical
 
-`function isDimensionCategorical(dimensionName: string): boolean`
+`function isDimensionCategorical(dimension: string): boolean`
 
 Returns true if a dimension is categorial and false if not (i.e. it is numerical).
 
@@ -357,3 +389,27 @@ Sets the dimension as label for hovering.
 `function getRecordWithId(recordId: number): string`
 
 Returns the label of a record.
+
+<br/>
+
+#### isRecordInactive
+
+`function isRecordInactive(record: string): boolean`
+
+Returns true if a record is inactive and false if not.
+
+<br/>
+
+#### colorRecord
+
+`function colorRecord(record: string, color: string): void`
+
+Change the color of a record.
+
+<br/>
+
+#### uncolorRecord
+
+`function uncolorRecord(record: string): void`
+
+Reset the color of a record to its default color.

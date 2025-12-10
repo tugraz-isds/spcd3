@@ -164,12 +164,12 @@ single dimension can be selected, and with the arrows on the left and
 right, the dimension can be moved to the corresponding side.
 
 **Filtering records** is a breeze with the application by using the
-  dropdown menu to choose a dimension. After selecting a dimension,
-  two input fields appear, where a minimum and maximum value can be
-  easily entered. Information about the filter range is shown, making
-  it easy to understand the impact of the filter. Similar to the set
-  filter, a Set Range is implemented, and information about the
-  original range is shown.
+dropdown menu to choose a dimension. After selecting a dimension,
+two input fields appear, where a minimum and maximum value can be
+easily entered. Information about the filter range is shown, making
+it easy to understand the impact of the filter. Similar to the set
+filter, a Set Range is implemented, and information about the
+original range is shown.
 
 By clicking on **Select Record(s)**, a box with all records opens,
 where one or more records can be selected. When a record is selected,
