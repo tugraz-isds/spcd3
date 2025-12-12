@@ -27,16 +27,14 @@ Grace,24,95,98
 Harper,69,9,97
 ```
 
-<br/>
-
 #### drawChart
 
 `function drawChart(data: []): void`
 
-Uses the given dataset to create a parallel coordinates chart, using D3 to dynamically create SVG
-elements in the DOM. This chart is considered to be the current chart.
+Uses the given dataset to create a parallel coordinates chart, using
+D3 to dynamically create SVG elements in the DOM. This chart is
+considered to be the current chart.
 
-<br/>
 
 #### deleteChart
 
@@ -44,7 +42,6 @@ elements in the DOM. This chart is considered to be the current chart.
 
 Deletes the current parallel coordinates chart.
 
-<br/>
 
 #### refresh
 
@@ -52,7 +49,6 @@ Deletes the current parallel coordinates chart.
 
 Refreshes the current parallel coordinates chart.
 
-<br/>
 
 #### reset
 
@@ -60,13 +56,15 @@ Refreshes the current parallel coordinates chart.
 
 Resets the current parallel coordinates chart.
 
-<br/>
 
 #### saveAsSvg
 
 `function saveAsSvg(): void`
 
-Saves the current parallel coordinates chart as an SVG file with a default name of **'parcoords.svg'**.
+Saves the current parallel coordinates chart as an SVG file with a
+default name of **'parcoords.svg'**.
+
+
 
 ## Show And Hide Functions
 
@@ -76,7 +74,6 @@ Saves the current parallel coordinates chart as an SVG file with a default name 
 
 Makes a hidden dimension visible. The dimension is assigned the status **shown**.
 
-<br/>
 
 #### hide
 
