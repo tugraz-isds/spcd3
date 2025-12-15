@@ -76,6 +76,14 @@ export function saveAsSvg(): void {
   svgString = svgString.replaceAll(regexDown, getImageTag("arrow_image_down", svgArrowDown));
   svgString = svgString.replaceAll(regexBottom, getImageTag("brush_image_bottom", svgArrowBottom));
   svgString = svgString.replaceAll(regexTop, getImageTag("brush_image_top", svgArrowTop));
+  svgString = svgString.replaceAll("currentColor", "black");
+  svgString = svgString.replaceAll("stroke=\"black\"", "");
+  svgString = svgString.replaceAll("fill=\"black\"", "");
+  svgString = svgString.replaceAll("dy=\"0\"", "");
+  svgString = svgString.replaceAll("fill=\"none\" font-size=\"10\" font-family=\"sans-serif\" text-anchor=\"end\"", 
+    "fill=\"none\" font-size=\"8\" text-anchor=\"end\" stroke=\"black\"");
+  svgString = svgString.replaceAll("domain", "dimension");
+  svgString = svgString.replaceAll("12px", "12");
 
   setOptionsAndDownload(svgString);
 }
@@ -175,6 +183,7 @@ function setOptionsAndDownload(svgString: string) {
   inputKeepClasses.type = 'checkbox';
   inputKeepClasses.id = 'keepClassesInput';
   inputKeepClasses.style.marginRight = '0.45rem';
+  inputKeepClasses.style.verticalAlign = 'middle';
   inputKeepClasses.checked = true;
 
   rowKeepClasses.appendChild(labelKeepClasses);
@@ -196,6 +205,7 @@ function setOptionsAndDownload(svgString: string) {
   inputRemoveUiControls.type = 'checkbox';
   inputRemoveUiControls.id = 'removeUiControlsInput';
   inputRemoveUiControls.style.marginRight = '0.45rem';
+  inputRemoveUiControls.style.verticalAlign = 'middle';
   inputRemoveUiControls.checked = true;
 
   rowRemoveUiControls.appendChild(labelRemoveUiControls);
@@ -229,6 +239,9 @@ function setOptionsAndDownload(svgString: string) {
     }
 
     let updatedSVG = roundDecimals(svgString, decimals);
+
+    updatedSVG = updatedSVG.replaceAll("class=\"records\" style=\"opacity: 1; stroke: rgba(0, 129, 175, 1); stroke-width: 2; fill: none;\"",
+      "class=\"records\" style=\"opacity: 0.5; stroke: rgba(0, 129, 175, 0.8); stroke-width: 2; fill: none;\"");
 
     if (!inputKeepClasses.checked) {
       updatedSVG = removeClasses(updatedSVG);
@@ -279,8 +292,8 @@ function removeClasses(svgString: string): string {
 
 function removeUiControls(svgString: string): string {
   svgString = svgString.replace(/<defs[\s\S]*?<\/defs>/g, '');
-  svgString = svgString.replace(/<use[\s\S]*?<\/use>/g, '');
-  svgString = svgString.replace(/<rect[\s\S]*?<\/rect>/g, '');
+  svgString = svgString.replace(/<g><use[\s\S]*?<\/use><\/g>/g, '');
+  svgString = svgString.replace(/<g><rect[\s\S]*?<\/rect><\/g>/g, '');
   svgString = svgString.replace(/y\s*=\s*["']?18["']?/g, 'y="29"');
   return svgString;
 }

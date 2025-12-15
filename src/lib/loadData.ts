@@ -132,7 +132,7 @@ function renderInvalidTable(rows: any[], columns: string[]): string {
   const headerHtml = `
     <thead>
       <tr>
-        ${columns.map(c => `<th style="text-align:left; font-size:0.85rem; background-color:rgb(232, 232, 158); border:0.063rem solid #ddd;">${c}</th>`).join("")}
+        ${columns.map(c => `<th style="text-align:left; font-size:0.85rem; background-color:rgb(201, 212, 221); border:0.063rem solid #ddd;">${c}</th>`).join("")}
       </tr>
     </thead>
   `;

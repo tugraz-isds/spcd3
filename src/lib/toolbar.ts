@@ -14,8 +14,8 @@ export function createToolbar(dataset: any[]): void {
         .style('border', 'none')
         .style('border-radius', '10%')
         .style('padding', '0.2em')
-        .style('width', '2em')
-        .style('height', '2em')
+        .style('width', '1.5em')
+        .style('height', '1.5em')
         .style('cursor', 'pointer');
 
     const toolbar = toolbarRow.append('div')
@@ -35,8 +35,8 @@ export function createToolbar(dataset: any[]): void {
         .style('border', 'none')
         .style('border-radius', '5%')
         .style('padding', '0.3em')
-        .style('width', '2em')
-        .style('height', '2em')
+        .style('width', '1.5em')
+        .style('height', '1.5em')
         .on('click', () => showModalWithData(dataset));
 
     toolbar.append('button')
@@ -47,8 +47,8 @@ export function createToolbar(dataset: any[]): void {
         .style('border', 'none')
         .style('border-radius', '5%')
         .style('padding', '0.3em')
-        .style('width', '2em')
-        .style('height', '2em')
+        .style('width', '1.5em')
+        .style('height', '1.5em')
         .on('click', io.saveAsSvg);
 
     toolbar.append('button')
@@ -59,8 +59,8 @@ export function createToolbar(dataset: any[]): void {
         .style('border', 'none')
         .style('border-radius', '5%')
         .style('padding', '0.3em')
-        .style('width', '2em')
-        .style('height', '2em')
+        .style('width', '1.5em')
+        .style('height', '1.5em')
         .on('click', pc.refresh);
 
     toolbar.append('button')
@@ -71,8 +71,8 @@ export function createToolbar(dataset: any[]): void {
         .style('border', 'none')
         .style('border-radius', '5%')
         .style('padding', '0.3em')
-        .style('width', '2em')
-        .style('height', '2em')
+        .style('width', '1.5em')
+        .style('height', '1.5em')
         .on('click', pc.reset);
 
     toggleButton.on('click', () => {
@@ -200,7 +200,7 @@ function generateTable(dataset: any[], table: HTMLTableElement) {
         th.innerText = header.charAt(0).toUpperCase() + header.slice(1);
         th.style.border = '0.063rem solid #ddd';
         th.style.padding = '0.5rem';
-        th.style.backgroundColor = 'rgb(232, 232, 158)';
+        th.style.backgroundColor = 'rgb(201, 212, 221)';
         th.style.position = 'sticky';
         th.style.top = '0';
         th.style.zIndex = '1';

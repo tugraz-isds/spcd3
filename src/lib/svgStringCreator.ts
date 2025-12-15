@@ -6,10 +6,10 @@ import { parcoords, key, padding } from './globals';
 
 export function setActivePathLinesToDownload(svg: any): void {
   svg.append('g')
-    .attr('class', 'active')
+    .attr('class', 'records')
     .style('opacity', '0.5')
     .style('stroke', 'rgba(0, 129, 175, 0.8)')
-    .style('stroke-width', '0.1rem')
+    .style('stroke-width', '2')
     .style('fill', 'none')
     .selectAll('path')
     .data(parcoords.data)
@@ -97,7 +97,12 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
       .attr('text-anchor', 'middle')
       .attr('y', 18)
       .text((d: { name: string; }) => d.name.length > 10 ? d.name.substr(0, 10) + '...' : d.name)
-      .style('font-size', '0.7rem');
+      .style('font-size', '12');
+
+    featureAxis
+      .selectAll('.tick text')
+      .attr('dy', 0)
+      .attr('dominant-baseline', 'middle');
 
     setBrushDownToDownload(featureAxis);
     setBrushUpToDownload(featureAxis);
