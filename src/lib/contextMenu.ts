@@ -392,11 +392,11 @@ function hideDimensionMenu(dimension: string): void {
 function styleContextMenu(event: any): void {
   const container = document.querySelector("#parallelcoords");
   const rect = container.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  const x = (event.clientX - rect.left)/16;
+  const y = (event.clientY - rect.top)/16;
   select('#contextmenu')
-    .style('left', x + 'px')
-    .style('top', y + 'px')
+    .style('left', x + 'rem')
+    .style('top', y + 'rem')
     .style('display', 'block')
     .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
     .style('border-radius', 0.3 + 'rem').style('margin', 0.5 + 'rem')

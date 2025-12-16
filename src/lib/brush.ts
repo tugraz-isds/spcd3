@@ -639,7 +639,7 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, window: any,
     const digs = getSigDig(d.name);
     tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB') * 10) / 10);
     tooltipValues.style('visibility', 'visible');
-    tooltipValues.style('top', window.event.pageY + 'px').style('left', window.event.pageX + 'px');
+    tooltipValues.style('top', window.event.pageY/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
     tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
         .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -678,7 +678,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesTop.text(Math.round(tooltipValueTop));
         tooltipValuesTop.style('visibility', 'visible');
-        tooltipValuesTop.style('top', Number(yPosTop + 180) + 'px').style('left', window.event.pageX + 'px');
+        tooltipValuesTop.style('top', Number(yPosTop + 180)/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
         tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
@@ -691,7 +691,7 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
     else {
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
-        tooltipValuesDown.style('top', Number(yPosBottom + 180) + 'px').style('left', window.event.pageX + 'px');
+        tooltipValuesDown.style('top', Number(yPosBottom + 180)/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
         tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
             .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
             .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')

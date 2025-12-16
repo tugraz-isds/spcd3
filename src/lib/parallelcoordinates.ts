@@ -238,7 +238,7 @@ const tooltipLabel = select('body')
     .style('pointer-events', 'none')
     .style('background', 'lightgrey')
     .style('padding', '0.2rem')
-    .style('border', '1px solid gray')
+    .style('border', '0.0625rem solid gray')
     .style('border-radius', '0.2rem')
     .style('white-space', 'pre-line')
     .style('font-size', '0.75rem')
@@ -418,10 +418,10 @@ function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
         select('#toggleRecord').text('Toggle Record');
     }
 
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    contextMenu.style('left', x + 'px')
-        .style('top', y + 'px')
+    const x = (event.clientX - rect.left) / 16 ;
+    const y = (event.clientY - rect.top) / 16;
+    contextMenu.style('left', x + 'rem')
+        .style('top', y + 'rem')
         .style('display', 'block')
         .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
         .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')

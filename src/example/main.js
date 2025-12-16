@@ -523,7 +523,7 @@ function generateModuleForSetFilter() {
     popupWindowFilter.style.width = 20 + 'rem';
     popupWindowFilter.style.height = 8 + 'rem';
     popupWindowFilter.style.backgroundColor = 'white';
-    popupWindowFilter.style.border = '1px solid black';
+    popupWindowFilter.style.border = '0.0625rem solid black';
 
     section.appendChild(popupWindowFilter);
 
@@ -732,14 +732,14 @@ function generateModuleForRangeSettings() {
     popupWindowRange.style.width = 20 + 'rem';
     popupWindowRange.style.height = 14 + 'rem';
     popupWindowRange.style.backgroundColor = 'white';
-    popupWindowRange.style.border = '1px solid black';
+    popupWindowRange.style.border = '0.0625rem solid black';
 
     section.appendChild(popupWindowRange);
 
     let headerRange = document.createElement('div');
     headerRange.id = 'rangeHeader';
     const newText = rangeDimensionData.length > 25 ? rangeDimensionData.substr(0, 25) + '...' : rangeDimensionData;
-    headerRange.textContent = 'Set Range for\r\n' + newText;//.replace(/(\S+\s*){1,3}/g, "$&\n");
+    headerRange.textContent = 'Set Range for\r\n' + newText;
     headerRange.style.whiteSpace = 'pre';
     headerRange.style.paddingLeft = 0.5 + 'rem';
     headerRange.style.paddingTop = 0.5 + 'rem';

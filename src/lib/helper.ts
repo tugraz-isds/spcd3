@@ -208,11 +208,11 @@ export function createToolTipForValues(records: any, recKey?: string) {
       .style('padding', '0.12rem')
       .style('white-space', 'nowrap')
       .style('z-index', '9999')
-      .style('left', d => `${d.pageX}px`)
-      .style('top',  d => `${d.pageY}px`)
+      .style('left', d => `${d.pageX/16}rem`)
+      .style('top',  d => `${d.pageY/16}rem`)
       .text(d => d.text), update => update
-      .style('left', d => `${d.pageX}px`)
-      .style('top',  d => `${d.pageY}px`)
+      .style('left', d => `${d.pageX/16}rem`)
+      .style('top',  d => `${d.pageY/16}rem`)
       .text(d => d.text),
     exit => exit.remove()
   );
@@ -235,15 +235,15 @@ export function getAllPointerEventsData(event: any): any {
 
 export function createTooltipForLabel(tooltipText, tooltipLabel, event) {
   if (!tooltipText || tooltipText.length === 0) return;
-  const x = event.clientX;
-  const y = event.clientY;
+  const x = event.clientX/16;
+  const y = event.clientY/16;
   let tempText = tooltipText.toString();
   tempText = tempText.split(',').join('\r\n');
   tooltipLabel.text(tempText)
     .style('visibility', 'visible')
     .style('position', 'fixed')
-    .style('top', `${y}px`)
-    .style('left', `${x}px`);
+    .style('top', `${y}rem`)
+    .style('left', `${x}rem`);
   return tooltipLabel;
 }
 
