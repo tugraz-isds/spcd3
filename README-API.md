@@ -1,9 +1,10 @@
 # SPCD3 API Guide
 
-The SPCD3 API comprises 41 functions grouped into nine categories.
+The SPCD3 API comprises 49 functions grouped into nine categories.
 
+<br/>
 
-## I/O Functions
+## 1. I/O Functions
 
 #### loadCSV
 
@@ -65,8 +66,9 @@ Saves the current parallel coordinates chart as an SVG file with a
 default name of **'parcoords.svg'**.
 
 
+<br/>
 
-## Show And Hide Functions
+## 2. Show And Hide Functions
 
 #### show
 
@@ -81,7 +83,6 @@ Makes a hidden dimension visible. The dimension is assigned the status **shown**
 
 Hides the given dimension. The dimension is assigned the status **hidden**.
 
-<br/>
 
 #### getHiddenStatus
 
@@ -89,7 +90,9 @@ Hides the given dimension. The dimension is assigned the status **hidden**.
 
 Returns the visibility status of the dimension, which can be either **shown** or **hidden**.
 
-## Invert Functions
+<br/>
+
+## 3. Invert Functions
 
 #### invert
 
@@ -97,7 +100,6 @@ Returns the visibility status of the dimension, which can be either **shown** or
 
 Inverts the given dimension.
 
-<br/>
 
 #### getInversionStatus
 
@@ -105,7 +107,6 @@ Inverts the given dimension.
 
 Returns the inversion status of a dimension, which can be either **ascending** or **descending**.
 
-<br/>
 
 #### setInversionStatus
 
@@ -113,7 +114,9 @@ Returns the inversion status of a dimension, which can be either **ascending** o
 
 Sets the inversion status of the given dimension to one of **ascending** and **descending**.
 
-## Move Functions
+<br/>
+
+## 4. Move Functions
 
 #### move
 
@@ -121,7 +124,6 @@ Sets the inversion status of the given dimension to one of **ascending** and **d
 
 Moves dimension A either to the left side of dimension B or to the right side of dimension B.
 
-<br/>
 
 #### moveByOne
 
@@ -129,7 +131,6 @@ Moves dimension A either to the left side of dimension B or to the right side of
 
 Moves a dimension one position to the left or right, independent of other dimensions.
 
-<br/>
 
 #### swap
 
@@ -137,7 +138,6 @@ Moves a dimension one position to the left or right, independent of other dimens
 
 Swaps the positions of the given dimensions.
 
-<br/>
 
 #### getDimensionPosition
 
@@ -145,7 +145,6 @@ Swaps the positions of the given dimensions.
 
 Returns the position of the given dimension (0...n-1).
 
-<br/>
 
 #### setDimensionPosition
 
@@ -153,7 +152,9 @@ Returns the position of the given dimension (0...n-1).
 
 Sets the position of the given dimension (0...n-1).
 
-## Range Functions
+<br/>
+
+## 5. Range Functions
 
 #### getDimensionRange
 
@@ -161,7 +162,6 @@ Sets the position of the given dimension (0...n-1).
 
 Returns the given dimension’s current range (min, max).
 
-<br/>
 
 #### setDimensionRange
 
@@ -169,7 +169,6 @@ Returns the given dimension’s current range (min, max).
 
 Sets the range of the given dimension to specific values (min, max).
 
-<br/>
 
 #### setDimensionRangeRounded
 
@@ -177,7 +176,6 @@ Sets the range of the given dimension to specific values (min, max).
 
 Sets the range of the given dimension to rounded specific values (min, max).
 
-<br/>
 
 #### getMinValue
 
@@ -185,7 +183,6 @@ Sets the range of the given dimension to rounded specific values (min, max).
 
 Returns the minimum data value of a dimension.
 
-<br/>
 
 #### getMaxValue
 
@@ -193,7 +190,6 @@ Returns the minimum data value of a dimension.
 
 Returns the maximum data value of a dimension.
 
-<br/>
 
 #### getCurrentMinRange
 
@@ -201,7 +197,6 @@ Returns the maximum data value of a dimension.
 
 Returns the current minimum value of a dimension’s range (in data coordinates).
 
-<br/>
 
 #### getCurrentMaxRange
 
@@ -209,7 +204,9 @@ Returns the current minimum value of a dimension’s range (in data coordinates)
 
 Returns the current maximum value of a dimension’s range (in data coordinates).
 
-## Filter Functions
+<br/>
+
+## 6. Filter Functions
 
 #### getFilter
 
@@ -217,24 +214,27 @@ Returns the current maximum value of a dimension’s range (in data coordinates)
 
 Returns the minimum and maximum values of the filter of a dimension.
 
-<br/>
 
 #### setFilter
 
 `function setFilter(dimension: string, min: number, max: number): void`
 
-Sets the filter for a dimension by specifying minimum and maximum values. If the minimum value lies below the current range, the filter minimum is set to the current range minimum. If the minimum value exceeds the current range, the filter maximum is set to the current range maximum.
+Sets the filter for a dimension by specifying minimum and maximum values.
+If the minimum value lies below the current range, the filter minimum is set
+to the current range minimum. If the minimum value exceeds the current range,
+the filter maximum is set to the current range maximum.
 
-## Selection Functions
+<br/>
+
+## 7. Selection Functions
 
 #### getSelected
 
 `function getSelected(): []`
 
-Returns all selected records in the chart as an array, where each record is identified with its label,
-taken by default from the first column of the dataset.
+Returns all selected records in the chart as an array, where each record is
+identified with its label, taken by default from the first column of the dataset.
 
-<br/>
 
 #### setSelection
 
@@ -242,7 +242,6 @@ taken by default from the first column of the dataset.
 
 Selects one or more records by handing over an array of labels.
 
-<br/>
 
 #### toggleSelection
 
@@ -250,15 +249,14 @@ Selects one or more records by handing over an array of labels.
 
 Toggles the selection of a given record by specifying its label.
 
-<br/>
 
 #### isSelected
 
 `function isSelected(record: string): boolean`
 
-Returns a boolean for the selection status of a given record by specifying its label: true if the record is selected and false if not.
+Returns a boolean for the selection status of a given record by
+specifying its label: true if the record is selected and false if not.
 
-<br/>
 
 #### setSelected
 
@@ -266,7 +264,6 @@ Returns a boolean for the selection status of a given record by specifying its l
 
 Selects a given record by specifying its label.
 
-<br/>
 
 #### setUnselected
 
@@ -274,7 +271,9 @@ Selects a given record by specifying its label.
 
 Deselects a given record by specifying its label.
 
-## Selection Functions with ID
+<br/>
+
+## 8. Selection Functions with ID
 
 #### setSelectionWithId
 
@@ -282,7 +281,6 @@ Deselects a given record by specifying its label.
 
 Selects one or more records by handing over an array of IDs.
 
-<br/>
 
 #### toggleSelectionWithId
 
@@ -290,15 +288,14 @@ Selects one or more records by handing over an array of IDs.
 
 Toggles the selection of a given record by specifying its ID.
 
-<br/>
 
 #### isSelectedWithId
 
 `function isSelectedWithId(recordId: number): boolean`
 
-Returns a boolean for the selection status of a given record by specifying its ID: true if the record is selected and false if not.
+Returns a boolean for the selection status of a given record by specifying
+its ID: true if the record is selected and false if not.
 
-<br/>
 
 #### setSelectedWithId
 
@@ -306,7 +303,6 @@ Returns a boolean for the selection status of a given record by specifying its I
 
 Selects a given record by specifying its ID.
 
-<br/>
 
 #### setUnselectedWithId
 
@@ -314,8 +310,9 @@ Selects a given record by specifying its ID.
 
 Deselects a given record by specifying its ID.
 
+<br/>
 
-## Helper Functions
+## 9. Helper Functions
 
 #### getAllDimensionNames
 
@@ -323,7 +320,6 @@ Deselects a given record by specifying its ID.
 
 Returns an array of all dimensions names in order.
 
-<br/>
 
 #### getAllHiddenDimensionNames
 
@@ -331,7 +327,6 @@ Returns an array of all dimensions names in order.
 
 Returns an array of all hidden dimensions names in order.
 
-<br/>
 
 #### getAllVisibleDimensionNames
 
@@ -339,7 +334,6 @@ Returns an array of all hidden dimensions names in order.
 
 Returns an array of all visible dimensions names in order.
 
-<br/>
 
 #### getAllRecords
 
@@ -347,7 +341,6 @@ Returns an array of all visible dimensions names in order.
 
 Returns all records as an array.
 
-<br/>
 
 #### getNumberofDimensions
 
@@ -355,7 +348,6 @@ Returns all records as an array.
 
 Returns the number of dimensions.
 
-<br/>
 
 #### getDimensionPosition
 
@@ -363,7 +355,6 @@ Returns the number of dimensions.
 
 Returns the position of a dimension (0..𝑚 − 1).
 
-<br/>
 
 #### isDimensionCategorical
 
@@ -371,7 +362,6 @@ Returns the position of a dimension (0..𝑚 − 1).
 
 Returns true if a dimension is categorial and false if not (i.e. it is numerical).
 
-<br/>
 
 #### setDimensionForHovering
 
@@ -379,7 +369,6 @@ Returns true if a dimension is categorial and false if not (i.e. it is numerical
 
 Sets the dimension as label for hovering.
 
-<br/>
 
 #### getRecordWithId
 
@@ -387,7 +376,6 @@ Sets the dimension as label for hovering.
 
 Returns the label of a record.
 
-<br/>
 
 #### isRecordInactive
 
@@ -395,7 +383,6 @@ Returns the label of a record.
 
 Returns true if a record is inactive and false if not.
 
-<br/>
 
 #### colorRecord
 
@@ -403,7 +390,6 @@ Returns true if a record is inactive and false if not.
 
 Change the color of a record.
 
-<br/>
 
 #### uncolorRecord
 

@@ -285,10 +285,14 @@ const handlePointerLeaveOrOut = () => {
 
 const handleClick = (event, d) => {
     const data = helper.getAllPointerEventsData(event);
+
+    const cleanedItems = data.map((item: string) =>
+        utils.cleanString(item).replace(/[.,]/g, '')
+    );
     const selectedRecords = api.getSelected();
 
     if (event.metaKey || event.shiftKey) {
-        data.forEach((record: string) => {
+        cleanedItems.forEach((record: string) => {
         if (selectedRecords.includes(record)) {
             api.setUnselected(record);
         } else {
@@ -296,13 +300,13 @@ const handleClick = (event, d) => {
         }});
     }
     else if (event.ctrlKey) {
-        data.forEach((record: string) => {
+        cleanedItems.forEach((record: string) => {
             api.toggleSelection(record);
         })
     }
     else {
         api.clearSelection();
-        api.setSelection(data);
+        api.setSelection(cleanedItems);
     }
     event.stopPropagation();
 }
