@@ -8,13 +8,18 @@ export function loadCSV(csv: string): any {
   let tempData = csvParse(csv);
   let data = validateParsedCsv(tempData);
 
-  if (data.invalidRows.length !== 0)
-    showInvalidRowsMessage(data.invalidRows, tempData.columns);
+  if (data.invalidRows.length !== 0) {
+    showInvalidRowsMessage(data.invalidRows, tempData.columns, data.removedColumns);
+  }
 
   return data.validData;
 }
 
-function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
+export function showInvalidRowsMessage(
+  invalidRows: any[],
+  columns: string[],
+  removedColumns: string[]
+) {
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
   overlay.style.top = "0";
@@ -27,7 +32,19 @@ function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
   overlay.style.alignItems = "center";
   overlay.style.zIndex = "9999";
 
-  overlay.addEventListener("click", () => document.body.removeChild(overlay));
+  const closeButton = document.createElement("span");
+  closeButton.innerHTML = "&times;";
+  closeButton.style.cursor = "pointer";
+  closeButton.style.fontWeight = "bold";
+  closeButton.style.fontSize = "1.5rem";
+  closeButton.style.lineHeight = "1";
+  closeButton.style.position = "absolute";
+  closeButton.style.top = "0.5rem";
+  closeButton.style.right = "0.5rem";
+
+  closeButton.addEventListener("click", () => {
+    document.body.removeChild(overlay);
+  });
 
   const box = document.createElement("div");
   box.style.background = "white";
@@ -41,6 +58,25 @@ function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
 
   const msg = document.createElement("p");
   msg.textContent = `Dataset imported and ${invalidRows.length} invalid rows are found.`;
+
+  box.appendChild(closeButton);
+  box.appendChild(msg);
+
+  if (removedColumns.length > 0) {
+    const removedInfo = document.createElement("div");
+    removedInfo.style.marginTop = "0.75rem";
+    removedInfo.style.fontSize = "0.85rem";
+    removedInfo.style.background = "#ffb3b3";
+    removedInfo.style.padding = "0.5rem";
+    removedInfo.style.borderRadius = "0.25rem";
+
+    removedInfo.innerHTML = `
+      <strong>Removed columns (no data):</strong><br>
+      ${removedColumns.join(", ")}
+    `;
+
+    box.appendChild(removedInfo);
+  }
 
   const btn = document.createElement("button");
   btn.textContent = "View";
@@ -57,7 +93,6 @@ function showInvalidRowsMessage(invalidRows: any[], columns: string[]) {
     showInvalidRowsPopup(invalidRows, columns);
   });
 
-  box.appendChild(msg);
   box.appendChild(btn);
   overlay.appendChild(box);
   document.body.appendChild(overlay);
@@ -94,6 +129,7 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   headerRow.style.justifyContent = "space-between";
   headerRow.style.alignItems = "center";
   headerRow.style.marginBottom = "1rem";
+  headerRow.style.flex = "0 0 auto";
 
   const title = document.createElement("h2");
   title.textContent = `Invalid Rows (${invalidRows.length})`;
@@ -105,7 +141,6 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   closeButton.style.fontWeight = "bold";
   closeButton.style.fontSize = "1.5rem";
   closeButton.style.lineHeight = "1";
-  closeButton.style.marginLeft = "1rem";
 
   closeButton.addEventListener("click", () => {
     document.body.removeChild(overlay);
@@ -115,9 +150,12 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   headerRow.appendChild(closeButton);
 
   const tableWrapper = document.createElement("div");
+  tableWrapper.style.overflowY = "auto";
+  tableWrapper.style.flex = "1 1 auto";
+  tableWrapper.style.padding = "0.5rem";
   tableWrapper.innerHTML = `
     <table border="1" cellpadding="6" style="border-collapse: collapse; margin-top: 0.5rem; width: 100%;">
-      ${renderInvalidTable(invalidRows, columns.reverse())}
+      ${renderInvalidTable(invalidRows, columns)}
     </table>
   `;
 
@@ -182,21 +220,39 @@ interface CsvData extends Array<CsvRow> {
 interface CsvValidationResult {
   validData: CsvData;
   invalidRows: Array<any>;
+  removedColumns: string[];
+}
+
+function isEmptyCell(value: any): boolean {
+  return value === undefined || value === null || String(value).trim() === "";
 }
 
 function validateParsedCsv(data: CsvData): CsvValidationResult {
-  const columns = data.columns;
+  const originalColumns = data.columns;
+
+  const removedColumns = originalColumns.filter(col =>
+    data.every(row => isEmptyCell(row[col]))
+  );
+
+  const columns = originalColumns.filter(col => !removedColumns.includes(col));
 
   const validData = [] as CsvData;
-  validData.columns = columns;
+  Object.defineProperty(validData, "columns", {
+    value: columns,
+    enumerable: false
+  });
 
   const invalidRows = [] as Array<any>;
-  (invalidRows as any).columns = columns;
+  Object.defineProperty(invalidRows, "columns", {
+    value: columns,
+    enumerable: false
+  });
 
   for (const row of data) {
     const emptyCols: string[] = [];
+
     for (const col of columns) {
-      const value = row[col]?.trim() ?? "";
+      const value = row[col]?.trim?.() ?? "";
       if (value === "") {
         emptyCols.push(col);
       }
@@ -214,9 +270,11 @@ function validateParsedCsv(data: CsvData): CsvValidationResult {
 
   return {
     validData,
-    invalidRows
+    invalidRows,
+    removedColumns
   };
 }
+
 
 function removeDuplicateColumnNames(value: string): any {
   let completeArray = value.split(/\r?\n/);
