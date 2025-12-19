@@ -81,7 +81,7 @@ export function createToolbar(dataset: any[]): void {
         .on('click', pc.reset);
 
     toggleButton.on('click', () => {
-        let isExpanded = toolbar.style('max-width') !== '0';
+        let isExpanded = toolbar.style('max-width') !== '0px';
 
         let expanded = !isExpanded;
 
