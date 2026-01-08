@@ -138,7 +138,7 @@ function showModalWithData(dataset: any[]): void {
 
     const saveAsCSV = document.createElement('button');
     saveAsCSV.id = 'saveAsCsv';
-    saveAsCSV.textContent = 'Save as CSV';
+    saveAsCSV.textContent = 'Download as CSV';
     saveAsCSV.style.marginBottom = '3rem';
     saveAsCSV.style.alignSelf = 'flex-start';
     saveAsCSV.style.width = 'auto';

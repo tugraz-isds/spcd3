@@ -90,9 +90,16 @@ npx gulp serve
 <br/>
 
 Each of the public Gulp tasks can also be invoked by running the
-equivalent npm script defined in package.json.
+equivalent yarn script defined in package.json.
 
 **Important:** To run the build, a live web server must be started.
+
+### Build a native desktop app
+
+`tauri` builds a native desktop app with Tauri 2.0:
+```
+yarn tauri
+```
 
 ## Usage
 

@@ -57,25 +57,31 @@ export function showInvalidRowsMessage(
   box.addEventListener("click", e => e.stopPropagation());
 
   const msg = document.createElement("p");
-  msg.textContent = `Dataset imported and ${invalidRows.length} invalid rows are found.`;
+  msg.textContent = `Dataset imported.`;
 
   box.appendChild(closeButton);
   box.appendChild(msg);
 
+  const removedRowInfo = document.createElement("div");
+  removedRowInfo.style.marginTop = "0.15rem";
+  removedRowInfo.style.fontSize = "0.85rem";
+  removedRowInfo.style.background = "white";
+  removedRowInfo.style.padding = "0.5rem";
+  removedRowInfo.style.borderRadius = "0.25rem";
+
+  removedRowInfo.textContent = `${invalidRows.length} invalid rows are found.`;
+  box.appendChild(removedRowInfo);
+
   if (removedColumns.length > 0) {
-    const removedInfo = document.createElement("div");
-    removedInfo.style.marginTop = "0.75rem";
-    removedInfo.style.fontSize = "0.85rem";
-    removedInfo.style.background = "#ffb3b3";
-    removedInfo.style.padding = "0.5rem";
-    removedInfo.style.borderRadius = "0.25rem";
+    const removedColumnInfo = document.createElement("div");
+    removedColumnInfo.style.marginTop = "0.15rem";
+    removedColumnInfo.style.fontSize = "0.85rem";
+    removedColumnInfo.style.background = "white";
+    removedColumnInfo.style.padding = "0.5rem";
+    removedColumnInfo.style.borderRadius = "0.25rem";
 
-    removedInfo.innerHTML = `
-      <strong>Removed columns (no data):</strong><br>
-      ${removedColumns.join(", ")}
-    `;
-
-    box.appendChild(removedInfo);
+    removedColumnInfo.textContent = `${removedColumns.length} column(s) without data: ${removedColumns.join(", ")}`;
+    box.appendChild(removedColumnInfo);
   }
 
   const btn = document.createElement("button");

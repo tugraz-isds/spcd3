@@ -84,7 +84,8 @@ export function saveAsSvg(): void {
     "fill=\"none\" font-size=\"8\" text-anchor=\"end\" stroke=\"black\"");
   svgString = svgString.replaceAll("domain", "dimension");
   svgString = svgString.replaceAll("12px", "12");
-
+  svgString = svgString.replaceAll("class=\"tick\" opacity=\"1\"", "class=\"tick\" fill=\"black\" stroke=\"none\"");
+  
   setOptionsAndDownload(svgString);
 }
 
@@ -249,6 +250,8 @@ function setOptionsAndDownload(svgString: string) {
 
     if (inputRemoveUiControls.checked) {
       updatedSVG = removeUiControls(updatedSVG);
+      updatedSVG = updatedSVG.replaceAll("<svg y=\"25\" x=\"-6\"><use width=\"12\" height=\"12\" y=\"0\" x=\"0\" href=\"#arrow_image_up\"></use></svg>", "");
+
     }
 
     let processedData = xmlFormat(updatedSVG, { indentation: '  ', collapseContent: true })
