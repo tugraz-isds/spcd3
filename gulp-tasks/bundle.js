@@ -13,10 +13,7 @@ async function bundle() {
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
       rollupTypeScript({ tsconfig: './tsconfig.json' }),
-    ],
-    output: {
-      preserveModules: true,
-    }
+    ]
   });
 
   const minPlugins = [rollupTerser()];
@@ -27,11 +24,11 @@ async function bundle() {
     const config = [
       { extension: 'js', plugins: [] },
       { extension: 'min.js', plugins: minPlugins },
-      { extension: 'min.js', plugins: gZipPlugins },
+      { extension: 'gZip.js', plugins: gZipPlugins },
     ];
     return config.map((conf) => bundle.write({
       file:`${location}/spcd3.${conf.extension}`,
-      format,
+      format: format === "esm" ? "es" : format,
       name: 'spcd3',
       plugins: conf.plugins,
       sourcemap: true,

@@ -81,10 +81,10 @@ npx gulp build
 
 <br/>
 
-`serve` executes the build task, then additionally executes a private task
+`dev` executes the build task, then additionally executes a private task
 called watcher, which starts live web server in the `dist/example/` folder:
 ```
-npx gulp serve
+npx gulp dev
 ```
 
 <br/>
@@ -96,9 +96,9 @@ equivalent yarn script defined in package.json.
 
 ### Build a native desktop app
 
-`tauri` builds a native desktop app with Tauri 2.0:
+`tauri` builds a native desktop app with Tauri 2.0 and copies the executable to `package/`:
 ```
-yarn tauri
+npx gulp tauri
 ```
 
 ## Usage

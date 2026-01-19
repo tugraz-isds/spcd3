@@ -1,7 +1,8 @@
 const {src, dest, series, parallel} = require('gulp');
 const del = require('del');
-const { bundle } = require("./gulp-tasks/bundle");
-const {watch} = require("./gulp-tasks/watch");
+const {bundle} = require("./gulp-tasks/bundle");
+const {watcher} = require("./gulp-tasks/watch");
+const {tauriBuild} = require("./gulp-tasks/tauri");
 
 function cleanDistFolder() {
     return del('dist', {force: true});
@@ -29,4 +30,6 @@ exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock)
 
 exports.build = series(cleanDistFolder, copyExampleFolder, bundle, copyLibFileToExample);
 
-exports.serve = series(exports.build, watch);
+exports.dev = series(exports.build, watcher);
+
+exports.tauri = tauriBuild;

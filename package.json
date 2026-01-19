@@ -11,8 +11,8 @@
   "scripts": {
     "clean": "npx gulp clean",
     "build": "npx gulp build",
-    "serve": "npx gulp serve",
-    "tauri": "npx gulp build && tauri build"
+    "dev": "npx gulp dev",
+    "tauri": "npx gulp tauri"
   },
   "repository": "git+https://github.com/tugraz-isds/spcd3",
   "keywords": [

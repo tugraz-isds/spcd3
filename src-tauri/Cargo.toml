@@ -1,10 +1,10 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+name = "spcd3"
+version = "1.0.0"
+description = "Steerable Parallel Coordinates in D3 (SPCD3)"
+authors = ["Romana Gruber"]
+license = "MIT"
+repository = "https://github.com/tugraz-isds/spcd3"
 edition = "2021"
 rust-version = "1.77.2"
 

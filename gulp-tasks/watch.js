@@ -1,19 +1,29 @@
-const gulp = require("gulp");
-const browserSync = require('browser-sync');
-const {bundle} = require("./bundle");
+const {src, dest, watch, series } = require('gulp');
+const bs = require("browser-sync").create();
+const { bundle } = require("./bundle");
 
-function reload() {
-    browserSync.reload();
+function copyExampleFolder() {
+    return src('./src/example/**/*').pipe(dest('./dist/example'));
 }
 
-function watch() {
-    browserSync.create();
-
-    browserSync.init({
-        server: './dist/example'
-    });
-
-    gulp.watch('/src/lib/scripts/**/*', gulp.series(bundle, reload));
+function copyLibFileToExample() {
+    return src('./dist/library/esm/spcd3.js').pipe(dest('./dist/example/lib/'));
 }
 
-module.exports = {watch}
+function reload(done) {
+  bs.reload();
+  done();
+}
+
+function watcher() {
+  bs.init({
+    server: "./dist/example",
+    open: false,
+    notify: false,
+  });
+
+  watch("src/lib/**/*.{ts,js}", series(bundle, copyLibFileToExample, reload));
+  watch("src/example/**/*", series(copyExampleFolder, reload));
+}
+
+module.exports = {watcher}
