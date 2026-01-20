@@ -53,7 +53,8 @@ export function drawChart(content: []): void {
         .style('align-items', 'center')
         .style('justify-content', 'flex-start')
         .style('margin-left', '2rem')
-        .style('font-size', '0.8vw');
+        .style('font-size', '0.8vw')
+        .style('overflow', 'visible'); 
 
     toolbar.createToolbar(parcoords.newDataset);
 

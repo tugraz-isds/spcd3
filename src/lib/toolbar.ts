@@ -6,19 +6,6 @@ import * as io from './io';
 export function createToolbar(dataset: any[]): void {
     const toolbarRow = d3.select('#toolbarRow');
 
-    const toggleButton = toolbarRow.append('button')
-        .attr('id', 'toggleButton')
-        .attr('title', 'Expand Toolbar')
-        .html(icon.getExpandToolbarIcon())
-        .style('verticalAlign', 'middle')
-        .style('margin', '0')
-        .style('border', 'none')
-        .style('border-radius', '10%')
-        .style('padding', '0.2em')
-        .style('width', '1.5em')
-        .style('height', '1.5em')
-        .style('cursor', 'pointer');
-
     const toolbar = toolbarRow.append('div')
         .attr('id', 'toolbar')
         .style('display', 'flex')
@@ -28,74 +15,133 @@ export function createToolbar(dataset: any[]): void {
         .style('transition', 'max-width 0.3s ease, opacity 0.3s ease')
         .style('pointer-events', 'none');
 
-    toolbar.append('button')
-        .attr('id', 'showData')
-        .attr('title', 'Show Table')
-        .html(icon.getTableIcon())
-        .style('verticalAlign', 'middle')
-        .style('margin', '0')
-        .style('border', 'none')
-        .style('border-radius', '5%')
-        .style('padding', '0.3em')
-        .style('width', '1.5em')
-        .style('height', '1.5em')
-        .on('click', () => showModalWithData(dataset));
-
-    toolbar.append('button')
-        .attr('id', 'downloadButton')
-        .attr('title', 'Download Chart (SVG)')
-        .html(icon.getDownloadButton())
-        .style('verticalAlign', 'middle')
-        .style('margin', '0')
-        .style('border', 'none')
-        .style('border-radius', '5%')
-        .style('padding', '0.3em')
-        .style('width', '1.5em')
-        .style('height', '1.5em')
-        .on('click', io.saveAsSvg);
-
-    toolbar.append('button')
-        .attr('id', 'refreshButton')
-        .attr('title', 'Refresh')
-        .html(icon.getRefreshIcon())
-        .style('verticalAlign', 'middle')
-        .style('margin', '0')
-        .style('border', 'none')
-        .style('border-radius', '5%')
-        .style('padding', '0.3em')
-        .style('width', '1.5em')
-        .style('height', '1.5em')
-        .on('click', pc.refresh);
-
-    toolbar.append('button')
-        .attr('id', 'resetButton')
-        .attr('title', 'Reset')
-        .html(icon.getResetIcon())
-        .style('verticalAlign', 'middle')
-        .style('margin', '0')
-        .style('border', 'none')
-        .style('border-radius', '5%')
-        .style('padding', '0.3em')
-        .style('width', '1.5em')
-        .style('height', '1.5em')
-        .on('click', pc.reset);
-
-    toggleButton.on('click', () => {
-        let isExpanded = toolbar.style('max-width') !== '0px';
-
-        let expanded = !isExpanded;
-
-        toolbar.style('max-width', expanded ? '12.5rem' : '0')
-            .style('opacity', expanded ? '1' : '0')
-            .style('pointer-events', expanded ? 'auto' : 'none');
-
-        toggleButton.attr('title', expanded ? 'Collapse Toolbar' : 'Expand Toolbar');
-
-        toggleButton.html(
-            expanded ? icon.getCollapseToolbarIcon() : icon.getExpandToolbarIcon()
-        );
+    const { btn: toggleButton, tip: toggleTip } = 
+    makeIconButton(toolbarRow, {
+        id: 'toggleButton',
+        iconHtml: icon.getExpandToolbarIcon(),
+        tipText: 'Expand Toolbar'
     });
 
+    makeIconButton(toolbar, {
+        iconHtml: icon.getTableIcon(),
+        tipText: 'Show Table',
+        onClick: () => showModalWithData(dataset)
+    });
+
+    makeIconButton(toolbar, {
+        id: 'downloadButton',
+        iconHtml: icon.getDownloadButton(),
+        tipText: 'Download Chart (SVG)',
+        onClick: io.saveAsSvg
+    });
+
+    makeIconButton(toolbar, {
+        id: 'refreshButton',
+        iconHtml: icon.getRefreshIcon(),
+        tipText: 'Refresh',
+        onClick: pc.refresh
+    });
+
+    makeIconButton(toolbar, {
+        id: 'resetButton',
+        iconHtml: icon.getResetIcon(),
+        tipText: 'Reset',
+        onClick: pc.reset
+    });
+
+    let isExpanded = false;
+
+    toggleButton.on('click', () => {
+        isExpanded = !isExpanded;
+
+        toolbar.style('max-width', isExpanded ? '12.5rem' : '0')
+            .style('opacity', isExpanded ? '1' : '0')
+            .style('pointer-events', isExpanded ? 'auto' : 'none')
+            .style('overflow', isExpanded ? 'visible' : 'hidden');
+
+        toggleTip.text(isExpanded ? 'Collapse Toolbar' : 'Expand Toolbar');
+
+        toggleButton.select('.btn-icon').html(
+            isExpanded ? icon.getCollapseToolbarIcon() : icon.getExpandToolbarIcon()
+        );
+
+        toggleButton.select('.btn-icon').selectAll('svg')
+            .style('display', 'block')
+            .style('width', '1em')
+            .style('height', '1em');
+    });
+}
+
+function makeIconButton(parent, opts) {
+  const {id, iconHtml, tipText, onClick} = opts;
+
+  const btn = parent.append('button')
+    .attr('type', 'button')
+    .attr('id', id ?? null)
+    .style('position', 'relative')
+    .style('display', 'inline-flex')
+    .style('align-items', 'center')
+    .style('justify-content', 'center')
+    .style('box-sizing', 'border-box')
+    .style('vertical-align', 'middle')
+    .style('margin', '0')
+    .style('line-height', '1')
+    .style('border', 'none')
+    .style('border-radius', '10%')
+    .style('padding', '0')
+    .style('width', '1.8em')
+    .style('height', '1.8em')
+    .style('cursor', 'pointer')
+    .style('overflow', 'visible');
+
+  if (onClick) btn.on('click', onClick);
+
+  btn.append('span')
+    .attr('class', 'btn-icon')
+    .attr('id', id + 'icon')
+    .style('display', 'inline-flex')
+    .style('align-items', 'center')
+    .style('justify-content', 'center')
+    .style('width', '1em')
+    .style('height', '1em')
+    .style('pointer-events', 'none')
+    .html(iconHtml);
+
+  btn.select('.btn-icon').selectAll('svg')
+    .style('display', 'block')
+    .style('width', '1em')
+    .style('height', '1em');
+
+  const tip = btn.append('span')
+    .attr('class', 'btn-tip')
+    .attr('id', id + 'tip')
+    .text(tipText ?? '')
+    .style('position', 'absolute')
+    .style('left', '70%')
+    .style('top', 'calc(100% + 0.5rem)')
+    .style('transform', 'translateX(-50%)')
+    .style('background', 'lightgrey')
+    .style('padding', '0.2rem')
+    .style('border', '0.0625rem solid gray')
+    .style('border-radius', '0.2rem')
+    .style('white-space', 'nowrap')
+    .style('font-size', '0.75rem')
+    .style('line-height', '1.2')
+    .style('pointer-events', 'none')
+    .style('opacity', '0')
+    .style('visibility', 'hidden')
+    .style('transition', 'opacity .15s ease')
+    .style('z-index', '99999');
+
+  function show() { tip.style('opacity', '1').style('visibility', 'visible'); }
+  function hide() { tip.style('opacity', '0').style('visibility', 'hidden'); }
+
+  btn.on('mouseenter', show)
+     .on('mouseleave', hide)
+     .on('focus', show)
+     .on('blur', hide);
+
+  return { btn, tip };
 }
 
 function showModalWithData(dataset: any[]): void {
