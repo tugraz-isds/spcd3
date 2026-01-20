@@ -6,6 +6,13 @@ import * as io from './io';
 export function createToolbar(dataset: any[]): void {
     const toolbarRow = d3.select('#toolbarRow');
 
+    const { btn: toggleButton, tip: toggleTip } = 
+    makeIconButton(toolbarRow, {
+        id: 'toggleButton',
+        iconHtml: icon.getExpandToolbarIcon(),
+        tipText: 'Expand Toolbar',
+    });
+
     const toolbar = toolbarRow.append('div')
         .attr('id', 'toolbar')
         .style('display', 'flex')
@@ -15,12 +22,6 @@ export function createToolbar(dataset: any[]): void {
         .style('transition', 'max-width 0.3s ease, opacity 0.3s ease')
         .style('pointer-events', 'none');
 
-    const { btn: toggleButton, tip: toggleTip } = 
-    makeIconButton(toolbarRow, {
-        id: 'toggleButton',
-        iconHtml: icon.getExpandToolbarIcon(),
-        tipText: 'Expand Toolbar'
-    });
 
     makeIconButton(toolbar, {
         iconHtml: icon.getTableIcon(),
