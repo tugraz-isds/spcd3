@@ -69,7 +69,7 @@ export function showInvalidRowsMessage(
   removedRowInfo.style.padding = "0.5rem";
   removedRowInfo.style.borderRadius = "0.25rem";
 
-  removedRowInfo.textContent = `${invalidRows.length} invalid rows are found.`;
+  removedRowInfo.textContent = `${invalidRows.length} invalid rows found.`;
   box.appendChild(removedRowInfo);
 
   if (removedColumns.length > 0) {
@@ -96,7 +96,7 @@ export function showInvalidRowsMessage(
 
   btn.addEventListener("click", () => {
     document.body.removeChild(overlay);
-    showInvalidRowsPopup(invalidRows, columns);
+    showInvalidRowsPopup(invalidRows, columns, removedColumns);
   });
 
   box.appendChild(btn);
@@ -104,7 +104,7 @@ export function showInvalidRowsMessage(
   document.body.appendChild(overlay);
 }
 
-function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
+function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColumns: string[] = []) {
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
   overlay.style.top = "0";
@@ -161,7 +161,7 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   tableWrapper.style.padding = "0.5rem";
   tableWrapper.innerHTML = `
     <table border="1" cellpadding="6" style="border-collapse: collapse; margin-top: 0.5rem; width: 100%;">
-      ${renderInvalidTable(invalidRows, columns)}
+      ${renderInvalidTable(invalidRows, columns, removedColumns)}
     </table>
   `;
 
@@ -172,11 +172,21 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[]) {
   document.body.appendChild(overlay);
 }
 
-function renderInvalidTable(rows: any[], columns: string[]): string {
+export function renderInvalidTable(
+  rows: any[],
+  columns: string[],
+  removedColumns: string[] = []
+): string {
   const headerHtml = `
     <thead>
       <tr>
-        ${columns.map(c => `<th style="text-align:left; font-size:0.85rem; background-color:rgb(201, 212, 221); border:0.063rem solid #ddd;">${c}</th>`).join("")}
+        ${columns.map(c => {
+          const isRemoved = removedColumns.includes(c);
+          return `<th style="
+            text-align:left;
+            background:${isRemoved ? "#ffb3b3" : "white"};
+          ">${c}</th>`;
+        }).join("")}
       </tr>
     </thead>
   `;
@@ -185,8 +195,8 @@ function renderInvalidTable(rows: any[], columns: string[]): string {
     <tr>
       ${columns.map(col => {
         const rawValue = row[col];
-        const value = rawValue ?? "";
-        const isInvalid = row.__invalidColumns?.includes(col);
+        const isInvalid =
+          row.__invalidColumns?.includes(col) || removedColumns.includes(col);
 
         const isNumber =
           typeof rawValue === "number" ||
@@ -196,16 +206,19 @@ function renderInvalidTable(rows: any[], columns: string[]): string {
 
         const align = isNumber ? "right" : "left";
 
+        const displayValue =
+          rawValue === null ? "(null)" :
+          isEmptyCell(rawValue) ? "null" :
+          rawValue;
+
         return `
           <td style="
-            background: ${isInvalid ? '#ffb3b3' : 'white'};
-            color: ${isInvalid ? 'black' : 'inherit'};
+            background: ${isInvalid ? "#ffb3b3" : "white"};
             text-align: ${align};
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border: 0.063rem solid #ddd;
+            font-size: 0.85rem;
+            padding: 4px 8px;
           ">
-            ${value === "" ? "null" : value}
+            ${displayValue}
           </td>
         `;
       }).join("")}
@@ -214,6 +227,7 @@ function renderInvalidTable(rows: any[], columns: string[]): string {
 
   return `${headerHtml}<tbody>${bodyHtml}</tbody>`;
 }
+
 
 interface CsvRow {
   [key: string]: string;
@@ -258,8 +272,7 @@ function validateParsedCsv(data: CsvData): CsvValidationResult {
     const emptyCols: string[] = [];
 
     for (const col of columns) {
-      const value = row[col]?.trim?.() ?? "";
-      if (value === "") {
+     if(isEmptyCell(row[col])) {
         emptyCols.push(col);
       }
     }

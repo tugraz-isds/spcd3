@@ -8,7 +8,7 @@ export function createToolbar(dataset: any[]): void {
 
     const toggleButton = toolbarRow.append('button')
         .attr('id', 'toggleButton')
-        .attr('title', 'Expand toolbar')
+        .attr('title', 'Expand Toolbar')
         .html(icon.getExpandToolbarIcon())
         .style('verticalAlign', 'middle')
         .style('margin', '0')
@@ -30,7 +30,7 @@ export function createToolbar(dataset: any[]): void {
 
     toolbar.append('button')
         .attr('id', 'showData')
-        .attr('title', 'Show table')
+        .attr('title', 'Show Table')
         .html(icon.getTableIcon())
         .style('verticalAlign', 'middle')
         .style('margin', '0')
@@ -89,7 +89,7 @@ export function createToolbar(dataset: any[]): void {
             .style('opacity', expanded ? '1' : '0')
             .style('pointer-events', expanded ? 'auto' : 'none');
 
-        toggleButton.attr('title', expanded ? 'Collapse toolbar' : 'Expand toolbar');
+        toggleButton.attr('title', expanded ? 'Collapse Toolbar' : 'Expand Toolbar');
 
         toggleButton.html(
             expanded ? icon.getCollapseToolbarIcon() : icon.getExpandToolbarIcon()

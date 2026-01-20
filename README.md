@@ -12,7 +12,7 @@ use the library and its steerable API. A live version of the latest
 deployment can be found at
 [https://tugraz-isds.github.io/spcd3](https://tugraz-isds.github.io/spcd3).
 
-![screenshot](exampleSpcD3.png)
+![screenshot](screenshots/exampleSpcD3.png)
 
 ## Dependencies
 
@@ -64,7 +64,7 @@ npx gulp clean
 <br/>
 
 `cleanAll` restores the project folder to its virgin state,
-by deleting the existing `dist/` and `node_modules/` directories
+by deleting the existing `dist/`, `package/` and `node_modules/` directories
 and the `yarn.lock` file:
 ```
 npx gulp cleanAll
@@ -95,6 +95,8 @@ equivalent yarn script defined in package.json.
 **Important:** To run the build, a live web server must be started.
 
 ### Build a native desktop app
+
+**Prerequisites:** To build a native desktop app, Rust, Cargo and Tauri 2.0 needs to be installed.
 
 `tauri` builds a native desktop app with Tauri 2.0 and copies the executable to `package/`:
 ```

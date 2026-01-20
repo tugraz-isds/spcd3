@@ -16,6 +16,10 @@ function cleanPackageLock() {
     return del('yarn-lock.json', {force: true});
 }
 
+function cleanPackage() {
+    return del('package', {force: true});
+}
+
 function copyExampleFolder() {
     return src('./src/example/**/*').pipe(dest('./dist/example'));
 }
@@ -26,7 +30,7 @@ function copyLibFileToExample() {
 
 exports.clean = cleanDistFolder;
 
-exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock);
+exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock, cleanPackage);
 
 exports.build = series(cleanDistFolder, copyExampleFolder, bundle, copyLibFileToExample);
 
