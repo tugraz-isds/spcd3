@@ -340,41 +340,43 @@ document.addEventListener('mousemove', (e) => {
 function setActivePathLines(svg, content, parcoords): any {
 
     const contextMenu = createContextMenuForRecords();
-    // active polylines/paths/records
-    return svg.append('g')
-        .attr('class', 'active')
-        .selectAll('path')
+    const g = svg.append('g').attr('class', 'active');
+
+    g.selectAll('path.hitarea')
         .data(content)
         .enter()
         .append('path')
-        .attr('class', (d: { [x: string]: string; }) => {
-            const keys = Object.keys(d);
-            setKey(keys[0]);
-            const selected_value = utils.cleanString(d[key]);
-            return 'line ' + selected_value;
-        })
-        .attr('id', (d: { [x: string]: string; }) => {
-            return utils.cleanString(d[key]);
-        })
-        .each(function (d: any) {
-            select(this)
-                .attr('d', helper.linePath(d, parcoords.newFeatures));
-        })
-        .style('pointer-events', 'stroke')
-        .style('stroke', 'rgba(0, 129, 175, 0.5)')
-        .style('stroke-width', '0.12rem')
+        .attr('class', 'hitarea')
+        .attr('d', d => helper.linePath(d, parcoords.newFeatures))
+        .style('stroke', 'transparent')
         .style('fill', 'none')
+        .style('stroke-width', '0.3rem')
+        .style('pointer-events', 'stroke')
         .on('pointerenter', handlePointerEnter)
         .on('pointerleave', handlePointerLeaveOrOut)
         .on('pointerout', handlePointerLeaveOrOut)
-        .on('mouseenter', handlePointerEnter)
-        .on('mouseout', handlePointerLeaveOrOut)
-        .on('mouseleave', handlePointerLeaveOrOut)
         .on('click', handleClick)
         .on('contextmenu', function (event: any, d: any) {
             handleRecordContextMenu(contextMenu, event, d);
             select('#contextmenu').style('display', 'none');
         });
+
+    return g.selectAll('path.visible')
+        .data(content)
+        .enter()
+        .append('path')
+        .attr('class', (d: any) => {
+            const keys = Object.keys(d);
+            setKey(keys[0]);
+            const selected_value = utils.cleanString(d[key]);
+            return 'line ' + selected_value;
+        })
+        .attr('id', d => utils.cleanString(d[key]))
+        .attr('d', d => helper.linePath(d, parcoords.newFeatures))
+        .style('pointer-events', 'none')
+        .style('stroke', 'rgba(0, 129, 175, 0.5)')
+        .style('stroke-width', '0.12rem')
+        .style('fill', 'none');
 }
 
 function createContextMenuForRecords(): any {
