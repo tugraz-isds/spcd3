@@ -7,3 +7,4 @@ node_modules
 !.env.example
 package-lock.json
 yarn.lock
+package
