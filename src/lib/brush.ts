@@ -869,39 +869,62 @@ function checkAllPositionsBottom(positionItem: any, dimension: string, d: any,
 function makeActive(currentLineName: string, duration: number): void {
     if (select('.' + currentLineName).classed('selected')) {
         select('.' + currentLineName)
-            .style('pointer-events', 'stroke')
             .text('')
             .transition()
             .duration(duration)
             .style('stroke', 'rgba(255, 165, 0, 1)');
+
+        select('#area_' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'transparent')
+            .style('stroke-width', '0.4rem')
+            .text('');
     }
     else if (select('.' + currentLineName).classed('colored')) {
         let color = select('.' + currentLineName).property('clusterColor');
         select('.' + currentLineName)
-            .style('pointer-events', 'stroke')
             .text('')
             .transition()
             .duration(duration)
             .style('stroke', color);
+
+        select('#area_' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'transparent')
+            .style('stroke-width', '0.4rem')
+            .text('');
     }
     else {
         select('.' + currentLineName)
-            .style('pointer-events', 'stroke')
             .text('')
             .transition()
             .duration(duration)
             .style('stroke', 'rgba(0, 129, 175, 0.5)');
+
+        select('#area_' + currentLineName)
+            .style('pointer-events', 'stroke')
+            .style('stroke', 'transparent')
+            .style('stroke-width', '0.4rem')
+            .text('');
     }
 }
 
 function makeInactive(currentLineName: string, dimension: string, duration: number): void {
     const line = select('.' + currentLineName);
+    const hitline = select('#area_' + currentLineName);
 
     line
         .text(dimension)
         .transition()
         .duration(duration)
+        .style('stroke', 'rgba(211, 211, 211, 0.4');
+    
+    hitline
+        .text(dimension)
+        .transition()
+        .duration(duration)
         .style('stroke', 'rgba(211, 211, 211, 0.4')
+        .style('stroke-width', '0.12rem')
         .on('end', function () {
             select(this).style('pointer-events', 'none');
         });

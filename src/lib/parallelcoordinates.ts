@@ -347,10 +347,16 @@ function setActivePathLines(svg, content, parcoords): any {
         .enter()
         .append('path')
         .attr('class', 'hitarea')
+        .attr('id', (d: any) => {
+            const keys = Object.keys(d);
+            setKey(keys[0]);
+            const selected_value = utils.cleanString(d[key]);
+            return 'area_' + selected_value;
+        })
         .attr('d', d => helper.linePath(d, parcoords.newFeatures))
         .style('stroke', 'transparent')
         .style('fill', 'none')
-        .style('stroke-width', '0.3rem')
+        .style('stroke-width', '0.4rem')
         .style('pointer-events', 'stroke')
         .on('pointerenter', handlePointerEnter)
         .on('pointerleave', handlePointerLeaveOrOut)

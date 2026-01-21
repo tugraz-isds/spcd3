@@ -776,3 +776,21 @@ export function hideMarker(dimension: string) {
     const cleanDimensionName = utils.cleanString(dimension);
     select('#marker_' + cleanDimensionName).attr('opacity', 0);
 }
+
+export function disableInteractivity() {
+    select('#toolbarRow').style('display', 'none');
+    select('#parallelcoords').style('pointer-events', 'none');
+    select('#pc_svg').style('background', 'lightgrey');
+    selectAll('.hitarea').style('pointer-events', 'none');
+    selectAll('.handle-hitbox').style('pointer-events', 'none');
+    selectAll('.hitbox').style('pointer-events', 'none'); 
+}
+
+export function enableInteractivity() {
+    select('#toolbarRow').style('display', 'flex');
+    select('#parallelcoords').style('pointer-events', 'auto');
+    select('#pc_svg').style('background', 'white');
+    selectAll('.hitarea').style('pointer-events', 'stroke');
+    selectAll('.handle-hitbox').style('pointer-events', 'auto');
+    selectAll('.hitbox').style('pointer-events', 'auto');
+}

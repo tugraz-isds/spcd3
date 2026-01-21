@@ -396,3 +396,15 @@ Change the color of a record.
 `function uncolorRecord(record: string): void`
 
 Reset the color of a record to its default color.
+
+#### disableInteractivity
+
+`function disableInteractivity(): void`
+
+Disables the interactivity of the chart.
+
+#### enableInteractivity
+
+`function enableInteractivity(): void`
+
+Enables the interactivity of the chart.
