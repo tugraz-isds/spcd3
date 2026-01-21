@@ -197,6 +197,7 @@ function generateDropdownForShow() {
     let textElement = document.createElement('span');
     textElement.innerHTML = 'Show Dimensions <img src="./svg/dropdown-symbol.svg" id="show"/>';
     textElement.id = 'showText';
+    textElement.className = 'labels';
     selectButton.appendChild(textElement);
 
     let dimensionContainer = document.createElement('div');
@@ -269,6 +270,7 @@ function generateDropdownForInvert() {
 
     let textElement = document.createElement('span');
     textElement.id = 'invertText';
+    textElement.className = 'labels';
     textElement.innerHTML = 'Invert Dimensions <img src="./svg/dropdown-symbol.svg" id="invert"/>';
     selectButton.appendChild(textElement);
 
@@ -344,6 +346,7 @@ function generateDropdownForMove() {
 
     let textElement = document.createElement('span');
     textElement.id = 'moveText';
+    textElement.className = 'labels';
     textElement.innerHTML = 'Move Dimensions <img src="./svg/dropdown-symbol.svg" id="move"/>';
     selectButton.appendChild(textElement);
 
@@ -460,6 +463,7 @@ function generateDropdownForFilter() {
 
     let textElement = document.createElement('span');
     textElement.id = 'filterText';
+    textElement.className = 'labels';
     textElement.innerHTML = 'Set Filter <img src="./svg/dropdown-symbol.svg" id="filter"/>';
     selectButton.appendChild(textElement);
 
@@ -668,6 +672,7 @@ function generateDropdownForRange() {
 
     let textElement = document.createElement('span');
     textElement.id = 'rangeText';
+    textElement.className = 'labels';
     textElement.innerHTML = 'Set Range <img src="./svg/dropdown-symbol.svg" id="range"/>';
     selectButton.appendChild(textElement);
 
@@ -952,6 +957,7 @@ function generateDropdownForSelectRecords() {
 
     let textElement = document.createElement('span');
     textElement.id = 'selectText';
+    textElement.className = 'labels';
     textElement.innerHTML = 'Select Records <img src="./svg/dropdown-symbol.svg" id="select"/>';
     selectButton.appendChild(textElement);
 
