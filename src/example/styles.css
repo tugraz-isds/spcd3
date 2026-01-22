@@ -129,6 +129,10 @@ div#parallelcoords {
   grid-column: span 1;
 }
 
+input {
+  text-align: right;
+}
+
 input[type="checkbox"] {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -296,6 +300,7 @@ img {
   aspect-ratio: 1/1;
   display:inline-block;
   margin-right: 0.5rem;
+  margin-left: 0.4rem;
 }
 
 div#moveDimensionHeader {

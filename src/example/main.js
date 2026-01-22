@@ -735,7 +735,7 @@ function generateModuleForRangeSettings() {
     popupWindowRange.style.visibility = 'visible';
     popupWindowRange.style.display = 'block';
     popupWindowRange.style.width = 20 + 'rem';
-    popupWindowRange.style.height = 14 + 'rem';
+    popupWindowRange.style.height = 18 + 'rem';
     popupWindowRange.style.backgroundColor = 'white';
     popupWindowRange.style.border = '0.0625rem solid black';
 
