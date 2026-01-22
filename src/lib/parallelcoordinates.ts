@@ -519,12 +519,12 @@ function setFeatureAxis(svg, yAxis, parcoords, width, padding): void {
     });*/
 
     const brushOverlay = svg.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", width)
-    .attr("height", height)
-    .style("fill", "transparent")
-    .style("pointer-events", "none");
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "transparent")
+        .style("pointer-events", "none");
 
     brush.setBrushDown(featureAxis, brushOverlay);
 

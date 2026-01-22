@@ -141,10 +141,10 @@ export function moveByOne(dimension: string, direction: string): void {
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
-    let active = select('g.active').selectAll('path');
+    let active_all = select('g.active').selectAll('path');
     let featureAxis = selectAll('.dimensions');
 
-    active.transition()
+    active_all.transition()
         .duration(1000)
         .attr('d', function (d: any) {
             return helper.linePath(d, parcoords.newFeatures);
@@ -199,7 +199,6 @@ export function move(dimensionA: string, toRightOf: boolean, dimensionB: string)
 }
 
 export function swap(dimensionA: string, dimensionB: string): void {
-
     const positionA = parcoords.xScales(dimensionA);
     const positionB = parcoords.xScales(dimensionB);
 
@@ -214,10 +213,10 @@ export function swap(dimensionA: string, dimensionB: string): void {
 
     parcoords.xScales.domain(parcoords.newFeatures);
 
-    let active = select('g.active').selectAll('path');
+    let active_all = select('g.active').selectAll('path');
     let featureAxis = selectAll('.dimensions');
 
-    active.transition()
+    active_all.transition()
         .duration(1000)
         .attr('d', (d: any) => {
             return helper.linePath(d, parcoords.newFeatures);
@@ -286,7 +285,7 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         .duration(1000)
         .ease(easeCubic);
 
-    let active = select('g.active')
+    let active_all = select('g.active')
         .selectAll('path')
         .transition()
         .duration(1000)
@@ -295,7 +294,7 @@ export function setDimensionRange(dimension: string, min: number, max: number): 
         })
         .ease(easeCubic);
 
-    active.each(function (d: any) {
+    active_all.each(function (d: any) {
         select(this)
             .transition()
             .duration(1000)
@@ -490,6 +489,13 @@ export function invertWoTransition(dimension: string): void {
             })
     });
 
+    helper.trans(selectAll('path.hitarea')).each(function (d: any) {
+        select(this)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
+            })
+    });
+
     brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
     if (helper.isInverted(dimension)) {
         brush.addInvertStatus(true, dimension, "isInverted");
@@ -533,6 +539,13 @@ export function setInversionStatus(dimension: string, status: string): void {
             .ease(easeCubic)
     });
 
+    helper.trans(selectAll('path.hitarea')).each(function (d: any) {
+        select(this)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
+            })
+    });
+
     const filter = getFilter(dimension);
     brush.addSettingsForBrushing(dimension, helper.isInverted(dimension));
     if (helper.isInverted(dimension)) {
@@ -574,6 +587,13 @@ export function invert(dimension: string): void {
                 return helper.linePath(d, parcoords.newFeatures);
             })
             .ease(easeCubic)
+    });
+
+    helper.trans(selectAll('path.hitarea')).each(function (d: any) {
+        select(this)
+            .attr('d', (d: any) => {
+                return helper.linePath(d, parcoords.newFeatures);
+            })
     });
 
     const filter = getFilter(dimension);

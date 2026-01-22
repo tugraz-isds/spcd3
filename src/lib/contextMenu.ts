@@ -458,6 +458,13 @@ function onDragEventHandler(featureAxis: any): any {
         .attr('d', helper.linePath(d, parcoords.newFeatures))
       });
 
+      let hitarea_active = selectAll('path.hitarea');
+
+      hitarea_active.each(function (d: any) {
+        select(this)
+        .attr('d', helper.linePath(d, parcoords.newFeatures))
+      });
+
       parcoords.newFeatures.sort((a: any, b: any) => {
         return helper.position(b, parcoords.dragging, parcoords.xScales)
           - helper.position(a, parcoords.dragging, parcoords.xScales) - 1;
