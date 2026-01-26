@@ -78,11 +78,13 @@ Additionally, the example folder is copied to `dist/example/`:
 ```
 npx gulp build
 ```
+To run the example, a live web server must be started in the
+folder `dist/example/`.
 
 <br/>
 
-`dev` executes the build task, then additionally executes a private task
-called watcher, which starts live web server in the `dist/example/` folder:
+`dev` executes the build task, and then additionally executes a private task
+called watcher, which starts a live web server in the `dist/example/` folder:
 ```
 npx gulp dev
 ```
@@ -90,18 +92,19 @@ npx gulp dev
 <br/>
 
 Each of the public Gulp tasks can also be invoked by running the
-equivalent yarn script defined in package.json.
+equivalent yarn script defined in `package.json`.
 
-**Important:** To run the build, a live web server must be started.
+
 
 ### Build a native desktop app
 
-**Prerequisites:** To build a native desktop app, Rust, Cargo and Tauri 2.0 needs to be installed.
+Prerequisites: To build a native desktop app, Rust, Cargo and Tauri 2.0 needs to be installed.
 
 `tauri` builds a native desktop app with Tauri 2.0 and copies the executable to `package/`:
 ```
 npx gulp tauri
 ```
+
 
 ## Usage
 
