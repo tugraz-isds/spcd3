@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     data = studentData;
     newData = loadCSV(data);
     showButtons();
-    drawChart(newData);
+    drawChart(newData, '0.4rem');
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -937,7 +937,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
     let reloadedData = loadCSV(data);
-    drawChart(reloadedData);
+    drawChart(reloadedData, '0.4rem', true);
 }
 
 function generateDropdownForSelectRecords() {

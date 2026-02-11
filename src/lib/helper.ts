@@ -166,14 +166,9 @@ export function createToolTipForValues(records: any, recKey?: string) {
     .data([recordId])
     .join('div')
     .attr('class', 'tip-layer')
-    .attr('data-record', recordId)
-    .style('position', 'fixed')
-    .style('left', '0')
-    .style('top', '0')
-    .style('pointer-events', 'none');
+    .attr('data-record', recordId);
 
   const data: ToolTipItem[] = dimensions
-    .filter(dim => utils.isElementVisible(select('#rect_' + utils.cleanString(dim))))
     .map(dim => {
       const yScale = parcoords.yScales[dim];
       const x = parcoords.xScales(dim);
@@ -185,29 +180,19 @@ export function createToolTipForValues(records: any, recKey?: string) {
 
       return {
         dim,
-        pageX: sp.x + 8,
-        pageY: sp.y + 8,
+        pageX: sp.x,
+        pageY: sp.y,
         text: String(records[dim]),
       };
     });
 
   const tips = layer
-    .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-div')
-    .data(data, (d: any) => d.dim);
+    .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
+    .data(data, (d: any) => dimensions);
 
   tips.join(
     enter => enter.append('div')
-      .attr('class', 'tooltip-div')
-      .style('position', 'absolute')
-      .style('pointer-events', 'none')
-      .style('font-size', '0.65rem')
-      .style('margin', '0.5rem')
-      .style('color', 'red')
-      .style('background-color', '#d3d3d3ad')
-      .style('font-weight', 'bold')
-      .style('padding', '0.12rem')
-      .style('white-space', 'nowrap')
-      .style('z-index', '9999')
+      .attr('class', 'tooltip-record')
       .style('left', d => `${d.pageX/16}rem`)
       .style('top',  d => `${d.pageY/16}rem`)
       .text(d => d.text), update => update
@@ -257,5 +242,5 @@ export function position(dimension: any, dragging: any, xScales: any): any {
 }
 
 export function cleanTooltip(): void {
-  selectAll('.tooltip-div').remove();
+  selectAll('.tooltip-record').remove();
 }

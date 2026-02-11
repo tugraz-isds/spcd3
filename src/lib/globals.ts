@@ -31,7 +31,9 @@ export let key: string;
 export let svg: any;
 export let hoverlabel: string;
 export let refreshData: any;
+export let columns: any;
 export let initDimension: any;
+export let thickness: any;
 
 export function setHoverLabel(label: string): void {
   hoverlabel = label;
@@ -43,6 +45,10 @@ export function setYaxis(axis: any): void {
 
 export function setRefreshData(data: any): void {
     refreshData = data;
+}
+
+export function setColumns(cols: any): void {
+  columns = cols;
 }
 
 export function setSvg(svgData: any): void {
@@ -115,4 +121,8 @@ export function setData(value: any): void {
 
 export function setKey(value: string): void {
     key = value;
+}
+
+export function setLineThickness(value: string): void {
+    thickness = value;
 }

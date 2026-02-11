@@ -113,100 +113,69 @@ function setOptionsAndDownload(svgString: string) {
   modal.style.minWidth = '18rem';
 
   const fakeheader = document.createElement('div');
-  fakeheader.style.height = '0.4rem';
-  fakeheader.style.background = 'lightgrey';
-  fakeheader.style.borderTopLeftRadius = '0.5rem';
-  fakeheader.style.borderTopRightRadius = '0.5rem';
+  fakeheader.className = 'modal-fake-header';
   modal.append(fakeheader);
 
   const title = document.createElement('div');
   title.textContent = 'Download Chart (SVG)';
-  title.style.padding = '0.5rem';
-  title.style.marginBottom = '0.5rem';
-  title.style.background = 'lightgrey';
-  title.style.textAlign =  'left';
+  title.className = 'modal-title-grey';
 
   const closeButton = document.createElement('span');
   closeButton.innerHTML = '&times;';
-  closeButton.style.padding = '0.5rem';
-  closeButton.style.marginBottom = '0.5rem';
-  closeButton.style.marginLeft = '9rem';
-  closeButton.style.cursor = 'pointer';
-  closeButton.style.fontWeight = 'bold';
-  closeButton.style.fontSize = '1.25rem';
-  closeButton.style.textAlign = 'right';
+  closeButton.className = 'close-button';
   title.append(closeButton);
 
   modal.append(title);
 
   const form = document.createElement('div');
-  form.style.display = 'flex';
-  form.style.flexDirection = 'column';
-  form.style.gap = '1rem';
+  form.className = 'form';
 
   const rowDecimals = document.createElement('div');
-  rowDecimals.style.display = 'flex';
-  rowDecimals.style.alignItems = 'center';
-  rowDecimals.style.justifyContent = 'space-between';
+  rowDecimals.className = 'options-div';
 
   const label = document.createElement('label');
+  label.className = 'label';
   label.textContent = 'Decimals places (0-10): ';
-  label.style.padding = '0.35rem';
-  label.style.textAlign = 'left';
-  label.style.flex = '1';
   label.htmlFor = 'decimalsInput';
 
   const input = document.createElement('input');
-  input.style.marginRight = '0.45rem';
+  input.className = 'input';
   input.type = 'number';
   input.min = '0';
   input.max = '10';
   input.value = '2';
   input.id = 'decimalsInput';
-  input.style.width = '3.125rem';
 
   rowDecimals.appendChild(label);
   rowDecimals.appendChild(input);
 
   const rowKeepClasses = document.createElement('div');
-  rowKeepClasses.style.display = 'flex';
-  rowKeepClasses.style.alignItems = 'center';
-  rowKeepClasses.style.justifyContent = 'space-between';
+  rowKeepClasses.className = 'options-div';
 
   const labelKeepClasses = document.createElement('label');
+  labelKeepClasses.className = 'label';
   labelKeepClasses.textContent = 'Keep classes: ';
-  labelKeepClasses.style.padding = '0.35rem';
-  labelKeepClasses.style.flex = '1';
-  labelKeepClasses.style.textAlign = 'left';
-  labelKeepClasses.style.marginRight = '0.5rem';
 
   const inputKeepClasses = document.createElement('input');
+  inputKeepClasses.className = 'input';
   inputKeepClasses.type = 'checkbox';
   inputKeepClasses.id = 'keepClassesInput';
-  inputKeepClasses.style.marginRight = '0.45rem';
-  inputKeepClasses.style.verticalAlign = 'middle';
   inputKeepClasses.checked = true;
 
   rowKeepClasses.appendChild(labelKeepClasses);
   rowKeepClasses.appendChild(inputKeepClasses);
 
   const rowRemoveUiControls = document.createElement('div');
-  rowRemoveUiControls.style.display = 'flex';
-  rowRemoveUiControls.style.alignItems = 'center';
-  rowRemoveUiControls.style.justifyContent = 'space-between';
+  rowRemoveUiControls.className = 'options-div';
 
   const labelRemoveUiControls = document.createElement('label');
+  labelRemoveUiControls.className = 'label';
   labelRemoveUiControls.textContent = 'Download without UI controls: ';
-  labelRemoveUiControls.style.padding = '0.35rem';
-  labelRemoveUiControls.style.flex = '1';
-  labelRemoveUiControls.style.textAlign = 'left';
-  labelRemoveUiControls.style.marginRight = '0.5rem';
 
   const inputRemoveUiControls = document.createElement('input');
+  inputRemoveUiControls.className = 'input';
   inputRemoveUiControls.type = 'checkbox';
   inputRemoveUiControls.id = 'removeUiControlsInput';
-  inputRemoveUiControls.style.marginRight = '0.45rem';
-  inputRemoveUiControls.style.verticalAlign = 'middle';
   inputRemoveUiControls.checked = true;
 
   rowRemoveUiControls.appendChild(labelRemoveUiControls);
@@ -214,12 +183,7 @@ function setOptionsAndDownload(svgString: string) {
 
   const button = document.createElement('button');
   button.textContent = 'Download';
-  button.style.cursor = 'pointer';
-  button.style.marginLeft = '0.5rem';
-  button.style.marginTop = '0.4rem';
-  button.style.marginBottom = '0.5rem';
-  button.style.marginRight = '0.5rem';
-  button.style.display = 'block';
+  button.className = 'download-button';
 
   form.appendChild(rowDecimals);
   form.appendChild(rowKeepClasses);

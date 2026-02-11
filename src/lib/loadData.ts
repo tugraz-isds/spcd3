@@ -21,39 +21,18 @@ export function showInvalidRowsMessage(
   removedColumns: string[]
 ) {
   const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.top = "0";
-  overlay.style.left = "0";
-  overlay.style.width = "100vw";
-  overlay.style.height = "100vh";
-  overlay.style.background = "rgba(0,0,0,0.4)";
-  overlay.style.display = "flex";
-  overlay.style.justifyContent = "center";
-  overlay.style.alignItems = "center";
-  overlay.style.zIndex = "9999";
+  overlay.className = 'modal-overlay-load';
 
   const closeButton = document.createElement("span");
+  closeButton.className = 'close-button';
   closeButton.innerHTML = "&times;";
-  closeButton.style.cursor = "pointer";
-  closeButton.style.fontWeight = "bold";
-  closeButton.style.fontSize = "1.5rem";
-  closeButton.style.lineHeight = "1";
-  closeButton.style.position = "absolute";
-  closeButton.style.top = "0.5rem";
-  closeButton.style.right = "0.5rem";
 
   closeButton.addEventListener("click", () => {
     document.body.removeChild(overlay);
   });
 
   const box = document.createElement("div");
-  box.style.background = "white";
-  box.style.padding = "1.5rem";
-  box.style.borderRadius = "0.5rem";
-  box.style.minWidth = "10rem";
-  box.style.position = "relative";
-  box.style.textAlign = "center";
-  box.style.boxShadow = "0 0.25rem 0.75rem rgba(0,0,0,0.2)";
+  box.className = 'box';
   box.addEventListener("click", e => e.stopPropagation());
 
   const msg = document.createElement("p");
@@ -63,22 +42,14 @@ export function showInvalidRowsMessage(
   box.appendChild(msg);
 
   const removedRowInfo = document.createElement("div");
-  removedRowInfo.style.marginTop = "0.15rem";
-  removedRowInfo.style.fontSize = "0.85rem";
-  removedRowInfo.style.background = "white";
-  removedRowInfo.style.padding = "0.5rem";
-  removedRowInfo.style.borderRadius = "0.25rem";
+  removedRowInfo.className = 'info';
 
   removedRowInfo.textContent = `${invalidRows.length} invalid rows found.`;
   box.appendChild(removedRowInfo);
 
   if (removedColumns.length > 0) {
     const removedColumnInfo = document.createElement("div");
-    removedColumnInfo.style.marginTop = "0.15rem";
-    removedColumnInfo.style.fontSize = "0.85rem";
-    removedColumnInfo.style.background = "white";
-    removedColumnInfo.style.padding = "0.5rem";
-    removedColumnInfo.style.borderRadius = "0.25rem";
+    removedColumnInfo.className = 'info';
 
     removedColumnInfo.textContent = `${removedColumns.length} column(s) without data: ${removedColumns.join(", ")}`;
     box.appendChild(removedColumnInfo);
@@ -86,13 +57,7 @@ export function showInvalidRowsMessage(
 
   const btn = document.createElement("button");
   btn.textContent = "View";
-  btn.style.marginTop = "1rem";
-  btn.style.padding = "0.5rem 1rem";
-  btn.style.cursor = "pointer";
-  btn.style.border = "0.08rem solid gray";
-  btn.style.borderRadius = "0.5rem";
-  btn.style.background = "#f6f6f6";
-  btn.style.fontSize = "1rem";
+  btn.className = 'view-button';
 
   btn.addEventListener("click", () => {
     document.body.removeChild(overlay);
@@ -106,47 +71,25 @@ export function showInvalidRowsMessage(
 
 function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColumns: string[] = []) {
   const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.top = "0";
-  overlay.style.left = "0";
-  overlay.style.width = "100vw";
-  overlay.style.height = "100vh";
-  overlay.style.background = "rgba(0,0,0,0.5)";
-  overlay.style.display = "flex";
-  overlay.style.justifyContent = "center";
-  overlay.style.alignItems = "center";
-  overlay.style.zIndex = "9999";
+  overlay.className = 'modal-overlay-load';
 
   overlay.addEventListener("click", () => document.body.removeChild(overlay));
 
   const dialog = document.createElement("div");
-  dialog.style.position = "relative";
-  dialog.style.background = "white";
-  dialog.style.padding = "2rem";
-  dialog.style.borderRadius = "0.5rem";
-  dialog.style.maxHeight = "80vh";
-  dialog.style.overflow = "auto";
-  dialog.style.minWidth = "38rem";
+  dialog.className = 'dialog';
 
   dialog.addEventListener("click", e => e.stopPropagation());
 
   const headerRow = document.createElement("div");
-  headerRow.style.display = "flex";
-  headerRow.style.justifyContent = "space-between";
-  headerRow.style.alignItems = "center";
-  headerRow.style.marginBottom = "1rem";
-  headerRow.style.flex = "0 0 auto";
+  headerRow.className = 'header-row';
 
   const title = document.createElement("h2");
   title.textContent = `Invalid Rows (${invalidRows.length})`;
   title.style.margin = "0";
 
   const closeButton = document.createElement("span");
+  closeButton.className = 'close-button';
   closeButton.innerHTML = "&times;";
-  closeButton.style.cursor = "pointer";
-  closeButton.style.fontWeight = "bold";
-  closeButton.style.fontSize = "1.5rem";
-  closeButton.style.lineHeight = "1";
 
   closeButton.addEventListener("click", () => {
     document.body.removeChild(overlay);
@@ -156,9 +99,7 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColu
   headerRow.appendChild(closeButton);
 
   const tableWrapper = document.createElement("div");
-  tableWrapper.style.overflowY = "auto";
-  tableWrapper.style.flex = "1 1 auto";
-  tableWrapper.style.padding = "0.5rem";
+  tableWrapper.className = 'table-wrapper';
   tableWrapper.innerHTML = `
     <table border="1" cellpadding="6" style="border-collapse: collapse; margin-top: 0.5rem; width: 100%;">
       ${renderInvalidTable(invalidRows, columns, removedColumns)}

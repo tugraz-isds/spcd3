@@ -5,9 +5,13 @@ const fs = require("fs/promises");
 const path = require("path");
 
 function runTauriBuild() {
-  const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
+  const command = "npx tauri build";
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, ["tauri", "build"], { stdio: "inherit" });
+    const p = spawn(command, {
+      stdio: "inherit",
+      shell: true,
+    });
+
     p.on("close", (code) =>
       code === 0 ? resolve() : reject(new Error(`tauri build failed (exit ${code})`))
     );

@@ -15,16 +15,19 @@ const RECT_VALUE = 300;
 
 let tooltipValues = select('#parallelcoords')
     .append('div')
+    .attr('class', 'tooltip-values')
     .style('position', 'absolute')
     .style('visibility', 'hidden');
 
 let tooltipValuesTop = select('#parallelcoords')
     .append('div')
+    .attr('class', 'tooltip-values')
     .style('position', 'absolute')
     .style('visibility', 'hidden');
 
 let tooltipValuesDown = select('#parallelcoords')
     .append('div')
+    .attr('class', 'tooltip-values')
     .style('position', 'absolute')
     .style('visibility', 'hidden');
 
@@ -44,9 +47,6 @@ export function setRectToDrag(featureAxis): void {
             .attr('height', RECT_VALUE)
             .attr('x', -6)
             .attr('y', 50)
-            .attr('fill', 'rgb(242, 242, 76)')
-            .attr('opacity', '0.5')
-            .style('cursor', 'default')
             .call(drag()
                 .on('drag', (event: any, d: any) => {
                     if (parcoords.newFeatures.length > 25) {
@@ -92,11 +92,6 @@ export function setBrushUp(featureAxis, brushOverlay): void {
             .attr('y', BOTTOM_AXIS_VALUE)
             .attr('width', 30)
             .attr('height', 30)
-            .style('fill', 'transparent')
-            .style('pointer-events', 'all')
-            .style('touch-action', 'none')
-            .style('-webkit-user-select', 'none')
-            .style('user-select', 'none')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
 
         const makeDrag = () => drag()
@@ -155,11 +150,6 @@ export function setBrushDown(featureAxis, brushOverlay): void {
             .attr('y', TOP_AXIS_LOW_VALUE)
             .attr('width', 30)
             .attr('height', 30)
-            .style('fill', 'transparent')
-            .style('pointer-events', 'all')
-            .style('touch-action', 'none')
-            .style('-webkit-user-select', 'none')
-            .style('user-select', 'none')
             .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
 
         const makeDrag = () => drag()
@@ -298,18 +288,16 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     if (yPosTop == TOP_AXIS_LOW_VALUE && yPosBottom == BOTTOM_AXIS_VALUE) {
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
-            .style('cursor', 'default');
-        select('#rect_' + cleanDimensionName)
-            .attr('fill', 'rgb(234, 234, 40)')
-            .attr('opacity', '0.5');
+            .style('cursor', 'default')
+            .style('fill', 'rgb(234, 234, 40)')
+            .style('opacity', '0.5');
     }
     else {
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
-        select('#rect_' + cleanDimensionName)
-            .attr('fill', 'rgb(255, 255, 0)')
-            .attr('opacity', '0.7');
+            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
+            .style('fill', 'rgb(255, 255, 0)')
+            .style('opacity', '0.7');
     }
 
     if (yPosBottom == BOTTOM_AXIS_VALUE) {
@@ -640,10 +628,6 @@ function setToolTipBrush(tooltipValues: any, d: any, event: any, window: any,
     tooltipValues.text(Math.round(tooltipValue.toPrecision(digs).toLocaleString('en-GB') * 10) / 10);
     tooltipValues.style('visibility', 'visible');
     tooltipValues.style('top', window.event.pageY/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
-    tooltipValues.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-        .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-        .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
 }
 
 function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
@@ -679,10 +663,6 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
         tooltipValuesTop.text(Math.round(tooltipValueTop));
         tooltipValuesTop.style('visibility', 'visible');
         tooltipValuesTop.style('top', Number(yPosTop + 180)/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
-        tooltipValuesTop.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
     }
 
     if ((!invertStatus && tooltipValueBottom == minValue) || (invertStatus && tooltipValueBottom == maxValue)) {
@@ -692,10 +672,6 @@ function setToolTipDragAndBrush(tooltipValuesTop: any, tooltipValuesDown: any,
         tooltipValuesDown.text(Math.round(tooltipValueBottom));
         tooltipValuesDown.style('visibility', 'visible');
         tooltipValuesDown.style('top', Number(yPosBottom + 180)/16 + 'rem').style('left', window.event.pageX/16 + 'rem');
-        tooltipValuesDown.style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-            .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-            .style('padding', 0.12 + 'rem').style('white-space', 'pre-line')
-            .style('background-color', 'LightGray').style('margin-left', 0.5 + 'rem');
     }
 }
 

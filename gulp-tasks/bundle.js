@@ -1,6 +1,7 @@
 const rollup = require("rollup");
 const rollupCommonJs = require("@rollup/plugin-commonjs");
 const rollupTypeScript = require("@rollup/plugin-typescript");
+const postcss = require('rollup-plugin-postcss');
 const {default: rollupNodeResolve} = require("@rollup/plugin-node-resolve");
 const {terser: rollupTerser} = require("rollup-plugin-terser");
 const {default: rollupGzip} = require("rollup-plugin-gzip");
@@ -13,6 +14,7 @@ async function bundle() {
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
       rollupTypeScript({ tsconfig: './tsconfig.json' }),
+      postcss({ extract: false }),
     ]
   });
 

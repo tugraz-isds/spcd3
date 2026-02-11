@@ -5,7 +5,7 @@ import * as utils from './utils';
 import * as helper from './helper';
 import * as api from './helperApiFunc';
 import * as icon from './icons/icons';
-import { parcoords, active, width, padding, paddingXaxis } from './globals';
+import { parcoords, active, width, paddingXaxis } from './globals';
 
 let scrollXPos: number;
 let timer: string | number | NodeJS.Timeout;
@@ -39,9 +39,7 @@ function setToolTipsOnFeatureAxis(featureAxis: any): void {
   let tooltipFeatures = select('body')
     .append('div')
     .attr('id', 'tooltip')
-    .style('position', 'absolute')
-    .style('pointer-events', 'none')
-    .style('visibility', 'hidden');
+    .attr('class', 'tooltip-dimension');
 
   featureAxis
     .append('text')
@@ -66,14 +64,7 @@ function setToolTipsOnFeatureAxis(featureAxis: any): void {
       tooltipFeatures.text(d.name);
       tooltipFeatures
         .style("left", x / 16 + 'rem')
-        .style("top", y / 16 + 'rem')
-        .style('font-size', '0.75rem')
-        .style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem')
-        .style('margin', 0.5 + 'rem')
-        .style('padding', 0.12 + 'rem')
-        .style('background-color', 'lightgrey')
-        .style('margin-left', 0.5 + 'rem');
+        .style("top", y / 16 + 'rem');
         return tooltipFeatures;
     })
     .on('mouseout', function () {
@@ -107,8 +98,7 @@ function showAllMenu(): void {
 
 function resetFilterMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
-    select('#resetfilterMenu')
-      .style('color', 'lightgrey');
+    select('#resetfilterMenu').style('color', 'lightgrey');
     return;
   }
   
@@ -220,7 +210,7 @@ function handleFilterButton(dimension: string): void {
   }
   else if (max < minRange) {
     max = minRange;
-    select('#errorFilter').text(`Max value is smaller than min range value, 
+    errorMessage.text(`Max value is smaller than min range value, 
       filter is set to min.`);
   }
   else {
@@ -281,11 +271,13 @@ function setRangeMenu(dimension: string): void {
   }
         
   rangeMenu.style('visibility', 'visible')
-    .style('color', 'black')
-    .on('click', (event: { stopPropagation: () => void; }) => {
+    .style('color', 'black');
+  
+  rangeMenu.on('click', (event: { stopPropagation: () => void; }) => {
       handleRangeButton(dimension);     
-    select('#closeButtonRange').on('click', () => {
+      select('#closeButtonRange').on('click', () => {
       select('#modalSetRange').style('display', 'none');
+      select('#errorRange').style('display', 'none');
       select('#modalOverlaySetRange').style('display', 'none');
     });
     select('#contextmenu').style('display', 'none');
@@ -300,6 +292,7 @@ function handleRangeButton(dimension: string): void {
   let resultMax = (maxRange - Math.floor(maxRange)) !== 0;
   let minValue = String(minRange);
   let maxValue = String(maxRange);
+  let errorMessage = select('#errorRange');
   if (resultMin && !resultMax) {
     const count = minValue.split('.')[1].length;
     maxValue = maxRange.toFixed(count);
@@ -328,46 +321,39 @@ function handleRangeButton(dimension: string): void {
   if (inverted) {
     if (max < api.getMinValue(dimension) ||
       min > api.getMaxValue(dimension)) {
-        select('#errorRange').text(`The range has to be bigger than ${minValue} and ${maxValue}.`)
-        .style('display', 'block')
-        .style('padding-left', 0.5 + 'rem')
-        .style('padding-top', 0.5 + 'rem')
-        .style('color', 'red')
-        .style('font-size', 'x-small');
+        errorMessage.text(`The range has to be bigger than ${minValue} and smaller than ${maxValue}.`)
         isOk = false;
-      }
     }
-    else {
-      if (min > api.getMinValue(dimension) ||
+  }
+  else {
+    if (min > api.getMinValue(dimension) ||
         max < api.getMaxValue(dimension)) {
-          select('#errorRange').text(`The range has to be bigger than ${minValue} and ${maxValue}.`)
-          .style('display', 'block')
-          .style('padding-left', 0.5 + 'rem')
-          .style('padding-top', 0.5 + 'rem')
-          .style('color', 'red')
-          .style('font-size', 'x-small');
+          errorMessage.text(`The range has to be smaller than ${minValue} and bigger than ${maxValue}.`)
           isOk = false;
-        }
-      }
-      if (isOk) {
-        select('#errorRange').style('display', 'none');
-        api.setDimensionRange(dimension, min, max);
-        select('#modalSetRange').style('display', 'none');
-        select('#modalOverlaySetRange').style('display', 'none');
-      }
-    });
-    select('#maxRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
+    }
+  }
+  if (isOk) {
+      api.setDimensionRange(dimension, min, max);
+      errorMessage.style('display', 'none');
+      select('#modalSetRange').style('display', 'none');
+      select('#modalOverlaySetRange').style('display', 'none');
+  }
+  else {
+      errorMessage.style('display', 'block');
+  }
+  });
+  select('#maxRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
       if (event.key === "Enter") {
         event.preventDefault();
         document.getElementById("buttonRange").click();
       }
-    });
-    select('#minRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
+  });
+  select('#minRangeValue').on('keypress', (event: { key: string; preventDefault: () => void; }) => {
       if (event.key === "Enter") {
         event.preventDefault();
         document.getElementById("buttonRange").click();
       }
-    });
+  });
 }
 
 function invertDimensionMenu(dimension: string): void {
@@ -398,11 +384,6 @@ function styleContextMenu(event: any): void {
     .style('left', x + 'px')
     .style('top', y + 'px')
     .style('display', 'block')
-    .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-    .style('border-radius', 0.3 + 'rem').style('margin', 0.5 + 'rem')
-    .style('padding', 0.35 + 'rem')
-    .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
-    .style('cursor', 'pointer').style('minWidth', 15 + 'rem')
     .on('click', (event: { stopPropagation: () => void; }) => {
       event.stopPropagation();
     });
@@ -522,6 +503,7 @@ function scroll(d: { subject: any; }): void {
 function createContextMenu(): void {
   let contextMenu = select('#parallelcoords')
     .append('g')
+    .attr('class', 'contextmenu-dimensions')
     .attr('id', 'contextmenu')
     .style('position', 'absolute')
     .style('display', 'none');
@@ -576,15 +558,8 @@ function createContextMenu(): void {
 function createModalToSetRange(): void {
   select('body')
     .append('div')
-    .attr('id', 'modalOverlaySetRange')
-    .style('position', 'fixed')
-    .style('top', '0')
-    .style('left', '0')
-    .style('width', '100vw')
-    .style('height', '100vh')
-    .style('background-color', 'rgba(0, 0, 0, 0.5)')
-    .style('display', 'none')
-    .style('z-index', '999');
+    .attr('class', 'modal-overlay')
+    .attr('id', 'modalOverlaySetRange');
 
   select('#modalOverlaySetRange').on('click', () => {
     select('#modalSetRange').style('display', 'none');
@@ -593,16 +568,8 @@ function createModalToSetRange(): void {
 
   const modalSetRange = select('body')
     .append('div')
+    .attr('class', 'modal')
     .attr('id', 'modalSetRange')
-    .style('position', 'fixed')
-    .style('top', '50%')
-    .style('left', '50%')
-    .style('transform', 'translate(-50%, -50%)')
-    .style('z-index', '1000')
-    .style('background-color', 'white')
-    .style('padding', '1rem')
-    .style('border-radius', '0.5rem')
-    .style('box-shadow', '0 0.25rem 0.625rem rgba(0,0,0,0.2)')
     .style('display', 'none');
 
   createModalTitle(modalSetRange, 'Set Range for ');
@@ -620,15 +587,8 @@ function createModalToSetRange(): void {
 function createModalToFilter(): void {
   select('body')
     .append('div')
-    .attr('id', 'modalOverlayFilter')
-    .style('position', 'fixed')
-    .style('top', '0')
-    .style('left', '0')
-    .style('width', '100vw')
-    .style('height', '100vh')
-    .style('background-color', 'rgba(0, 0, 0, 0.5)')
-    .style('display', 'none')
-    .style('z-index', '999');
+    .attr('class', 'modal-overlay')
+    .attr('id', 'modalOverlayFilter');
 
   select('#modalOverlayFilter').on('click', () => {
     select('#modalFilter').style('display', 'none');
@@ -637,16 +597,8 @@ function createModalToFilter(): void {
 
   const modalFilter = select('body')
     .append('div')
+    .attr('class', 'modal')
     .attr('id', 'modalFilter')
-    .style('position', 'fixed')
-    .style('top', '50%')
-    .style('left', '50%')
-    .style('transform', 'translate(-50%, -50%)')
-    .style('z-index', '1000')
-    .style('background-color', 'white')
-    .style('padding', '1rem')
-    .style('border-radius', '0.5rem')
-    .style('box-shadow', '0 0.25rem 0.625rem rgba(0,0,0,0.2)')
     .style('display', 'none');
 
   createModalTitle(modalFilter, 'Set Filter for ');
@@ -660,77 +612,156 @@ function createModalToFilter(): void {
 
 function createModalTitle(modal: any, modalTitel: string): void {
   const title = document.createElement('div');
+  title.className = 'modal-title';
   title.textContent = modalTitel;
-  title.style.paddingLeft = '0.5rem';
-  title.style.fontSize = 'large';
   modal.append(() => title);
 }
 
 function createHeader(modal: any, id: string): void {
   const header = document.createElement('div');
   header.id = id;
-  header.style.paddingLeft = '0.5rem';
-  header.style.fontSize = 'large';
+  header.className = 'modal-header';
   modal.append(() => header);
 }
 
 function createInfoMessage(modal: any, id: string): void {
   const infoMessage = document.createElement('div');
   infoMessage.id = id;
-  infoMessage.style.color = 'grey';
-  infoMessage.style.fontSize = 'smaller';
-  infoMessage.style.paddingLeft = '0.5rem';
-  infoMessage.style.paddingBottom = '0.5rem';
-  infoMessage.style.paddingTop = '1rem';
+  infoMessage.className = 'modal-infomessage';
   modal.append(() => infoMessage);
 }
 
 function createInputFieldWithLabel(modal: any, text: string, inputId: string): void {
   const label = document.createElement('label');
+  label.className = 'modal-label';
   label.textContent = text;
-  label.style.padding = '0.5rem';
   modal.append(() => label);
 
   const input = document.createElement('input');
+  input.className = 'modal-input';
   input.type = 'number';
   input.id = inputId;
-  input.style.width = '4.5rem';
-  input.style.border = '0.1rem solid lightgrey';
-  input.style.borderRadius = "5%";
   modal.append(() => input);
 }
 
 function createButton(modal: any, id: string): void {
   const button = document.createElement('button');
+  button.className = 'modal-button';
   button.id = id;
   button.textContent = 'Save';
-  button.style.marginLeft = '0.5rem';
-  button.style.marginTop = '1rem';
-  button.style.width = '6.2rem';
   modal.append(() => button);
 }
 
 function createCloseButton(modal: any, id: string): void {
   const closeButton = document.createElement('span');
+  closeButton.className = 'close-button';
   closeButton.id = id;
   closeButton.innerHTML = '&times;';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = '0.625rem';
-  closeButton.style.right = '0.938rem';
-  closeButton.style.cursor = 'pointer';
-  closeButton.style.fontWeight = 'bold';
-  closeButton.style.fontSize = '1.25rem';
   modal.append(() => closeButton);
 }
 
 function createErrorMessage(modal: any, id: string): void {
   const errorMessage = document.createElement('div');
+  errorMessage.className = 'modal-errormessage';
   errorMessage.id = id;
-  errorMessage.style.position = 'relative';
-  errorMessage.style.display = 'none';
-  errorMessage.style.paddingLeft = 0.5 + 'rem';
-  errorMessage.style.paddingTop = 0.5 +'rem';
-  errorMessage.style.color = 'red';
-  errorMessage.style.fontSize = 'x-small';
   modal.append(() => errorMessage);
+}
+
+export function createContextMenuForRecords(): any {
+    let contextMenu = select('#parallelcoords')
+        .append('g')
+        .attr('class', 'contextmenu-records')
+        .attr('id', 'contextmenuRecords')
+        .style('position', 'absolute')
+        .style('display', 'none');
+
+    createContextMenuItem(contextMenu, 'selectRecord', 'contextmenu', 'Select Record', 'Select Record(s)');
+    createContextMenuItem(contextMenu, 'unSelectRecord', 'contextmenu', 'Unselect Record', 'Unselect Record(s)');
+    createContextMenuItem(contextMenu, 'toggleRecord', 'contextmenu', 'Toggle Record', 'Toggle Record(s)');
+    createContextMenuItem(contextMenu, 'addSelection', 'contextmenu', 'Add to Selection', 'Add to Selection');
+    createContextMenuItem(contextMenu, 'removeSelection', 'contextmenu', 'Remove from Selection', 'Remove from Selection');
+    return contextMenu;
+}
+
+function createContextMenuItem(contextMenu, id, className, text, title)
+{
+     contextMenu.append('div')
+        .attr('id', id)
+        .attr('class', className)
+        .attr('title', title)
+        .text(text);
+}
+
+export function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
+    const container = document.querySelector("#parallelcoords");
+    const rect = container.getBoundingClientRect();
+    const data = helper.getAllPointerEventsData(event);
+    const cleanedItems = data.map((item: string) =>
+        utils.cleanString(item).replace(/[.,]/g, '')
+    );
+
+    if (cleanedItems.length > 1) {
+        select('#selectRecord').text('Select Records');
+        select('#unSelectRecord').text('Unselect Records');
+        select('#toggleRecord').text('Toggle Records');
+    } else {
+        select('#selectRecord').text('Select Record');
+        select('#unSelectRecord').text('Unselect Record');
+        select('#toggleRecord').text('Toggle Record');
+    }
+
+    const x = (event.clientX - rect.left) / 16 ;
+    const y = (event.clientY - rect.top) / 16;
+    contextMenu
+        .style('left', x + 'rem')
+        .style('top', y + 'rem')
+        .style('display', 'block')
+        .on('click', (event: { stopPropagation: () => void; }) => {
+            event.stopPropagation();
+        });
+
+    select('#selectRecord').on('click', (event) => {
+        api.setSelection(cleanedItems);
+        event.stopPropagation();
+        select('#contextmenuRecords').style('display', 'none');
+    });
+
+    select('#unSelectRecord').on('click', (event) => {
+        cleanedItems.forEach(item => {
+            api.setUnselected(item);
+        });
+        event.stopPropagation();
+        select('#contextmenuRecords').style('display', 'none');
+    });
+
+    select('#toggleRecord').style('border-top', '0.08rem lightgrey solid')
+        .on('click', (event) => {
+            cleanedItems.forEach(item => {
+                api.toggleSelection(item);
+            });
+            event.stopPropagation();
+            select('#contextmenuRecords').style('display', 'none');
+        });
+
+    select('#addSelection').style('border-top', '0.08rem lightgrey solid')
+        .on('click', (event) => {
+            let selectedRecords = [];
+            selectedRecords = api.getSelected();
+            const records = [...selectedRecords , ...cleanedItems];
+            api.setSelection(records);
+            event.stopPropagation();
+            select('#contextmenuRecords').style('display', 'none');
+        });
+
+    select('#removeSelection').on('click', (event) => {
+        cleanedItems.forEach(item => {
+            api.setUnselected(item);
+        });
+        event.stopPropagation();
+        select('#contextmenuRecords').style('display', 'none');
+    });
+
+    selectAll('.contextmenu').style('padding', 0.35 + 'rem');
+    
+    event.preventDefault();
 }

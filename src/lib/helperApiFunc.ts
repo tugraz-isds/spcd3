@@ -1,4 +1,4 @@
-import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis } from './globals';
+import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns } from './globals';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as brush from './brush';
@@ -752,7 +752,7 @@ export function getAllVisibleDimensionNames(): string[] {
 }
 
 export function getAllDimensionNames(): string[] {
-    return parcoords.data['columns'];
+    return columns;
 }
 
 export function getAllHiddenDimensionNames(): string[] {

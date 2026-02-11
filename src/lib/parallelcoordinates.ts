@@ -1,6 +1,5 @@
 import 'd3-transition';
-import { zoom } from 'd3-zoom';
-import { select, selectAll } from 'd3-selection';
+import { select } from 'd3-selection';
 import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
@@ -8,67 +7,81 @@ import * as context from './contextMenu';
 import * as icon from './icons/icons';
 import * as toolbar from './toolbar';
 import * as api from './helperApiFunc';
-import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg, padding, 
+import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg, 
     refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension,
     setActive, setYScales, setData, setFeatures, setNewDataset, setNewFeatures,
-    setXScales, setHoverLabel, key, hoverlabel, setKey, height } from './globals';
+    setXScales, setHoverLabel, key, hoverlabel, setKey, height, 
+    setColumns, columns, thickness, setLineThickness} from './globals';
+
+import './stylesheet.css'
 
 declare const window: any;
 
 //---------- IO Functions ----------
 
-export function drawChart(content: []): void {
-    setRefreshData(structuredClone(content));
+let initialColumns: any | undefined;
+let currentColumns: any | undefined;
+let datasetKey: string | undefined;
+
+function makeDatasetKey(content: any) {
+  const cols = "Test";
+  const n = content.length ?? [];
+  return `${cols}::${n}`;
+}
+
+export function drawChart(content: [], lineThick, resetKey?: boolean): void {
+    
+    const nextKey = makeDatasetKey(content);
+
+    if (datasetKey !== nextKey) {
+        datasetKey = nextKey;
+        initialColumns = structuredClone(content['columns']).reverse();
+        currentColumns = structuredClone(initialColumns);
+        setColumns(initialColumns);
+        setRefreshData(structuredClone(content));
+    }
+    
     deleteChart();
 
-    let newFeatures = content['columns'].reverse();
-
-    setUpParcoordData(content, newFeatures);
-
-    const height = 360;
-
-    let wrapper = select('#parallelcoords');
-
-    if (wrapper === null)
-    {
-        wrapper = select<HTMLBodyElement, unknown>(document.body)
-            .append<HTMLDivElement>("div")
-            .attr('id', 'parallelcoords')
-            .style('display', 'block')
-            .style('width', '100%')
-            .style('margin', '0')
-            .style('padding', '0')
-            .style('text-align', 'left')
-            .style('justify-content', 'center')
-            .style('align-items', 'center');
+    if (thickness === undefined) {
+        setLineThickness('0.4rem');
     }
 
-    const chartWrapper = wrapper.append('div')
-        .attr('id', 'chartWrapper');
+    if (lineThick !== undefined) {
+        setLineThickness(lineThick);
+    }
 
-    chartWrapper.append('div')
-        .attr('id', 'toolbarRow')
-        .style('display', 'flex')
-        .style('flex-wrap', 'wrap')
-        .style('align-items', 'center')
-        .style('justify-content', 'flex-start')
-        .style('margin-left', '2rem')
-        .style('font-size', '0.8vw')
-        .style('overflow', 'visible'); 
+    if (resetKey) {
+        setUpParcoordData(content, initialColumns);
+    } else {
+        setUpParcoordData(content, currentColumns);
+    } 
+   
+
+    let chart = select('#parallelcoords');
+
+    if (chart === null)
+    {
+        chart = select<HTMLBodyElement, unknown>(document.body)
+            .append<HTMLDivElement>("div")
+            .attr('id', 'parallelcoords');
+    }
+
+    const chartWrapper = chart.append('div').attr('id', 'chartWrapper');
+
+    chartWrapper.append('div').attr('id', 'toolbarRow')
 
     toolbar.createToolbar(parcoords.newDataset);
 
     setSvg(chartWrapper.append('svg')
         .attr('id', 'pc_svg')
-        .attr('viewBox', [0, 0, width, height])
-        .attr('font-family', 'Verdana, sans-serif'));
+        .attr('viewBox', [0, 0, width, 360]));
 
-    const plot = svg.append("g")
-        .attr("class", "plot");
+    const plot = svg.append("g").attr("class", "plot");
 
     setDefsForIcons();
 
-    setFeatureAxis(plot, yAxis, parcoords, width, padding);
+    setFeatureAxis(plot, yAxis, parcoords, width);
 
     setActive(setActivePathLines(plot, content, parcoords));
 
@@ -84,26 +97,27 @@ export function drawChart(content: []): void {
         })
         .on("mousedown.selection", function (event: any) {
             event.preventDefault();
+        })
+        .on('mouseleave', function () {
+            if (cleanupTimeout) {
+                clearTimeout(cleanupTimeout);
+                cleanupTimeout = setTimeout(() => {
+                    handlePointerLeaveOrOut();
+                }, 100);
+            }
+        })
+        .on('mousemove', function(event: any) {
+            const chartBounds = svg.node().getBoundingClientRect();
+            if (
+                event.clientX < chartBounds.left ||
+                event.clientX > chartBounds.right ||
+                event.clientY < chartBounds.top ||
+                event.clientY > chartBounds.bottom
+            ) {
+                handlePointerLeaveOrOut();
+            }
         });
-
-        /*const zoomBehavior = zoom()
-            .scaleExtent([0.5, 20])
-            .translateExtent([[0, 0], [width * 3, height * 3]])
-            .on("zoom", (event) => {
-                plot.attr("transform", event.transform);
-            });
-
-
-        const identity = { k: 1, x: 0, y: 0 };
-        svg.call(zoomBehavior)
-            .on("dblclick.zoom", null)
-            .on("dblclick.reset", (event) => {
-                event.preventDefault();
-                svg.transition()
-                    .duration(400)
-                    .call(zoomBehavior.transform, identity);
-            });*/
-
+    
     window.onclick = () => {
         select('#contextmenu').style('display', 'none');
         select('#contextmenuRecords').style('display', 'none');
@@ -111,16 +125,8 @@ export function drawChart(content: []): void {
 }
 
 export function reset() {
-    drawChart(refreshData);
-    let toolbar = select('#toolbar');
-    toolbar.style('max-width', '12.5rem')
-        .style('opacity', '1')
-        .style('pointer-events', 'auto');
-
-    let toggleButton = select('#toggleButton');
-    toggleButton.attr('title', 'Collapse toolbar');
-
-    toggleButton.html(icon.getCollapseToolbarIcon());
+    const data = structuredClone(refreshData);
+    drawChart(data, thickness, true);
 }
 
 
@@ -231,35 +237,22 @@ function setUpParcoordData(data: any, newFeatures: []): void {
     setHoverLabel(api.getAllVisibleDimensionNames()[0]);
 }
 
-const tooltipLabel = select('body')
-    .append('div')
-    .attr('id', 'tooltip_label')
-    .style('position', 'absolute')
-    .style('visibility', 'hidden')
-    .style('pointer-events', 'none')
-    .style('background', 'lightgrey')
-    .style('padding', '0.2rem')
-    .style('border', '0.0625rem solid gray')
-    .style('border-radius', '0.2rem')
-    .style('white-space', 'pre-line')
-    .style('font-size', '0.75rem')
-    .style('z-index', '1000');
-
 let delay = null;
 let cleanupTimeout = null;
 
-const clearExistingDelay = () => {
+function clearExistingDelay() {
     if (delay) {
         clearTimeout(delay);
         delay = null;
     }
 };
 
-const handlePointerEnter = (event: any, d: any) => {
+function handlePointerEnter(event: any, d: any) {
     clearExistingDelay();
     doNotHighlight();
 
     const data = helper.getAllPointerEventsData(event);
+    const tooltipLabel = select('.tooltip-record')
 
     highlight(data);
     helper.createTooltipForLabel(data, tooltipLabel, event);
@@ -277,19 +270,20 @@ const handlePointerEnter = (event: any, d: any) => {
   });
 };
 
-const handlePointerLeaveOrOut = () => {
+function handlePointerLeaveOrOut() {
     doNotHighlight();
     clearExistingDelay();
-    select('#tooltip_label').style('visibility', 'hidden');
+    select('.tooltip-record').style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
-const handleClick = (event, d) => {
+function handleClick(event, d) {
     const data = helper.getAllPointerEventsData(event);
 
     const cleanedItems = data.map((item: string) =>
         utils.cleanString(item).replace(/[.,]/g, '')
     );
+
     const selectedRecords = api.getSelected();
 
     if (event.metaKey || event.shiftKey) {
@@ -312,34 +306,9 @@ const handleClick = (event, d) => {
     event.stopPropagation();
 }
 
-select('#pc_svg').on('mouseleave', () => {
-    if (cleanupTimeout) clearTimeout(cleanupTimeout);
-    cleanupTimeout = setTimeout(() => {
-        doNotHighlight();
-        clearExistingDelay();
-        select('#tooltip_label').style('visibility', 'hidden');
-        helper.cleanTooltip();
-    }, 100);
-});
-
-document.addEventListener('mousemove', (e) => {
-    const chartSel = select('#pc_svg');
-    const chart = chartSel.node();
-    if (!chart) return;
-    const chartBounds = chart.getBoundingClientRect();
-    if (
-        e.clientX < chartBounds.left ||
-        e.clientX > chartBounds.right ||
-        e.clientY < chartBounds.top ||
-        e.clientY > chartBounds.bottom
-    ) {
-        handlePointerLeaveOrOut();
-    }
-});
-
 function setActivePathLines(svg, content, parcoords): any {
 
-    const contextMenu = createContextMenuForRecords();
+    const contextMenuRecords = context.createContextMenuForRecords();
     const g = svg.append('g').attr('class', 'active');
 
     g.selectAll('path.hitarea')
@@ -356,14 +325,14 @@ function setActivePathLines(svg, content, parcoords): any {
         .attr('d', d => helper.linePath(d, parcoords.newFeatures))
         .style('stroke', 'transparent')
         .style('fill', 'none')
-        .style('stroke-width', '0.4rem')
+        .style('stroke-width', thickness)
         .style('pointer-events', 'stroke')
         .on('pointerenter', handlePointerEnter)
         .on('pointerleave', handlePointerLeaveOrOut)
         .on('pointerout', handlePointerLeaveOrOut)
         .on('click', handleClick)
         .on('contextmenu', function (event: any, d: any) {
-            handleRecordContextMenu(contextMenu, event, d);
+            context.handleRecordContextMenu(contextMenuRecords, event, d);
             select('#contextmenu').style('display', 'none');
         });
 
@@ -385,112 +354,9 @@ function setActivePathLines(svg, content, parcoords): any {
         .style('fill', 'none');
 }
 
-function createContextMenuForRecords(): any {
-    let contextMenu = select('#parallelcoords')
-        .append('g')
-        .attr('id', 'contextmenuRecords')
-        .style('position', 'absolute')
-        .style('display', 'none');
+export const throttleShowValues = utils.throttle(helper.createToolTipForValues, 50);
 
-    createContextMenuItem(contextMenu, 'selectRecord', 'contextmenu', 'Select Record', 'Select Record(s)');
-    createContextMenuItem(contextMenu, 'unSelectRecord', 'contextmenu', 'Unselect Record', 'Unselect Record(s)');
-    createContextMenuItem(contextMenu, 'toggleRecord', 'contextmenu', 'Toggle Record', 'Toggle Record(s)');
-    createContextMenuItem(contextMenu, 'addSelection', 'contextmenu', 'Add to Selection', 'Add to Selection');
-    createContextMenuItem(contextMenu, 'removeSelection', 'contextmenu', 'Remove from Selection', 'Remove from Selection');
-    return contextMenu;
-}
-
-function createContextMenuItem(contextMenu, id, className, text, title)
-{
-     contextMenu.append('div')
-        .attr('id', id)
-        .attr('class', className)
-        .attr('title', title)
-        .text(text);
-}
-
-function handleRecordContextMenu(contextMenu: any, event: any, d: any): void {
-    const container = document.querySelector("#parallelcoords");
-    const rect = container.getBoundingClientRect();
-    const data = helper.getAllPointerEventsData(event);
-    const cleanedItems = data.map((item: string) =>
-        utils.cleanString(item).replace(/[.,]/g, '')
-    );
-
-    if (cleanedItems.length > 1) {
-        select('#selectRecord').text('Select Records');
-        select('#unSelectRecord').text('Unselect Records');
-        select('#toggleRecord').text('Toggle Records');
-    } else {
-        select('#selectRecord').text('Select Record');
-        select('#unSelectRecord').text('Unselect Record');
-        select('#toggleRecord').text('Toggle Record');
-    }
-
-    const x = (event.clientX - rect.left) / 16 ;
-    const y = (event.clientY - rect.top) / 16;
-    contextMenu.style('left', x + 'rem')
-        .style('top', y + 'rem')
-        .style('display', 'block')
-        .style('font-size', '0.75rem').style('border', 0.08 + 'rem solid gray')
-        .style('border-radius', 0.1 + 'rem').style('margin', 0.5 + 'rem')
-        .style('padding', 0.35 + 'rem')
-        .style('background-color', 'white').style('margin-left', 0.5 + 'rem')
-        .style('cursor', 'pointer')
-        .on('click', (event: { stopPropagation: () => void; }) => {
-            event.stopPropagation();
-        });
-
-    select('#selectRecord').on('click', (event) => {
-        api.setSelection(cleanedItems);
-        event.stopPropagation();
-        select('#contextmenuRecords').style('display', 'none');
-    });
-
-    select('#unSelectRecord').on('click', (event) => {
-        cleanedItems.forEach(item => {
-            api.setUnselected(item);
-        });
-        event.stopPropagation();
-        select('#contextmenuRecords').style('display', 'none');
-    });
-
-    select('#toggleRecord').style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
-            cleanedItems.forEach(item => {
-                api.toggleSelection(item);
-            });
-            event.stopPropagation();
-            select('#contextmenuRecords').style('display', 'none');
-        });
-
-    select('#addSelection').style('border-top', '0.08rem lightgrey solid')
-        .on('click', (event) => {
-            let selectedRecords = [];
-            selectedRecords = api.getSelected();
-            const records = [...selectedRecords , ...cleanedItems];
-            api.setSelection(records);
-            event.stopPropagation();
-            select('#contextmenuRecords').style('display', 'none');
-        });
-
-    select('#removeSelection').on('click', (event) => {
-        cleanedItems.forEach(item => {
-            api.setUnselected(item);
-        });
-        event.stopPropagation();
-        select('#contextmenuRecords').style('display', 'none');
-    });
-
-    selectAll('.contextmenu').style('padding', 0.35 + 'rem');
-    
-    event.preventDefault();
-}
-
-const delay1 = 50;
-export const throttleShowValues = utils.throttle(helper.createToolTipForValues, delay1);
-
-function setFeatureAxis(svg, yAxis, parcoords, width, padding): void {
+function setFeatureAxis(svg, yAxis, parcoords, width): void {
 
     let featureAxis = svg.selectAll('g.feature')
         .data(parcoords.features)
@@ -503,20 +369,14 @@ function setFeatureAxis(svg, yAxis, parcoords, width, padding): void {
         .each(function (d: { name: string; }) {
             const processedDimensionName = utils.cleanString(d.name);
             select(this)
+                .attr('class', 'dimension-axis')
                 .attr('id', 'dimension_axis_' + processedDimensionName)
                 .call(yAxis[d.name]);
         });
 
-    /*let tickElements = document.querySelectorAll('g.tick');
-    tickElements.forEach((gElement) => {
-        let transformValue = gElement.getAttribute('transform');
-        let yValue = transformValue.match(/translate\(0,([^\)]+)\)/);
-        if (yValue) {
-            let originalValue = parseFloat(yValue[1]);
-            let shortenedValue = originalValue.toFixed(4);
-            gElement.setAttribute('transform', `translate(0,${shortenedValue})`);
-        }
-    });*/
+    select('body')
+        .append('div')
+        .attr('class', 'tooltip-record');
 
     const brushOverlay = svg.append("rect")
         .attr("x", 0)
@@ -563,15 +423,15 @@ function createImage(defs, id, width, height, image): void {
 function setInvertIcon(featureAxis): void {
     let value = (50 / 1.3).toFixed(4);
 
-    const svg = featureAxis
+    const invertIcon = featureAxis
         .append('svg')
         .attr('x', -6 - 22)
-        .attr('y', Number(value) - 22)
+        .attr('y', Number(value)-22)
         .attr('width', 44)
         .attr('height', 22)
-        .style('overflow', 'visible') 
+        .attr('overflow', 'visible') 
 
-    svg.append('rect')
+    invertIcon.append('rect')
         .attr('id', 'invert_hitbox')
         .attr('class', 'hitbox')
         .attr('x', 6)
@@ -584,12 +444,11 @@ function setInvertIcon(featureAxis): void {
         .style('pointer-events', 'all')
         .each(function (d: { name: string }) {
             const processed = utils.cleanString(d.name);
-            select(this)
-            .attr('id', 'invert_hitbox_' + processed)
+            select(this).attr('id', 'invert_hitbox_' + processed)
             .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         });
 
-    svg.append('use')
+    invertIcon.append('use')
        .attr('href', '#arrow_image_up')
        .attr('width', 12)
        .attr('height', 12)
@@ -597,13 +456,12 @@ function setInvertIcon(featureAxis): void {
        .attr('y', Number(value)-33)
        .each(function (d: { name: string }) {
             const processed = utils.cleanString(d.name);
-            select(this)
-            .attr('id', 'dimension_invert_' + processed)
+            select(this).attr('id', 'dimension_invert_' + processed)
             .text('up')
             .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`);
         });
 
-    svg.on('click', (event: any, d: { name: string }) => {
+    invertIcon.on('click', (event: any, d: { name: string }) => {
         api.invert(d.name);
         event.stopPropagation();
     });
@@ -654,21 +512,15 @@ function doNotHighlight() {
 }
 
 function setMarker(featureAxis: any): void {
-    featureAxis
-        .each(function (d: { name: string; }) {
-            const processedDimensionName = utils.cleanString(d.name);
-            select(this)
-                .append('g')
-                .attr('class', 'marker')
-                .append('rect')
-                .attr('id', 'marker_' + processedDimensionName)
-                .attr('width', 44)
-                .attr('height', 305)
-                .attr('x', -22)
-                .attr('y', 30)
-                .attr('fill', 'none')
-                .attr('stroke', "rgb(228, 90, 15)")
-                .attr('stroke-width', '0.1rem')
-                .attr('opacity', '0')
-        });
+    featureAxis.each(function (d: { name: string; }) {
+        const processedDimensionName = utils.cleanString(d.name);
+        select(this).append('g')
+            .attr('class', 'marker')
+            .append('rect')
+            .attr('id', 'marker_' + processedDimensionName)
+            .attr('width', 44)
+            .attr('height', 305)
+            .attr('x', -22)
+            .attr('y', 30)
+    });
 }
