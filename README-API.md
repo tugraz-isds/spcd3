@@ -408,3 +408,9 @@ Disables the interactivity of the chart.
 `function enableInteractivity(): void`
 
 Enables the interactivity of the chart.
+
+#### setSelectableWidth
+
+`function setSelectableWidth(width: string)`
+
+Sets the width of the invisible hitbox used for line interaction.

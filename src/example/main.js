@@ -937,7 +937,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
     let reloadedData = loadCSV(data);
-    drawChart(reloadedData, '0.4rem', true);
+    drawChart(reloadedData, true);
 }
 
 function generateDropdownForSelectRecords() {

@@ -2,6 +2,10 @@ body {
     font-size: 0.8rem;
 }
 
+header {
+    display: flex;
+}
+
 button {
     cursor: pointer;
     background: #f6f6f6;
@@ -26,23 +30,27 @@ td {
     padding: 0.5rem;
 }
 
-/*form {
+img {
+    display:inline-block;
+}
+
+.form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-label {
+.label {
     padding: 0.35rem;
     text-align: left;
     flex: 1;
 }
 
-input {
+.input {
     width: 3.125;
     margin-right: 0.45rem;
     vertical-align: middle;
-}*/
+}
 
 .tablecontainer {
     width: 100%;
@@ -80,6 +88,32 @@ input {
     color: red;
     font-size: 0.65rem;
     font-weight: bold;
+}
+
+.tooltip-record-select {
+    position: absolute;
+    pointer-events: none;
+    border: none;
+    border-radius: 0.1rem;
+    margin: 0.5rem;
+    padding: 0.12rem;
+    background-color: lightgrey;
+    color: orange;
+    font-size: 0.65rem;
+    font-weight: bold;
+}
+
+.tooltip-label {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    background: lightgrey;
+    padding: 0.2rem;
+    border: 0.0625rem solid grey;
+    border-radius: 0.2rem;
+    white-space: pre-line;
+    font-size: 0.75rem;
+    z-index: 1000;
 }
 
 .tooltip-dimension {

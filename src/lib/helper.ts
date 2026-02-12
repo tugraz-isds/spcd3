@@ -152,7 +152,7 @@ function recordIdOf(rec: any) {
   return rec.id ?? rec._id ?? rec.key;
 }
 
-export function createToolTipForValues(records: any, recKey?: string) {
+export function createToolTipForValues(records: any, isSelect: boolean) {
   const dimensions = getAllVisibleDimensionNames();
   const svg = select('#pc_svg').node() as SVGSVGElement;
   const plotG = (document.querySelector<SVGGElement>('#pc_svg g.plot') ?? svg);
@@ -172,10 +172,14 @@ export function createToolTipForValues(records: any, recKey?: string) {
     .map(dim => {
       const yScale = parcoords.yScales[dim];
       const x = parcoords.xScales(dim);
-      const y = yScale(records[dim]);
+      const record = records[dim];
+      const cleanRecord = record.length > 10 ? record.substr(0, 10) + '...' :
+        record;
+      const y = yScale(cleanRecord);
 
       const pt = svg.createSVGPoint();
-      pt.x = x; pt.y = y;
+      pt.x = x;
+      pt.y = y;
       const sp = pt.matrixTransform(ctm);
 
       return {
@@ -186,21 +190,42 @@ export function createToolTipForValues(records: any, recKey?: string) {
       };
     });
 
-  const tips = layer
-    .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
-    .data(data, (d: any) => dimensions);
+    if (isSelect) {
+      const tips = layer
+        .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record-select')
+        .data(data, (d: any) => dimensions);
 
-  tips.join(
-    enter => enter.append('div')
-      .attr('class', 'tooltip-record')
-      .style('left', d => `${d.pageX/16}rem`)
-      .style('top',  d => `${d.pageY/16}rem`)
-      .text(d => d.text), update => update
-      .style('left', d => `${d.pageX/16}rem`)
-      .style('top',  d => `${d.pageY/16}rem`)
-      .text(d => d.text),
-    exit => exit.remove()
-  );
+      tips.join(
+        enter => enter.append('div')
+          .attr('id', `tooltip-record-select-${records[hoverlabel]}`)
+          .attr('class', 'tooltip-record-select')
+          .style('left', d => `${d.pageX/16}rem`)
+          .style('top',  d => `${d.pageY/16}rem`)
+          .text(d => d.text), update => update
+          .style('left', d => `${d.pageX/16}rem`)
+          .style('top',  d => `${d.pageY/16}rem`)
+          .text(d => d.text),
+        exit => exit.remove()
+        
+      );
+    }
+    else {
+      const tips = layer
+        .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
+        .data(data, (d: any) => dimensions);
+
+      tips.join(
+        enter => enter.append('div')
+          .attr('class', 'tooltip-record')
+          .style('left', d => `${d.pageX/16}rem`)
+          .style('top',  d => `${d.pageY/16}rem`)
+          .text(d => d.text), update => update
+          .style('left', d => `${d.pageX/16}rem`)
+          .style('top',  d => `${d.pageY/16}rem`)
+          .text(d => d.text),
+        exit => exit.remove()
+      );
+    }
 }
 
 export function getAllPointerEventsData(event: any): any {
@@ -243,4 +268,8 @@ export function position(dimension: any, dragging: any, xScales: any): any {
 
 export function cleanTooltip(): void {
   selectAll('.tooltip-record').remove();
+}
+
+export function cleanTooltipSelect(): void {
+  selectAll('.tooltip-record-select').remove();
 }

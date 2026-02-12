@@ -35,6 +35,31 @@ adjust dimension ranges, filter records, hover over records, and
 select records.
 
 
+### Hovering over Records
+
+If there are a large number of records, a parallel coordinates
+visualisation contains a large number of potentially crossing and
+overlapping polylines, so it is challenging to recognise which
+polyline belongs to which record. Hovering over one or more polylines
+highlights the polyline(s) beneath the mouse pointer in red and
+displays a tooltip with the labels of the corresponding records. By
+default, the label is taken from the first column of the dataset.
+
+![screenshot](screenshots/hoverRecords.png)
+
+
+### Select Records
+
+It is helpful to be able to select one or more records in the dataset
+and to highlight them accordingly. Left-clicking one or more polylines
+selects the corresponding record(s) and highlights them in orange.
+Shift-left-clicking adds one or more records to the current selection.
+Control-left-clicking toggles the selection status of the
+corresponding records. Left-clicking in empty space clears the current
+selection.
+
+![screenshot](screenshots/selectRecords.png)
+
 ### Inverting Dimensions
 
 By default, a dimension's axis places higher values at the top and
@@ -97,31 +122,6 @@ context menu: \uiname{Set Filter} sets a filter to specific values and
 
 ![screenshot](screenshots/filterDimension.png)
 
-
-### Hovering over Records
-
-If there are a large number of records, a parallel coordinates
-visualisation contains a large number of potentially crossing and
-overlapping polylines, so it is challenging to recognise which
-polyline belongs to which record. Hovering over one or more polylines
-highlights the polyline(s) beneath the mouse pointer in red and
-displays a tooltip with the labels of the corresponding records. By
-default, the label is taken from the first column of the dataset.
-
-![screenshot](screenshots/hoverRecords.png)
-
-
-### Select Records
-
-It is helpful to be able to select one or more records in the dataset
-and to highlight them accordingly. Left-clicking one or more polylines
-selects the corresponding record(s) and highlights them in orange.
-Shift-left-clicking adds one or more records to the current selection.
-Control-left-clicking toggles the selection status of the
-corresponding records. Left-clicking in empty space clears the current
-selection.
-
-![screenshot](screenshots/selectRecords.png)
 
 
 ## Steerable API

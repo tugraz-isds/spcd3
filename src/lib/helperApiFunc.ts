@@ -1,4 +1,4 @@
-import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns } from './globals';
+import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns, setLineThickness } from './globals';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as brush from './brush';
@@ -813,4 +813,8 @@ export function enableInteractivity() {
     selectAll('.hitarea').style('pointer-events', 'stroke');
     selectAll('.handle-hitbox').style('pointer-events', 'auto');
     selectAll('.hitbox').style('pointer-events', 'auto');
+}
+
+export function setSelectableWidth(width: string) {
+    setLineThickness(width);
 }

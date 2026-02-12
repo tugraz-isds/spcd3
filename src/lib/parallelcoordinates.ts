@@ -1,5 +1,5 @@
 import 'd3-transition';
-import { select } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 import * as brush from './brush';
 import * as utils from './utils';
 import * as helper from './helper';
@@ -11,9 +11,10 @@ import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg,
     refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension,
     setActive, setYScales, setData, setFeatures, setNewDataset, setNewFeatures,
     setXScales, setHoverLabel, key, hoverlabel, setKey, height, 
-    setColumns, columns, thickness, setLineThickness} from './globals';
+    setColumns, thickness, setLineThickness} from './globals';
 
-import './stylesheet.css'
+import './reset.css';
+import './stylesheet.css';
 
 declare const window: any;
 
@@ -29,7 +30,7 @@ function makeDatasetKey(content: any) {
   return `${cols}::${n}`;
 }
 
-export function drawChart(content: [], lineThick, resetKey?: boolean): void {
+export function drawChart(content: [], resetKey?: boolean): void {
     
     const nextKey = makeDatasetKey(content);
 
@@ -45,10 +46,6 @@ export function drawChart(content: [], lineThick, resetKey?: boolean): void {
 
     if (thickness === undefined) {
         setLineThickness('0.4rem');
-    }
-
-    if (lineThick !== undefined) {
-        setLineThickness(lineThick);
     }
 
     if (resetKey) {
@@ -121,12 +118,13 @@ export function drawChart(content: [], lineThick, resetKey?: boolean): void {
     window.onclick = () => {
         select('#contextmenu').style('display', 'none');
         select('#contextmenuRecords').style('display', 'none');
+        helper.cleanTooltipSelect();
     }
 }
 
 export function reset() {
     const data = structuredClone(refreshData);
-    drawChart(data, thickness, true);
+    drawChart(data, true);
 }
 
 
@@ -252,7 +250,7 @@ function handlePointerEnter(event: any, d: any) {
     doNotHighlight();
 
     const data = helper.getAllPointerEventsData(event);
-    const tooltipLabel = select('.tooltip-record')
+    const tooltipLabel = select('.tooltip-label')
 
     highlight(data);
     helper.createTooltipForLabel(data, tooltipLabel, event);
@@ -263,17 +261,17 @@ function handlePointerEnter(event: any, d: any) {
     });
 
     data.forEach((item: any, i: number) => {
-    const rec = datasetMap.get(item);
-    if (rec) {
-      helper.createToolTipForValues(rec, rec.id ?? String(i));
-    }
-  });
+        const rec = datasetMap.get(item);
+        if (rec) {
+          helper.createToolTipForValues(rec, false);
+        }
+    });
 };
 
 function handlePointerLeaveOrOut() {
     doNotHighlight();
     clearExistingDelay();
-    select('.tooltip-record').style('visibility', 'hidden');
+    select('.tooltip-label').style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
@@ -290,18 +288,56 @@ function handleClick(event, d) {
         cleanedItems.forEach((record: string) => {
         if (selectedRecords.includes(record)) {
             api.setUnselected(record);
+            selectAll(`#tooltip-record-select-${record}`).style('display', 'none');
         } else {
             api.setSelected(record);
+            const datasetMap = new Map();
+            parcoords.newDataset.forEach((cleanedItems: { [x: string]: any; }) => {
+                datasetMap.set(cleanedItems[hoverlabel], cleanedItems);
+            });
+
+            data.forEach((item: any, i: number) => {
+                const rec = datasetMap.get(item);
+                if (rec) {
+                helper.createToolTipForValues(rec, true);
+                }
+            });
         }});
     }
     else if (event.ctrlKey) {
         cleanedItems.forEach((record: string) => {
-            api.toggleSelection(record);
-        })
+        if (selectedRecords.includes(record)) {
+            api.setUnselected(record);
+            select(`#tooltip-record-select-${record}`).remove();
+        } else {
+            api.setSelected(record);
+            const datasetMap = new Map();
+            parcoords.newDataset.forEach((cleanedItems: { [x: string]: any; }) => {
+                datasetMap.set(cleanedItems[hoverlabel], cleanedItems);
+            });
+
+            data.forEach((item: any, i: number) => {
+                const rec = datasetMap.get(item);
+                if (rec) {
+                helper.createToolTipForValues(rec, true);
+                }
+            });
+        }});
     }
     else {
         api.clearSelection();
         api.setSelection(cleanedItems);
+        const datasetMap = new Map();
+        parcoords.newDataset.forEach((cleanedItems: { [x: string]: any; }) => {
+            datasetMap.set(cleanedItems[hoverlabel], cleanedItems);
+        });
+
+        data.forEach((item: any, i: number) => {
+            const rec = datasetMap.get(item);
+            if (rec) {
+            helper.createToolTipForValues(rec, true);
+            }
+        });
     }
     event.stopPropagation();
 }
@@ -376,7 +412,7 @@ function setFeatureAxis(svg, yAxis, parcoords, width): void {
 
     select('body')
         .append('div')
-        .attr('class', 'tooltip-record');
+        .attr('class', 'tooltip-label');
 
     const brushOverlay = svg.append("rect")
         .attr("x", 0)
