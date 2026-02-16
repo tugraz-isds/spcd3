@@ -364,3 +364,72 @@ div#selectRecordsHeader {
   padding-bottom: 0.8rem;
   padding-top: 0.8rem;
 }
+
+.modal-overlay-load {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  position: relative;
+  background-color: white;
+  padding: 1.5rem;
+  padding-top: 2.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 0.625rem rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 20rem;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.938rem;
+  font-weight: bold;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.hitbox-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hitbox-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.hitbox-label {
+  font-size: 0.95rem;
+}
+
+.hitbox-value {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.hitbox-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hitbox-min,
+.hitbox-max {
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.hitbox-slider {
+  flex: 1;
+}

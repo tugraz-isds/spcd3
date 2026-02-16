@@ -2,6 +2,7 @@ import * as d3 from 'd3-selection';
 import * as icon from './icons/icons';
 import * as pc from './parallelcoordinates';
 import * as io from './io';
+import { numberOfDimensions, numberOfRecords } from './globals';
 
 export function createToolbar(dataset: any[]): void {
     const toolbarRow = d3.select('#toolbarRow');
@@ -129,8 +130,13 @@ function showModalWithData(dataset: any[]): void {
     const closeButton = document.createElement('span');
     closeButton.className = 'close-button';
     closeButton.innerHTML = '&times;';
-    closeButton.style.marginBottom = '3rem';
+    closeButton.style.marginBottom = '1rem';
     modal.append(() => closeButton);
+
+    const dimensionsElement = document.createElement('div');
+    dimensionsElement.textContent = `Dataset consists of ${numberOfDimensions} dimensions and ${numberOfRecords} records.`;
+    dimensionsElement.style.marginBottom = '1rem';
+    modal.append(() => dimensionsElement);
 
     const scrollWrapper = document.createElement('div');
     scrollWrapper.className = 'scroll-wrapper';

@@ -78,29 +78,31 @@ img {
 }
 
 .tooltip-record {
-    position: absolute;
+    position: fixed;
     pointer-events: none;
     border: none;
     border-radius: 0.1rem;
     margin: 0.5rem;
     padding: 0.12rem;
-    background-color: lightgrey;
+    background-color: rgba(211, 211, 211, 0.5);
     color: red;
     font-size: 0.65rem;
     font-weight: bold;
+    z-index: 9999;
 }
 
 .tooltip-record-select {
-    position: absolute;
+    position: fixed;
     pointer-events: none;
     border: none;
     border-radius: 0.1rem;
     margin: 0.5rem;
     padding: 0.12rem;
-    background-color: lightgrey;
+    background-color: rgba(211, 211, 211, 0.5);;
     color: orange;
     font-size: 0.65rem;
     font-weight: bold;
+    z-index: 9999;
 }
 
 .tooltip-label {
@@ -274,9 +276,9 @@ img {
 .scroll-wrapper {
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: auto;
     width: 100%;
+    overflow: auto;
+    max-height: 100%; 
 }
 
 /*.tip-layer {
@@ -443,8 +445,10 @@ img {
     padding: 2rem;
     border-radius: 0.5rem;
     max-height: 80vh;
-    overflow: auto;
+    overflow: hidden;
     min-width: 38rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .table-wrapper {

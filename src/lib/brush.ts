@@ -1,4 +1,4 @@
-import { select } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 import { drag } from 'd3-drag';
 import * as icon from './icons/icons';
 import * as helper from './utils';
@@ -49,6 +49,7 @@ export function setRectToDrag(featureAxis): void {
             .attr('y', 50)
             .call(drag()
                 .on('drag', (event: any, d: any) => {
+                    selectAll('path.hitarea').style('pointer-events', 'none');
                     if (parcoords.newFeatures.length > 25) {
                         throttleDragAndBrush(processedDimensionName, d, event, delta,
                         tooltipValuesTop, tooltipValuesDown, window);
@@ -65,6 +66,13 @@ export function setRectToDrag(featureAxis): void {
                 .on('end', () => {
                     tooltipValuesTop.style('visibility', 'hidden');
                     tooltipValuesDown.style('visibility', 'hidden');
+                    let hitarea_active = select('g.active').selectAll('path');
+                    hitarea_active.each(function (d: any) {
+                        const isActive = select(this).style('stroke');
+                        if (isActive !== 'rgba(0, 129, 175, 0.5)') {
+                            select('#' + this.id.replaceAll('line', 'area')).style('pointer-events', 'stroke');
+                        }      
+                    });
                 }));
     });
 }

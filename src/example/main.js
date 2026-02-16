@@ -5,7 +5,8 @@ import {
     getMinValue, getMaxValue, getInversionStatus, setDimensionRange,
     getAllDimensionNames, getAllVisibleDimensionNames,
     getAllHiddenDimensionNames, getAllRecords, toggleSelection, isSelected,
-    setDimensionRangeRounded, isDimensionCategorical
+    setDimensionRangeRounded, isDimensionCategorical, setSelectableWidth,
+    getSelectableWith
 }
     from './lib/spcd3.js';
 
@@ -88,6 +89,10 @@ let resetAllButton = document.getElementById('resetAll');
 resetAllButton.addEventListener('click', resetAll, false);
 resetAllButton.style.visibility = 'hidden';
 
+let sensitivityButton = document.getElementById('setSelectionSensitivity');
+sensitivityButton.addEventListener('click', generateModalForSetSensitivity, false);
+sensitivityButton.style.visibility = 'hidden';
+
 function openFileDialog() {
     document.getElementById('fileInput').click();
 }
@@ -124,6 +129,7 @@ function showButtons() {
     resetRangesButton.style.visibility = 'visible';
     resetRoundedRangesButton.style.visibility = 'visible';
     resetAllButton.style.visibility = 'visible';
+    sensitivityButton.style.visibility = 'visible';
 }
 
 function updateDimensions(dimension) {
@@ -938,6 +944,92 @@ function resetToRoundedRange() {
 function resetAll() {
     let reloadedData = loadCSV(data);
     drawChart(reloadedData, true);
+}
+
+function generateModalForSetSensitivity() {
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay-load";
+
+  const modal = document.createElement("div");
+  modal.className = "modal-content";
+
+  const closeButton = document.createElement("span");
+  closeButton.className = "close-button";
+  closeButton.innerHTML = "&times;";
+
+  const close = () => {
+    document.removeEventListener("keydown", onKeyDown);
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Escape") close();
+  };
+
+  closeButton.addEventListener("click", close);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKeyDown);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "hitbox-control";
+
+  const labelRow = document.createElement("div");
+  labelRow.className = "hitbox-label-row";
+
+  const label = document.createElement("div");
+  label.className = "hitbox-label";
+  label.textContent = "Selection Width";
+
+  const valueDisplay = document.createElement("div");
+  valueDisplay.className = "hitbox-value";
+
+  labelRow.appendChild(label);
+  labelRow.appendChild(valueDisplay);
+
+  const sliderRow = document.createElement("div");
+  sliderRow.className = "hitbox-slider-row";
+
+  const slider = document.createElement("input");
+  slider.className = "hitbox-slider";
+  slider.type = "range";
+  slider.min = "0";
+  slider.max = "1";
+  slider.step = "0.1";
+
+  const minLabel = document.createElement("span");
+  minLabel.className = "hitbox-min";
+  minLabel.textContent = slider.min;
+
+  const maxLabel = document.createElement("span");
+  maxLabel.className = "hitbox-max";
+  maxLabel.textContent = slider.max;
+
+  const current = getSelectableWith();
+  console.log(getSelectableWith());
+
+  slider.value = String(current);
+  valueDisplay.textContent = current;
+
+  slider.addEventListener("input", (e) => {
+    const v = Math.round(+e.target.value * 100) / 100;
+    valueDisplay.textContent = v.toFixed(2);
+    setSelectableWidth(v);
+  });
+
+  sliderRow.appendChild(minLabel);
+  sliderRow.appendChild(slider);
+  sliderRow.appendChild(maxLabel);
+
+  wrapper.appendChild(labelRow);
+  wrapper.appendChild(sliderRow);
+
+  modal.appendChild(closeButton);
+  modal.appendChild(wrapper);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
 }
 
 function generateDropdownForSelectRecords() {

@@ -11,7 +11,7 @@ import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg,
     refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension,
     setActive, setYScales, setData, setFeatures, setNewDataset, setNewFeatures,
     setXScales, setHoverLabel, key, hoverlabel, setKey, height, 
-    setColumns, thickness, setLineThickness} from './globals';
+    setColumns, thickness, setLineThickness, setNumberOfDimensions, setNumberOfRecords} from './globals';
 
 import './reset.css';
 import './stylesheet.css';
@@ -41,6 +41,9 @@ export function drawChart(content: [], resetKey?: boolean): void {
         setColumns(initialColumns);
         setRefreshData(structuredClone(content));
     }
+
+    setNumberOfDimensions(initialColumns.length);
+    setNumberOfRecords(content.length);    
     
     deleteChart();
 
@@ -54,7 +57,6 @@ export function drawChart(content: [], resetKey?: boolean): void {
         setUpParcoordData(content, currentColumns);
     } 
    
-
     let chart = select('#parallelcoords');
 
     if (chart === null)
@@ -118,6 +120,7 @@ export function drawChart(content: [], resetKey?: boolean): void {
     window.onclick = () => {
         select('#contextmenu').style('display', 'none');
         select('#contextmenuRecords').style('display', 'none');
+        helper.cleanTooltipSelect();
         helper.cleanTooltipSelect();
     }
 }

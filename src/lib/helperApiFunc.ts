@@ -1,4 +1,4 @@
-import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns, setLineThickness } from './globals';
+import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns, setLineThickness, getLineThickness } from './globals';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as brush from './brush';
@@ -817,4 +817,13 @@ export function enableInteractivity() {
 
 export function setSelectableWidth(width: string) {
     setLineThickness(width);
+    let hitarea_active = selectAll('path.hitarea');
+    hitarea_active.each(function (d: any) {
+        const value = width + 'rem';
+        select(this).style('stroke-width', value);
+    });
+}
+
+export function getSelectableWith(): string {
+    return getLineThickness();
 }

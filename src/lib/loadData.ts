@@ -98,6 +98,9 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColu
   headerRow.appendChild(title);
   headerRow.appendChild(closeButton);
 
+  const scrollWrapper = document.createElement('div');
+  scrollWrapper.className = 'scroll-wrapper';
+
   const tableWrapper = document.createElement("div");
   tableWrapper.className = 'table-wrapper';
   tableWrapper.innerHTML = `
@@ -106,8 +109,10 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColu
     </table>
   `;
 
+  scrollWrapper.appendChild(tableWrapper);
+
   dialog.appendChild(headerRow);
-  dialog.appendChild(tableWrapper);
+  dialog.appendChild(scrollWrapper);
 
   overlay.appendChild(dialog);
   document.body.appendChild(overlay);
@@ -125,7 +130,7 @@ export function renderInvalidTable(
           const isRemoved = removedColumns.includes(c);
           return `<th style="
             text-align:left;
-            background:${isRemoved ? "#ffb3b3" : "white"};
+            background:${isRemoved ? "#ffb3b3" : "rgb(201, 212, 221)"};
           ">${c}</th>`;
         }).join("")}
       </tr>

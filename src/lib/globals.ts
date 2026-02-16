@@ -34,6 +34,8 @@ export let refreshData: any;
 export let columns: any;
 export let initDimension: any;
 export let thickness: any;
+export let numberOfRecords: number;
+export let numberOfDimensions: number;
 
 export function setHoverLabel(label: string): void {
   hoverlabel = label;
@@ -125,4 +127,16 @@ export function setKey(value: string): void {
 
 export function setLineThickness(value: string): void {
     thickness = value;
+}
+
+export function getLineThickness(): string {
+  return thickness;
+}
+
+export function setNumberOfRecords(value: number): void {
+    numberOfRecords = value;
+}
+
+export function setNumberOfDimensions(value: number): void {
+    numberOfDimensions = value;
 }
