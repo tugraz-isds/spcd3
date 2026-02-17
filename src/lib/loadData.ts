@@ -21,7 +21,15 @@ export function showInvalidRowsMessage(
   removedColumns: string[]
 ) {
   const overlay = document.createElement("div");
-  overlay.className = 'modal-overlay-load';
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'block';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.style.display = 'block';
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
 
   const closeButton = document.createElement("span");
   closeButton.className = 'close-button';
@@ -31,52 +39,62 @@ export function showInvalidRowsMessage(
     document.body.removeChild(overlay);
   });
 
-  const box = document.createElement("div");
-  box.className = 'box';
-  box.addEventListener("click", e => e.stopPropagation());
+  header.appendChild(closeButton);
+  modal.appendChild(header);
 
-  const msg = document.createElement("p");
-  msg.textContent = `Dataset imported.`;
+  const contentDiv = document.createElement("div");
+  contentDiv.className = 'modal-content';
+  contentDiv.addEventListener("click", e => e.stopPropagation());
 
-  box.appendChild(closeButton);
-  box.appendChild(msg);
+  const importInfo = document.createElement("div");
+  importInfo.className = 'modal-info';
+  importInfo.textContent = `Dataset imported.`;
+
+  contentDiv.appendChild(importInfo);
 
   const removedRowInfo = document.createElement("div");
-  removedRowInfo.className = 'info';
+  removedRowInfo.className = 'modal-info';
 
   removedRowInfo.textContent = `${invalidRows.length} invalid rows found.`;
-  box.appendChild(removedRowInfo);
+  contentDiv.appendChild(removedRowInfo);
 
   if (removedColumns.length > 0) {
     const removedColumnInfo = document.createElement("div");
-    removedColumnInfo.className = 'info';
+    removedColumnInfo.className = 'modal-info';
 
-    removedColumnInfo.textContent = `${removedColumns.length} column(s) without data: ${removedColumns.join(", ")}`;
-    box.appendChild(removedColumnInfo);
+    if (removedColumns.length > 1) {
+      removedColumnInfo.textContent = `${removedColumns.length} columns without data: ${removedColumns.join(", ") + '.'}`;
+      contentDiv.appendChild(removedColumnInfo);
+    }
+    else {
+      removedColumnInfo.textContent = `${removedColumns.length} column without data: ${removedColumns.join(", ") + '.'}`;
+      contentDiv.appendChild(removedColumnInfo);
+    }
   }
 
   const btn = document.createElement("button");
   btn.textContent = "View";
-  btn.className = 'view-button';
+  btn.className = 'generic-button';
 
   btn.addEventListener("click", () => {
     document.body.removeChild(overlay);
     showInvalidRowsPopup(invalidRows, columns, removedColumns);
   });
 
-  box.appendChild(btn);
-  overlay.appendChild(box);
+  contentDiv.appendChild(btn);
+  modal.appendChild(contentDiv);
+  overlay.appendChild(modal);
   document.body.appendChild(overlay);
 }
 
 function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColumns: string[] = []) {
   const overlay = document.createElement("div");
-  overlay.className = 'modal-overlay-load';
+  overlay.className = 'modal-tableoverlay';
 
   overlay.addEventListener("click", () => document.body.removeChild(overlay));
 
   const dialog = document.createElement("div");
-  dialog.className = 'dialog';
+  dialog.className = 'modal-tabledata';
 
   dialog.addEventListener("click", e => e.stopPropagation());
 
@@ -102,12 +120,10 @@ function showInvalidRowsPopup(invalidRows: any[], columns: string[], removedColu
   scrollWrapper.className = 'scroll-wrapper';
 
   const tableWrapper = document.createElement("div");
-  tableWrapper.className = 'table-wrapper';
-  tableWrapper.innerHTML = `
-    <table border="1" cellpadding="6" style="border-collapse: collapse; margin-top: 0.5rem; width: 100%;">
-      ${renderInvalidTable(invalidRows, columns, removedColumns)}
-    </table>
-  `;
+  tableWrapper.className = 'tablecontainer';
+
+  const table = renderInvalidTable(invalidRows, columns, removedColumns);
+  tableWrapper.appendChild(table);
 
   scrollWrapper.appendChild(tableWrapper);
 
@@ -122,57 +138,71 @@ export function renderInvalidTable(
   rows: any[],
   columns: string[],
   removedColumns: string[] = []
-): string {
-  const headerHtml = `
-    <thead>
-      <tr>
-        ${columns.map(c => {
-          const isRemoved = removedColumns.includes(c);
-          return `<th style="
-            text-align:left;
-            background:${isRemoved ? "#ffb3b3" : "rgb(201, 212, 221)"};
-          ">${c}</th>`;
-        }).join("")}
-      </tr>
-    </thead>
-  `;
+): any {
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
 
-  const bodyHtml = rows.map(row => `
-    <tr>
-      ${columns.map(col => {
-        const rawValue = row[col];
-        const isInvalid =
-          row.__invalidColumns?.includes(col) || removedColumns.includes(col);
+  columns.forEach(c => {
+    const th = document.createElement("th");
 
-        const isNumber =
-          typeof rawValue === "number" ||
-          (typeof rawValue === "string" &&
-           rawValue.trim() !== "" &&
-           !isNaN(Number(rawValue.replace(",", "."))));
+    const isRemoved = removedColumns.includes(c);
 
-        const align = isNumber ? "right" : "left";
+    th.textContent = c;
 
-        const displayValue =
-          rawValue === null ? "(null)" :
-          isEmptyCell(rawValue) ? "null" :
-          rawValue;
+    th.style.textAlign = "left";
+    th.style.background = isRemoved ? "#ffb3b3" : "rgb(201, 212, 221)";
 
-        return `
-          <td style="
-            background: ${isInvalid ? "#ffb3b3" : "white"};
-            text-align: ${align};
-            font-size: 0.85rem;
-            padding: 4px 8px;
-          ">
-            ${displayValue}
-          </td>
-        `;
-      }).join("")}
-    </tr>
-  `).join("");
+    headRow.appendChild(th);
+  });
 
-  return `${headerHtml}<tbody>${bodyHtml}</tbody>`;
+  thead.appendChild(headRow);
+  const tbody = document.createElement("tbody");
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+
+    columns.forEach(col => {
+      const td = document.createElement("td");
+
+      const rawValue = row[col];
+
+      const isInvalid =
+        row.__invalidColumns?.includes(col) ||
+        removedColumns.includes(col);
+
+      const isNumber =
+        typeof rawValue === "number" ||
+        (typeof rawValue === "string" &&
+          rawValue.trim() !== "" &&
+          !isNaN(Number(rawValue.replace(",", "."))));
+
+      const align = isNumber ? "right" : "left";
+
+      const displayValue =
+        rawValue === null ? "(null)" :
+        isEmptyCell(rawValue) ? "null" :
+        rawValue;
+
+      td.textContent = displayValue;
+
+      td.style.background = isInvalid ? "#ffb3b3" : "white";
+      td.style.textAlign = align;
+      td.style.fontSize = "0.85rem";
+      td.style.padding = "4px 8px";
+
+      tr.appendChild(td);
+  });
+
+  tbody.appendChild(tr);
+});
+
+const table = document.createElement("table");
+table.appendChild(thead);
+table.appendChild(tbody);
+
+return table; 
 }
+
 
 
 interface CsvRow {

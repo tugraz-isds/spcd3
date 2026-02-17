@@ -949,10 +949,10 @@ function resetAll() {
 function generateModalForSetSensitivity() {
 
   const overlay = document.createElement("div");
-  overlay.className = "modal-overlay-load";
+  overlay.className = "modal-overlay-test";
 
   const modal = document.createElement("div");
-  modal.className = "modal-content";
+  modal.className = "modal-content-test";
 
   const closeButton = document.createElement("span");
   closeButton.className = "close-button";

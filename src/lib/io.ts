@@ -4,7 +4,7 @@ import * as svgcreator from './svgStringCreator';
 import * as api from './helperApiFunc';
 import * as helper from './helper';
 import { create } from 'd3-selection';
-import { parcoords, height, padding, width, key } from './globals';
+import { parcoords, height, width } from './globals';
 
 export function createSvgString(): string {
 
@@ -91,41 +91,32 @@ export function saveAsSvg(): void {
 
 function setOptionsAndDownload(svgString: string) {
   let name = 'parcoords.svg';
+
   const modalOverlay = document.createElement('div');
-  modalOverlay.style.position = 'fixed';
-  modalOverlay.style.top = '0';
-  modalOverlay.style.left = '0';
-  modalOverlay.style.width = '100vw';
-  modalOverlay.style.height = '100vh';
-  modalOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-  modalOverlay.style.display = 'flex';
-  modalOverlay.style.justifyContent = 'center';
-  modalOverlay.style.alignItems = 'center';
-  modalOverlay.style.zIndex = '9999';
+  modalOverlay.className = 'modal-overlay';
+  modalOverlay.style.display = 'block';
 
   const modal = document.createElement('div');
-  modal.style.backgroundColor = 'white';
-  modal.style.padding = '0';
-  modal.style.border = '0.08rem solid gray';
-  modal.style.borderRadius = '0.5rem';
-  modal.style.boxShadow = '0 0 0.625rem rgba(0,0,0,0.3)';
-  modal.style.textAlign = 'center';
-  modal.style.minWidth = '18rem';
+  modal.className = 'modal';
+  modal.style.display = 'block';
 
-  const fakeheader = document.createElement('div');
-  fakeheader.className = 'modal-fake-header';
-  modal.append(fakeheader);
+  const header = document.createElement('div');
+  header.className = 'modal-header';
 
   const title = document.createElement('div');
   title.textContent = 'Download Chart (SVG)';
-  title.className = 'modal-title-grey';
+  title.style.paddingLeft = '0';
+  title.style.paddingBottom = '0.5rem';
+  title.className = 'modal-title';
 
   const closeButton = document.createElement('span');
   closeButton.innerHTML = '&times;';
   closeButton.className = 'close-button';
-  title.append(closeButton);
 
-  modal.append(title);
+  header.appendChild(title);
+  header.appendChild(closeButton);
+
+  modal.appendChild(header);
 
   const form = document.createElement('div');
   form.className = 'form';
@@ -183,7 +174,7 @@ function setOptionsAndDownload(svgString: string) {
 
   const button = document.createElement('button');
   button.textContent = 'Download';
-  button.className = 'download-button';
+  button.className = 'generic-button';
 
   form.appendChild(rowDecimals);
   form.appendChild(rowKeepClasses);

@@ -13,6 +13,38 @@ button {
     border-radius: 0.1rem;
 }
 
+.generic-button {
+    margin: 0.5rem auto;
+    display: block;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.save-button {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    align-self: flex-start;
+    display: inline-block;
+}
+
+.save-csv-button {
+    margin-bottom: 3rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    align-self: flex-start;
+    display: inline-block;
+}
+
+.close-button {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.938rem;
+    font-weight: bold;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
 th {
     border: 0.063rem solid grey;
     padding: 0.5rem;
@@ -31,7 +63,7 @@ td {
 }
 
 img {
-    display:inline-block;
+    display: inline-block;
 }
 
 .form {
@@ -63,6 +95,10 @@ img {
     text-align: left;
     justify-content: center;
     align-items: center;
+}
+
+.chartWrapper {
+    margin-left: 1rem;
 }
 
 .dimensions-axis {
@@ -129,38 +165,6 @@ img {
     visibility: hidden;
 }
 
-.save-button {
-    margin-bottom: 3rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    align-self: flex-start;
-    width: auto;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.download-button {
-    margin: 0.5rem auto;
-    display: block;
-    cursor: pointer;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
-}
-
-.close-button {
-    position: absolute;
-    top: 0.625rem;
-    right: 0.938rem;
-    font-weight: bold;
-    font-size: 1.25rem;
-    cursor: pointer;
-}
-
-.view-button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-}
-
 .marker {
     fill: none;
     stroke: rgb(228, 90, 15);
@@ -193,7 +197,6 @@ img {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
-    margin-left: 2rem;
     overflow: visible;
 }
 
@@ -238,12 +241,6 @@ img {
     z-index: 99999;
 }
 
-/*#toolbar.active {
-    max-width: 12.5rem;
-    opacity: 1;
-    pointer-events: auto;
-}*/
-
 .modal-tableoverlay {
     position: fixed;
     top: 0;
@@ -281,12 +278,6 @@ img {
     max-height: 100%; 
 }
 
-/*.tip-layer {
-    position: fixed;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-}*/
 
 .contextmenu-records {
     border: 0.08rem solid grey;
@@ -317,19 +308,6 @@ img {
     z-index: 999;
 }
 
-.modal-overlay-load {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
 .modal {
     position: fixed;
     top: 50%;
@@ -343,29 +321,32 @@ img {
     display: none;
 }
 
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+}
+
 .modal-title {
     padding-left: 0.5rem;
     font-size: large;
 }
 
-.modal-title-grey {
+.modal-content {
+    min-width: 10rem;
+    position: relative;
+}
+
+.modal-info {
+    margin-top: 0.15rem;
     padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    background: lightgrey;
-    text-align: left;
 }
 
-.modal-header {
-    padding-left: 0.5rem;
-    font-size: large;
-}
-
-.modal-infomessage {
+.modal-notes {
     color: grey;
     font-size: smaller;
-    padding-left: 0.5rem;
-    padding-bottom: 0.5rem;
-    padding-top: 1rem;
+    padding: 1rem 0 0.5rem 0.5rem;
 }
 
 .modal-label {
@@ -376,12 +357,6 @@ img {
     width: 4.5rem;
     border: 0.1rem solid lightgrey;
     border-radius: 5%;
-}
-
-.modal-button {
-    margin-left: 0.5rem;
-    margin-top: 1rem;
-    width: 6.2rem;
 }
 
 .modal-errormessage {
@@ -401,13 +376,6 @@ img {
     font-size: x-small;
 }
 
-.modal-fake-header {
-    height: 0.4rem;
-    background: lightgrey;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem; 
-}
-
 .header-row {
     display: flex;
     justify-content: space-between;
@@ -422,40 +390,6 @@ img {
     justify-content: space-between;
 }
 
-.box {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    min-width: 10rem;
-    position: relative;
-    text-align: center;
-    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.2);
-}
-
-.info {
-    margin-top: 0.15rem;
-    background: white;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-}
-
-.dialog {
-    position: relative;
-    background: white;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    max-height: 80vh;
-    overflow: hidden;
-    min-width: 38rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.table-wrapper {
-    overflow-y: auto;
-    flex: 1 1 auto;
-    padding: 0.5rem;
-}
 
 .triangle-hitbox {
     width: 30;

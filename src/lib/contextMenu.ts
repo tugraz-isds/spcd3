@@ -620,14 +620,14 @@ function createModalTitle(modal: any, modalTitel: string): void {
 function createHeader(modal: any, id: string): void {
   const header = document.createElement('div');
   header.id = id;
-  header.className = 'modal-header';
+  header.className = 'modal-title';
   modal.append(() => header);
 }
 
 function createInfoMessage(modal: any, id: string): void {
   const infoMessage = document.createElement('div');
   infoMessage.id = id;
-  infoMessage.className = 'modal-infomessage';
+  infoMessage.className = 'modal-notes';
   modal.append(() => infoMessage);
 }
 
@@ -646,7 +646,7 @@ function createInputFieldWithLabel(modal: any, text: string, inputId: string): v
 
 function createButton(modal: any, id: string): void {
   const button = document.createElement('button');
-  button.className = 'modal-button';
+  button.className = 'save-button';
   button.id = id;
   button.textContent = 'Save';
   modal.append(() => button);

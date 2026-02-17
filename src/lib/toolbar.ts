@@ -114,7 +114,7 @@ function showModalWithData(dataset: any[]): void {
         .attr('id', 'dataModal');
 
     const saveAsCSV = document.createElement('button');
-    saveAsCSV.className = 'save-button';
+    saveAsCSV.className = 'save-csv-button';
     saveAsCSV.id = 'saveAsCsv';
     saveAsCSV.textContent = 'Download as CSV';
     modal.append(() => saveAsCSV);
@@ -134,7 +134,7 @@ function showModalWithData(dataset: any[]): void {
     modal.append(() => closeButton);
 
     const dimensionsElement = document.createElement('div');
-    dimensionsElement.textContent = `Dataset consists of ${numberOfDimensions} dimensions and ${numberOfRecords} records.`;
+    dimensionsElement.textContent = `Dataset has ${numberOfDimensions} dimensions and ${numberOfRecords} records.`;
     dimensionsElement.style.marginBottom = '1rem';
     modal.append(() => dimensionsElement);
 

@@ -48,7 +48,7 @@ default, the label is taken from the first column of the dataset.
 ![screenshot](screenshots/hoverRecords.png)
 
 
-### Select Records
+### Selecting Records
 
 It is helpful to be able to select one or more records in the dataset
 and to highlight them accordingly. Left-clicking one or more polylines
@@ -83,7 +83,7 @@ at the desired position.
 ![screenshot](screenshots/moveDimension.png)
 
 
-### Open Context Menu
+### Opening Context Menu
 
 Each dimension in the application offers a versatile context menu, as
 depicted in the next Figure. This menu is easily accessible with a
@@ -110,7 +110,7 @@ original range.
 ![screenshot](screenshots/setRange.png)
 
 
-### Filter Records
+### Filtering Records
 
 Records can be activated and deactivated by setting filters on one or
 more dimensions. A double-edged range slider can be manipulated on

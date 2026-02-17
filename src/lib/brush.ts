@@ -4,7 +4,7 @@ import * as icon from './icons/icons';
 import * as helper from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
 import * as api from './helperApiFunc';
-import { parcoords } from './globals';
+import { getLineThickness, parcoords } from './globals';
 
 
 // globals
@@ -861,7 +861,7 @@ function makeActive(currentLineName: string, duration: number): void {
         select('#area_' + currentLineName)
             .style('pointer-events', 'stroke')
             .style('stroke', 'transparent')
-            .style('stroke-width', '0.4rem')
+            .style('stroke-width', getLineThickness() + 'rem')
             .text('');
     }
     else if (select('.' + currentLineName).classed('colored')) {
@@ -875,7 +875,7 @@ function makeActive(currentLineName: string, duration: number): void {
         select('#area_' + currentLineName)
             .style('pointer-events', 'stroke')
             .style('stroke', 'transparent')
-            .style('stroke-width', '0.4rem')
+            .style('stroke-width', getLineThickness() + 'rem')
             .text('');
     }
     else {
@@ -888,7 +888,7 @@ function makeActive(currentLineName: string, duration: number): void {
         select('#area_' + currentLineName)
             .style('pointer-events', 'stroke')
             .style('stroke', 'transparent')
-            .style('stroke-width', '0.4rem')
+            .style('stroke-width', getLineThickness() + 'rem')
             .text('');
     }
 }
@@ -907,8 +907,8 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
         .text(dimension)
         .transition()
         .duration(duration)
-        .style('stroke', 'rgba(211, 211, 211, 0.4')
-        .style('stroke-width', '0.12rem')
+        .style('stroke', 'transparent')
+        .style('stroke-width', getLineThickness() + 'rem')
         .on('end', function () {
             select(this).style('pointer-events', 'none');
         });

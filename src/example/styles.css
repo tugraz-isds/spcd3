@@ -365,7 +365,7 @@ div#selectRecordsHeader {
   padding-top: 0.8rem;
 }
 
-.modal-overlay-load {
+.modal-overlay-test {
   position: fixed;
   inset: 0;
   background-color: rgba(0,0,0,0.5);
@@ -375,7 +375,7 @@ div#selectRecordsHeader {
   z-index: 9999;
 }
 
-.modal-content {
+.modal-content-test {
   position: relative;
   background-color: white;
   padding: 1.5rem;

@@ -66,7 +66,8 @@ export function drawChart(content: [], resetKey?: boolean): void {
             .attr('id', 'parallelcoords');
     }
 
-    const chartWrapper = chart.append('div').attr('id', 'chartWrapper');
+    const chartWrapper = chart.append('div')
+        .attr('class', 'chartWrapper');
 
     chartWrapper.append('div').attr('id', 'toolbarRow')
 
