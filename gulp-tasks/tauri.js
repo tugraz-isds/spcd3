@@ -5,16 +5,18 @@ const fs = require("fs/promises");
 const path = require("path");
 
 function runTauriBuild() {
-  const command = "npx tauri build";
   return new Promise((resolve, reject) => {
-    const p = spawn(command, {
+    const p = spawn("npx", ["tauri", "build"], {
       stdio: "inherit",
-      shell: true,
+      shell: process.platform === "win32",
     });
 
-    p.on("close", (code) =>
-      code === 0 ? resolve() : reject(new Error(`tauri build failed (exit ${code})`))
-    );
+    p.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`tauri build failed (exit ${code})`));
+    });
+
+    p.on("error", reject);
   });
 }
 
@@ -50,7 +52,7 @@ async function copyTauriExecutable() {
     return copyExactlyOneFile("src-tauri/target/**/release/bundle/dmg/*.dmg", outDir);
   }
   if (process.platform === "win32") {
-    return copyExactlyOneFile("src-tauri/target/**/release/bundle/nsis/*.exe", outDir);
+    return copyExactlyOneFile("src-tauri/target/**/release/*.exe", outDir);
   }
   if (process.platform === "linux") {
     return copyExactlyOneFile("src-tauri/target/**/release/bundle/appimage/*.AppImage", outDir);

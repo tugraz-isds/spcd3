@@ -81,9 +81,9 @@ export function drawChart(content: [], resetKey?: boolean): void {
 
     setDefsForIcons();
 
-    setFeatureAxis(plot, yAxis, parcoords, width);
-
     setActive(setActivePathLines(plot, content, parcoords));
+
+    setFeatureAxis(plot, yAxis, parcoords, width);
 
     svg.on("contextmenu", function (event: any) {
             event.stopPropagation();

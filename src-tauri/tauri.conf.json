@@ -27,7 +27,8 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/spcd3-icon.png"
+      "icons/spcd3-icon.png",
+      "icons/icon.ico"
     ]
   }
 }

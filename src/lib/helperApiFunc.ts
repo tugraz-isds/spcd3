@@ -1,4 +1,4 @@
-import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns, setLineThickness, getLineThickness } from './globals';
+import { active, parcoords, setHoverLabel, initDimension, setYaxis, yAxis, columns, setLineThickness, getLineThickness, hoverlabel } from './globals';
 import * as utils from './utils';
 import * as helper from './helper';
 import * as brush from './brush';
@@ -629,6 +629,18 @@ export function setSelection(records: string[]): void {
                 .classed('selected', true)
                 .transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
+ 
+            // TODO get all selected
+            /*const datasetMap = new Map();
+            parcoords.newDataset.forEach((records: { [x: string]: any; }) => {
+                datasetMap.set(records[hoverlabel], records);
+            });
+            records.forEach((item: any, i: number) => {
+                const rec = datasetMap.get(item);
+                if (rec) {
+                    helper.createToolTipForValues(rec, true);
+                }
+            });   */   
         }
     }
 }
