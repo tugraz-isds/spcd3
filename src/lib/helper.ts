@@ -54,12 +54,61 @@ export function setupYScales(header: any, dataset: any): any {
   return yScales;
 }
 
-export function setupXScales(header: any): any {
+function getTextWidthSVG(text, font) {
+  const temp = select("body")
+    .append("svg")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .append("text")
+    .style("font", font)
+    .text(text);
+
+  const width = temp.node().getBBox().width;
+
+  temp.remove();
+  return width;
+}
+
+function getLongestTickLabel(data, labelKey) {
+    const uniqueLabels = Array.from(
+      new Set<string>(data.map(d => String(d[labelKey] ?? "")))
+    ).filter(s => s.length > 0);
+    const ticks = uniqueLabels.length > 30
+      ? uniqueLabels.filter((_, i) => i % 4 === 0)
+      : uniqueLabels;
+
+  return ticks.reduce((longest, v) => {
+    return v.length > longest.length ? v : longest;
+  }, "");
+}
+
+function detectLastStringKey(data) {
+  const keys = Object.keys(data[0]);
+
+  const stringKeys = keys.filter(key =>
+    typeof data[0][key] === "string" &&
+    isNaN(Number(data[0][key]))
+  );
+
+  return stringKeys[stringKeys.length - 1];
+}
+
+export function setupXScales(header: any, dataset: any): any {
+
+  const labelKey = detectLastStringKey(dataset);
+
+  const longest = getLongestTickLabel(dataset, labelKey);
+  
+  const longestTicklabel = longest.length > 10 ? longest.substr(0, 10) + '.......' : longest;
+
+  const labelWidth = getTextWidthSVG(longestTicklabel, "0.75rem Verdana");
+
+  const margin = labelWidth * 0.6;
   const n = header.length;
   const pad = (n <= 2) ? 0 : 0.2;
   return scalePoint()
     .domain(header.map((x: { name: any; }) => x.name))
-    .range([width - padding, padding])
+    .range([width - margin, margin])
     .padding(pad)
     .align(0.5);
 }

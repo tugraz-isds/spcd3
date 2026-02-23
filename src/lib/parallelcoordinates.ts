@@ -186,7 +186,7 @@ function setUpParcoordData(data: any, newFeatures: []): void {
     setFeatures(dataset[0]);
     setNewDataset(dataset[1]);
 
-    setXScales(helper.setupXScales(dataset[0]));
+    setXScales(helper.setupXScales(dataset[0], dataset[1]));
     setYScales(helper.setupYScales(dataset[0], dataset[1]));
     setNewFeatures(newFeatures);
     setData(data);
