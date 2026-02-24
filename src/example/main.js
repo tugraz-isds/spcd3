@@ -981,7 +981,7 @@ function generateModalForSetSensitivity() {
 
   const label = document.createElement("div");
   label.className = "hitbox-label";
-  label.textContent = "Selection Width";
+  label.textContent = "Selection Sensitivity";
 
   const valueDisplay = document.createElement("div");
   valueDisplay.className = "hitbox-value";
@@ -1008,16 +1008,26 @@ function generateModalForSetSensitivity() {
   maxLabel.textContent = slider.max;
 
   const current = getSelectableWith();
-  console.log(getSelectableWith());
 
   slider.value = String(current);
-  valueDisplay.textContent = current;
+  valueDisplay.textContent = current + 'rem';
 
   slider.addEventListener("input", (e) => {
     const v = Math.round(+e.target.value * 100) / 100;
-    valueDisplay.textContent = v.toFixed(2);
-    setSelectableWidth(v);
+    valueDisplay.textContent = v + 'rem';
   });
+
+  const infoMessage = document.createElement('div');
+  infoMessage.textContent = "Sets the sensitivity of polylines for hover and select.";
+  infoMessage.className = "info-text";
+
+  const button = document.createElement('button');
+  button.className = 'apply-button';
+  button.textContent = 'Save';
+  button.addEventListener("click", () => {
+    setSelectableWidth(slider.value);
+    overlay.remove();
+  })
 
   sliderRow.appendChild(minLabel);
   sliderRow.appendChild(slider);
@@ -1025,6 +1035,8 @@ function generateModalForSetSensitivity() {
 
   wrapper.appendChild(labelRow);
   wrapper.appendChild(sliderRow);
+  wrapper.appendChild(infoMessage);
+  wrapper.appendChild(button);
 
   modal.appendChild(closeButton);
   modal.appendChild(wrapper);

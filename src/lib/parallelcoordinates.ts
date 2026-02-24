@@ -48,7 +48,7 @@ export function drawChart(content: [], resetKey?: boolean): void {
     deleteChart();
 
     if (thickness === undefined) {
-        setLineThickness('0.4rem');
+        setLineThickness('0.4');
     }
 
     if (resetKey) {
