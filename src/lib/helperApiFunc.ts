@@ -653,6 +653,7 @@ export function clearSelection(): void {
             .transition()
             .style('stroke', 'rgba(0, 129, 175, 0.5)')
     });
+    helper.cleanTooltipSelect();
 }
 
 export function toggleSelection(record: string): void {
@@ -831,7 +832,7 @@ export function setSelectableWidth(width: string) {
     setLineThickness(width);
     let hitarea_active = selectAll('path.hitarea');
     hitarea_active.each(function (d: any) {
-        const value = width + 'rem';
+        const value = width;
         select(this).style('stroke-width', value);
     });
 }

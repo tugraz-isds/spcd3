@@ -114,7 +114,7 @@ img {
 }
 
 .tooltip-record {
-    position: fixed;
+    position: absolute;
     pointer-events: none;
     border: none;
     border-radius: 0.1rem;
@@ -128,7 +128,7 @@ img {
 }
 
 .tooltip-record-select {
-    position: fixed;
+    position: absolute;
     pointer-events: none;
     border: none;
     border-radius: 0.1rem;

@@ -242,7 +242,7 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
     if (isSelect) {
       const tips = layer
         .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record-select')
-        .data(data, (d: any) => dimensions);
+        .data(data, (d: any) => d.dim);
 
       tips.join(
         enter => enter.append('div')

@@ -1,10 +1,11 @@
 import { select, selectAll } from 'd3-selection';
 import { drag } from 'd3-drag';
 import * as icon from './icons/icons';
-import * as helper from './utils';
+import * as utils from './utils';
 import { isDimensionCategorical } from './helperApiFunc';
 import * as api from './helperApiFunc';
 import { getLineThickness, parcoords } from './globals';
+import * as helper from './helper';
 
 
 // globals
@@ -37,7 +38,7 @@ export function setRectToDrag(featureAxis): void {
 
     let delta: any;
     featureAxis.each(function (d: { name: string; }) {
-        const processedDimensionName = helper.cleanString(d.name);
+        const processedDimensionName = utils.cleanString(d.name);
         select(this)
             .append('g')
             .attr('class', 'rect')
@@ -80,7 +81,7 @@ export function setRectToDrag(featureAxis): void {
 export function setBrushUp(featureAxis, brushOverlay): void {
 
     featureAxis.each(function (d: { name: string }) {
-        const processedDimensionName = helper.cleanString(d.name);
+        const processedDimensionName = utils.cleanString(d.name);
         const g = select(this).append('g').attr('class', 'brush_' + processedDimensionName);
 
         g.append('use')
@@ -91,7 +92,7 @@ export function setBrushUp(featureAxis, brushOverlay): void {
             .attr('height', 10)
             .attr('href', '#brush_image_top')
             .attr('pointer-events', 'none')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
 
         const hit = g.append('rect')
             .attr('class', 'handle-hitbox')
@@ -100,7 +101,7 @@ export function setBrushUp(featureAxis, brushOverlay): void {
             .attr('y', BOTTOM_AXIS_VALUE)
             .attr('width', 30)
             .attr('height', 30)
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`);
 
         const makeDrag = () => drag()
             .container(function () { return (this as any).ownerSVGElement || this; })
@@ -138,7 +139,7 @@ export function setBrushUp(featureAxis, brushOverlay): void {
 export function setBrushDown(featureAxis, brushOverlay): void {
 
     featureAxis.each(function (d: { name: string }) {
-        const processedDimensionName = helper.cleanString(d.name);
+        const processedDimensionName = utils.cleanString(d.name);
         const g = select(this).append('g').attr('class', 'brush_' + processedDimensionName);
 
         g.append('use')
@@ -149,7 +150,7 @@ export function setBrushDown(featureAxis, brushOverlay): void {
             .attr('height', 10)
             .attr('href', '#brush_image_bottom')
             .attr('pointer-events', 'none')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
 
         const hit = g.append('rect')
             .attr('class', 'handle-hitbox')
@@ -158,7 +159,7 @@ export function setBrushDown(featureAxis, brushOverlay): void {
             .attr('y', TOP_AXIS_LOW_VALUE)
             .attr('width', 30)
             .attr('height', 30)
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`);
 
         const makeDrag = () => drag()
             .container(function () { return (this as any).ownerSVGElement || this; })
@@ -236,7 +237,7 @@ export function brushDown(cleanDimensionName: string, event: any, d: any,
     }
     else {
         select('#rect_' + cleanDimensionName)
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`);
     }
 
     if (yPosTop == TOP_AXIS_LOW_VALUE) {
@@ -303,7 +304,7 @@ export function brushUp(cleanDimensionName: any, event: any, d: any,
     else {
         select('#rect_' + cleanDimensionName)
             .attr('href', '#brush_image_top_active')
-            .style('cursor', `url('data:image/svg+xml,${helper.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
+            .style('cursor', `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`)
             .style('fill', 'rgb(255, 255, 0)')
             .style('opacity', '0.7');
     }
@@ -407,7 +408,7 @@ export function dragAndBrush(cleanDimensionName: any, d: any, event: any,
 
 export function filter(dimensionName: string, min: number, max: number): void {
 
-    const cleanDimensionName = helper.cleanString(dimensionName);
+    const cleanDimensionName = utils.cleanString(dimensionName);
     const invertStatus = getInvertStatus(dimensionName);
     const yScale = parcoords.yScales[dimensionName];
 
@@ -516,7 +517,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
                 }
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine, 1000);
+                makeActive(currentLine, d, 1000);
             }
         }
     });
@@ -527,7 +528,7 @@ export function filterWithCoords(topPosition: number, bottomPosition: number,
     addPosition(topPosition, dimension, 'top');
     addPosition(bottomPosition, dimension, 'bottom');
 
-    const cleanDimensionName = helper.cleanString(dimension);
+    const cleanDimensionName = utils.cleanString(dimension);
 
     let rectHeight = bottomPosition - topPosition;
 
@@ -575,7 +576,7 @@ export function filterWithCoords(topPosition: number, bottomPosition: number,
 
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine, 1000);
+                makeActive(currentLine, d, 1000);
             }
         }
     });
@@ -585,7 +586,7 @@ export function filterWithCoords(topPosition: number, bottomPosition: number,
 function getLineName(d: any): string {
     const keys = Object.keys(d);
     const key = keys[0];
-    return helper.cleanString(d[key]);
+    return utils.cleanString(d[key]);
 }
 
 export function addPosition(yPosTop: number, dimension: string, key: string): void {
@@ -753,7 +754,7 @@ function updateLines(dimension: string, cleanDimensionName: string): void {
                 }
             });
             if (!checkedLines.includes(currentLine)) {
-                makeActive(currentLine, RECT_VALUE);
+                makeActive(currentLine, d, RECT_VALUE);
             }
         }
         else {
@@ -850,7 +851,7 @@ function checkAllPositionsBottom(positionItem: any, dimension: string, d: any,
     }
 }
 
-function makeActive(currentLineName: string, duration: number): void {
+function makeActive(currentLineName: string, record: any, duration: number): void {
     if (select('.' + currentLineName).classed('selected')) {
         select('.' + currentLineName)
             .text('')
@@ -863,6 +864,8 @@ function makeActive(currentLineName: string, duration: number): void {
             .style('stroke', 'transparent')
             .style('stroke-width', getLineThickness() + 'rem')
             .text('');
+
+        helper.createToolTipForValues(record, true);
     }
     else if (select('.' + currentLineName).classed('colored')) {
         let color = select('.' + currentLineName).property('clusterColor');
@@ -902,6 +905,10 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
         .transition()
         .duration(duration)
         .style('stroke', 'rgba(211, 211, 211, 0.4');
+
+    console.log(currentLineName);
+
+    selectAll(`#tooltip-record-select-${currentLineName}`).style('display', 'none');
     
     hitline
         .text(dimension)
@@ -916,7 +923,7 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
 
 export function addSettingsForBrushing(dimension: string,
     invertStatus: boolean): void {
-    const processedName = helper.cleanString(dimension);
+    const processedName = utils.cleanString(dimension);
     const yScale = parcoords.yScales[dimension];
 
     const dimensionSettings = parcoords.currentPosOfDims.find((d: { key: string; }) => d.key === dimension);
@@ -998,6 +1005,6 @@ export function addInvertStatus(status: any, dimensionName: any, key: any): void
 }
 
 const delay = 50;
-export const throttleBrushDown = helper.throttle(brushDown, delay);
-export const throttleBrushUp = helper.throttle(brushUp, delay);
-export const throttleDragAndBrush = helper.throttle(dragAndBrush, delay);
+export const throttleBrushDown = utils.throttle(brushDown, delay);
+export const throttleBrushUp = utils.throttle(brushUp, delay);
+export const throttleDragAndBrush = utils.throttle(dragAndBrush, delay);

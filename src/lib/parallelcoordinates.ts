@@ -48,7 +48,7 @@ export function drawChart(content: [], resetKey?: boolean): void {
     deleteChart();
 
     if (thickness === undefined) {
-        setLineThickness('0.4');
+        setLineThickness('0.4rem');
     }
 
     if (resetKey) {
@@ -121,8 +121,6 @@ export function drawChart(content: [], resetKey?: boolean): void {
     window.onclick = () => {
         select('#contextmenu').style('display', 'none');
         select('#contextmenuRecords').style('display', 'none');
-        helper.cleanTooltipSelect();
-        helper.cleanTooltipSelect();
     }
 }
 

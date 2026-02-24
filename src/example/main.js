@@ -1009,8 +1009,8 @@ function generateModalForSetSensitivity() {
 
   const current = getSelectableWith();
 
-  slider.value = String(current);
-  valueDisplay.textContent = current + 'rem';
+  slider.value = String(current.replace('rem', ''));
+  valueDisplay.textContent = current;
 
   slider.addEventListener("input", (e) => {
     const v = Math.round(+e.target.value * 100) / 100;
@@ -1025,7 +1025,7 @@ function generateModalForSetSensitivity() {
   button.className = 'apply-button';
   button.textContent = 'Save';
   button.addEventListener("click", () => {
-    setSelectableWidth(slider.value);
+    setSelectableWidth(slider.value + 'rem');
     overlay.remove();
   })
 

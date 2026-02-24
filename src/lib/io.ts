@@ -15,7 +15,7 @@ export function createSvgString(): string {
 
     let yScalesForDownload = helper.setupYScales(parcoords.features, parcoords.newDataset);
     let yAxisForDownload = helper.setupYAxis(yScalesForDownload, parcoords.newDataset, hiddenDims);
-    let xScalesForDownload = helper.setupXScales(orderedFeatures);
+    let xScalesForDownload = helper.setupXScales(orderedFeatures, parcoords.newDataset);
 
     let svg = create('svg')
         .attr("xmlns", "http://www.w3.org/2000/svg")
