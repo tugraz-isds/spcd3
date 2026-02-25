@@ -629,18 +629,11 @@ export function setSelection(records: string[]): void {
                 .classed('selected', true)
                 .transition()
                 .style('stroke', 'rgba(255, 165, 0, 1)');
- 
-            // TODO get all selected
-            /*const datasetMap = new Map();
-            parcoords.newDataset.forEach((records: { [x: string]: any; }) => {
-                datasetMap.set(records[hoverlabel], records);
-            });
-            records.forEach((item: any, i: number) => {
-                const rec = datasetMap.get(item);
-                if (rec) {
-                    helper.createToolTipForValues(rec, true);
-                }
-            });   */   
+
+        records.forEach(record => {
+            const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+            helper.createToolTipForValues(path, true);
+        })
         }
     }
 }
@@ -677,6 +670,8 @@ export function setUnselected(record: string): void {
         .classed('selected', false)
         .transition()
         .style('stroke', 'rgba(0, 129, 175, 0.5)');
+    
+    selectAll(`#tooltip-record-select-${record}`).style('display', 'none');
 }
 
 export function isRecordInactive(record: string): boolean {

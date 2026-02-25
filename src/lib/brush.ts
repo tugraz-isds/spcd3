@@ -906,8 +906,6 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
         .duration(duration)
         .style('stroke', 'rgba(211, 211, 211, 0.4');
 
-    console.log(currentLineName);
-
     selectAll(`#tooltip-record-select-${currentLineName}`).style('display', 'none');
     
     hitline
