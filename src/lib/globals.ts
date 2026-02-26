@@ -36,6 +36,11 @@ export let initDimension: any;
 export let thickness: any;
 export let numberOfRecords: number;
 export let numberOfDimensions: number;
+export let resetContentData: any;
+
+export function setContent(contentdata: any): void {
+  resetContentData = contentdata;
+}
 
 export function setHoverLabel(label: string): void {
   hoverlabel = label;

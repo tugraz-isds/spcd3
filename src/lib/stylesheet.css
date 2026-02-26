@@ -99,6 +99,7 @@ img {
 
 .chartWrapper {
     margin-left: 1rem;
+    overflow-x: auto;
 }
 
 .dimensions-axis {
@@ -198,6 +199,7 @@ img {
     align-items: center;
     justify-content: flex-start;
     overflow: visible;
+    padding-left: 1rem;
 }
 
 .toolbar-button {
@@ -225,7 +227,7 @@ img {
 /*TODO: POPOVER*/
 .toolbar-buttontip {
     position: absolute;
-    left: 70%;
+    left: 150%;
     top: calc(100% + 0.5rem);
     transform: translateX(-50%);
     background: lightgrey;

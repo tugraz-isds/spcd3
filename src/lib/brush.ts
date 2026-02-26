@@ -6,6 +6,7 @@ import { isDimensionCategorical } from './helperApiFunc';
 import * as api from './helperApiFunc';
 import { getLineThickness, parcoords } from './globals';
 import * as helper from './helper';
+import { hoverlabel } from './globals';
 
 
 // globals
@@ -67,11 +68,12 @@ export function setRectToDrag(featureAxis): void {
                 .on('end', () => {
                     tooltipValuesTop.style('visibility', 'hidden');
                     tooltipValuesDown.style('visibility', 'hidden');
-                    let hitarea_active = select('g.active').selectAll('path');
-                    hitarea_active.each(function (d: any) {
+                    let active = select('g.active').selectAll('path');
+                    let hitarea = selectAll('path.hitarea');
+                    active.each(function (d: any) {
                         const isActive = select(this).style('stroke');
-                        if (isActive !== 'rgba(0, 129, 175, 0.5)') {
-                            select('#' + this.id.replaceAll('line', 'area')).style('pointer-events', 'stroke');
+                        if (isActive === 'rgba(0, 129, 175, 0.5)') {
+                            hitarea.filter(d => d[hoverlabel] === this.id).style('pointer-events', 'stroke');
                         }      
                     });
                 }));
@@ -904,7 +906,8 @@ function makeInactive(currentLineName: string, dimension: string, duration: numb
         .text(dimension)
         .transition()
         .duration(duration)
-        .style('stroke', 'rgba(211, 211, 211, 0.4');
+        .style('stroke', 'rgba(211, 211, 211, 0.4')
+        .style('pointer-events', 'none');
 
     selectAll(`#tooltip-record-select-${currentLineName}`).style('display', 'none');
     
@@ -981,8 +984,15 @@ export function addSettingsForBrushing(dimension: string,
             .attr('href', '#brush_image_top_active');
     }
 
-    addPosition(top, dimension, 'top');
-    addPosition(bottom, dimension, 'bottom');
+    if (isDimensionCategorical(dimension)) {
+        addPosition(bottom, dimension, 'top');
+        addPosition(top, dimension, 'bottom');
+    }
+    else {
+        addPosition(top, dimension, 'top');
+        addPosition(bottom, dimension, 'bottom');
+    }
+    
 }
 
 function getInvertStatus(key: any): boolean {

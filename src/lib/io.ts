@@ -99,22 +99,23 @@ function setOptionsAndDownload(svgString: string) {
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.style.display = 'block';
+  modal.style.width = '30vw';
 
   const header = document.createElement('div');
   header.className = 'modal-header';
+  header.style.paddingLeft = '0';
 
   const title = document.createElement('div');
   title.textContent = 'Download Chart (SVG)';
-  title.style.paddingLeft = '0';
-  title.style.paddingBottom = '0.5rem';
   title.className = 'modal-title';
+  title.style.paddingLeft = '0';
 
   const closeButton = document.createElement('span');
   closeButton.innerHTML = '&times;';
   closeButton.className = 'close-button';
 
-  header.appendChild(title);
-  header.appendChild(closeButton);
+  modal.appendChild(title);
+  modal.appendChild(closeButton);
 
   modal.appendChild(header);
 

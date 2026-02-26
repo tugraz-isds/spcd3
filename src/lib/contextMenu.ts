@@ -5,7 +5,7 @@ import * as utils from './utils';
 import * as helper from './helper';
 import * as api from './helperApiFunc';
 import * as icon from './icons/icons';
-import { parcoords, active, width, paddingXaxis } from './globals';
+import { parcoords, active, width, paddingXaxis, hoverlabel } from './globals';
 
 let scrollXPos: number;
 let timer: string | number | NodeJS.Timeout;
@@ -187,6 +187,8 @@ function handleFilterButton(dimension: string): void {
   const ranges = api.getDimensionRange(dimension);
   const minRange = Number(inverted ? ranges[1] : ranges[0]);
   const maxRange = Number(inverted ? ranges[0] : ranges[1]);
+
+  select('#infoFilter').text(`Set a filter between ${minRange} and ${maxRange}.`);
 
   if (max < min) {
     max = maxRange;
@@ -485,6 +487,13 @@ function onDragEndEventHandler(featureAxis: any): any {
         select(this)
           .attr('d', helper.linePath(d, parcoords.newFeatures))
       });
+
+      helper.cleanTooltipSelect();
+      var selectedRecords = api.getSelected();
+      selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+      });
     };
   }
 }
@@ -604,6 +613,7 @@ function createModalToFilter(): void {
   createModalTitle(modalFilter, 'Set Filter for ');
   createCloseButton(modalFilter, 'closeButtonFilter');
   createHeader(modalFilter, 'headerDimensionFilter');
+  createInfoMessage(modalFilter, 'infoFilter');
   createInputFieldWithLabel(modalFilter, 'Min', 'minFilterValue');
   createInputFieldWithLabel(modalFilter, 'Max', 'maxFilterValue');
   createButton(modalFilter, 'buttonFilter');

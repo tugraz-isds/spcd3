@@ -11,7 +11,8 @@ import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg,
     refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension,
     setActive, setYScales, setData, setFeatures, setNewDataset, setNewFeatures,
     setXScales, setHoverLabel, key, hoverlabel, setKey, height, 
-    setColumns, thickness, setLineThickness, setNumberOfDimensions, setNumberOfRecords} from './globals';
+    setColumns, thickness, setLineThickness, setNumberOfDimensions, setNumberOfRecords,
+    setContent, resetContentData} from './globals';
 
 import './reset.css';
 import './stylesheet.css';
@@ -20,29 +21,18 @@ declare const window: any;
 
 //---------- IO Functions ----------
 
-let initialColumns: any | undefined;
-let currentColumns: any | undefined;
-let datasetKey: string | undefined;
-
 function makeDatasetKey(content: any) {
   const cols = "Test";
   const n = content.length ?? [];
   return `${cols}::${n}`;
 }
 
-export function drawChart(content: [], resetKey?: boolean): void {
-    
-    const nextKey = makeDatasetKey(content);
+export function drawChart(content: []): void {
+    setContent(content);
+    var columns = structuredClone(content['columns']).reverse();
+    setColumns(columns);
 
-    if (datasetKey !== nextKey) {
-        datasetKey = nextKey;
-        initialColumns = structuredClone(content['columns']).reverse();
-        currentColumns = structuredClone(initialColumns);
-        setColumns(initialColumns);
-        setRefreshData(structuredClone(content));
-    }
-
-    setNumberOfDimensions(initialColumns.length);
+    setNumberOfDimensions(columns.length);
     setNumberOfRecords(content.length);    
     
     deleteChart();
@@ -51,11 +41,7 @@ export function drawChart(content: [], resetKey?: boolean): void {
         setLineThickness('0.4rem');
     }
 
-    if (resetKey) {
-        setUpParcoordData(content, initialColumns);
-    } else {
-        setUpParcoordData(content, currentColumns);
-    } 
+    setUpParcoordData(content, columns);
    
     let chart = select('#parallelcoords');
 
@@ -125,8 +111,7 @@ export function drawChart(content: [], resetKey?: boolean): void {
 }
 
 export function reset() {
-    const data = structuredClone(refreshData);
-    drawChart(data, true);
+    drawChart(resetContentData);
 }
 
 
@@ -146,6 +131,8 @@ export function deleteChart(): void {
     select('#refreshButton').remove();
     select('#showData').remove();
     select('#toolbarRow').remove();
+    helper.cleanTooltip();
+    helper.cleanTooltipSelect();
     parcoords.currentPosOfDims.length = 0;
 }
 

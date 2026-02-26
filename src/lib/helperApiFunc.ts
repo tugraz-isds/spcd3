@@ -43,6 +43,13 @@ export function hide(dimension: string): void {
         .duration(1500)
         .attrTween('d', (d: { [x: string]: any; }) => generateLineTween(oldxScales, parcoords.xScales, newDimensions, parcoords.yScales)(d)
         );
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 function generateLineTween(oldXscales: (arg0: string | number) => any, newXscales: (arg0: string | number) => any, newDimensions: any[], yScales: { [x: string]: (arg0: any) => any; }) {
@@ -96,6 +103,13 @@ export function show(dimension: string): void {
             });
             return line()(points);
         });
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 export function getHiddenStatus(dimension: string): string {
@@ -160,6 +174,13 @@ export function moveByOne(dimension: string, direction: string): void {
 
     delete parcoords.dragging[dimension];
     delete parcoords.dragging[neighbour];
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 export function move(dimensionA: string, toRightOf: boolean, dimensionB: string): void {
@@ -231,6 +252,13 @@ export function swap(dimensionA: string, dimensionB: string): void {
 
     delete parcoords.dragging[dimensionA];
     delete parcoords.dragging[dimensionB];
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 //---------- Filter Functions ----------
@@ -387,6 +415,7 @@ function setFilterAfterSettingRanges(dimension: string, inverted: boolean): void
 export function setDimensionRangeRounded(dimension: string, min: number, max: number): void {
     const inverted = helper.isInverted(dimension);
     const hiddenDims = getAllHiddenDimensionNames();
+
     if (inverted) {
         parcoords.yScales[dimension].domain([max, min]).nice();
         setYaxis(helper.setupYAxis(parcoords.yScales, parcoords.newDataset, hiddenDims));
@@ -397,9 +426,16 @@ export function setDimensionRangeRounded(dimension: string, min: number, max: nu
     }
 
     const roundedRanges = parcoords.yScales[dimension].domain();
-    addRange(roundedRanges[0], parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
-    addRange(roundedRanges[1], parcoords.currentPosOfDims, dimension, 'currentRangeTop');
+    if (inverted) {
+        addRange(roundedRanges[1], parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+        addRange(roundedRanges[0], parcoords.currentPosOfDims, dimension, 'currentRangeTop');
 
+    }
+    else {
+        addRange(roundedRanges[0], parcoords.currentPosOfDims, dimension, 'currentRangeBottom');
+        addRange(roundedRanges[1], parcoords.currentPosOfDims, dimension, 'currentRangeTop');
+    }
+    
     select('#dimension_axis_' + utils.cleanString(dimension))
         .call(yAxis[dimension])
         .transition()
@@ -503,6 +539,13 @@ export function invertWoTransition(dimension: string): void {
     else {
         brush.addInvertStatus(false, dimension, "isInverted");
     }
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 
@@ -554,6 +597,13 @@ export function setInversionStatus(dimension: string, status: string): void {
     else {
         brush.addInvertStatus(false, dimension, "isInverted");
     }
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
+    });
 }
 
 export function invert(dimension: string): void {
@@ -594,6 +644,13 @@ export function invert(dimension: string): void {
             .attr('d', (d: any) => {
                 return helper.linePath(d, parcoords.newFeatures);
             })
+    });
+
+    helper.cleanTooltipSelect();
+    var selectedRecords = getSelected();
+    selectedRecords.forEach(record => {
+        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        helper.createToolTipForValues(path, true);
     });
 
     const filter = getFilter(dimension);

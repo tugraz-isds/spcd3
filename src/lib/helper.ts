@@ -103,7 +103,7 @@ export function setupXScales(header: any, dataset: any): any {
 
   const labelWidth = getTextWidthSVG(longestTicklabel, "0.75rem Verdana");
 
-  const margin = labelWidth * 0.6;
+  const margin = labelWidth * 0.6 + 16;
   const n = header.length;
   const pad = (n <= 2) ? 0 : 0.2;
   return scalePoint()

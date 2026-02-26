@@ -60,8 +60,8 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
       const processedDimensionName = utils.cleanString(d.name);
       const max = api.getCurrentMaxRange(d.name);
       const min = api.getCurrentMinRange(d.name);
-      if (!api.isDimensionCategorical(d.name)) {
-        const inversionStatus = api.getInversionStatus(d.name);
+      const inversionStatus = api.getInversionStatus(d.name);
+      if (!api.isDimensionCategorical(d.name)) {       
         if (inversionStatus === 'ascending') {
           yScales[d.name].domain([min, max]);
           yAxis = helper.setupYAxis(yScales,
@@ -86,9 +86,18 @@ export function setFeatureAxisToDownload(svg: any, yAxis: any, yScales: any,
         }
       }
       else {
+        if (inversionStatus === 'ascending') {
         select(this)
           .attr('id', 'dimension_axis_' + processedDimensionName)
-          .call(yAxis[d.name])
+          .call(yAxis[d.name]);
+        }
+        else {
+          const scale = yScales[d.name];
+          scale.domain([...scale.domain()].reverse());
+          select(this)
+          .attr('id', 'dimension_axis_' + processedDimensionName)
+          .call(yAxis[d.name]);
+        }
       }
     });
 
