@@ -167,11 +167,12 @@ export function linePath(d: any, newFeatures: any): any {
     const valueEntry = tempdata.find(x => x[0] === newFeature);
     if (valueEntry) {
       const name = newFeature;
-      const value = valueEntry[1];
+      const value: string = String(valueEntry[1]);
       const x = parcoords.dragging[name] !== undefined
         ? parcoords.dragging[name]
         : parcoords.xScales(name);
-      const y = parcoords.yScales[name](value);
+      const cleanedValue = value.length > 10 ? value.substr(0, 10) + '...' : value;
+      const y = parcoords.yScales[name](cleanedValue);
       points.push([x, y]);
     }
   });
@@ -210,12 +211,17 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
 
   const recordId = recordIdOf(records);
 
-  const layer = select('body')
+  const wrapper = document.querySelector<HTMLDivElement>('#parallelcoords .chartWrapper');
+  if (!wrapper) return;
+
+  const layer = select(wrapper)
     .selectAll<HTMLDivElement, string>(`div.tip-layer[data-record="${recordId}"]`)
     .data([recordId])
     .join('div')
     .attr('class', 'tip-layer')
     .attr('data-record', recordId);
+
+  const wrapperRect = wrapper.getBoundingClientRect();
 
   const data: ToolTipItem[] = dimensions
     .map(dim => {
@@ -233,15 +239,14 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
 
       return {
         dim,
-        pageX: sp.x,
-        pageY: sp.y,
+        pageX: sp.x - wrapperRect.left + wrapper.scrollLeft,
+        pageY: sp.y - wrapperRect.top  + wrapper.scrollTop,
         text: String(records[dim]),
       };
     });
 
     if (isSelect) {
-      const tips = layer
-        .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record-select')
+      const tips = layer.selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record-select')
         .data(data, (d: any) => d.dim);
 
       tips.join(
@@ -259,8 +264,7 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
       );
     }
     else {
-      const tips = layer
-        .selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
+      const tips = layer.selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
         .data(data, (d: any) => dimensions);
 
       tips.join(

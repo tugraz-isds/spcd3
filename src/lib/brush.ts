@@ -15,27 +15,9 @@ const TOP_AXIS_VALUE = 50;
 const BOTTOM_AXIS_VALUE = 350;
 const RECT_VALUE = 300;
 
-let tooltipValues = select('#parallelcoords')
-    .append('div')
-    .attr('class', 'tooltip-values')
-    .style('position', 'absolute')
-    .style('visibility', 'hidden');
-
-let tooltipValuesTop = select('#parallelcoords')
-    .append('div')
-    .attr('class', 'tooltip-values')
-    .style('position', 'absolute')
-    .style('visibility', 'hidden');
-
-let tooltipValuesDown = select('#parallelcoords')
-    .append('div')
-    .attr('class', 'tooltip-values')
-    .style('position', 'absolute')
-    .style('visibility', 'hidden');
-
 // Brushing
 
-export function setRectToDrag(featureAxis): void {
+export function setRectToDrag(featureAxis, tooltipValuesDown, tooltipValuesTop): void {
 
     let delta: any;
     featureAxis.each(function (d: { name: string; }) {
@@ -80,7 +62,7 @@ export function setRectToDrag(featureAxis): void {
     });
 }
 
-export function setBrushUp(featureAxis, brushOverlay): void {
+export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
 
     featureAxis.each(function (d: { name: string }) {
         const processedDimensionName = utils.cleanString(d.name);
@@ -138,7 +120,7 @@ export function setBrushUp(featureAxis, brushOverlay): void {
     });
 }
 
-export function setBrushDown(featureAxis, brushOverlay): void {
+export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
 
     featureAxis.each(function (d: { name: string }) {
         const processedDimensionName = utils.cleanString(d.name);

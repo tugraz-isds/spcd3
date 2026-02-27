@@ -688,9 +688,9 @@ export function setSelection(records: string[]): void {
                 .style('stroke', 'rgba(255, 165, 0, 1)');
 
         records.forEach(record => {
-            const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+            const path = parcoords.newDataset.find(d => utils.cleanString(d[hoverlabel]) === record);
             helper.createToolTipForValues(path, true);
-        })
+        });
         }
     }
 }

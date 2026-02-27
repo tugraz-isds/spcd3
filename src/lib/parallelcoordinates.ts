@@ -7,12 +7,11 @@ import * as context from './contextMenu';
 import * as icon from './icons/icons';
 import * as toolbar from './toolbar';
 import * as api from './helperApiFunc';
-import { yAxis, parcoords, width, svg, setYaxis, setRefreshData, setSvg, 
-    refreshData, setWidth, setHeight, setPadding, setPaddingXaxis, setInitDimension,
-    setActive, setYScales, setData, setFeatures, setNewDataset, setNewFeatures,
-    setXScales, setHoverLabel, key, hoverlabel, setKey, height, 
-    setColumns, thickness, setLineThickness, setNumberOfDimensions, setNumberOfRecords,
-    setContent, resetContentData} from './globals';
+import { yAxis, parcoords, width, svg, setYaxis, setSvg, setWidth, setHeight,
+    setPadding, setPaddingXaxis, setInitDimension, setActive, setYScales, setData,
+    setFeatures, setNewDataset, setNewFeatures, setXScales, setHoverLabel, key,
+    hoverlabel, setKey, height, setColumns, thickness, setLineThickness,
+    setNumberOfDimensions, setNumberOfRecords, setContent, resetContentData} from './globals';
 
 import './reset.css';
 import './stylesheet.css';
@@ -21,11 +20,6 @@ declare const window: any;
 
 //---------- IO Functions ----------
 
-function makeDatasetKey(content: any) {
-  const cols = "Test";
-  const n = content.length ?? [];
-  return `${cols}::${n}`;
-}
 
 export function drawChart(content: []): void {
     setContent(content);
@@ -265,7 +259,10 @@ function handlePointerLeaveOrOut() {
 };
 
 function handleClick(event, d) {
-    const data = helper.getAllPointerEventsData(event);
+    var data = helper.getAllPointerEventsData(event);
+
+    if (hoverSnapshot) data = hoverSnapshot;
+        hoverSnapshot = null;
 
     const cleanedItems = data.map((item: string) =>
         utils.cleanString(item).replace(/[.,]/g, '')
@@ -288,7 +285,7 @@ function handleClick(event, d) {
             data.forEach((item: any, i: number) => {
                 const rec = datasetMap.get(item);
                 if (rec) {
-                helper.createToolTipForValues(rec, true);
+                    helper.createToolTipForValues(rec, true);
                 }
             });
         }});
@@ -324,7 +321,7 @@ function handleClick(event, d) {
         data.forEach((item: any, i: number) => {
             const rec = datasetMap.get(item);
             if (rec) {
-            helper.createToolTipForValues(rec, true);
+                helper.createToolTipForValues(rec, true);
             }
         });
     }
@@ -411,11 +408,23 @@ function setFeatureAxis(svg, yAxis, parcoords, width): void {
         .style("fill", "transparent")
         .style("pointer-events", "none");
 
-    brush.setBrushDown(featureAxis, brushOverlay);
+    let tooltipValues = select('#parallelcoords')
+        .append('div')
+        .attr('class', 'tooltip-values');
+    
+    let tooltipValuesTop = select('#parallelcoords')
+        .append('div')
+        .attr('class', 'tooltip-values');
+    
+    let tooltipValuesDown = select('#parallelcoords')
+        .append('div')
+        .attr('class', 'tooltip-values');
 
-    brush.setBrushUp(featureAxis, brushOverlay);
+    brush.setBrushDown(featureAxis, brushOverlay, tooltipValues);
 
-    brush.setRectToDrag(featureAxis);
+    brush.setBrushUp(featureAxis, brushOverlay, tooltipValues);
+
+    brush.setRectToDrag(featureAxis, tooltipValuesTop, tooltipValuesDown);
 
     setMarker(featureAxis);
 
@@ -496,7 +505,11 @@ function setInvertIcon(featureAxis): void {
 
 let currentlyHighlightedItems = [];
 
+let hoverSnapshot = null;
+
 function highlight(data: any[]) {
+
+    hoverSnapshot = data;
 
     const cleanedItems = data.map((item: string) =>
         utils.cleanString(item).replace(/[.,]/g, '')

@@ -100,6 +100,14 @@ img {
 .chartWrapper {
     margin-left: 1rem;
     overflow-x: auto;
+    position: relative; 
+}
+
+.tip-layer{
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
 }
 
 .dimensions-axis {
@@ -112,6 +120,8 @@ img {
     margin: 0.5rem;
     padding: 0.12rem;
     background-color: lightgrey;
+    position: absolute;
+    visibility: hidden;
 }
 
 .tooltip-record {
@@ -138,7 +148,7 @@ img {
     background-color: rgba(211, 211, 211, 0.5);;
     color: orange;
     font-size: 0.65rem;
-    font-weight: bold;
+    font-weight: bolder;
     z-index: 999;
 }
 

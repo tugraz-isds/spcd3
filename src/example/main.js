@@ -107,7 +107,7 @@ function handleFileSelect(event) {
             clearPlot();
             data = e.target.result;
             newData = loadCSV(data);
-            drawChart(newData);
+            drawChart(newData, '0.4rem');
 
             showButtons();
 
