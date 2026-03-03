@@ -97,6 +97,10 @@ img {
     align-items: center;
 }
 
+#pc_svg {
+    padding-bottom: 1rem;
+}
+
 .chartWrapper {
     margin-left: 1rem;
     overflow-x: auto;

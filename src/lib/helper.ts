@@ -131,7 +131,7 @@ export function setupYAxis(yScales: any, dataset: any, hiddenDims: any): any {
         );
         const uniqueLabels = Array.from(new Set(shortenedLabels));
         const ticks = uniqueLabels.length > limit
-          ? uniqueLabels.filter((_, i) => i % 4 === 0)
+          ? uniqueLabels.filter((_, i) => i % 6 === 0)
           : uniqueLabels;
 
         yAxis[key] = axisLeft(scale).tickValues(ticks).tickFormat((d: any) => d);
@@ -251,7 +251,7 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
 
       tips.join(
         enter => enter.append('div')
-          .attr('id', `tooltip-record-select-${records[hoverlabel]}`)
+          .attr('id', `tooltip-record-select-${utils.cleanString(records[hoverlabel])}`)
           .attr('class', 'tooltip-record-select')
           .style('left', d => `${d.pageX/16}rem`)
           .style('top',  d => `${d.pageY/16}rem`)
@@ -259,9 +259,7 @@ export function createToolTipForValues(records: any, isSelect: boolean) {
           .style('left', d => `${d.pageX/16}rem`)
           .style('top',  d => `${d.pageY/16}rem`)
           .text(d => d.text),
-        exit => exit.remove()
-        
-      );
+        exit => exit.remove());
     }
     else {
       const tips = layer.selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')

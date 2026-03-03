@@ -439,3 +439,83 @@ div#selectRecordsHeader {
 .hitbox-slider {
   flex: 1;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 9999;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.625rem rgba(0,0,0,0.2);
+    display: none;
+    width: 22rem;
+    max-width: 90vw;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+}
+
+.modal-title {
+    padding-left: 0.25rem;
+    font-size: large;
+}
+
+.modal-content {
+    min-width: 10rem;
+    position: relative;
+}
+
+.modal-info {
+    margin-top: 0.15rem;
+}
+
+.modal-notes {
+    color: grey;
+    font-size: smaller;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+}
+
+.modal-label {
+    padding: 0.5rem;
+}
+
+.modal-input {
+    width: 4.5rem;
+    border: 0.1rem solid lightgrey;
+    border-radius: 5%;
+}
+
+.modal-errormessage {
+    position: relative;
+    display: none;
+    padding-left: 0.5rem;
+    padding-top: 0.5rem;
+    color: red;
+    font-size: x-small;
+}
+
+.save-button {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    align-self: flex-start;
+    display: inline-block;
+}
