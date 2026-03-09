@@ -15,23 +15,19 @@ button {
 
 .generic-button {
     margin: 0.5rem auto;
+    padding: 0 0.5rem;
     display: block;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
 }
 
 .save-button {
     margin-left: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    align-self: flex-start;
+    padding: 0 0.5rem;
     display: inline-block;
 }
 
 .save-csv-button {
     margin-bottom: 3rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding: 0 0.5rem;
     align-self: flex-start;
     display: inline-block;
 }
@@ -40,25 +36,22 @@ button {
     position: absolute;
     top: 0.625rem;
     right: 0.938rem;
-    font-weight: bold;
     font-size: 1.25rem;
-    cursor: pointer;
+    font-weight: bold;
 }
 
 th {
-    border: 0.063rem solid grey;
-    padding: 0.5rem;
-    background-color: rgb(201, 212, 221);
     position: sticky;
     top: 0;
-    z-index: 1;
+    border: 0.08rem solid grey;
+    padding: 0.5rem;
+    background-color: rgb(201, 212, 221);
     white-space: nowrap;
     overflow: hidden;
-    text-transform: ellipsis;
 }
 
 td {
-    border: 0.063rem solid grey;
+    border: 0.08rem solid grey;
     padding: 0.5rem;
 }
 
@@ -79,22 +72,18 @@ img {
 }
 
 .input {
-    width: 3.125;
+    width: 3.125rem;
     margin-right: 0.45rem;
-    vertical-align: middle;
 }
 
 .tablecontainer {
     width: 100%;
-    border-collapse: collapse;
 }
 
 #parallelcoords {
     display: block;
     width: 100%;
     text-align: left;
-    justify-content: center;
-    align-items: center;
 }
 
 #pc_svg {
@@ -102,9 +91,9 @@ img {
 }
 
 .chartWrapper {
-    margin-left: 1rem;
+    position: relative;
     overflow-x: auto;
-    position: relative; 
+    margin-left: 1rem;
 }
 
 .tip-layer{
@@ -119,12 +108,12 @@ img {
 }
 
 .tooltip-values {
+    position: absolute;
     border: 0.08rem solid grey;
     border-radius: 0.1rem;
     margin: 0.5rem;
     padding: 0.12rem;
     background-color: lightgrey;
-    position: absolute;
     visibility: hidden;
 }
 
@@ -162,9 +151,8 @@ img {
     pointer-events: none;
     background: lightgrey;
     padding: 0.2rem;
-    border: 0.0625rem solid grey;
-    border-radius: 0.2rem;
-    white-space: pre-line;
+    border: 0.08rem solid grey;
+    border-radius: 0.1rem;
     font-size: 0.75rem;
     z-index: 1000;
 }
@@ -238,7 +226,6 @@ img {
     pointer-events: none;
 }
 
-/*TODO: POPOVER*/
 .toolbar-buttontip {
     position: absolute;
     left: 150%;
@@ -246,8 +233,8 @@ img {
     transform: translateX(-50%);
     background: lightgrey;
     padding: 0.2rem;
-    border: 0.0625rem solid grey;
-    border-radius: 0.2rem;
+    border: 0.08rem solid grey;
+    border-radius: 0.1rem;
     white-space: nowrap;
     line-height: 1.2;
     pointer-events: none;
@@ -261,8 +248,8 @@ img {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
     display: block;
@@ -319,8 +306,8 @@ img {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     display: none;
     z-index: 9999;
@@ -374,7 +361,7 @@ img {
 .modal-input {
     width: 4.5rem;
     border: 0.1rem solid lightgrey;
-    border-radius: 5%;
+    border-radius: 0.1rem;
 }
 
 .modal-errormessage {
@@ -408,7 +395,6 @@ img {
     justify-content: space-between;
 }
 
-
 .triangle-hitbox {
     width: 30;
     height: 30;
@@ -421,7 +407,4 @@ img {
 .handle-hitbox {
     fill: transparent;
     pointer-events: all;
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
 }
