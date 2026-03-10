@@ -25,7 +25,14 @@ function copyExampleFolder() {
 }
 
 function copyLibFileToExample() {
-    return src('./dist/library/esm/spcd3.js').pipe(dest('./dist/example/lib/'));
+    const sourceFile = path.resolve(__dirname, './dist/library/esm/lib.js');
+    const targetDir = path.resolve(__dirname, './dist/example/lib/');
+
+    if (!fs.existsSync(sourceFile)) {
+        return;
+    }
+
+    return src(sourceFile).pipe(dest(targetDir));
 }
 
 exports.clean = cleanDistFolder;
