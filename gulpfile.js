@@ -3,6 +3,8 @@ const del = require('del');
 const {bundle} = require("./gulp-tasks/bundle");
 const {watcher} = require("./gulp-tasks/watch");
 const {tauriBuild} = require("./gulp-tasks/tauri");
+const path = require('path');
+const fs = require('fs');
 
 function cleanDistFolder() {
     return del('dist', {force: true});
@@ -25,7 +27,7 @@ function copyExampleFolder() {
 }
 
 function copyLibFileToExample() {
-    const sourceFile = path.resolve(__dirname, './dist/library/esm/lib.js');
+    const sourceFile = path.resolve(__dirname, './dist/library/esm/spcd3.js');
     const targetDir = path.resolve(__dirname, './dist/example/lib/');
 
     if (!fs.existsSync(sourceFile)) {
