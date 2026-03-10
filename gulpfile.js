@@ -37,11 +37,42 @@ function copyLibFileToExample() {
     return src(sourceFile).pipe(dest(targetDir));
 }
 
+function debugLibFile(cb) {
+    const expectedFile = path.resolve(__dirname, 'dist/library/esm/spcd3.js');
+    const distDir = path.resolve(__dirname, 'dist');
+
+    console.log('cwd:', process.cwd());
+    console.log('__dirname:', __dirname);
+    console.log('expected file:', expectedFile);
+    console.log('exists:', fs.existsSync(expectedFile));
+
+    if (fs.existsSync(distDir)) {
+        console.log('dist contents:');
+        printFiles(distDir);
+    } else {
+        console.log('dist folder not found');
+    }
+
+    cb();
+}
+
+function printFiles(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            printFiles(fullPath);
+        } else {
+            console.log(fullPath);
+        }
+    }
+}
+
 exports.clean = cleanDistFolder;
 
 exports.cleanAll = parallel(cleanDistFolder, cleanNodeModules, cleanPackageLock, cleanPackage);
 
-exports.build = series(cleanDistFolder, copyExampleFolder, bundle, copyLibFileToExample);
+exports.build = series(cleanDistFolder, copyExampleFolder, bundle, debugLibFile, copyLibFileToExample);
 
 exports.dev = series(exports.build, watcher);
 
