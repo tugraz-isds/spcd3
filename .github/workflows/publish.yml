@@ -1,4 +1,4 @@
-name: publish-debug
+name: 'publish'
 
 on:
   workflow_dispatch:
@@ -10,132 +10,55 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
-
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
-            args: --target aarch64-apple-darwin
-          - platform: macos-latest
-            args: --target x86_64-apple-darwin
-          - platform: ubuntu-22.04
-            args: ""
-          - platform: windows-latest
-            args: ""
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
 
     runs-on: ${{ matrix.platform }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Linux system dependencies
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
-          sudo apt-get update 
+          sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Setup Node
+      - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: yarn
+          cache: 'yarn' # Set this to npm, yarn or pnpm.
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
         with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: ./src-tauri -> target
+          workspaces: './src-tauri -> target'
 
-      - name: Show tool versions
-        shell: bash
-        run: |
-          echo "Node: $(node -v)"
-          echo "Yarn: $(yarn -v)"
-          echo "Rustc: $(rustc -V)"
-          echo "Cargo: $(cargo -V)"
+      - name: install frontend dependencies
+        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
+        run: yarn install --immutable # change this to npm or pnpm depending on which one you use.
 
-      - name: Show package.json
-        shell: bash
-        run: cat package.json
-
-      - name: Show Tauri config
-        shell: bash
-        run: |
-          if [ -f src-tauri/tauri.conf.json ]; then
-            echo "Found src-tauri/tauri.conf.json"
-            cat src-tauri/tauri.conf.json
-          elif [ -f src-tauri/tauri.conf.json5 ]; then
-            echo "Found src-tauri/tauri.conf.json5"
-            cat src-tauri/tauri.conf.json5
-          elif [ -f src-tauri/tauri.conf.toml ]; then
-            echo "Found src-tauri/tauri.conf.toml"
-            cat src-tauri/tauri.conf.toml
-          else
-            echo "No Tauri config found"
-          fi
-
-      - name: Install frontend dependencies
-        run: yarn install --immutable
-
-      - name: Check Tauri CLI
-        shell: bash
-        run: yarn tauri --version
-
-      - name: Build frontend only
-        shell: bash
-        run: |
-          if yarn run | grep -q " build"; then
-            yarn build
-          else
-            echo "No frontend build script found, skipping"
-          fi
-
-      - name: Build Tauri
-        shell: bash
-        run: yarn tauri build --verbose ${{ matrix.args }}
-
-      - name: List bundle output (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          echo "=== src-tauri/target ==="
-          find src-tauri/target -maxdepth 6 -type f | sort || true
-          echo "=== target ==="
-          find target -maxdepth 6 -type f | sort || true
-
-      - name: List bundle output (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "=== src-tauri/target ==="
-          if (Test-Path "src-tauri/target") {
-            Get-ChildItem "src-tauri/target" -Recurse -File | Select-Object FullName
-          } else {
-            Write-Host "src-tauri/target not found"
-          }
-
-          Write-Host "=== target ==="
-          if (Test-Path "target") {
-            Get-ChildItem "target" -Recurse -File | Select-Object FullName
-          } else {
-            Write-Host "target not found"
-          }
-
-      - name: Upload build artifacts for debugging
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: tauri-debug-${{ matrix.platform }}-${{ strategy.job-index }}
-          path: |
-            src-tauri/target
-            target
-          if-no-files-found: warn
+          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'App v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
