@@ -1,19 +1,20 @@
+const path = require("path");
 const rollup = require("rollup");
 const rollupCommonJs = require("@rollup/plugin-commonjs");
 const rollupTypeScript = require("@rollup/plugin-typescript");
-const postcss = require('rollup-plugin-postcss');
-const {default: rollupNodeResolve} = require("@rollup/plugin-node-resolve");
-const {terser: rollupTerser} = require("rollup-plugin-terser");
-const {default: rollupGzip} = require("rollup-plugin-gzip");
+const postcss = require("rollup-plugin-postcss");
+const { default: rollupNodeResolve } = require("@rollup/plugin-node-resolve");
+const { terser: rollupTerser } = require("rollup-plugin-terser");
+const { default: rollupGzip } = require("rollup-plugin-gzip");
 const fs = require("fs");
 
 async function bundle() {
-  const bundle = await rollup.rollup({
-    input: './src/lib/index.ts',
+  const build = await rollup.rollup({
+    input: path.resolve(process.cwd(), "src/lib/index.ts"),
     plugins: [
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
-      rollupTypeScript({ tsconfig: './tsconfig.json' }),
+      rollupTypeScript({ tsconfig: path.resolve(process.cwd(), "tsconfig.json") }),
       postcss({ extract: false }),
     ]
   });
@@ -21,31 +22,47 @@ async function bundle() {
   const minPlugins = [rollupTerser()];
   const gZipPlugins = [rollupTerser(), rollupGzip()];
 
-  function writeLib(format) {
-    const location = `./dist/library/${format}`;
+  async function writeLib(format) {
+    const location = path.resolve(process.cwd(), `dist/library/${format}`);
     const config = [
-      { extension: 'js', plugins: [] },
-      { extension: 'min.js', plugins: minPlugins },
-      { extension: 'gZip.js', plugins: gZipPlugins },
+      { extension: "js", plugins: [] },
+      { extension: "min.js", plugins: minPlugins },
+      { extension: "gZip.js", plugins: gZipPlugins },
     ];
-    return config.map((conf) => bundle.write({
-      file:`${location}/spcd3.${conf.extension}`,
-      format: format === "esm" ? "es" : format,
-      name: 'spcd3',
-      plugins: conf.plugins,
-      sourcemap: true,
-    }).then(() => {
-      const fileData = fs.readFileSync(`${location}/spcd3.${conf.extension}`, 'utf8');
-      const formatString = format === 'iife' ? 'IIFE' : format === 'esm' ? 'ESM' : format === 'cjs' ? 'CommonJS' : '';
-      const dataWithHeaderLine = `// SPCD3 version 1.0.0 ${formatString}\n` + fileData;
-      fs.writeFileSync(`${location}/spcd3.${conf.extension}`, dataWithHeaderLine, 'utf8');
-    }))
+
+    for (const conf of config) {
+      const file = path.join(location, `spcd3.${conf.extension}`);
+
+      await build.write({
+        file,
+        format: format === "esm" ? "es" : format,
+        name: "spcd3",
+        plugins: conf.plugins,
+        sourcemap: true,
+      });
+
+      if (!fs.existsSync(file)) {
+        throw new Error(`Expected output file was not created: ${file}`);
+      }
+
+      const fileData = fs.readFileSync(file, "utf8");
+      const formatString =
+        format === "iife" ? "IIFE" :
+        format === "esm" ? "ESM" :
+        format === "cjs" ? "CommonJS" : "";
+
+      fs.writeFileSync(
+        file,
+        `// SPCD3 version 1.0.0 ${formatString}\n${fileData}`,
+        "utf8"
+      );
+    }
   }
 
-  return Promise.all([
-      ...writeLib('esm'),
-      ...writeLib('iife'),
-      ...writeLib('cjs')])
+  await writeLib("esm");
+  await writeLib("iife");
+  await writeLib("cjs");
+  await build.close();
 }
 
-module.exports = {bundle}
+module.exports = { bundle };
