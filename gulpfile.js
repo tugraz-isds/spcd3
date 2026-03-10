@@ -31,7 +31,7 @@ function copyLibFileToExample() {
     const targetDir = path.resolve(__dirname, './dist/example/lib/');
 
     if (!fs.existsSync(sourceFile)) {
-        return;
+        throw new Error(`Source file not found: ${sourceFile}`);
     }
 
     return src(sourceFile).pipe(dest(targetDir));
