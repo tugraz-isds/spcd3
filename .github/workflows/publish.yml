@@ -52,14 +52,30 @@ jobs:
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: yarn install --immutable # change this to npm or pnpm depending on which one you use.
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build macOS manually
+        if: ${{ !matrix.publish_with_tauri_action }}
+        run: yarn tauri build ${{ matrix.args }}
+
+      - name: Upload macOS artifacts
+        if: ${{ !matrix.publish_with_tauri_action }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.args }}
+          path: |
+            src-tauri/target/**/release/bundle/**/*.app
+            src-tauri/target/**/release/bundle/**/*.dmg
+            src-tauri/target/**/release/bundle/**/*.tar.gz
+          if-no-files-found: error
+
+      - name: Publish Windows/Linux with Tauri Action
+        if: ${{ matrix.publish_with_tauri_action }}
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: .
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          tagName: app-v__VERSION__
+          releaseName: App v__VERSION__
+          releaseBody: See the assets to download this version and install.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
