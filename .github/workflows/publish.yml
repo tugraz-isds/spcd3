@@ -102,6 +102,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -114,8 +117,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="app-v$(node -p "require('./package.json').version")"
-          TITLE="App v$(node -p "require('./package.json').version")"
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="app-v$VERSION"
+          TITLE="App v$VERSION"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release edit "$TAG" \
@@ -133,5 +137,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="app-v$(node -p "require('./package.json').version")"
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="app-v$VERSION"
           find release-assets -type f -print0 | xargs -0 gh release upload "$TAG" --clobber
