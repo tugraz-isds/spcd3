@@ -125,6 +125,9 @@ export function deleteChart(): void {
     select('#refreshButton').remove();
     select('#showData').remove();
     select('#toolbarRow').remove();
+    select('.chartWrapper').remove();
+    selectAll('.tip-layer').remove();
+    selectAll('.tooltip-values').remove();
     helper.cleanTooltip();
     helper.cleanTooltipSelect();
     parcoords.currentPosOfDims.length = 0;
@@ -233,7 +236,7 @@ function handlePointerEnter(event: any, d: any) {
     doNotHighlight();
 
     const data = helper.getAllPointerEventsData(event);
-    const tooltipLabel = select('.tooltip-label')
+    const tooltipLabel = selectAll('.tooltip-label');
 
     highlight(data);
     helper.createTooltipForLabel(data, tooltipLabel, event);
@@ -245,6 +248,7 @@ function handlePointerEnter(event: any, d: any) {
 
     data.forEach((item: any, i: number) => {
         const rec = datasetMap.get(item);
+        console.log(rec);
         if (rec) {
           helper.createToolTipForValues(rec, false);
         }
