@@ -38,6 +38,7 @@ button {
     right: 0.938rem;
     font-size: 1.25rem;
     font-weight: bold;
+    cursor: pointer;
 }
 
 th {
@@ -174,6 +175,11 @@ img {
     stroke: rgb(228, 90, 15);
     stroke-width: 0.1rem;
     opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.marker.visible {
+    opacity: 1;
 }
 
 .rect {

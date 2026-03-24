@@ -248,7 +248,6 @@ function handlePointerEnter(event: any, d: any) {
 
     data.forEach((item: any, i: number) => {
         const rec = datasetMap.get(item);
-        console.log(rec);
         if (rec) {
           helper.createToolTipForValues(rec, false);
         }
@@ -258,7 +257,7 @@ function handlePointerEnter(event: any, d: any) {
 function handlePointerLeaveOrOut() {
     doNotHighlight();
     clearExistingDelay();
-    select('.tooltip-label').style('visibility', 'hidden');
+    selectAll('.tooltip-label').style('visibility', 'hidden');
     helper.cleanTooltip();
 };
 
@@ -557,12 +556,12 @@ function setMarker(featureAxis: any): void {
     featureAxis.each(function (d: { name: string; }) {
         const processedDimensionName = utils.cleanString(d.name);
         select(this).append('g')
-            .attr('class', 'marker')
-            .append('rect')
-            .attr('id', 'marker_' + processedDimensionName)
-            .attr('width', 44)
-            .attr('height', 305)
-            .attr('x', -22)
-            .attr('y', 30)
+          .append('rect')
+          .attr('id', 'marker_' + processedDimensionName)
+          .attr('class', 'marker')
+          .attr('width', 44)
+          .attr('height', 330)
+          .attr('x', -22)
+          .attr('y', 30);
     });
 }

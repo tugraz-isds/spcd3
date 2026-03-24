@@ -492,7 +492,9 @@ function onDragEndEventHandler(featureAxis: any): any {
       var selectedRecords = api.getSelected();
       selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!api.isRecordInactive(record)) {
+          helper.createToolTipForValues(path, true);
+        } 
       });
     };
   }

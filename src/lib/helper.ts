@@ -105,7 +105,7 @@ export function setupXScales(header: any, dataset: any): any {
 
   const margin = labelWidth * 0.6 + 16;
   const n = header.length;
-  const pad = (n <= 2) ? 0 : 0.2;
+  const pad = (n <= 4) ? 0.1 : 0.2;
   return scalePoint()
     .domain(header.map((x: { name: any; }) => x.name))
     .range([width - margin, margin])

@@ -179,7 +179,10 @@ export function moveByOne(dimension: string, direction: string): void {
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!isRecordInactive(record)) {
+            console.log(record);
+            helper.createToolTipForValues(path, true);
+        } 
     });
 }
 
@@ -257,7 +260,10 @@ export function swap(dimensionA: string, dimensionB: string): void {
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!isRecordInactive(record)) {
+            console.log(record);
+            helper.createToolTipForValues(path, true);
+        } 
     });
 }
 
@@ -544,7 +550,9 @@ export function invertWoTransition(dimension: string): void {
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!isRecordInactive(record)) {
+            helper.createToolTipForValues(path, true);
+        } 
     });
 }
 
@@ -602,7 +610,9 @@ export function setInversionStatus(dimension: string, status: string): void {
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!isRecordInactive(record)) {
+            helper.createToolTipForValues(path, true);
+        }
     });
 }
 
@@ -650,7 +660,9 @@ export function invert(dimension: string): void {
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
-        helper.createToolTipForValues(path, true);
+        if (!isRecordInactive(record)) {
+            helper.createToolTipForValues(path, true);
+        }
     });
 
     const filter = getFilter(dimension);
@@ -725,7 +737,6 @@ export function setSelected(record: string): void {
 export function setUnselected(record: string): void {
     selectAll('#' + utils.cleanString(record))
         .classed('selected', false)
-        .transition()
         .style('stroke', 'rgba(0, 129, 175, 0.5)');
     
     selectAll(`#tooltip-record-select-${record}`).style('display', 'none');
@@ -854,18 +865,23 @@ export function isDimensionCategorical(dimension: string): boolean {
 
 export function showMarker(dimension: string) {
     const cleanDimensionName = utils.cleanString(dimension);
-    select('#marker_' + cleanDimensionName).attr('opacity', 1);
+    select('#marker_' + cleanDimensionName).classed('visible', true);
 }
 
 export function hideMarker(dimension: string) {
     const cleanDimensionName = utils.cleanString(dimension);
-    select('#marker_' + cleanDimensionName).attr('opacity', 0);
+    select('#marker_' + cleanDimensionName).classed('visible', false);
+}
+
+export function setClassColoredFalse(record) {
+  const path = selectAll('#' + utils.cleanString(record));
+    path.classed("colored", false);
 }
 
 export function disableInteractivity() {
     select('#toolbarRow').style('display', 'none');
     select('#parallelcoords').style('pointer-events', 'none');
-    select('#pc_svg').style('background', 'lightgrey');
+    select('#parallelcoords').style('background', 'lightgrey').style('z-index', 1);
     selectAll('.hitarea').style('pointer-events', 'none');
     selectAll('.handle-hitbox').style('pointer-events', 'none');
     selectAll('.hitbox').style('pointer-events', 'none'); 
@@ -874,7 +890,7 @@ export function disableInteractivity() {
 export function enableInteractivity() {
     select('#toolbarRow').style('display', 'flex');
     select('#parallelcoords').style('pointer-events', 'auto');
-    select('#pc_svg').style('background', 'white');
+    select('#parallelcoords').style('background', 'white');
     selectAll('.hitarea').style('pointer-events', 'stroke');
     selectAll('.handle-hitbox').style('pointer-events', 'auto');
     selectAll('.hitbox').style('pointer-events', 'auto');
