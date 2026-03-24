@@ -180,7 +180,6 @@ export function moveByOne(dimension: string, direction: string): void {
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
         if (!isRecordInactive(record)) {
-            console.log(record);
             helper.createToolTipForValues(path, true);
         } 
     });
@@ -261,7 +260,6 @@ export function swap(dimensionA: string, dimensionB: string): void {
     selectedRecords.forEach(record => {
         const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
         if (!isRecordInactive(record)) {
-            console.log(record);
             helper.createToolTipForValues(path, true);
         } 
     });
