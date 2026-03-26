@@ -657,7 +657,7 @@ export function invert(dimension: string): void {
     helper.cleanTooltipSelect();
     var selectedRecords = getSelected();
     selectedRecords.forEach(record => {
-        const path = parcoords.newDataset.find(d => d[hoverlabel] === record);
+        const path = parcoords.newDataset.find(d => utils.cleanString(d[hoverlabel]) === record);
         if (!isRecordInactive(record)) {
             helper.createToolTipForValues(path, true);
         }

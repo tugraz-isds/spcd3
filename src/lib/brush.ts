@@ -420,8 +420,6 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .attr('y', rectY - 10);
 
     select('#triangle_down_hit' + cleanDimensionName)
-        .transition()
-        .duration(1000)
         .attr('y', rectY - 10);
 
     select('#triangle_up_' + cleanDimensionName)
@@ -430,8 +428,6 @@ export function filter(dimensionName: string, min: number, max: number): void {
         .attr('y', rectY + rectHeight);
 
     select('#triangle_up_hit' + cleanDimensionName)
-        .transition()
-        .duration(1000)
         .attr('y', rectY + rectHeight);
 
     if (topPosition == TOP_AXIS_VALUE) {
@@ -934,6 +930,8 @@ export function addSettingsForBrushing(dimension: string,
     const rect = select('#rect_' + processedName);
     const triDown = select('#triangle_down_' + processedName);
     const triUp = select('#triangle_up_' + processedName);
+    const hitTriDown = select('#triangle_down_hit' + processedName);
+    const hitTriUp = select('#triangle_up_hit' + processedName);
 
     rect.transition()
         .duration(RECT_VALUE)
@@ -947,6 +945,10 @@ export function addSettingsForBrushing(dimension: string,
     triUp.transition()
         .duration(RECT_VALUE)
         .attr('y', rectY + rectH);
+
+    hitTriDown.attr('y', rectY - 10);
+
+    hitTriUp.attr('y', rectY + rectH);
 
     if (rectY-10 == TOP_AXIS_LOW_VALUE) {
         select('#triangle_down_' + processedName)
