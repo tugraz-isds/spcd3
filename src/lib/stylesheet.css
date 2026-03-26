@@ -188,8 +188,8 @@ img {
 }
 
 .triangle {
-    width: 14;
-    height: 10;
+    width: 0.9rem;
+    height: 0.8rem;
     pointer-events: none;
 }
 
@@ -234,10 +234,8 @@ img {
 }
 
 .toolbar-buttontip {
-    position: absolute;
-    left: 150%;
-    top: calc(100% + 0.5rem);
-    transform: translateX(-50%);
+    inset: auto;
+    margin: 0;
     background: lightgrey;
     padding: 0.2rem;
     border: 0.08rem solid grey;
@@ -245,10 +243,10 @@ img {
     white-space: nowrap;
     line-height: 1.2;
     pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease;
-    z-index: 99999;
+}
+
+.toolbar-buttontip:popover-open {
+    position: fixed;
 }
 
 .modal-tableoverlay {

@@ -63,7 +63,7 @@ export function createToolbar(dataset: any[]): void {
 }
 
 function makeIconButton(parent, opts) {
-  const {id, iconHtml, tipText, onClick} = opts;
+  const { id, iconHtml, tipText, onClick } = opts;
 
   const btn = parent.append('button')
     .attr('class', 'toolbar-button')
@@ -74,24 +74,83 @@ function makeIconButton(parent, opts) {
 
   btn.append('span')
     .attr('class', 'toolbar-buttonicon')
-    .attr('id', id + 'icon')
+    .attr('id', `${id}icon`)
     .html(iconHtml);
 
-  btn.select('.btn-icon').selectAll('svg')
+  btn.select('.toolbar-buttonicon').selectAll('svg')
     .attr('class', 'toolbar-svg');
 
-  const tip = btn.append('span')
+  const tip = parent.append('span')
     .attr('class', 'toolbar-buttontip')
-    .attr('id', id + 'tip')
+    .attr('id', `${id}tip`)
+    .attr('popover', 'manual')
     .text(tipText ?? '');
 
-  function show() { tip.style('opacity', '1').style('visibility', 'visible'); }
-  function hide() { tip.style('opacity', '0').style('visibility', 'hidden'); }
+  const btnNode = btn.node();
+  const tipNode = tip.node();
+
+  function positionTip() {
+    if (!btnNode || !tipNode) return;
+
+    const rect = btnNode.getBoundingClientRect();
+    const gap = 8;
+
+    tipNode.style.left = '0';
+    tipNode.style.top = '0';
+
+    const tipRect = tipNode.getBoundingClientRect();
+
+    let left = rect.left + rect.width / 2 - tipRect.width / 2;
+    let top = rect.bottom + gap;
+
+    const padding = 0.5;
+
+    if (left < padding) left = padding;
+    if (left + tipRect.width > window.innerWidth - padding) {
+      left = window.innerWidth - tipRect.width - padding;
+    }
+
+    if (top + tipRect.height > window.innerHeight - padding) {
+      top = rect.top - tipRect.height - gap;
+    }
+
+    if (top < padding) top = padding;
+
+    tipNode.style.left = `${left/16}rem`;
+    tipNode.style.top = `${top/16}rem`;
+  }
+
+  function show() {
+    if (!tipNode) return;
+    if (!tipNode.matches(':popover-open')) {
+      tipNode.showPopover();
+    }
+    positionTip();
+  }
+
+  function hide() {
+    if (!tipNode) return;
+    if (tipNode.matches(':popover-open')) {
+      tipNode.hidePopover();
+    }
+  }
 
   btn.on('mouseenter', show)
-     .on('mouseleave', hide)
-     .on('focus', show)
-     .on('blur', hide);
+    .on('mouseleave', hide)
+    .on('focus', show)
+    .on('blur', hide);
+
+  d3.select(window).on(`resize.${id}`, () => {
+    if (tipNode?.matches(':popover-open')) {
+      positionTip();
+    }
+  });
+
+  d3.select(window).on(`scroll.${id}`, () => {
+    if (tipNode?.matches(':popover-open')) {
+      positionTip();
+    }
+  });
 
   return { btn, tip };
 }
