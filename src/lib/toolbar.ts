@@ -89,7 +89,42 @@ function makeIconButton(parent, opts) {
   const btnNode = btn.node();
   const tipNode = tip.node();
 
-  function positionTip() {
+  function show() {
+    if (!tipNode) return;
+    if (!tipNode.matches(':popover-open')) {
+      tipNode.showPopover();
+    }
+    positionTip(btnNode, tipNode);
+  }
+
+  function hide() {
+    if (!tipNode) return;
+    if (tipNode.matches(':popover-open')) {
+      tipNode.hidePopover();
+    }
+  }
+
+  btn.on('mouseenter', show)
+    .on('mouseleave', hide)
+    .on('focus', show)
+    .on('blur', hide);
+
+  d3.select(window).on(`resize.${id}`, () => {
+    if (tipNode?.matches(':popover-open')) {
+      positionTip(btnNode, tipNode);
+    }
+  });
+
+  d3.select(window).on(`scroll.${id}`, () => {
+    if (tipNode?.matches(':popover-open')) {
+      positionTip(btnNode, tipNode);
+    }
+  });
+
+  return { btn, tip };
+}
+
+function positionTip(btnNode: any, tipNode: any) {
     if (!btnNode || !tipNode) return;
 
     const rect = btnNode.getBoundingClientRect();
@@ -119,41 +154,6 @@ function makeIconButton(parent, opts) {
     tipNode.style.left = `${left/16}rem`;
     tipNode.style.top = `${top/16}rem`;
   }
-
-  function show() {
-    if (!tipNode) return;
-    if (!tipNode.matches(':popover-open')) {
-      tipNode.showPopover();
-    }
-    positionTip();
-  }
-
-  function hide() {
-    if (!tipNode) return;
-    if (tipNode.matches(':popover-open')) {
-      tipNode.hidePopover();
-    }
-  }
-
-  btn.on('mouseenter', show)
-    .on('mouseleave', hide)
-    .on('focus', show)
-    .on('blur', hide);
-
-  d3.select(window).on(`resize.${id}`, () => {
-    if (tipNode?.matches(':popover-open')) {
-      positionTip();
-    }
-  });
-
-  d3.select(window).on(`scroll.${id}`, () => {
-    if (tipNode?.matches(':popover-open')) {
-      positionTip();
-    }
-  });
-
-  return { btn, tip };
-}
 
 function showModalWithData(dataset: any[]): void {
 
