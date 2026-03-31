@@ -14,9 +14,11 @@ async function bundle() {
     plugins: [
       rollupNodeResolve({ browser: true }),
       rollupCommonJs(),
-      rollupTypeScript({ tsconfig: path.resolve(process.cwd(), "tsconfig.json") }),
+      rollupTypeScript({
+        tsconfig: path.resolve(process.cwd(), "tsconfig.json"),
+      }),
       postcss({ extract: false }),
-    ]
+    ],
   });
 
   const minPlugins = [rollupTerser()];
@@ -27,7 +29,7 @@ async function bundle() {
     const config = [
       { extension: "js", plugins: [] },
       { extension: "min.js", plugins: minPlugins },
-      { extension: "gZip.js", plugins: gZipPlugins },
+      { extension: "gz.js", plugins: gZipPlugins },
     ];
 
     for (const conf of config) {
@@ -47,14 +49,18 @@ async function bundle() {
 
       const fileData = fs.readFileSync(file, "utf8");
       const formatString =
-        format === "iife" ? "IIFE" :
-        format === "esm" ? "ESM" :
-        format === "cjs" ? "CommonJS" : "";
+        format === "iife"
+          ? "IIFE"
+          : format === "esm"
+            ? "ESM"
+            : format === "cjs"
+              ? "CommonJS"
+              : "";
 
       fs.writeFileSync(
         file,
         `// SPCD3 version 1.0.0 ${formatString}\n${fileData}`,
-        "utf8"
+        "utf8",
       );
     }
   }

@@ -1,4 +1,4 @@
-const {series} = require("gulp");
+const { series } = require("gulp");
 const { spawn } = require("child_process");
 const fg = require("fast-glob");
 const fs = require("fs/promises");
@@ -30,7 +30,9 @@ function platformFolder() {
 async function copyExactlyOneFile(pattern, outDir) {
   const matches = await fg([pattern], { onlyFiles: true });
   if (matches.length !== 1) {
-    throw new Error(`Expected exactly 1 file for pattern "${pattern}", got ${matches.length}:\n${matches.join("\n")}`);
+    throw new Error(
+      `Expected exactly 1 file for pattern "${pattern}", got ${matches.length}:\n${matches.join("\n")}`,
+    );
   }
 
   await fs.mkdir(outDir, { recursive: true });
@@ -49,13 +51,19 @@ async function copyTauriExecutable() {
   const outDir = path.join("package", platformFolder());
 
   if (process.platform === "darwin") {
-    return copyExactlyOneFile("src-tauri/target/**/release/bundle/dmg/*.dmg", outDir);
+    return copyExactlyOneFile(
+      "src-tauri/target/**/release/bundle/dmg/*.dmg",
+      outDir,
+    );
   }
   if (process.platform === "win32") {
     return copyExactlyOneFile("src-tauri/target/**/release/*.exe", outDir);
   }
   if (process.platform === "linux") {
-    return copyExactlyOneFile("src-tauri/target/**/release/bundle/appimage/*.AppImage", outDir);
+    return copyExactlyOneFile(
+      "src-tauri/target/**/release/bundle/appimage/*.AppImage",
+      outDir,
+    );
   }
 
   throw new Error(`Unsupported platform: ${process.platform}`);

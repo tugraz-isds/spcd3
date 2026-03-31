@@ -1,4 +1,3 @@
-
 export let padding: number;
 export let paddingXaxis: number;
 export let width: number;
@@ -51,7 +50,7 @@ export function setYaxis(axis: any): void {
 }
 
 export function setRefreshData(data: any): void {
-    refreshData = data;
+  refreshData = data;
 }
 
 export function setColumns(cols: any): void {
@@ -59,31 +58,31 @@ export function setColumns(cols: any): void {
 }
 
 export function setSvg(svgData: any): void {
-    svg = svgData;
+  svg = svgData;
 }
 
-export function setWidth(value: number):void {
-    width = value;
+export function setWidth(value: number): void {
+  width = value;
 }
 
-export function setHeight(value: number):void {
-    height = value;
+export function setHeight(value: number): void {
+  height = value;
 }
 
-export function setPadding(value: number):void {
-    padding = value;
+export function setPadding(value: number): void {
+  padding = value;
 }
 
-export function setPaddingXaxis(value: number):void {
-    paddingXaxis = value;
+export function setPaddingXaxis(value: number): void {
+  paddingXaxis = value;
 }
 
-export function setInitDimension(dimensions: any):void {
-    initDimension = dimensions;
+export function setInitDimension(dimensions: any): void {
+  initDimension = dimensions;
 }
 
 export function setActive(paths: any): void {
-    active = paths;
+  active = paths;
 }
 
 export function setParcoords(value: typeof parcoords) {
@@ -127,11 +126,11 @@ export function setData(value: any): void {
 }
 
 export function setKey(value: string): void {
-    key = value;
+  key = value;
 }
 
 export function setLineThickness(value: string): void {
-    thickness = value;
+  thickness = value;
 }
 
 export function getLineThickness(): string {
@@ -139,9 +138,9 @@ export function getLineThickness(): string {
 }
 
 export function setNumberOfRecords(value: number): void {
-    numberOfRecords = value;
+  numberOfRecords = value;
 }
 
 export function setNumberOfDimensions(value: number): void {
-    numberOfDimensions = value;
+  numberOfDimensions = value;
 }

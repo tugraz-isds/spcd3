@@ -1,44 +1,48 @@
-import { select, selectAll, ScaleLinear } from 'd3-selection';
-import { scalePoint, scaleLinear } from 'd3-scale';
-import { axisLeft } from 'd3-axis';
-import { line } from 'd3-shape';
-import * as utils from './utils';
-import { parcoords, height, width, padding, hoverlabel } from './globals';
+import { select, selectAll, ScaleLinear } from "d3-selection";
+import { scalePoint, scaleLinear } from "d3-scale";
+import { axisLeft } from "d3-axis";
+import { line } from "d3-shape";
+import * as utils from "./utils";
+import { parcoords, height, width, padding, hoverlabel } from "./globals";
 
 const PADDING = 50;
 
 export function prepareData(data: [], dimensions: any): any {
   let dataset = [];
-  data.forEach((item: { [x: string]: any; }) => {
+  data.forEach((item: { [x: string]: any }) => {
     let row = {};
     dimensions.forEach((dimension: string | number) => {
       row[dimension] = item[dimension];
     });
     dataset.push(row);
-  })
+  });
   let header = [];
-  Object.keys(dataset[0]).forEach(element => header.push({ 'name': element }));
+  Object.keys(dataset[0]).forEach((element) => header.push({ name: element }));
   return [header, dataset];
 }
 
 export function setupYScales(header: any, dataset: any): any {
   let yScales = {};
-  header.map((x: { name: string | number; }) => {
-    const values = dataset.map((o: { [x: string]: any; }) => o[x.name]);
+  header.map((x: { name: string | number }) => {
+    const values = dataset.map((o: { [x: string]: any }) => o[x.name]);
     let labels = [];
-    const numericValues = values.every(v => !isNaN(Number(v)));
+    const numericValues = values.every((v) => !isNaN(Number(v)));
     if (!numericValues) {
       values.forEach(function (element: string) {
-        labels.push(element.length > 10 ? element.substr(0, 10) + '...' :
-        element);
+        labels.push(
+          element.length > 10 ? element.substr(0, 10) + "..." : element,
+        );
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([PADDING, height - PADDING])
-      }
-    else {
-      const max = Math.max(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
-      const min = Math.min(...dataset.map((o: { [x: string]: any; }) => o[x.name]));
+        .range([PADDING, height - PADDING]);
+    } else {
+      const max = Math.max(
+        ...dataset.map((o: { [x: string]: any }) => o[x.name]),
+      );
+      const min = Math.min(
+        ...dataset.map((o: { [x: string]: any }) => o[x.name]),
+      );
       if (min === max) {
         const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
         yScales[x.name] = scaleLinear()
@@ -48,7 +52,7 @@ export function setupYScales(header: any, dataset: any): any {
         yScales[x.name] = scaleLinear()
           .domain([min, max])
           .range([height - PADDING, PADDING]);
-        }
+      }
     }
   });
   return yScales;
@@ -70,10 +74,11 @@ function getTextWidthSVG(text, font) {
 }
 
 function getLongestTickLabel(data, labelKey) {
-    const uniqueLabels = Array.from(
-      new Set<string>(data.map(d => String(d[labelKey] ?? "")))
-    ).filter(s => s.length > 0);
-    const ticks = uniqueLabels.length > 30
+  const uniqueLabels = Array.from(
+    new Set<string>(data.map((d) => String(d[labelKey] ?? ""))),
+  ).filter((s) => s.length > 0);
+  const ticks =
+    uniqueLabels.length > 30
       ? uniqueLabels.filter((_, i) => i % 4 === 0)
       : uniqueLabels;
 
@@ -85,36 +90,35 @@ function getLongestTickLabel(data, labelKey) {
 function detectLastStringKey(data) {
   const keys = Object.keys(data[0]);
 
-  const stringKeys = keys.filter(key =>
-    typeof data[0][key] === "string" &&
-    isNaN(Number(data[0][key]))
+  const stringKeys = keys.filter(
+    (key) => typeof data[0][key] === "string" && isNaN(Number(data[0][key])),
   );
 
   return stringKeys[stringKeys.length - 1];
 }
 
 export function setupXScales(header: any, dataset: any): any {
-
   const labelKey = detectLastStringKey(dataset);
 
   const longest = getLongestTickLabel(dataset, labelKey);
-  
-  const longestTicklabel = longest.length > 10 ? longest.substr(0, 10) + '.......' : longest;
+
+  const longestTicklabel =
+    longest.length > 10 ? longest.substr(0, 10) + "......." : longest;
 
   const labelWidth = getTextWidthSVG(longestTicklabel, "0.75rem Verdana");
 
   const margin = labelWidth * 0.6 + 16;
   const n = header.length;
-  const pad = (n <= 4) ? 0.1 : 0.2;
+  const pad = n <= 4 ? 0.1 : 0.2;
   return scalePoint()
-    .domain(header.map((x: { name: any; }) => x.name))
+    .domain(header.map((x: { name: any }) => x.name))
     .range([width - margin, margin])
     .padding(pad)
     .align(0.5);
 }
 
 function isLinearScale(scale: any): scale is ScaleLinear<number, number> {
-  return typeof (scale as any).ticks === 'function';
+  return typeof (scale as any).ticks === "function";
 }
 
 export function setupYAxis(yScales: any, dataset: any, hiddenDims: any): any {
@@ -123,36 +127,42 @@ export function setupYAxis(yScales: any, dataset: any, hiddenDims: any): any {
 
   Object.entries(yScales).forEach(([key, scale]) => {
     if (hiddenDims.includes(key)) return;
-      if (!isLinearScale(scale)) {
-        const rawLabels = dataset.map((d: { [x: string]: any; }) => d[key]);
-        const shortenedLabels = rawLabels.map((val: string) =>
-          typeof val === 'string' && val.length > 10 ? val.substr(0, 10) + 
-          '...' : val
-        );
-        const uniqueLabels = Array.from(new Set(shortenedLabels));
-        const ticks = uniqueLabels.length > limit
+    if (!isLinearScale(scale)) {
+      const rawLabels = dataset.map((d: { [x: string]: any }) => d[key]);
+      const shortenedLabels = rawLabels.map((val: string) =>
+        typeof val === "string" && val.length > 10
+          ? val.substr(0, 10) + "..."
+          : val,
+      );
+      const uniqueLabels = Array.from(new Set(shortenedLabels));
+      const ticks =
+        uniqueLabels.length > limit
           ? uniqueLabels.filter((_, i) => i % 6 === 0)
           : uniqueLabels;
 
-        yAxis[key] = axisLeft(scale).tickValues(ticks).tickFormat((d: any) => d);
-      } else if (isLinearScale(scale)) {
-        const ticks: number[] = scale.ticks(5).concat(scale.domain());
-        const sorted: number[] = Array.from(new Set(ticks)).sort((a, b) => a - b);
+      yAxis[key] = axisLeft(scale)
+        .tickValues(ticks)
+        .tickFormat((d: any) => d);
+    } else if (isLinearScale(scale)) {
+      const ticks: number[] = scale.ticks(5).concat(scale.domain());
+      const sorted: number[] = Array.from(new Set(ticks)).sort((a, b) => a - b);
 
-        if (sorted.length >= 2) {
-          const diffStart = sorted[1] - sorted[0];
-          if (diffStart < 5) {
-            sorted.splice(1, 1);
-          }
-          const len = sorted.length;
-          const last = sorted[len - 1];
-          const secondLast = sorted[len - 2];
-          const diffEnd = last - secondLast;
+      if (sorted.length >= 2) {
+        const diffStart = sorted[1] - sorted[0];
+        if (diffStart < 5) {
+          sorted.splice(1, 1);
+        }
+        const len = sorted.length;
+        const last = sorted[len - 1];
+        const secondLast = sorted[len - 2];
+        const diffEnd = last - secondLast;
         if (diffEnd < 5) {
           sorted.splice(len - 2, 1);
         }
       }
-      yAxis[key] = axisLeft(scale).tickValues(sorted).tickFormat((d: any) => d);
+      yAxis[key] = axisLeft(scale)
+        .tickValues(sorted)
+        .tickFormat((d: any) => d);
     }
   });
   return yAxis;
@@ -160,18 +170,20 @@ export function setupYAxis(yScales: any, dataset: any, hiddenDims: any): any {
 
 export function linePath(d: any, newFeatures: any): any {
   const lineGenerator = line();
-  const tempdata = Object.entries(d).filter(x => x[0]);
+  const tempdata = Object.entries(d).filter((x) => x[0]);
   const points = [];
 
   newFeatures.forEach((newFeature: string) => {
-    const valueEntry = tempdata.find(x => x[0] === newFeature);
+    const valueEntry = tempdata.find((x) => x[0] === newFeature);
     if (valueEntry) {
       const name = newFeature;
       const value: string = String(valueEntry[1]);
-      const x = parcoords.dragging[name] !== undefined
-        ? parcoords.dragging[name]
-        : parcoords.xScales(name);
-      const cleanedValue = value.length > 10 ? value.substr(0, 10) + '...' : value;
+      const x =
+        parcoords.dragging[name] !== undefined
+          ? parcoords.dragging[name]
+          : parcoords.xScales(name);
+      const cleanedValue =
+        value.length > 10 ? value.substr(0, 10) + "..." : value;
       const y = parcoords.yScales[name](cleanedValue);
       points.push([x, y]);
     }
@@ -180,10 +192,10 @@ export function linePath(d: any, newFeatures: any): any {
 }
 
 export function isInverted(dimension: string): boolean {
-  const invertId = '#dimension_invert_' + utils.cleanString(dimension);
+  const invertId = "#dimension_invert_" + utils.cleanString(dimension);
   const element = select(invertId);
   const arrowStatus = element.text();
-  return arrowStatus == 'down' ? true : false;
+  return arrowStatus == "down" ? true : false;
 }
 
 function getAllVisibleDimensionNames(): string[] {
@@ -204,83 +216,102 @@ function recordIdOf(rec: any) {
 
 export function createToolTipForValues(records: any, isSelect: boolean) {
   const dimensions = getAllVisibleDimensionNames();
-  const svg = select('#pc_svg').node() as SVGSVGElement;
-  const plotG = (document.querySelector<SVGGElement>('#pc_svg g.plot') ?? svg);
+  const svg = select("#pc_svg").node() as SVGSVGElement;
+  const plotG = document.querySelector<SVGGElement>("#pc_svg g.plot") ?? svg;
   const ctm = plotG.getScreenCTM();
   if (!ctm) return;
 
   const recordId = recordIdOf(records);
 
-  const wrapper = document.querySelector<HTMLDivElement>('#parallelcoords .chartWrapper');
+  const wrapper = document.querySelector<HTMLDivElement>(
+    "#parallelcoords .chartWrapper",
+  );
   if (!wrapper) return;
 
   const layer = select(wrapper)
-    .selectAll<HTMLDivElement, string>(`div.tip-layer[data-record="${recordId}"]`)
+    .selectAll<
+      HTMLDivElement,
+      string
+    >(`div.tip-layer[data-record="${recordId}"]`)
     .data([recordId])
-    .join('div')
-    .attr('class', 'tip-layer')
-    .attr('data-record', recordId);
+    .join("div")
+    .attr("class", "tip-layer")
+    .attr("data-record", recordId);
 
   const wrapperRect = wrapper.getBoundingClientRect();
 
-  const data: ToolTipItem[] = dimensions
-    .map(dim => {
-      const yScale = parcoords.yScales[dim];
-      const x = parcoords.xScales(dim);
-      const record = records[dim];
-      const cleanRecord = record.length > 10 ? record.substr(0, 10) + '...' :
-        record;
-      const y = yScale(cleanRecord);
+  const data: ToolTipItem[] = dimensions.map((dim) => {
+    const yScale = parcoords.yScales[dim];
+    const x = parcoords.xScales(dim);
+    const record = records[dim];
+    const cleanRecord =
+      record.length > 10 ? record.substr(0, 10) + "..." : record;
+    const y = yScale(cleanRecord);
 
-      const pt = svg.createSVGPoint();
-      pt.x = x;
-      pt.y = y;
-      const sp = pt.matrixTransform(ctm);
+    const pt = svg.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    const sp = pt.matrixTransform(ctm);
 
-      return {
-        dim,
-        pageX: sp.x - wrapperRect.left + wrapper.scrollLeft,
-        pageY: sp.y - wrapperRect.top  + wrapper.scrollTop,
-        text: String(records[dim]),
-      };
-    });
+    return {
+      dim,
+      pageX: sp.x - wrapperRect.left + wrapper.scrollLeft,
+      pageY: sp.y - wrapperRect.top + wrapper.scrollTop,
+      text: String(records[dim]),
+    };
+  });
 
-    if (isSelect) {
-      const tips = layer.selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record-select')
-        .data(data, (d: any) => d.dim);
+  if (isSelect) {
+    const tips = layer
+      .selectAll<HTMLDivElement, ToolTipItem>("div.tooltip-record-select")
+      .data(data, (d: any) => d.dim);
 
-      tips.join(
-        enter => enter.append('div')
-          .attr('id', `tooltip-record-select-${utils.cleanString(records[hoverlabel])}`)
-          .attr('class', 'tooltip-record-select')
-          .style('left', d => `${d.pageX/16}rem`)
-          .style('top',  d => `${d.pageY/16}rem`)
-          .text(d => d.text), update => update
-          .style('left', d => `${d.pageX/16}rem`)
-          .style('top',  d => `${d.pageY/16}rem`)
-          .text(d => d.text),
-        exit => exit.remove());
-    }
-    else {
-      const tips = layer.selectAll<HTMLDivElement, ToolTipItem>('div.tooltip-record')
-        .data(data, (d: any) => dimensions);
+    tips.join(
+      (enter) =>
+        enter
+          .append("div")
+          .attr(
+            "id",
+            `tooltip-record-select-${utils.cleanString(records[hoverlabel])}`,
+          )
+          .attr("class", "tooltip-record-select")
+          .style("left", (d) => `${d.pageX / 16}rem`)
+          .style("top", (d) => `${d.pageY / 16}rem`)
+          .text((d) => d.text),
+      (update) =>
+        update
+          .style("left", (d) => `${d.pageX / 16}rem`)
+          .style("top", (d) => `${d.pageY / 16}rem`)
+          .text((d) => d.text),
+      (exit) => exit.remove(),
+    );
+  } else {
+    const tips = layer
+      .selectAll<HTMLDivElement, ToolTipItem>("div.tooltip-record")
+      .data(data, (d: any) => dimensions);
 
-      tips.join(
-        enter => enter.append('div')
-          .attr('class', 'tooltip-record')
-          .style('left', d => `${d.pageX/16}rem`)
-          .style('top',  d => `${d.pageY/16}rem`)
-          .text(d => d.text), update => update
-          .style('left', d => `${d.pageX/16}rem`)
-          .style('top',  d => `${d.pageY/16}rem`)
-          .text(d => d.text),
-        exit => exit.remove()
-      );
-    }
+    tips.join(
+      (enter) =>
+        enter
+          .append("div")
+          .attr("class", "tooltip-record")
+          .style("left", (d) => `${d.pageX / 16}rem`)
+          .style("top", (d) => `${d.pageY / 16}rem`)
+          .text((d) => d.text),
+      (update) =>
+        update
+          .style("left", (d) => `${d.pageX / 16}rem`)
+          .style("top", (d) => `${d.pageY / 16}rem`)
+          .text((d) => d.text),
+      (exit) => exit.remove(),
+    );
+  }
 }
 
 export function getAllPointerEventsData(event: any): any {
-  const selection = selectAll(document.elementsFromPoint(event.clientX, event.clientY)).filter('path');
+  const selection = selectAll(
+    document.elementsFromPoint(event.clientX, event.clientY),
+  ).filter("path");
   if (selection == null) return;
   const object = selection._groups;
   const data = [];
@@ -296,15 +327,16 @@ export function getAllPointerEventsData(event: any): any {
 
 export function createTooltipForLabel(tooltipText, tooltipLabel, event) {
   if (!tooltipText || tooltipText.length === 0) return;
-  const x = event.clientX/16;
-  const y = event.clientY/16;
+  const x = event.clientX / 16;
+  const y = event.clientY / 16;
   let tempText = tooltipText.toString();
-  tempText = tempText.split(',').join('\r\n');
-  tooltipLabel.text(tempText)
-    .style('visibility', 'visible')
-    .style('position', 'fixed')
-    .style('top', `${y}rem`)
-    .style('left', `${x}rem`);
+  tempText = tempText.split(",").join("\r\n");
+  tooltipLabel
+    .text(tempText)
+    .style("visibility", "visible")
+    .style("position", "fixed")
+    .style("top", `${y}rem`)
+    .style("left", `${x}rem`);
   return tooltipLabel;
 }
 
@@ -318,9 +350,9 @@ export function position(dimension: any, dragging: any, xScales: any): any {
 }
 
 export function cleanTooltip(): void {
-  selectAll('.tooltip-record').remove();
+  selectAll(".tooltip-record").remove();
 }
 
 export function cleanTooltipSelect(): void {
-  selectAll('.tooltip-record-select').remove();
+  selectAll(".tooltip-record-select").remove();
 }

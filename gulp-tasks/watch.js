@@ -1,13 +1,13 @@
-const {src, dest, watch, series } = require('gulp');
+const { src, dest, watch, series } = require("gulp");
 const bs = require("browser-sync").create();
 const { bundle } = require("./bundle");
 
 function copyExampleFolder() {
-    return src('./src/example/**/*').pipe(dest('./dist/example'));
+  return src("./src/example/**/*").pipe(dest("./dist/example"));
 }
 
 function copyLibFileToExample() {
-    return src('./dist/library/esm/spcd3.js').pipe(dest('./dist/example/lib/'));
+  return src("./dist/library/esm/spcd3.js").pipe(dest("./dist/example/lib/"));
 }
 
 function reload(done) {
@@ -26,4 +26,4 @@ function watcher() {
   watch("src/example/**/*", series(copyExampleFolder, reload));
 }
 
-module.exports = {watcher}
+module.exports = { watcher };

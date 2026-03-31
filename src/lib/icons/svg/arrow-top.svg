@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 6 5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 5">
   <path d="M 0 5 L 3 0 L 6 5 z"/>
 </svg>
