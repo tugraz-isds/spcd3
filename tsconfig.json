@@ -5,11 +5,17 @@
     "target": "es2022",
     "sourceMap": true,
     "outDir": "dist",
+    "rootDir": "src",
     "pretty": true,
     "downlevelIteration" : true,
     "declaration": true,
     "declarationDir": "types",
-    "moduleResolution":"node"
+    "moduleResolution":"node",
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "pc-lib": ["src/lib/index.ts"]
+    }
   },
   "include": [
     "src/**/*"

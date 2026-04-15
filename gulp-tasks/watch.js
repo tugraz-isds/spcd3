@@ -1,6 +1,13 @@
 const { src, dest, watch, series } = require("gulp");
 const bs = require("browser-sync").create();
 const { bundle } = require("./bundle");
+const ts = require("gulp-typescript");
+
+const tsProject = ts.createProject("tsconfig.json");
+
+function buildExampleTS() {
+  return tsProject.src().pipe(tsProject()).pipe(dest("./dist"));
+}
 
 function copyExampleFolder() {
   return src("./src/example/**/*").pipe(dest("./dist/example"));
@@ -23,7 +30,7 @@ function watcher() {
   });
 
   watch("src/lib/**/*.{ts,js}", series(bundle, copyLibFileToExample, reload));
-  watch("src/example/**/*", series(copyExampleFolder, reload));
+  watch("src/example/**/*", series(buildExampleTS, copyExampleFolder, reload));
 }
 
 module.exports = { watcher };

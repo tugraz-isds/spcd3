@@ -28,7 +28,7 @@ import {
   isDimensionCategorical,
   setSelectableWidth,
   getSelectableWith,
-} from "./lib/spcd3.js";
+} from "pc-lib";
 
 let data;
 let newData;
@@ -39,7 +39,7 @@ let rangeDimensionData;
 let studentData =
   "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
 
-window.addEventListener("click", (event) => {
+window.addEventListener("click", (event: any) => {
   if (!event.target.id.includes("show")) {
     closeElements("options");
   }
@@ -72,7 +72,7 @@ document.addEventListener(
     data = studentData;
     newData = loadCSV(data);
     showButtons();
-    drawChart(newData, "0.4rem");
+    drawChart(newData);
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -92,7 +92,7 @@ inputFile.addEventListener("change", handleFileSelect, false);
 inputFile.addEventListener("cancel", () => {
   document.getElementById("input").textContent = "Upload File...";
 });
-inputFile.addEventListener("click", (event) => {
+inputFile.addEventListener("click", (event: any) => {
   event.target.value = null;
 });
 
@@ -136,7 +136,7 @@ function handleFileSelect(event) {
       clearPlot();
       data = e.target.result;
       newData = loadCSV(data);
-      drawChart(newData, "0.4rem");
+      drawChart(newData);
 
       showButtons();
 
@@ -186,9 +186,15 @@ function showOptions(id, buttonId) {
   }
 
   const dimensions = getAllDimensionNames();
-  dimensions.forEach(function (dimension) {
-    if (getHiddenStatus(dimension) == "hidden") {
-      document.getElementById("show_" + dimension).checked = false;
+
+  dimensions.forEach((dimension: string) => {
+    if (getHiddenStatus(dimension) === "hidden") {
+      const el = document.getElementById(
+        `show_${dimension}`,
+      ) as HTMLInputElement | null;
+      if (el) {
+        el.checked = false;
+      }
     }
   });
 }
@@ -210,13 +216,14 @@ function showOptionsForRecords(id, buttonId) {
     : (button.style.color = "black");
 
   let records = getAllRecords();
-  records.forEach(function (record) {
+  records.forEach(function (record: string) {
     let selected = isSelected(record);
-    let checkbox = document.getElementById("sel_" + record);
-    if (selected) {
-      checkbox.checked = true;
-    } else {
-      checkbox.checked = false;
+    const checkbox = document.getElementById(
+      `sel_${record}`,
+    ) as HTMLInputElement | null;
+
+    if (checkbox) {
+      checkbox.checked = selected;
     }
   });
 }
@@ -238,9 +245,9 @@ function generateDropdownForShow() {
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "options";
-  dimensionContainer.name = "options";
   dimensionContainer.className = "ddList";
   dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "options");
 
   let dimensions = getAllDimensionNames();
   let copyDimensions = dimensions.slice();
@@ -250,7 +257,7 @@ function generateDropdownForShow() {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("change", (event) => {
+  dimensionContainer.addEventListener("change", (event: any) => {
     updateDimensions(event.target.value);
   });
 
@@ -291,9 +298,9 @@ function generateDropdownForInvert() {
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "invertOptions";
-  dimensionContainer.name = "invertOptions";
   dimensionContainer.className = "ddList";
   dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "invertOptions");
 
   const dimensions = getAllVisibleDimensionNames();
   if (dimensions.length > 10) {
@@ -376,9 +383,9 @@ function generateDropdownForMove() {
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "moveOptions";
-  dimensionContainer.name = "moveOptions";
   dimensionContainer.className = "ddList";
   dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "moveOptions");
 
   let selectButton = document.createElement("button");
   selectButton.id = "moveButton";
@@ -474,24 +481,35 @@ function disableLeftAndRightButton() {
   for (let i = 0; i < dimensions.length; i++) {
     const position = getDimensionPosition(dimensions[i]);
     const numberOfDimensions = getNumberOfDimensions();
-    if (position == numberOfDimensions - 1 || position == -1) {
-      document.getElementById("moveleft_" + dimensions[i]).disabled = true;
-      document.getElementById("moveleft_" + dimensions[i]).innerHTML =
-        '<img src="./svg/arrow-left-disabled.svg" id="moveArrow"/>';
-    } else {
-      document.getElementById("moveleft_" + dimensions[i]).disabled = false;
-      document.getElementById("moveleft_" + dimensions[i]).innerHTML =
-        '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
+    const moveLeft = document.getElementById(
+      `moveleft_${dimensions[i]}`,
+    ) as HTMLButtonElement | null;
+
+    if (moveLeft) {
+      if (position === numberOfDimensions - 1 || position === -1) {
+        moveLeft.disabled = true;
+        moveLeft.innerHTML =
+          '<img src="./svg/arrow-left-disabled.svg" id="moveArrow"/>';
+      } else {
+        moveLeft.disabled = false;
+        moveLeft.innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
+      }
     }
 
-    if (position == 0 || position == -1) {
-      document.getElementById("moveright_" + dimensions[i]).disabled = true;
-      document.getElementById("moveright_" + dimensions[i]).innerHTML =
-        '<img src="./svg/arrow-right-disabled.svg" id="moveArrow"/>';
-    } else {
-      document.getElementById("moveright_" + dimensions[i]).disabled = false;
-      document.getElementById("moveright_" + dimensions[i]).innerHTML =
-        '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
+    const moveRight = document.getElementById(
+      `moveright_${dimensions[i]}`,
+    ) as HTMLButtonElement | null;
+
+    if (moveRight) {
+      if (position === 0 || position === -1) {
+        moveRight.disabled = true;
+        moveRight.innerHTML =
+          '<img src="./svg/arrow-right-disabled.svg" id="moveArrow"/>';
+      } else {
+        moveRight.disabled = false;
+        moveRight.innerHTML =
+          '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
+      }
     }
   }
 }
@@ -539,15 +557,15 @@ function generateDropdownForFilter() {
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "filterOptions";
-  dimensionContainer.name = "filterOptions";
   dimensionContainer.className = "ddList";
   dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "filterOptions");
 
   if (dimensions.length > 15) {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("click", (event) => {
+  dimensionContainer.addEventListener("click", (event: any) => {
     if (event.target.value != undefined) {
       filterDimensionData = event.target.value;
       generateModuleForSetFilter();
@@ -619,8 +637,8 @@ function generateModuleForSetFilter() {
 
   const inputMin = document.createElement("input");
   inputMin.id = "filterMinValue";
-  inputMax.type = "number";
-  inputMax.lang = "en";
+  inputMin.type = "number";
+  inputMin.lang = "en";
   inputMin.className = "modal-input";
   inputMin.value = Number(currentFilters[0]).toFixed(0);
 
@@ -704,8 +722,8 @@ function generateModuleForSetFilter() {
     const limit = getDimensionRange(filterDimensionData);
     const inversionstatus = getInversionStatus(filterDimensionData);
 
-    const topLimit = limit[1];
-    const bottomLimit = limit[0];
+    const topLimit = Number(limit[1]);
+    const bottomLimit = Number(limit[0]);
 
     if (inversionstatus === "descending") {
       if (min < topLimit) {
@@ -786,15 +804,15 @@ function generateDropdownForRange() {
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "rangeOptions";
-  dimensionContainer.name = "rangeOptions";
   dimensionContainer.className = "ddList";
   dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "rangeOptions");
 
   if (dimensions.length > 15) {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("click", (event) => {
+  dimensionContainer.addEventListener("click", (event: any) => {
     if (event.target.value != undefined) {
       rangeDimensionData = event.target.value;
       generateModuleForRangeSettings();
@@ -1022,7 +1040,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
   let reloadedData = loadCSV(data);
-  drawChart(reloadedData, true);
+  drawChart(reloadedData);
 }
 
 function generateModalForSetSensitivity() {
@@ -1090,8 +1108,8 @@ function generateModalForSetSensitivity() {
   slider.value = String(current.replace("rem", ""));
   valueDisplay.textContent = current;
 
-  slider.addEventListener("input", (e) => {
-    const v = Math.round(+e.target.value * 100) / 100;
+  slider.addEventListener("input", (event: any) => {
+    const v = Math.round(+event.target.value * 100) / 100;
     valueDisplay.textContent = v + "rem";
   });
 
@@ -1146,15 +1164,15 @@ function generateDropdownForSelectRecords() {
 
   let recordsContainer = document.createElement("div");
   recordsContainer.id = "options_r";
-  recordsContainer.name = "options_r";
   recordsContainer.className = "ddList";
   recordsContainer.style.display = "none";
+  recordsContainer.setAttribute("name", "options_r");
 
   if (records.length > 10) {
     recordsContainer.style.height = "12.5rem";
   }
 
-  recordsContainer.addEventListener("change", (event) => {
+  recordsContainer.addEventListener("change", (event: any) => {
     var line = document.getElementsByClassName(event.target.value);
     const element = line[0];
     const computedStyle = window.getComputedStyle(element);

@@ -5,6 +5,13 @@ const { watcher } = require("./gulp-tasks/watch");
 const { tauriBuild } = require("./gulp-tasks/tauri");
 const path = require("path");
 const fs = require("fs");
+const ts = require("gulp-typescript");
+
+const tsProject = ts.createProject("tsconfig.json");
+
+function buildExampleTS() {
+  return tsProject.src().pipe(tsProject()).pipe(dest("./dist"));
+}
 
 function cleanDistFolder() {
   return del("dist", { force: true });
@@ -48,6 +55,7 @@ exports.cleanAll = parallel(
 
 exports.build = series(
   cleanDistFolder,
+  buildExampleTS,
   copyExampleFolder,
   bundle,
   copyLibFileToExample,
