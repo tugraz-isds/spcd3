@@ -438,7 +438,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 12 6, auto`,
       );
   } else if (
     api.getDimensionPosition(d.name) ==
@@ -451,7 +451,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
         `url('data:image/svg+xml,${utils.setSize(
           encodeURIComponent(icon.getArrowLeft()),
           12,
-        )}') 8 8, auto`,
+        )}') 0 6, auto`,
       );
   } else {
     featureAxis
@@ -461,7 +461,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
         `url('data:image/svg+xml,${utils.setSize(
           encodeURIComponent(icon.getArrowLeftAndRight()),
           12,
-        )}') 8 8, auto`,
+        )}') 6 6, auto`,
       );
   }
 }

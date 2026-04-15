@@ -562,7 +562,7 @@ function setInvertIcon(featureAxis): void {
         .attr("id", "invert_hitbox_" + processed)
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`,
+          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 7 12, auto`,
         );
     });
 
@@ -580,7 +580,7 @@ function setInvertIcon(featureAxis): void {
         .text("up")
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 8 8, auto`,
+          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 7 12, auto`,
         );
     });
 

@@ -98,7 +98,7 @@ export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 6 0, auto`,
       );
 
     const hit = g
@@ -111,7 +111,7 @@ export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 6 0, auto`,
       );
 
     const makeDrag = () =>
@@ -175,7 +175,7 @@ export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 6 12, auto`,
       );
 
     const hit = g
@@ -188,7 +188,7 @@ export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 6 12, auto`,
       );
 
     const makeDrag = () =>
@@ -280,7 +280,7 @@ export function brushDown(
   } else {
     select("#rect_" + cleanDimensionName).style(
       "cursor",
-      `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`,
+      `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 6 6, auto`,
     );
   }
 
@@ -355,7 +355,7 @@ export function brushUp(
       .attr("href", "#brush_image_top_active")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 8 8, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 6 6, auto`,
       )
       .style("fill", "rgb(255, 255, 0)")
       .style("opacity", "0.7");
