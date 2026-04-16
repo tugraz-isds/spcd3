@@ -64,24 +64,24 @@ export function drawChart(content: []): void {
 
   setUpParcoordData(content, columns);
 
-  let chart = select("#parallelcoords");
+  let chart = select("#spcd3-parallelcoords");
 
   if (chart === null) {
     chart = select(document.body)
       .append("div")
-      .attr("id", "parallelcoords");
+      .attr("id", "spcd3-parallelcoords");
   }
 
-  const chartWrapper = chart.append("div").attr("class", "chartWrapper");
+  const chartWrapper = chart.append("div").attr("class", "spcd3-chartWrapper");
 
-  chartWrapper.append("div").attr("id", "toolbarRow");
+  chartWrapper.append("div").attr("id", "spcd3-toolbarRow");
 
   toolbar.createToolbar(parcoords.newDataset);
 
   setSvg(
     chartWrapper
       .append("svg")
-      .attr("id", "pc_svg")
+      .attr("id", "spcd3-pc_svg")
       .attr("viewBox", [0, 0, width, 360]),
   );
 
@@ -145,17 +145,17 @@ export function refresh(): void {
 }
 
 export function deleteChart(): void {
-  select("#pc_svg").remove();
+  select("#spcd3-pc_svg").remove();
   select("#contextmenu").remove();
   select("#contextmenuRecords").remove();
   select("#modalFilter").remove();
   select("#modalRange").remove();
   select("#refreshButton").remove();
   select("#showData").remove();
-  select("#toolbarRow").remove();
-  select(".chartWrapper").remove();
-  selectAll(".tip-layer").remove();
-  selectAll(".tooltip-values").remove();
+  select("#spcd3-toolbarRow").remove();
+  select(".spcd3-chartWrapper").remove();
+  selectAll(".spcd3-tip-layer").remove();
+  selectAll(".spcd3-tooltip-values").remove();
   helper.cleanTooltip();
   helper.cleanTooltipSelect();
   parcoords.currentPosOfDims.length = 0;
@@ -302,7 +302,7 @@ function handlePointerEnter(event: any, d: any) {
   doNotHighlight();
 
   const data = helper.getAllPointerEventsData(event);
-  const tooltipLabel = selectAll(".tooltip-label");
+  const tooltipLabel = selectAll(".spcd3-tooltip-label");
 
   highlight(data);
   helper.createTooltipForLabel(data, tooltipLabel, event);
@@ -323,7 +323,7 @@ function handlePointerEnter(event: any, d: any) {
 function handlePointerLeaveOrOut() {
   doNotHighlight();
   clearExistingDelay();
-  selectAll(".tooltip-label").style("visibility", "hidden");
+  selectAll(".spcd3-tooltip-label").style("visibility", "hidden");
   helper.cleanTooltip();
 }
 
@@ -465,12 +465,12 @@ function setFeatureAxis(svg: any, yAxis: any, parcoords: any, width: any): void 
   featureAxis.append("g").each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     select(this)
-      .attr("class", "dimension-axis")
+      .attr("class", "spcd3-dimensions-axis")
       .attr("id", "dimension_axis_" + processedDimensionName)
       .call(yAxis[d.name]);
   });
 
-  select("body").append("div").attr("class", "tooltip-label");
+  select("body").append("div").attr("class", "spcd3-tooltip-label");
 
   const brushOverlay = svg
     .append("rect")
@@ -481,17 +481,17 @@ function setFeatureAxis(svg: any, yAxis: any, parcoords: any, width: any): void 
     .style("fill", "transparent")
     .style("pointer-events", "none");
 
-  let tooltipValues = select("#parallelcoords")
+  let tooltipValues = select("#spcd3-parallelcoords")
     .append("div")
-    .attr("class", "tooltip-values");
+    .attr("class", "spcd3-tooltip-values");
 
-  let tooltipValuesTop = select("#parallelcoords")
+  let tooltipValuesTop = select("#spcd3-parallelcoords")
     .append("div")
-    .attr("class", "tooltip-values");
+    .attr("class", "spcd3-tooltip-values");
 
-  let tooltipValuesDown = select("#parallelcoords")
+  let tooltipValuesDown = select("#spcd3-parallelcoords")
     .append("div")
-    .attr("class", "tooltip-values");
+    .attr("class", "spcd3-tooltip-values");
 
   brush.setBrushDown(featureAxis, brushOverlay, tooltipValues);
 
@@ -563,7 +563,7 @@ function setInvertIcon(featureAxis: any): void {
         .attr("id", "invert_hitbox_" + processed)
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 7 12, auto`,
+          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 6 6, auto`,
         );
     });
 
@@ -581,7 +581,7 @@ function setInvertIcon(featureAxis: any): void {
         .text("up")
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 7 12, auto`,
+          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 6 6, auto`,
         );
     });
 
@@ -639,7 +639,7 @@ function setMarker(featureAxis: any): void {
       .append("g")
       .append("rect")
       .attr("id", "marker_" + processedDimensionName)
-      .attr("class", "marker")
+      .attr("class", "spcd3-marker")
       .attr("width", 44)
       .attr("height", 330)
       .attr("x", -22)

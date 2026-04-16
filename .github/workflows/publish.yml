@@ -71,7 +71,6 @@ jobs:
           name: ${{ matrix.id }}
           path: |
             src-tauri/target/**/release/bundle/dmg/*.dmg
-            src-tauri/target/**/release/bundle/macos/*.app
           if-no-files-found: warn
 
       - name: Upload Linux bundles
@@ -113,6 +112,27 @@ jobs:
       - name: Show collected files
         run: find release-assets -type f | sort
 
+      - name: Sort files into OS folders
+        run: |
+          mkdir -p \
+            release-assets/by-os/macos \
+            release-assets/by-os/linux \
+            release-assets/by-os/windows
+
+          find release-assets/macos-aarch64 -type f \( -name '*.dmg' \) -exec cp {} release-assets/by-os/macos/ \;
+          find release-assets/linux -type f \( -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -exec cp {} release-assets/by-os/linux/ \;
+          find release-assets/windows -type f \( -name '*.msi' -o -name '*.exe' \) -exec cp {} release-assets/by-os/windows/ \;
+
+      - name: Show sorted files
+        run: find release-assets/by-os -type f | sort
+
+      - name: Create per-OS archives
+        run: |
+          cd release-assets/by-os
+          zip -r ../spcd3-macos.zip macos
+          zip -r ../spcd3-linux.zip linux
+          zip -r ../spcd3-windows.zip windows
+
       - name: Create or update draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -139,4 +159,4 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="app-v$VERSION"
-          find release-assets -type f -print0 | xargs -0 gh release upload "$TAG" --clobber
+          find release-assets -maxdepth 1 -type f -name 'spcd3-*.zip' -print0 | xargs -0 gh release upload "$TAG" --clobber

@@ -26,7 +26,7 @@ export function setRectToDrag(
     const processedDimensionName = utils.cleanString(d.name);
     select(this)
       .append("g")
-      .attr("class", "rect")
+      .attr("class", "spcd3-rect")
       .append("rect")
       .attr("id", "rect_" + processedDimensionName)
       .attr("width", 12)
@@ -81,7 +81,11 @@ export function setRectToDrag(
   });
 }
 
-export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: any): void {
+export function setBrushUp(
+  featureAxis: any,
+  brushOverlay: any,
+  tooltipValues: any,
+): void {
   featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const g = select(this)
@@ -103,7 +107,7 @@ export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: a
 
     const hit = g
       .append("rect")
-      .attr("class", "handle-hitbox")
+      .attr("class", "spcd3-handle-hitbox")
       .attr("id", "triangle_up_hit" + processedDimensionName)
       .attr("x", -15)
       .attr("y", BOTTOM_AXIS_VALUE)
@@ -122,7 +126,7 @@ export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: a
         .on("start", () => {
           brushOverlay.raise().style("pointer-events", "all");
           g.select("#triangle_up_" + processedDimensionName).raise();
-          g.selectAll(".handle-hitbox").raise();
+          g.selectAll(".spcd3-handle-hitbox").raise();
         })
         .on("drag", (event: any, dd: any) => {
           if (parcoords.newFeatures.length > 25) {
@@ -143,12 +147,12 @@ export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: a
           if (yNow != null) {
             hit.attr("y", +yNow);
           }
-          g.selectAll(".handle-hitbox").raise();
+          g.selectAll(".spcd3-handle-hitbox").raise();
         })
         .on("end", () => {
           cleanup(brushOverlay, tooltipValues);
           requestAnimationFrame(() => {
-            const newHit = g.select(".handle-hitbox");
+            const newHit = g.select(".spcd3-handle-hitbox");
             if (!newHit.empty()) {
               newHit.call(makeDrag());
             }
@@ -158,7 +162,11 @@ export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: a
   });
 }
 
-export function setBrushDown(featureAxis: any, brushOverlay: any, tooltipValues: any): void {
+export function setBrushDown(
+  featureAxis: any,
+  brushOverlay: any,
+  tooltipValues: any,
+): void {
   featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const g = select(this)
@@ -180,7 +188,7 @@ export function setBrushDown(featureAxis: any, brushOverlay: any, tooltipValues:
 
     const hit = g
       .append("rect")
-      .attr("class", "handle-hitbox")
+      .attr("class", "spcd3-handle-hitbox")
       .attr("id", "triangle_down_hit" + processedDimensionName)
       .attr("x", -15)
       .attr("y", TOP_AXIS_LOW_VALUE)
@@ -199,7 +207,7 @@ export function setBrushDown(featureAxis: any, brushOverlay: any, tooltipValues:
         .on("start", () => {
           brushOverlay.raise().style("pointer-events", "all");
           g.select("#triangle_down_" + processedDimensionName).raise();
-          g.selectAll(".handle-hitbox").raise();
+          g.selectAll(".spcd3-handle-hitbox").raise();
         })
         .on("drag", (event: any, dd: any) => {
           if (parcoords.newFeatures.length > 25) {
@@ -220,12 +228,12 @@ export function setBrushDown(featureAxis: any, brushOverlay: any, tooltipValues:
           if (yNow != null) {
             hit.attr("y", +yNow);
           }
-          g.selectAll(".handle-hitbox").raise();
+          g.selectAll(".spcd3-handle-hitbox").raise();
         })
         .on("end", () => {
           cleanup(brushOverlay, tooltipValues);
           requestAnimationFrame(() => {
-            const newHit = g.select(".handle-hitbox");
+            const newHit = g.select(".spcd3-handle-hitbox");
             if (!newHit.empty()) {
               newHit.call(makeDrag());
             }
@@ -280,7 +288,7 @@ export function brushDown(
   } else {
     select("#rect_" + cleanDimensionName).style(
       "cursor",
-      `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 6 6, auto`,
+      `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 10 10, auto`,
     );
   }
 
@@ -355,7 +363,7 @@ export function brushUp(
       .attr("href", "#brush_image_top_active")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 6 6, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 10 10, auto`,
       )
       .style("fill", "rgb(255, 255, 0)")
       .style("opacity", "0.7");

@@ -44,9 +44,7 @@ export function setupYScales(
     if (!numericValues) {
       values.forEach(function (element: DataValue) {
         const label = String(element ?? "");
-        labels.push(
-          label.length > 10 ? label.substr(0, 10) + "..." : label,
-        );
+        labels.push(label.length > 10 ? label.substr(0, 10) + "..." : label);
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
@@ -239,7 +237,9 @@ type ToolTipItem = {
   text: string;
 };
 
-function recordIdOf(rec: DataRow & { id?: string; _id?: string; key?: string }) {
+function recordIdOf(
+  rec: DataRow & { id?: string; _id?: string; key?: string },
+) {
   return rec.id ?? rec._id ?? rec.key;
 }
 
@@ -248,16 +248,17 @@ export function createToolTipForValues(
   isSelect: boolean,
 ): void {
   const dimensions = getAllVisibleDimensionNames();
-  const svg = select("#pc_svg").node() as SVGSVGElement;
+  const svg = select("#spcd3-pc_svg").node() as SVGSVGElement;
   if (!svg) return;
-  const plotG = document.querySelector<SVGGElement>("#pc_svg g.plot") ?? svg;
+  const plotG =
+    document.querySelector<SVGGElement>("#spcd3-pc_svg g.plot") ?? svg;
   const ctm = plotG.getScreenCTM();
   if (!ctm) return;
 
   const recordId = recordIdOf(records);
 
   const wrapper = document.querySelector<HTMLDivElement>(
-    "#parallelcoords .chartWrapper",
+    "#spcd3-parallelcoords .spcd3-chartWrapper",
   );
   if (!wrapper) return;
 
@@ -265,7 +266,7 @@ export function createToolTipForValues(
     .selectAll(`div.tip-layer[data-record="${recordId}"]`)
     .data([recordId])
     .join("div")
-    .attr("class", "tip-layer")
+    .attr("class", "spcd3-tip-layer")
     .attr("data-record", recordId);
 
   const wrapperRect = wrapper.getBoundingClientRect();
@@ -294,7 +295,7 @@ export function createToolTipForValues(
 
   if (isSelect) {
     const tips = layer
-      .selectAll("div.tooltip-record-select")
+      .selectAll("div.spcd3-tooltip-record-select")
       .data(data, (d: any) => d.dim);
 
     tips.join(
@@ -305,7 +306,7 @@ export function createToolTipForValues(
             "id",
             `tooltip-record-select-${utils.cleanString(String(records[hoverlabel] ?? ""))}`,
           )
-          .attr("class", "tooltip-record-select")
+          .attr("class", "spcd3-tooltip-record-select")
           .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
           .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
           .text((d: ToolTipItem) => d.text),
@@ -318,14 +319,14 @@ export function createToolTipForValues(
     );
   } else {
     const tips = layer
-      .selectAll("div.tooltip-record")
+      .selectAll("div.spcd3-tooltip-record")
       .data(data, (d: any) => dimensions);
 
     tips.join(
       (enter: any) =>
         enter
           .append("div")
-          .attr("class", "tooltip-record")
+          .attr("class", "spcd3-tooltip-record")
           .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
           .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
           .text((d: ToolTipItem) => d.text),
@@ -385,9 +386,9 @@ export function position(dimension: any, dragging: any, xScales: any): any {
 }
 
 export function cleanTooltip(): void {
-  selectAll(".tooltip-record").remove();
+  selectAll(".spcd3-tooltip-record").remove();
 }
 
 export function cleanTooltipSelect(): void {
-  selectAll(".tooltip-record-select").remove();
+  selectAll(".spcd3-tooltip-record-select").remove();
 }

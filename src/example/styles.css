@@ -1,20 +1,26 @@
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin: 1rem 1rem 2rem 1rem;
   background-color: #88bbdd;
   border-radius: 0.3rem;
   padding: 1rem;
 }
 
-header h1 {
+.page-header-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 1rem;
+}
+
+.page-header-row h1 {
   margin: 0;
+  min-width: 0;
 }
 
 div#repolink {
   font-size: 1.5rem;
   text-align: right;
+  white-space: nowrap;
 }
 
 body {
@@ -25,6 +31,7 @@ body {
   color: #2b2b2b;
   margin-bottom: 0.1rem;
   overflow-x: hidden;
+  font-size: 0.8rem;
 }
 
 #top-controls {
@@ -61,21 +68,16 @@ input::file-selector-button:hover {
   transition-duration: 0.1s;
 }
 
-#pc_svg {
+#spcd3-pc_svg {
   height: 23rem;
 }
 
-#border {
-  border-bottom: #88bbdd 0.4rem;
-  border-bottom-style: solid;
-  visibility: hidden;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
-}
-
 #bottom-controls {
-  margin-left: 2rem;
+  border-top: #88bbdd 0.4rem solid;
+  margin-top: 2rem;
   margin-bottom: 4rem;
+  padding-top: 2rem;
+  padding-left: 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(27rem, 1fr));
   grid-column-gap: 1rem;
@@ -296,6 +298,48 @@ div#invertDimensionHeader {
   margin-right: 6rem;
 }
 
+#showText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+#invertText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+#moveText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+#filterText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+#rangeText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+#selectText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.4rem;
+}
+
 .labels {
   padding-left: 0.5rem;
 }
@@ -303,9 +347,8 @@ div#invertDimensionHeader {
 img {
   width: 0.531rem;
   aspect-ratio: 1/1;
-  display: inline-block;
-  margin-right: 0.5rem;
-  margin-left: 0.4rem;
+  display: block;
+  margin: 0;
 }
 
 div#moveDimensionHeader {

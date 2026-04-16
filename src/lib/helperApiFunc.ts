@@ -74,7 +74,9 @@ export function hide(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     helper.createToolTipForValues(path, true);
   });
 }
@@ -153,7 +155,9 @@ export function show(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     helper.createToolTipForValues(path, true);
   });
 }
@@ -237,7 +241,9 @@ export function moveByOne(dimension: string, direction: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -329,7 +335,9 @@ export function swap(dimensionA: string, dimensionB: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -667,12 +675,12 @@ export function invertWoTransition(dimension: string): void {
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select(dimensionId).call(
@@ -705,7 +713,9 @@ export function invertWoTransition(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -727,12 +737,12 @@ export function setInversionStatus(dimension: string, status: string): void {
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select(dimensionId)
@@ -774,7 +784,9 @@ export function setInversionStatus(dimension: string, status: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -797,12 +809,12 @@ export function invert(dimension: string): void {
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 8 8 , auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
   );
 
   select(dimensionId)
@@ -988,16 +1000,14 @@ export function uncolorRecord(record: string): void {
 //---------- Helper Functions ----------
 
 export function getAllRecords(): string[] {
-  const selection = active;
-  const object = selection._groups;
-  const data = [];
-  for (let i = 0; i < object[0].length; i++) {
-    const items = object.map((item: any[]) => item[i]);
-    const keys = Object.keys(items);
-    const text = items[keys[0]].id;
-    data.push(text);
+  if (!active || typeof active.nodes !== "function") {
+    return [];
   }
-  return data;
+
+  return active
+    .nodes()
+    .map((node: Element) => node.id)
+    .filter((id: string) => id.length > 0);
 }
 
 export function getAllVisibleDimensionNames(): string[] {
@@ -1059,22 +1069,22 @@ export function setClassColoredFalse(record: string) {
 }
 
 export function disableInteractivity() {
-  select("#toolbarRow").style("display", "none");
-  select("#parallelcoords").style("pointer-events", "none");
-  select("#parallelcoords")
+  select("#spcd3-toolbarRow").style("display", "none");
+  select("#spcd3-parallelcoords").style("pointer-events", "none");
+  select("#spcd3-parallelcoords")
     .style("background", "lightgrey")
     .style("z-index", 1);
   selectAll(".hitarea").style("pointer-events", "none");
-  selectAll(".handle-hitbox").style("pointer-events", "none");
+  selectAll(".spcd3-handle-hitbox").style("pointer-events", "none");
   selectAll(".hitbox").style("pointer-events", "none");
 }
 
 export function enableInteractivity() {
-  select("#toolbarRow").style("display", "flex");
-  select("#parallelcoords").style("pointer-events", "auto");
-  select("#parallelcoords").style("background", "white");
+  select("#spcd3-toolbarRow").style("display", "flex");
+  select("#spcd3-parallelcoords").style("pointer-events", "auto");
+  select("#spcd3-parallelcoords").style("background", "white");
   selectAll(".hitarea").style("pointer-events", "stroke");
-  selectAll(".handle-hitbox").style("pointer-events", "auto");
+  selectAll(".spcd3-handle-hitbox").style("pointer-events", "auto");
   selectAll(".hitbox").style("pointer-events", "auto");
 }
 

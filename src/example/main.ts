@@ -1245,7 +1245,7 @@ function generateDropdownForSelectRecords() {
 }
 
 function clearPlot() {
-  const parentElement = elementById<HTMLElement>("parallelcoords");
+  const parentElement = elementById<HTMLElement>("spcd3-parallelcoords");
   const invertContainer = elementById<HTMLElement>("invDimensionContainer");
   const hideContainer = elementById<HTMLElement>("hideDimensionContainer");
   const moveContainer = elementById<HTMLElement>("moDimensionContainer");

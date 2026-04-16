@@ -12,6 +12,7 @@
     "clean": "npx gulp clean",
     "build": "npx gulp build",
     "dev": "npx gulp dev",
+    "icons": "npx gulp icons",
     "tauri": "npx gulp tauri"
   },
   "repository": "git+https://github.com/tugraz-isds/spcd3",

@@ -5,7 +5,7 @@ import * as io from "./io";
 import { numberOfDimensions, numberOfRecords } from "./globals";
 
 export function createToolbar(dataset: any[]): void {
-  const toolbarRow = d3.select("#toolbarRow");
+  const toolbarRow = d3.select("#spcd3-toolbarRow");
 
   const { btn: toggleButton, tip: toggleTip } = makeIconButton(toolbarRow, {
     id: "toggleButton",
@@ -15,8 +15,8 @@ export function createToolbar(dataset: any[]): void {
 
   const toolbar = toolbarRow
     .append("div")
-    .attr("id", "toolbar")
-    .attr("class", "toolbar");
+    .attr("id", "spcd3-toolbar")
+    .attr("class", "spcd3-toolbar");
 
   makeIconButton(toolbar, {
     iconHtml: icon.getTableIcon(),
@@ -70,7 +70,7 @@ function makeIconButton(parent: any, opts: any) {
 
   const btn = parent
     .append("button")
-    .attr("class", "toolbar-button")
+    .attr("class", "spcd3-toolbar-button")
     .attr("type", "button")
     .attr("id", id ?? null);
 
@@ -78,18 +78,18 @@ function makeIconButton(parent: any, opts: any) {
 
   btn
     .append("span")
-    .attr("class", "toolbar-buttonicon")
+    .attr("class", "spcd3-toolbar-buttonicon")
     .attr("id", `${id}icon`)
     .html(iconHtml);
 
   btn
-    .select(".toolbar-buttonicon")
+    .select(".spcd3-toolbar-buttonicon")
     .selectAll("svg")
-    .attr("class", "toolbar-svg");
+    .attr("class", "spcd3-toolbar-svg");
 
   const tip = parent
     .append("span")
-    .attr("class", "toolbar-buttontip")
+    .attr("class", "spcd3-toolbar-buttontip")
     .attr("id", `${id}tip`)
     .attr("popover", "manual")
     .text(tipText ?? "");
@@ -168,7 +168,7 @@ function showModalWithData(dataset: any[]): void {
   const overlay = d3
     .select("body")
     .append("div")
-    .attr("class", "modal-tableoverlay")
+    .attr("class", "spcd3-modal-tableoverlay")
     .attr("id", "modalTableOverlay");
 
   overlay.on("click", () => {
@@ -179,11 +179,11 @@ function showModalWithData(dataset: any[]): void {
   const modal = d3
     .select("body")
     .append("div")
-    .attr("class", "modal-tabledata")
+    .attr("class", "spcd3-modal-tabledata")
     .attr("id", "dataModal");
 
   const saveAsCSV = document.createElement("button");
-  saveAsCSV.className = "save-csv-button";
+  saveAsCSV.className = "spcd3-button spcd3-save-csv-button";
   saveAsCSV.id = "saveAsCsv";
   saveAsCSV.textContent = "Download as CSV";
   modal.append(() => saveAsCSV);
@@ -199,7 +199,7 @@ function showModalWithData(dataset: any[]): void {
   });
 
   const closeButton = document.createElement("span");
-  closeButton.className = "close-button";
+  closeButton.className = "spcd3-close-button";
   closeButton.innerHTML = "&times;";
   closeButton.style.marginBottom = "1rem";
   modal.append(() => closeButton);
@@ -210,10 +210,10 @@ function showModalWithData(dataset: any[]): void {
   modal.append(() => dimensionsElement);
 
   const scrollWrapper = document.createElement("div");
-  scrollWrapper.className = "scroll-wrapper";
+  scrollWrapper.className = "spcd3-scroll-wrapper";
 
   const tableContainer = document.createElement("table");
-  tableContainer.className = "tablecontainer";
+  tableContainer.className = "spcd3-tablecontainer";
 
   scrollWrapper.appendChild(tableContainer);
   modal.append(() => scrollWrapper);
@@ -241,6 +241,7 @@ function generateTable(dataset: any[], table: HTMLTableElement) {
   headers.forEach((header) => {
     const th = document.createElement("th");
     th.innerText = header.charAt(0).toUpperCase() + header.slice(1);
+    th.className = "spcd3-th";
 
     const isNumericCol = reservedArray.every((row: { [x: string]: any }) => {
       const val = row[header];
@@ -263,6 +264,7 @@ function generateTable(dataset: any[], table: HTMLTableElement) {
       const td = document.createElement("td");
       const value = obj[key];
       td.innerText = value;
+      td.className = "spcd3-td";
 
       if (!isNaN(parseFloat(value)) && isFinite(value)) {
         td.style.textAlign = "right";

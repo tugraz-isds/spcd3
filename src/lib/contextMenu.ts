@@ -40,7 +40,7 @@ function setToolTipsOnFeatureAxis(featureAxis: any): void {
   let tooltipFeatures = select("body")
     .append("div")
     .attr("id", "tooltip")
-    .attr("class", "tooltip-dimension");
+    .attr("class", "spcd3-tooltip-dimension");
 
   featureAxis
     .append("text")
@@ -418,7 +418,7 @@ function hideDimensionMenu(dimension: string): void {
 }
 
 function styleContextMenu(event: any): void {
-  const container = document.querySelector("#parallelcoords");
+  const container = document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
   const rect = container.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -473,7 +473,7 @@ function onDragStartEventHandler(): any {
       this.__origin__ = parcoords.xScales(d.subject.name);
       parcoords.dragging[d.subject.name] = this.__origin__;
       parcoords.dragPosStart[d.subject.name] = this.__origin__;
-      const element = document.getElementById("parallelcoords");
+      const element = document.getElementById("spcd3-parallelcoords");
       if (!element) return;
       scrollXPos = element.scrollLeft;
     };
@@ -564,7 +564,9 @@ function onDragEndEventHandler(featureAxis: any): any {
       helper.cleanTooltipSelect();
       var selectedRecords = api.getSelected();
       selectedRecords.forEach((record: string) => {
-        const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
+        const path = parcoords.newDataset.find(
+          (d: any) => d[hoverlabel] === record,
+        );
         if (!api.isRecordInactive(record)) {
           helper.createToolTipForValues(path, true);
         }
@@ -574,7 +576,7 @@ function onDragEndEventHandler(featureAxis: any): any {
 }
 
 function scroll(d: { subject: any }): void {
-  const element = document.getElementById("parallelcoords");
+  const element = document.getElementById("spcd3-parallelcoords");
   if (!element) return;
   if (
     parcoords.dragPosStart[d.subject.name] < parcoords.dragging[d.subject.name]
@@ -586,9 +588,9 @@ function scroll(d: { subject: any }): void {
 }
 
 function createContextMenu(): void {
-  let contextMenu = select("#parallelcoords")
+  let contextMenu = select("#spcd3-parallelcoords")
     .append("g")
-    .attr("class", "contextmenu-dimensions")
+    .attr("class", "spcd3-contextmenu-dimensions")
     .attr("id", "contextmenu")
     .style("position", "absolute")
     .style("display", "none");
@@ -652,7 +654,7 @@ function createContextMenu(): void {
 function createModalToSetRange(): void {
   select("body")
     .append("div")
-    .attr("class", "modal-overlay")
+    .attr("class", "spcd3-modal-overlay")
     .attr("id", "modalOverlaySetRange");
 
   select("#modalOverlaySetRange").on("click", () => {
@@ -662,7 +664,7 @@ function createModalToSetRange(): void {
 
   const modalSetRange = select("body")
     .append("div")
-    .attr("class", "modal")
+    .attr("class", "spcd3-modal")
     .attr("id", "modalSetRange")
     .style("display", "none");
 
@@ -681,7 +683,7 @@ function createModalToSetRange(): void {
 function createModalToFilter(): void {
   select("body")
     .append("div")
-    .attr("class", "modal-overlay")
+    .attr("class", "spcd3-modal-overlay")
     .attr("id", "modalOverlayFilter");
 
   select("#modalOverlayFilter").on("click", () => {
@@ -691,7 +693,7 @@ function createModalToFilter(): void {
 
   const modalFilter = select("body")
     .append("div")
-    .attr("class", "modal")
+    .attr("class", "spcd3-modal")
     .attr("id", "modalFilter")
     .style("display", "none");
 
@@ -707,7 +709,7 @@ function createModalToFilter(): void {
 
 function createModalTitle(modal: any, modalTitel: string): void {
   const title = document.createElement("div");
-  title.className = "modal-title";
+  title.className = "spcd3-modal-title";
   title.textContent = modalTitel;
   modal.append(() => title);
 }
@@ -715,14 +717,14 @@ function createModalTitle(modal: any, modalTitel: string): void {
 function createHeader(modal: any, id: string): void {
   const header = document.createElement("div");
   header.id = id;
-  header.className = "modal-title";
+  header.className = "spcd3-modal-title";
   modal.append(() => header);
 }
 
 function createInfoMessage(modal: any, id: string): void {
   const infoMessage = document.createElement("div");
   infoMessage.id = id;
-  infoMessage.className = "modal-notes";
+  infoMessage.className = "spcd3-modal-notes";
   modal.append(() => infoMessage);
 }
 
@@ -732,12 +734,12 @@ function createInputFieldWithLabel(
   inputId: string,
 ): void {
   const label = document.createElement("label");
-  label.className = "modal-label";
+  label.className = "spcd3-modal-label";
   label.textContent = text;
   modal.append(() => label);
 
   const input = document.createElement("input");
-  input.className = "modal-input";
+  input.className = "spcd3-modal-input";
   input.type = "number";
   input.id = inputId;
   modal.append(() => input);
@@ -745,7 +747,7 @@ function createInputFieldWithLabel(
 
 function createButton(modal: any, id: string): void {
   const button = document.createElement("button");
-  button.className = "save-button";
+  button.className = "spcd3-button spcd3-save-button";
   button.id = id;
   button.textContent = "Save";
   modal.append(() => button);
@@ -753,7 +755,7 @@ function createButton(modal: any, id: string): void {
 
 function createCloseButton(modal: any, id: string): void {
   const closeButton = document.createElement("span");
-  closeButton.className = "close-button";
+  closeButton.className = "spcd3-close-button";
   closeButton.id = id;
   closeButton.innerHTML = "&times;";
   modal.append(() => closeButton);
@@ -761,15 +763,15 @@ function createCloseButton(modal: any, id: string): void {
 
 function createErrorMessage(modal: any, id: string): void {
   const errorMessage = document.createElement("div");
-  errorMessage.className = "modal-errormessage";
+  errorMessage.className = "spcd3-modal-errormessage";
   errorMessage.id = id;
   modal.append(() => errorMessage);
 }
 
 export function createContextMenuForRecords(): any {
-  let contextMenu = select("#parallelcoords")
+  let contextMenu = select("#spcd3-parallelcoords")
     .append("g")
-    .attr("class", "contextmenu-records")
+    .attr("class", "spcd3-contextmenu-records")
     .attr("id", "contextmenuRecords")
     .style("position", "absolute")
     .style("display", "none");
@@ -832,7 +834,7 @@ export function handleRecordContextMenu(
   event: any,
   d: any,
 ): void {
-  const container = document.querySelector("#parallelcoords");
+  const container = document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
   const rect = container.getBoundingClientRect();
   const data = helper.getAllPointerEventsData(event);

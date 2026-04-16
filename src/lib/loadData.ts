@@ -25,18 +25,18 @@ export function showInvalidRowsMessage(
   removedColumns: string[],
 ) {
   const overlay = document.createElement("div");
-  overlay.className = "modal-overlay";
+  overlay.className = "spcd3-modal-overlay";
   overlay.style.display = "block";
 
   const modal = document.createElement("div");
-  modal.className = "modal";
+  modal.className = "spcd3-modal";
   modal.style.display = "block";
 
   const header = document.createElement("div");
-  header.className = "modal-header";
+  header.className = "spcd3-modal-header";
 
   const closeButton = document.createElement("span");
-  closeButton.className = "close-button";
+  closeButton.className = "spcd3-close-button";
   closeButton.innerHTML = "&times;";
 
   closeButton.addEventListener("click", () => {
@@ -47,24 +47,24 @@ export function showInvalidRowsMessage(
   modal.appendChild(header);
 
   const contentDiv = document.createElement("div");
-  contentDiv.className = "modal-content";
+  contentDiv.className = "spcd3-modal-content";
   contentDiv.addEventListener("click", (e) => e.stopPropagation());
 
   const importInfo = document.createElement("div");
-  importInfo.className = "modal-info";
+  importInfo.className = "spcd3-modal-info";
   importInfo.textContent = `Dataset imported.`;
 
   contentDiv.appendChild(importInfo);
 
   const removedRowInfo = document.createElement("div");
-  removedRowInfo.className = "modal-info";
+  removedRowInfo.className = "spcd3-modal-info";
 
   removedRowInfo.textContent = `${invalidRows.length} invalid rows found.`;
   contentDiv.appendChild(removedRowInfo);
 
   if (removedColumns.length > 0) {
     const removedColumnInfo = document.createElement("div");
-    removedColumnInfo.className = "modal-info";
+    removedColumnInfo.className = "spcd3-modal-info";
 
     if (removedColumns.length > 1) {
       removedColumnInfo.textContent = `${removedColumns.length} columns without data: ${removedColumns.join(", ") + "."}`;
@@ -77,7 +77,7 @@ export function showInvalidRowsMessage(
 
   const btn = document.createElement("button");
   btn.textContent = "View";
-  btn.className = "generic-button";
+  btn.className = "spcd3-button spcd3-generic-button";
 
   btn.addEventListener("click", () => {
     document.body.removeChild(overlay);
@@ -96,24 +96,24 @@ function showInvalidRowsPopup(
   removedColumns: string[] = [],
 ) {
   const overlay = document.createElement("div");
-  overlay.className = "modal-tableoverlay";
+  overlay.className = "spcd3-modal-tableoverlay";
 
   overlay.addEventListener("click", () => document.body.removeChild(overlay));
 
   const dialog = document.createElement("div");
-  dialog.className = "modal-tabledata";
+  dialog.className = "spcd3-modal-tabledata";
 
   dialog.addEventListener("click", (e) => e.stopPropagation());
 
   const headerRow = document.createElement("div");
-  headerRow.className = "header-row";
+  headerRow.className = "spcd3-header-row";
 
   const title = document.createElement("h2");
   title.textContent = `Invalid Rows (${invalidRows.length})`;
   title.style.margin = "0";
 
   const closeButton = document.createElement("span");
-  closeButton.className = "close-button";
+  closeButton.className = "spcd3-close-button";
   closeButton.innerHTML = "&times;";
 
   closeButton.addEventListener("click", () => {
@@ -124,10 +124,10 @@ function showInvalidRowsPopup(
   headerRow.appendChild(closeButton);
 
   const scrollWrapper = document.createElement("div");
-  scrollWrapper.className = "scroll-wrapper";
+  scrollWrapper.className = "spcd3-scroll-wrapper";
 
   const tableWrapper = document.createElement("div");
-  tableWrapper.className = "tablecontainer";
+  tableWrapper.className = "spcd3-tablecontainer";
 
   const table = renderInvalidTable(invalidRows, columns, removedColumns);
   tableWrapper.appendChild(table);
@@ -151,6 +151,7 @@ export function renderInvalidTable(
 
   columns.forEach((c) => {
     const th = document.createElement("th");
+    th.className = "spcd3-th";
 
     const isRemoved = removedColumns.includes(c);
 
@@ -170,6 +171,7 @@ export function renderInvalidTable(
 
     columns.forEach((col) => {
       const td = document.createElement("td");
+      td.className = "spcd3-td";
 
       const rawValue = row[col];
 
@@ -278,21 +280,101 @@ function validateParsedCsv(data: CsvData): CsvValidationResult {
   };
 }
 
-function removeDuplicateColumnNames(value: string): any {
-  let completeArray = value.split(/\r?\n/);
-  let column_string = csvParse(completeArray[0]);
-  let n = 0;
-  const unique = (arr: string[]) =>
-    arr.map(
-      ((s) => (v: string) =>
-        !s.has(v) && s.add(v) ? v : `${v}(${(n += 1)})`)(
-        new Set(),
-      ),
-    );
-  completeArray[0] = unique(column_string["columns"]).toString();
-  return completeArray.join("\r\n");
+function removeDuplicateColumnNames(value: string): string {
+  const { headerLine, rest } = splitHeaderFromCsv(value);
+  const columns = parseCsvHeaderLine(headerLine);
+  const seen = new Map<string, number>();
+
+  const uniqueColumns = columns.map((column) => {
+    const count = seen.get(column) ?? 0;
+    seen.set(column, count + 1);
+    return count === 0 ? column : `${column}(${count})`;
+  });
+
+  const rebuiltHeader = uniqueColumns.map(escapeCsvCell).join(",");
+  return `${rebuiltHeader}${rest}`;
 }
 
-function checkIfDuplicatesExists(value: string): any {
-  return new Set(value).size !== value.length;
+function checkIfDuplicatesExists(value: string): boolean {
+  const columns = parseCsvHeaderLine(value);
+  return new Set(columns).size !== columns.length;
+}
+
+function splitHeaderFromCsv(csv: string): {
+  headerLine: string;
+  rest: string;
+} {
+  let inQuotes = false;
+
+  for (let i = 0; i < csv.length; i++) {
+    const char = csv[i];
+    const next = csv[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (!inQuotes && (char === "\n" || char === "\r")) {
+      if (char === "\r" && next === "\n") {
+        return {
+          headerLine: csv.slice(0, i),
+          rest: csv.slice(i),
+        };
+      }
+
+      return {
+        headerLine: csv.slice(0, i),
+        rest: csv.slice(i),
+      };
+    }
+  }
+
+  return {
+    headerLine: csv,
+    rest: "",
+  };
+}
+
+function parseCsvHeaderLine(line: string): string[] {
+  const values: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const next = line[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (!inQuotes && char === ",") {
+      values.push(current);
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  values.push(current);
+  return values;
+}
+
+function escapeCsvCell(value: string): string {
+  if (/[",\r\n]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }

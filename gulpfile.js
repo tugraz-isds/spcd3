@@ -3,6 +3,7 @@ const del = require("del");
 const { bundle } = require("./gulp-tasks/bundle");
 const { watcher } = require("./gulp-tasks/watch");
 const { tauriBuild } = require("./gulp-tasks/tauri");
+const { generateIcons } = require("./gulp-tasks/generate-icons");
 const path = require("path");
 const fs = require("fs");
 const ts = require("gulp-typescript");
@@ -45,6 +46,7 @@ function copyLibFileToExample() {
 }
 
 exports.clean = cleanDistFolder;
+exports.icons = generateIcons;
 
 exports.cleanAll = parallel(
   cleanDistFolder,
@@ -55,6 +57,7 @@ exports.cleanAll = parallel(
 
 exports.build = series(
   cleanDistFolder,
+  generateIcons,
   buildExampleTS,
   copyExampleFolder,
   bundle,

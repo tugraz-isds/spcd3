@@ -1,38 +1,30 @@
-body {
-  font-size: 0.8rem;
-}
-
-header {
-  display: flex;
-}
-
-button {
+.spcd3-button {
   cursor: pointer;
   background: #f6f6f6;
   border: 0.08rem solid grey;
   border-radius: 0.1rem;
 }
 
-.generic-button {
+.spcd3-generic-button {
   margin: 0.5rem auto;
   padding: 0 0.5rem;
   display: block;
 }
 
-.save-button {
+.spcd3-save-button {
   margin-left: 0.5rem;
   padding: 0 0.5rem;
   display: inline-block;
 }
 
-.save-csv-button {
+.spcd3-save-csv-button {
   margin-bottom: 3rem;
   padding: 0 0.5rem;
   align-self: flex-start;
   display: inline-block;
 }
 
-.close-button {
+.spcd3-close-button {
   position: absolute;
   top: 0.625rem;
   right: 0.938rem;
@@ -41,7 +33,7 @@ button {
   cursor: pointer;
 }
 
-th {
+.spcd3-th {
   position: sticky;
   top: 0;
   border: 0.08rem solid grey;
@@ -51,64 +43,80 @@ th {
   overflow: hidden;
 }
 
-td {
+.spcd3-td {
   border: 0.08rem solid grey;
   padding: 0.5rem;
 }
 
-img {
+.spcd3-img {
   display: inline-block;
 }
 
-.form {
+.spcd3-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.label {
+.spcd3-label {
   padding: 0.35rem;
   text-align: left;
   flex: 1;
 }
 
-.input {
+.spcd3-input {
   width: 3.125rem;
   margin-right: 0.45rem;
 }
 
-.tablecontainer {
+.spcd3-tablecontainer {
   width: 100%;
 }
 
-#parallelcoords {
+#spcd3-parallelcoords {
   display: block;
   width: 100%;
   text-align: left;
 }
 
-#pc_svg {
+#spcd3-pc_svg {
   padding-bottom: 1rem;
 }
 
-.chartWrapper {
+.spcd3-chartWrapper {
   position: relative;
   overflow-x: auto;
   margin-left: 1rem;
 }
 
-.tip-layer {
+.spcd3-tip-layer {
   position: absolute;
   left: 0;
   top: 0;
   pointer-events: none;
 }
 
-.dimensions-axis {
+.spcd3-dimensions-axis path,
+.spcd3-dimensions-axis line {
   stroke: black;
 }
 
-.tooltip-values {
+.spcd3-dimensions-axis text {
+  stroke: none;
+  stroke-width: 0;
+  fill: black;
+  font-weight: normal;
+  paint-order: fill;
+}
+
+.spcd3-dimensions-axis .tick text {
+  stroke: none;
+  stroke-width: 0;
+  fill: black;
+  font-weight: 400;
+}
+
+.spcd3-tooltip-values {
   position: absolute;
   border: 0.08rem solid grey;
   border-radius: 0.1rem;
@@ -118,7 +126,7 @@ img {
   visibility: hidden;
 }
 
-.tooltip-record {
+.spcd3-tooltip-record {
   position: absolute;
   pointer-events: none;
   border: none;
@@ -132,7 +140,7 @@ img {
   z-index: 999;
 }
 
-.tooltip-record-select {
+.spcd3-tooltip-record-select {
   position: absolute;
   pointer-events: none;
   border: none;
@@ -146,7 +154,7 @@ img {
   z-index: 999;
 }
 
-.tooltip-label {
+.spcd3-tooltip-label {
   position: absolute;
   visibility: hidden;
   pointer-events: none;
@@ -159,7 +167,7 @@ img {
   white-space: pre-line;
 }
 
-.tooltip-dimension {
+.spcd3-tooltip-dimension {
   position: absolute;
   pointer-events: none;
   border: 0.08rem solid grey;
@@ -170,7 +178,7 @@ img {
   visibility: hidden;
 }
 
-.marker {
+.spcd3-marker {
   fill: none;
   stroke: rgb(228, 90, 15);
   stroke-width: 0.1rem;
@@ -178,22 +186,22 @@ img {
   transition: opacity 0.2s ease;
 }
 
-.marker.visible {
+.spcd3-marker.visible {
   opacity: 1;
 }
 
-.rect {
+.spcd3-rect {
   fill: rgba(242, 242, 76, 0.5);
   cursor: default;
 }
 
-.triangle {
+.spcd3-triangle {
   width: 0.9rem;
   height: 0.8rem;
   pointer-events: none;
 }
 
-.toolbar {
+.spcd3-toolbar {
   display: flex;
   overflow: hidden;
   max-width: 0;
@@ -204,7 +212,7 @@ img {
   pointer-events: none;
 }
 
-#toolbarRow {
+#spcd3-toolbarRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -213,20 +221,21 @@ img {
   padding-left: 1rem;
 }
 
-.toolbar-button {
+.spcd3-toolbar-button {
   width: 1.4rem;
   height: 1.4rem;
   position: relative;
   display: inline-flex;
   overflow: visible;
   border: none;
+  cursor: pointer;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   vertical-align: middle;
 }
 
-.toolbar-buttonicon {
+.spcd3-toolbar-buttonicon {
   width: 1rem;
   height: 1rem;
   display: inline-flex;
@@ -235,7 +244,7 @@ img {
   pointer-events: none;
 }
 
-.toolbar-buttontip {
+.spcd3-toolbar-buttontip {
   inset: auto;
   margin: 0;
   background: lightgrey;
@@ -247,11 +256,11 @@ img {
   pointer-events: none;
 }
 
-.toolbar-buttontip:popover-open {
+.spcd3-toolbar-buttontip:popover-open {
   position: fixed;
 }
 
-.modal-tableoverlay {
+.spcd3-modal-tableoverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -262,7 +271,7 @@ img {
   display: block;
 }
 
-.modal-tabledata {
+.spcd3-modal-tabledata {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -280,7 +289,7 @@ img {
   overflow: hidden;
 }
 
-.scroll-wrapper {
+.spcd3-scroll-wrapper {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
@@ -288,7 +297,7 @@ img {
   max-height: 100%;
 }
 
-.contextmenu-records {
+.spcd3-contextmenu-records {
   border: 0.08rem solid grey;
   border-radius: 0.1rem;
   margin: 0.5rem;
@@ -298,7 +307,7 @@ img {
   z-index: 9999;
 }
 
-.contextmenu-dimensions {
+.spcd3-contextmenu-dimensions {
   border: 0.08rem solid grey;
   border-radius: 0.1rem;
   margin: 0.5rem;
@@ -308,7 +317,7 @@ img {
   z-index: 9999;
 }
 
-.modal-overlay {
+.spcd3-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -319,7 +328,7 @@ img {
   z-index: 9999;
 }
 
-.modal {
+.spcd3-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -332,45 +341,45 @@ img {
   display: none;
 }
 
-.modal-header {
+.spcd3-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
 }
 
-.modal-title {
+.spcd3-modal-title {
   padding-left: 0.5rem;
   font-size: large;
 }
 
-.modal-content {
+.spcd3-modal-content {
   min-width: 10rem;
   position: relative;
 }
 
-.modal-info {
+.spcd3-modal-info {
   margin-top: 0.15rem;
   padding: 0.5rem;
 }
 
-.modal-notes {
+.spcd3-modal-notes {
   color: grey;
   font-size: smaller;
   padding: 1rem 0 0.5rem 0.5rem;
 }
 
-.modal-label {
+.spcd3-modal-label {
   padding: 0.5rem;
 }
 
-.modal-input {
+.spcd3-modal-input {
   width: 4.5rem;
   border: 0.1rem solid lightgrey;
   border-radius: 0.1rem;
 }
 
-.modal-errormessage {
+.spcd3-modal-errormessage {
   position: relative;
   display: none;
   padding-left: 0.5rem;
@@ -379,7 +388,7 @@ img {
   font-size: x-small;
 }
 
-#errorRange {
+#spcd3-errorRange {
   display: block;
   padding-left: 0.5rem;
   padding-top: 0.5rem;
@@ -387,7 +396,7 @@ img {
   font-size: x-small;
 }
 
-.header-row {
+.spcd3-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -395,13 +404,13 @@ img {
   flex: 0 0 auto;
 }
 
-.options-div {
+.spcd3-options-div {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.triangle-hitbox {
+.spcd3-triangle-hitbox {
   width: 30;
   height: 30;
   fill: transparent;
@@ -410,7 +419,7 @@ img {
   user-select: none;
 }
 
-.handle-hitbox {
+.spcd3-handle-hitbox {
   fill: transparent;
   pointer-events: all;
 }

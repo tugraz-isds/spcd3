@@ -134,26 +134,26 @@ function setOptionsAndDownload(svgString: string) {
   let name = "parcoords.svg";
 
   const modalOverlay = document.createElement("div");
-  modalOverlay.className = "modal-overlay";
+  modalOverlay.className = "spcd3-modal-overlay";
   modalOverlay.style.display = "block";
 
   const modal = document.createElement("div");
-  modal.className = "modal";
+  modal.className = "spcd3-modal";
   modal.style.display = "block";
   modal.style.width = "30vw";
 
   const header = document.createElement("div");
-  header.className = "modal-header";
+  header.className = "spcd3-modal-header";
   header.style.paddingLeft = "0";
 
   const title = document.createElement("div");
   title.textContent = "Download Chart (SVG)";
-  title.className = "modal-title";
+  title.className = "spcd3-modal-title";
   title.style.paddingLeft = "0";
 
   const closeButton = document.createElement("span");
   closeButton.innerHTML = "&times;";
-  closeButton.className = "close-button";
+  closeButton.className = "spcd3-close-button";
 
   modal.appendChild(title);
   modal.appendChild(closeButton);
@@ -161,18 +161,18 @@ function setOptionsAndDownload(svgString: string) {
   modal.appendChild(header);
 
   const form = document.createElement("div");
-  form.className = "form";
+  form.className = "spcd3-form";
 
   const rowDecimals = document.createElement("div");
-  rowDecimals.className = "options-div";
+  rowDecimals.className = "spcd3-options-div";
 
   const label = document.createElement("label");
-  label.className = "label";
+  label.className = "spcd3-label";
   label.textContent = "Decimals places (0-10): ";
   label.htmlFor = "decimalsInput";
 
   const input = document.createElement("input");
-  input.className = "input";
+  input.className = "spcd3-input";
   input.type = "number";
   input.min = "0";
   input.max = "10";
@@ -183,14 +183,14 @@ function setOptionsAndDownload(svgString: string) {
   rowDecimals.appendChild(input);
 
   const rowKeepClasses = document.createElement("div");
-  rowKeepClasses.className = "options-div";
+  rowKeepClasses.className = "spcd3-options-div";
 
   const labelKeepClasses = document.createElement("label");
-  labelKeepClasses.className = "label";
+  labelKeepClasses.className = "spcd3-label";
   labelKeepClasses.textContent = "Keep classes: ";
 
   const inputKeepClasses = document.createElement("input");
-  inputKeepClasses.className = "input";
+  inputKeepClasses.className = "spcd3-input";
   inputKeepClasses.type = "checkbox";
   inputKeepClasses.id = "keepClassesInput";
   inputKeepClasses.checked = true;
@@ -199,14 +199,14 @@ function setOptionsAndDownload(svgString: string) {
   rowKeepClasses.appendChild(inputKeepClasses);
 
   const rowRemoveUiControls = document.createElement("div");
-  rowRemoveUiControls.className = "options-div";
+  rowRemoveUiControls.className = "spcd3-options-div";
 
   const labelRemoveUiControls = document.createElement("label");
-  labelRemoveUiControls.className = "label";
+  labelRemoveUiControls.className = "spcd3-label";
   labelRemoveUiControls.textContent = "Download without UI controls: ";
 
   const inputRemoveUiControls = document.createElement("input");
-  inputRemoveUiControls.className = "input";
+  inputRemoveUiControls.className = "spcd3-input";
   inputRemoveUiControls.type = "checkbox";
   inputRemoveUiControls.id = "removeUiControlsInput";
   inputRemoveUiControls.checked = true;
@@ -216,7 +216,7 @@ function setOptionsAndDownload(svgString: string) {
 
   const button = document.createElement("button");
   button.textContent = "Download";
-  button.className = "generic-button";
+  button.className = "spcd3-button spcd3-generic-button";
 
   form.appendChild(rowDecimals);
   form.appendChild(rowKeepClasses);
