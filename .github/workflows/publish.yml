@@ -90,6 +90,7 @@ jobs:
         with:
           name: ${{ matrix.id }}
           path: |
+            src-tauri/target/**/release/spcd3.exe
             src-tauri/target/**/release/bundle/msi/*.msi
             src-tauri/target/**/release/bundle/nsis/*.exe
           if-no-files-found: warn
