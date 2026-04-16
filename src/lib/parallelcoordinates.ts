@@ -49,7 +49,8 @@ declare const window: any;
 
 export function drawChart(content: []): void {
   setContent(content);
-  var columns = structuredClone(content["columns"]).reverse();
+  const chartContent = content as any;
+  var columns = structuredClone(chartContent["columns"]).reverse();
   setColumns(columns);
 
   setNumberOfDimensions(columns.length);
@@ -66,8 +67,8 @@ export function drawChart(content: []): void {
   let chart = select("#parallelcoords");
 
   if (chart === null) {
-    chart = select<HTMLBodyElement, unknown>(document.body)
-      .append<HTMLDivElement>("div")
+    chart = select(document.body)
+      .append("div")
       .attr("id", "parallelcoords");
   }
 
@@ -286,8 +287,8 @@ function setUpParcoordData(data: any, newFeatures: []): void {
   setHoverLabel(api.getAllVisibleDimensionNames()[0]);
 }
 
-let delay = null;
-let cleanupTimeout = null;
+let delay: ReturnType<typeof setTimeout> | null = null;
+let cleanupTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function clearExistingDelay() {
   if (delay) {
@@ -326,7 +327,7 @@ function handlePointerLeaveOrOut() {
   helper.cleanTooltip();
 }
 
-function handleClick(event, d) {
+function handleClick(event: any, d: any) {
   var data = helper.getAllPointerEventsData(event);
 
   if (hoverSnapshot) data = hoverSnapshot;
@@ -396,7 +397,7 @@ function handleClick(event, d) {
   event.stopPropagation();
 }
 
-function setActivePathLines(svg, content, parcoords): any {
+function setActivePathLines(svg: any, content: any, parcoords: any): any {
   const contextMenuRecords = context.createContextMenuForRecords();
   const g = svg.append("g").attr("class", "active");
 
@@ -411,7 +412,7 @@ function setActivePathLines(svg, content, parcoords): any {
       const selected_value = utils.cleanString(d[key]);
       return "area_" + selected_value;
     })
-    .attr("d", (d) => helper.linePath(d, parcoords.newFeatures))
+    .attr("d", (d: any) => helper.linePath(d, parcoords.newFeatures))
     .style("stroke", "transparent")
     .style("fill", "none")
     .style("stroke-width", thickness)
@@ -436,8 +437,8 @@ function setActivePathLines(svg, content, parcoords): any {
       const selected_value = utils.cleanString(d[key]);
       return "line " + selected_value;
     })
-    .attr("id", (d) => utils.cleanString(d[key]))
-    .attr("d", (d) => helper.linePath(d, parcoords.newFeatures))
+    .attr("id", (d: any) => utils.cleanString(d[key]))
+    .attr("d", (d: any) => helper.linePath(d, parcoords.newFeatures))
     .style("pointer-events", "none")
     .style("stroke", "rgba(0, 129, 175, 0.5)")
     .style("stroke-width", "0.12rem")
@@ -449,7 +450,7 @@ export const throttleShowValues = utils.throttle(
   50,
 );
 
-function setFeatureAxis(svg, yAxis, parcoords, width): void {
+function setFeatureAxis(svg: any, yAxis: any, parcoords: any, width: any): void {
   let featureAxis = svg
     .selectAll("g.feature")
     .data(parcoords.features)
@@ -461,7 +462,7 @@ function setFeatureAxis(svg, yAxis, parcoords, width): void {
       (d: { name: any }) => "translate(" + parcoords.xScales(d.name) + ")",
     );
 
-  featureAxis.append("g").each(function (d: { name: string }) {
+  featureAxis.append("g").each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     select(this)
       .attr("class", "dimension-axis")
@@ -524,7 +525,7 @@ function setDefsForIcons(): void {
   );
 }
 
-function createImage(defs, id, width, height, image): void {
+function createImage(defs: any, id: any, width: any, height: any, image: any): void {
   defs
     .append("image")
     .attr("id", id)
@@ -533,7 +534,7 @@ function createImage(defs, id, width, height, image): void {
     .attr("href", "data:image/svg+xml;," + image);
 }
 
-function setInvertIcon(featureAxis): void {
+function setInvertIcon(featureAxis: any): void {
   let value = (50 / 1.3).toFixed(4);
 
   const invertIcon = featureAxis
@@ -556,7 +557,7 @@ function setInvertIcon(featureAxis): void {
     .attr("ry", 6)
     .attr("fill", "transparent")
     .style("pointer-events", "all")
-    .each(function (d: { name: string }) {
+    .each(function (this: any, d: { name: string }) {
       const processed = utils.cleanString(d.name);
       select(this)
         .attr("id", "invert_hitbox_" + processed)
@@ -573,7 +574,7 @@ function setInvertIcon(featureAxis): void {
     .attr("height", 12)
     .attr("x", 22.5)
     .attr("y", Number(value) - 33)
-    .each(function (d: { name: string }) {
+    .each(function (this: any, d: { name: string }) {
       const processed = utils.cleanString(d.name);
       select(this)
         .attr("id", "dimension_invert_" + processed)
@@ -592,9 +593,9 @@ function setInvertIcon(featureAxis): void {
 
 // Hovering
 
-let currentlyHighlightedItems = [];
+let currentlyHighlightedItems: string[] = [];
 
-let hoverSnapshot = null;
+let hoverSnapshot: any = null;
 
 function highlight(data: any[]) {
   hoverSnapshot = data;
@@ -616,7 +617,7 @@ function highlight(data: any[]) {
 function doNotHighlight() {
   if (!currentlyHighlightedItems.length) return;
 
-  currentlyHighlightedItems.forEach((item) => {
+  currentlyHighlightedItems.forEach((item: string) => {
     const line = select("#" + item);
     if (line.classed("selected")) {
       line.transition().style("stroke", "rgba(255, 165, 0, 1)");
@@ -632,7 +633,7 @@ function doNotHighlight() {
 }
 
 function setMarker(featureAxis: any): void {
-  featureAxis.each(function (d: { name: string }) {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     select(this)
       .append("g")

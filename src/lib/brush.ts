@@ -17,12 +17,12 @@ const RECT_VALUE = 300;
 // Brushing
 
 export function setRectToDrag(
-  featureAxis,
-  tooltipValuesDown,
-  tooltipValuesTop,
+  featureAxis: any,
+  tooltipValuesDown: any,
+  tooltipValuesTop: any,
 ): void {
   let delta: any;
-  featureAxis.each(function (d: { name: string }) {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     select(this)
       .append("g")
@@ -68,11 +68,11 @@ export function setRectToDrag(
             tooltipValuesDown.style("visibility", "hidden");
             let active = select("g.active").selectAll("path");
             let hitarea = selectAll("path.hitarea");
-            active.each(function (d: any) {
+            active.each(function (this: any, d: any) {
               const isActive = select(this).style("stroke");
               if (isActive === "rgba(0, 129, 175, 0.5)") {
                 hitarea
-                  .filter((d) => d[hoverlabel] === this.id)
+                  .filter((d: any) => d[hoverlabel] === this.id)
                   .style("pointer-events", "stroke");
               }
             });
@@ -81,8 +81,8 @@ export function setRectToDrag(
   });
 }
 
-export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
-  featureAxis.each(function (d: { name: string }) {
+export function setBrushUp(featureAxis: any, brushOverlay: any, tooltipValues: any): void {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const g = select(this)
       .append("g")
@@ -116,7 +116,7 @@ export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
 
     const makeDrag = () =>
       drag()
-        .container(function () {
+        .container(function (this: any) {
           return (this as any).ownerSVGElement || this;
         })
         .on("start", () => {
@@ -148,7 +148,7 @@ export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
         .on("end", () => {
           cleanup(brushOverlay, tooltipValues);
           requestAnimationFrame(() => {
-            const newHit = g.select<SVGRectElement>(".handle-hitbox");
+            const newHit = g.select(".handle-hitbox");
             if (!newHit.empty()) {
               newHit.call(makeDrag());
             }
@@ -158,8 +158,8 @@ export function setBrushUp(featureAxis, brushOverlay, tooltipValues): void {
   });
 }
 
-export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
-  featureAxis.each(function (d: { name: string }) {
+export function setBrushDown(featureAxis: any, brushOverlay: any, tooltipValues: any): void {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const g = select(this)
       .append("g")
@@ -193,7 +193,7 @@ export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
 
     const makeDrag = () =>
       drag()
-        .container(function () {
+        .container(function (this: any) {
           return (this as any).ownerSVGElement || this;
         })
         .on("start", () => {
@@ -225,7 +225,7 @@ export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
         .on("end", () => {
           cleanup(brushOverlay, tooltipValues);
           requestAnimationFrame(() => {
-            const newHit = g.select<SVGRectElement>(".handle-hitbox");
+            const newHit = g.select(".handle-hitbox");
             if (!newHit.empty()) {
               newHit.call(makeDrag());
             }
@@ -235,7 +235,7 @@ export function setBrushDown(featureAxis, brushOverlay, tooltipValues): void {
   });
 }
 
-function cleanup(brushOverlay, tooltipValues) {
+function cleanup(brushOverlay: any, tooltipValues: any) {
   brushOverlay.style("pointer-events", "none").lower();
   tooltipValues.style("visibility", "hidden");
 }
@@ -677,7 +677,7 @@ export function filterWithCoords(
     if (value < topPosition || value > bottomPosition) {
       makeInactive(currentLine, dimension, 1000);
     } else if (dimNameToCheck == dimension && dimNameToCheck != emptyString) {
-      let checkedLines = [];
+      let checkedLines: string[] = [];
       parcoords.currentPosOfDims.forEach(function (item: any) {
         checkAllPositionsTop(item, dimension, d, checkedLines, currentLine);
         checkAllPositionsBottom(item, dimension, d, checkedLines, currentLine);
@@ -700,7 +700,7 @@ export function addPosition(
   dimension: string,
   key: string,
 ): void {
-  let newObject = {};
+  const newObject: Record<string, any> = {};
   newObject[key] = yPosTop;
   const target = parcoords.currentPosOfDims.find(
     (obj: { key: any }) => obj.key == dimension,
@@ -918,7 +918,7 @@ function updateLines(dimension: string, cleanDimensionName: string): void {
         makeInactive(currentLine, dimension, 100);
       }
     } else if (dimNameToCheck == dimension && dimNameToCheck != emptyString) {
-      let checkedLines = [];
+      let checkedLines: string[] = [];
       parcoords.currentPosOfDims.forEach(function (item: {
         top: number;
         bottom: number;
@@ -1128,7 +1128,7 @@ function makeInactive(
     .duration(duration)
     .style("stroke", "transparent")
     .style("stroke-width", getLineThickness() + "rem")
-    .on("end", function () {
+    .on("end", function (this: any) {
       select(this).style("pointer-events", "none");
     });
 }
@@ -1236,7 +1236,7 @@ export function addInvertStatus(
   dimensionName: any,
   key: any,
 ): void {
-  let newObject = {};
+  const newObject: Record<string, any> = {};
   newObject[key] = status;
   const target = parcoords.currentPosOfDims.find(
     (obj: { key: any }) => obj.key == dimensionName,

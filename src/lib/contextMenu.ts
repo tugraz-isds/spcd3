@@ -8,7 +8,7 @@ import * as icon from "./icons/icons";
 import { parcoords, active, width, paddingXaxis, hoverlabel } from "./globals";
 
 let scrollXPos: number;
-let timer: string | number | NodeJS.Timeout;
+let timer: ReturnType<typeof setInterval> | null = null;
 
 export function setContextMenu(featureAxis: any): void {
   createContextMenu();
@@ -144,7 +144,7 @@ function filterMenu(dimension: string): void {
     (event: { key: string; preventDefault: () => void }) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        document.getElementById("buttonFilter").click();
+        document.getElementById("buttonFilter")?.click();
       }
     },
   );
@@ -154,7 +154,7 @@ function filterMenu(dimension: string): void {
     (event: { key: string; preventDefault: () => void }) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        document.getElementById("buttonFilter").click();
+        document.getElementById("buttonFilter")?.click();
       }
     },
   );
@@ -381,7 +381,7 @@ function handleRangeButton(dimension: string): void {
     (event: { key: string; preventDefault: () => void }) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        document.getElementById("buttonRange").click();
+        document.getElementById("buttonRange")?.click();
       }
     },
   );
@@ -390,7 +390,7 @@ function handleRangeButton(dimension: string): void {
     (event: { key: string; preventDefault: () => void }) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        document.getElementById("buttonRange").click();
+        document.getElementById("buttonRange")?.click();
       }
     },
   );
@@ -419,6 +419,7 @@ function hideDimensionMenu(dimension: string): void {
 
 function styleContextMenu(event: any): void {
   const container = document.querySelector("#parallelcoords");
+  if (!container) return;
   const rect = container.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
@@ -468,11 +469,12 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
 
 function onDragStartEventHandler(): any {
   {
-    return function onDragStart(d: { subject: any }) {
+    return function onDragStart(this: any, d: { subject: any }) {
       this.__origin__ = parcoords.xScales(d.subject.name);
       parcoords.dragging[d.subject.name] = this.__origin__;
       parcoords.dragPosStart[d.subject.name] = this.__origin__;
       const element = document.getElementById("parallelcoords");
+      if (!element) return;
       scrollXPos = element.scrollLeft;
     };
   }
@@ -480,7 +482,7 @@ function onDragStartEventHandler(): any {
 
 function onDragEventHandler(featureAxis: any): any {
   {
-    return function onDrag(d: { subject: any; x: any }) {
+    return function onDrag(this: any, d: { subject: any; x: any }) {
       if (timer !== null) {
         clearInterval(timer);
         timer = null;
@@ -494,13 +496,13 @@ function onDragEventHandler(featureAxis: any): any {
         Math.max(paddingXaxis, (this.__origin__ += d.x)),
       );
 
-      active.each(function (d: any) {
+      active.each(function (this: any, d: any) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
       let hitarea_active = selectAll("path.hitarea");
 
-      hitarea_active.each(function (d: any) {
+      hitarea_active.each(function (this: any, d: any) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
@@ -527,7 +529,7 @@ function onDragEventHandler(featureAxis: any): any {
 
 function onDragEndEventHandler(featureAxis: any): any {
   {
-    return function onDragEnd(d: { subject: any }) {
+    return function onDragEnd(this: any, d: { subject: any }) {
       const distance = (width - 80) / parcoords.newFeatures.length;
       const init = parcoords.dragPosStart[d.subject.name];
 
@@ -555,14 +557,14 @@ function onDragEndEventHandler(featureAxis: any): any {
       delete parcoords.dragging[d.subject.name];
       delete parcoords.dragPosStart[d.subject.name];
 
-      helper.trans(active).each(function (d: any) {
+      helper.trans(active).each(function (this: any, d: any) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
       helper.cleanTooltipSelect();
       var selectedRecords = api.getSelected();
-      selectedRecords.forEach((record) => {
-        const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+      selectedRecords.forEach((record: string) => {
+        const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
         if (!api.isRecordInactive(record)) {
           helper.createToolTipForValues(path, true);
         }
@@ -573,6 +575,7 @@ function onDragEndEventHandler(featureAxis: any): any {
 
 function scroll(d: { subject: any }): void {
   const element = document.getElementById("parallelcoords");
+  if (!element) return;
   if (
     parcoords.dragPosStart[d.subject.name] < parcoords.dragging[d.subject.name]
   ) {
@@ -809,7 +812,13 @@ export function createContextMenuForRecords(): any {
   return contextMenu;
 }
 
-function createContextMenuItem(contextMenu, id, className, text, title) {
+function createContextMenuItem(
+  contextMenu: any,
+  id: string,
+  className: string,
+  text: string,
+  title: string,
+) {
   contextMenu
     .append("div")
     .attr("id", id)
@@ -824,6 +833,7 @@ export function handleRecordContextMenu(
   d: any,
 ): void {
   const container = document.querySelector("#parallelcoords");
+  if (!container) return;
   const rect = container.getBoundingClientRect();
   const data = helper.getAllPointerEventsData(event);
   const cleanedItems = data.map((item: string) =>
@@ -850,14 +860,14 @@ export function handleRecordContextMenu(
       event.stopPropagation();
     });
 
-  select("#selectRecord").on("click", (event) => {
+  select("#selectRecord").on("click", (event: any) => {
     api.setSelection(cleanedItems);
     event.stopPropagation();
     select("#contextmenuRecords").style("display", "none");
   });
 
-  select("#unSelectRecord").on("click", (event) => {
-    cleanedItems.forEach((item) => {
+  select("#unSelectRecord").on("click", (event: any) => {
+    cleanedItems.forEach((item: string) => {
       api.setUnselected(item);
     });
     event.stopPropagation();
@@ -866,8 +876,8 @@ export function handleRecordContextMenu(
 
   select("#toggleRecord")
     .style("border-top", "0.08rem lightgrey solid")
-    .on("click", (event) => {
-      cleanedItems.forEach((item) => {
+    .on("click", (event: any) => {
+      cleanedItems.forEach((item: string) => {
         api.toggleSelection(item);
       });
       event.stopPropagation();
@@ -876,8 +886,8 @@ export function handleRecordContextMenu(
 
   select("#addSelection")
     .style("border-top", "0.08rem lightgrey solid")
-    .on("click", (event) => {
-      let selectedRecords = [];
+    .on("click", (event: any) => {
+      let selectedRecords: string[] = [];
       selectedRecords = api.getSelected();
       const records = [...selectedRecords, ...cleanedItems];
       api.setSelection(records);
@@ -885,8 +895,8 @@ export function handleRecordContextMenu(
       select("#contextmenuRecords").style("display", "none");
     });
 
-  select("#removeSelection").on("click", (event) => {
-    cleanedItems.forEach((item) => {
+  select("#removeSelection").on("click", (event: any) => {
+    cleanedItems.forEach((item: string) => {
       api.setUnselected(item);
     });
     event.stopPropagation();

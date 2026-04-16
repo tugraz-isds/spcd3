@@ -65,7 +65,7 @@ export function createToolbar(dataset: any[]): void {
   });
 }
 
-function makeIconButton(parent, opts) {
+function makeIconButton(parent: any, opts: any) {
   const { id, iconHtml, tipText, onClick } = opts;
 
   const btn = parent

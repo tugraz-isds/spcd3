@@ -1,20 +1,19 @@
 {
   "compilerOptions": {
     "module": "esnext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "target": "es2022",
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
     "pretty": true,
-    "downlevelIteration" : true,
+    "skipLibCheck": true,
     "declaration": true,
     "declarationDir": "types",
-    "moduleResolution":"node",
     "allowJs": true,
-    "baseUrl": ".",
     "paths": {
-      "pc-lib": ["src/lib/index.ts"]
+      "pc-lib": ["./src/lib/index.ts"]
     }
   },
   "include": [

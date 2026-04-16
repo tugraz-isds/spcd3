@@ -30,41 +30,55 @@ import {
   getSelectableWith,
 } from "pc-lib";
 
-let data;
-let newData;
-let moveDimensionData;
-let filterDimensionData;
-let rangeDimensionData;
+type ParsedData = ReturnType<typeof loadCSV>;
+
+let data: string;
+let newData: ParsedData;
+let moveDimensionData = "";
+let filterDimensionData = "";
+let rangeDimensionData = "";
 
 let studentData =
   "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
 
-window.addEventListener("click", (event: any) => {
-  if (!event.target.id.includes("show")) {
+window.addEventListener("click", (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null;
+  const targetId = target?.id ?? "";
+  if (!targetId.includes("show")) {
     closeElements("options");
   }
-  if (!event.target.id.includes("invert")) {
+  if (!targetId.includes("invert")) {
     closeElements("invertOptions");
   }
-  if (!event.target.id.includes("move")) {
+  if (!targetId.includes("move")) {
     closeElements("moveOptions");
   }
-  if (!event.target.id.includes("filter")) {
+  if (!targetId.includes("filter")) {
     closeElements("filterOptions");
-    if (document.getElementById("filterContainer") != null) {
-      document.getElementById("filterContainer").remove();
+    const filterContainer = document.getElementById("filterContainer");
+    if (filterContainer) {
+      filterContainer.remove();
     }
   }
-  if (!event.target.id.includes("range")) {
+  if (!targetId.includes("range")) {
     closeElements("rangeOptions");
-    if (document.getElementById("rangeContainer")) {
-      document.getElementById("rangeContainer").remove();
+    const rangeContainer = document.getElementById("rangeContainer");
+    if (rangeContainer) {
+      rangeContainer.remove();
     }
   }
-  if (!event.target.id.includes("sel")) {
+  if (!targetId.includes("sel")) {
     closeElements("options_r");
   }
 });
+
+function elementById<T extends HTMLElement>(id: string): T {
+  const element = document.getElementById(id) as T | null;
+  if (!element) {
+    throw new Error("No element with id: ${id}");
+  }
+  return element;
+}
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -79,42 +93,48 @@ document.addEventListener(
     generateDropdownForFilter();
     generateDropdownForRange();
     generateDropdownForSelectRecords();
-    document.getElementById("border").style.visibility = "visible";
+    elementById<HTMLElement>("border").style.visibility = "visible";
   },
   false,
 );
 
-let inputButton = document.getElementById("input");
+let inputButton = elementById<HTMLElement>("input");
 inputButton.addEventListener("click", openFileDialog, false);
 
-let inputFile = document.getElementById("fileInput");
+let inputFile = elementById<HTMLInputElement>("fileInput");
 inputFile.addEventListener("change", handleFileSelect, false);
 inputFile.addEventListener("cancel", () => {
-  document.getElementById("input").textContent = "Upload File...";
+  elementById<HTMLElement>("input").textContent = "Upload File...";
 });
-inputFile.addEventListener("click", (event: any) => {
-  event.target.value = null;
+inputFile.addEventListener("click", (event: MouseEvent) => {
+  const target = event.target as HTMLInputElement | null;
+  if (target) {
+    target.value = "";
+  }
 });
 
-let downloadButton = document.getElementById("download");
+let downloadButton = elementById<HTMLButtonElement>("download");
 downloadButton.addEventListener("click", () => {
   saveAsSvg();
 });
 downloadButton.style.visibility = "hidden";
 
-let resetRangesButton = document.getElementById("resetRanges");
+let resetRangesButton = elementById<HTMLButtonElement>("resetRanges");
 resetRangesButton.addEventListener("click", resetToOriginalRange, false);
 resetRangesButton.style.visibility = "hidden";
 
-let resetRoundedRangesButton = document.getElementById("resetRoundedRanges");
+let resetRoundedRangesButton =
+  elementById<HTMLButtonElement>("resetRoundedRanges");
 resetRoundedRangesButton.addEventListener("click", resetToRoundedRange, false);
 resetRoundedRangesButton.style.visibility = "hidden";
 
-let resetAllButton = document.getElementById("resetAll");
+let resetAllButton = elementById<HTMLButtonElement>("resetAll");
 resetAllButton.addEventListener("click", resetAll, false);
 resetAllButton.style.visibility = "hidden";
 
-let sensitivityButton = document.getElementById("setSelectionSensitivity");
+let sensitivityButton = elementById<HTMLButtonElement>(
+  "setSelectionSensitivity",
+);
 sensitivityButton.addEventListener(
   "click",
   generateModalForSetSensitivity,
@@ -123,18 +143,21 @@ sensitivityButton.addEventListener(
 sensitivityButton.style.visibility = "hidden";
 
 function openFileDialog() {
-  document.getElementById("fileInput").click();
+  elementById<HTMLInputElement>("fileInput").click();
 }
 
-function handleFileSelect(event) {
-  const file = event.target.files[0];
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement | null;
+  const file = target?.files?.[0];
 
   if (file) {
     const reader = new FileReader();
 
-    reader.onload = function (e) {
+    reader.onload = function (e: ProgressEvent<FileReader>) {
       clearPlot();
-      data = e.target.result;
+      const result = e.target?.result;
+      if (typeof result !== "string") return;
+      data = result;
       newData = loadCSV(data);
       drawChart(newData);
 
@@ -147,7 +170,7 @@ function handleFileSelect(event) {
       generateDropdownForRange();
       generateDropdownForSelectRecords();
 
-      document.getElementById("border").style.visibility = "visible";
+      elementById<HTMLElement>("border").style.visibility = "visible";
     };
     reader.readAsText(file);
   }
@@ -161,7 +184,7 @@ function showButtons() {
   sensitivityButton.style.visibility = "visible";
 }
 
-function updateDimensions(dimension) {
+function updateDimensions(dimension: string) {
   if (getHiddenStatus(dimension) == "shown") {
     hide(dimension);
   } else {
@@ -169,13 +192,16 @@ function updateDimensions(dimension) {
   }
 }
 
-function closeElements(id) {
-  let options = document.getElementById(id);
-  options.style.display = "none";
+function closeElements(id: string) {
+  const options = document.getElementById(id);
+  if (options) {
+    options.style.display = "none";
+  }
 }
 
-function showOptions(id, buttonId) {
-  let options = document.getElementById(id);
+function showOptions(id: string, buttonId: string) {
+  const options = document.getElementById(id);
+  if (!options) return;
 
   options.style.display == "none"
     ? (options.style.display = "block")
@@ -199,14 +225,16 @@ function showOptions(id, buttonId) {
   });
 }
 
-function showOptionsForRecords(id, buttonId) {
+function showOptionsForRecords(id: string, buttonId: string) {
   let checkboxes = document.getElementById(id);
+  if (!checkboxes) return;
 
   checkboxes.style.display == "none"
     ? (checkboxes.style.display = "block")
     : (checkboxes.style.display = "none");
 
   let button = document.getElementById(buttonId);
+  if (!button) return;
 
   checkboxes.style.display == "block"
     ? (button.style.backgroundColor = "white")
@@ -229,7 +257,7 @@ function showOptionsForRecords(id, buttonId) {
 }
 
 function generateDropdownForShow() {
-  const container = document.getElementById("hideDimensionContainer");
+  const container = elementById<HTMLElement>("hideDimensionContainer");
   container.style.position = "relative";
 
   let selectButton = document.createElement("button");
@@ -257,8 +285,11 @@ function generateDropdownForShow() {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("change", (event: any) => {
-    updateDimensions(event.target.value);
+  dimensionContainer.addEventListener("change", (event: Event) => {
+    const target = event.target as HTMLInputElement | null;
+    if (target) {
+      updateDimensions(target.value);
+    }
   });
 
   selectButton.addEventListener("click", () => {
@@ -293,7 +324,7 @@ function generateDropdownForShow() {
 }
 
 function generateDropdownForInvert() {
-  const container = document.getElementById("invDimensionContainer");
+  const container = elementById<HTMLElement>("invDimensionContainer");
   container.style.position = "relative";
 
   let dimensionContainer = document.createElement("div");
@@ -335,7 +366,7 @@ function generateDropdownForInvert() {
           '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
       }
 
-      inputButton.addEventListener("click", (event) => {
+      inputButton.addEventListener("click", () => {
         const value = inputButton.id.replace("invert_", "");
         if (value != undefined) {
           invert(value);
@@ -361,7 +392,7 @@ function generateDropdownForInvert() {
     showOptions("invertOptions", "invertButton");
     calcDDBehaviour(dimensionContainer, selectButton);
     for (let i = 0; i < dimensions.length; i++) {
-      document.addEventListener("DOMContentLoaded", function (event) {
+      document.addEventListener("DOMContentLoaded", function () {
         if (getInversionStatus(dimensions[i]) == "ascending") {
           inputButton.innerHTML =
             '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
@@ -378,7 +409,7 @@ function generateDropdownForInvert() {
 }
 
 function generateDropdownForMove() {
-  const container = document.getElementById("moDimensionContainer");
+  const container = elementById<HTMLElement>("moDimensionContainer");
   container.style.position = "relative";
 
   let dimensionContainer = document.createElement("div");
@@ -452,7 +483,10 @@ function generateDropdownForMove() {
   container.appendChild(dimensionContainer);
 }
 
-function calcDDBehaviour(dimensionContainer, selectButton) {
+function calcDDBehaviour(
+  dimensionContainer: HTMLElement,
+  selectButton: HTMLButtonElement,
+) {
   const dropdownHeight = dimensionContainer.clientHeight;
   const windowHeight = window.innerHeight;
   const dropdownTop = selectButton.getBoundingClientRect().top;
@@ -515,7 +549,7 @@ function disableLeftAndRightButton() {
 }
 
 function generateDropdownForFilter() {
-  const container = document.getElementById("filtDimensionContainer");
+  const container = elementById<HTMLElement>("filtDimensionContainer");
   container.style.position = "relative";
 
   let selectButton = document.createElement("button");
@@ -565,9 +599,10 @@ function generateDropdownForFilter() {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("click", (event: any) => {
-    if (event.target.value != undefined) {
-      filterDimensionData = event.target.value;
+  dimensionContainer.addEventListener("click", (event: MouseEvent) => {
+    const target = event.target as HTMLInputElement | null;
+    if (target?.value != undefined) {
+      filterDimensionData = target.value;
       generateModuleForSetFilter();
       dimensionContainer.style.display == "none"
         ? (dimensionContainer.style.display = "block")
@@ -580,7 +615,7 @@ function generateDropdownForFilter() {
 }
 
 function generateModuleForSetFilter() {
-  const section = document.getElementById("bottom-controls");
+  const section = elementById<HTMLElement>("bottom-controls");
 
   const overlay = document.createElement("div");
   overlay.id = "filterOverlay";
@@ -590,7 +625,7 @@ function generateModuleForSetFilter() {
   modal.id = "filterContainer";
   modal.className = "modal";
 
-  modal.addEventListener("click", (event) => {
+  modal.addEventListener("click", (event: MouseEvent) => {
     event.stopPropagation();
   });
 
@@ -670,7 +705,7 @@ function generateModuleForSetFilter() {
   error.id = "filterError";
   error.className = "modal-errormessage";
 
-  const onEnter = (event) => {
+  const onEnter = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
       saveButton.click();
@@ -679,7 +714,7 @@ function generateModuleForSetFilter() {
   inputMin.addEventListener("keydown", onEnter);
   inputMax.addEventListener("keydown", onEnter);
 
-  const showError = (msg) => {
+  const showError = (msg: string) => {
     error.textContent = msg;
     error.style.display = "block";
   };
@@ -762,7 +797,7 @@ function generateModuleForSetFilter() {
 }
 
 function generateDropdownForRange() {
-  const container = document.getElementById("ranDimensionContainer");
+  const container = elementById<HTMLElement>("ranDimensionContainer");
   container.style.position = "relative";
 
   let selectButton = document.createElement("button");
@@ -812,9 +847,10 @@ function generateDropdownForRange() {
     dimensionContainer.style.height = "12.5rem";
   }
 
-  dimensionContainer.addEventListener("click", (event: any) => {
-    if (event.target.value != undefined) {
-      rangeDimensionData = event.target.value;
+  dimensionContainer.addEventListener("click", (event: MouseEvent) => {
+    const target = event.target as HTMLInputElement | null;
+    if (target?.value != undefined) {
+      rangeDimensionData = target.value;
       generateModuleForRangeSettings();
       dimensionContainer.style.display == "none"
         ? (dimensionContainer.style.display = "block")
@@ -827,7 +863,7 @@ function generateDropdownForRange() {
 }
 
 function generateModuleForRangeSettings() {
-  const section = document.getElementById("bottom-controls");
+  const section = elementById<HTMLElement>("bottom-controls");
 
   const overlay = document.createElement("div");
   overlay.id = "rangeOverlay";
@@ -837,7 +873,7 @@ function generateModuleForRangeSettings() {
   modal.id = "rangeContainer";
   modal.className = "modal";
 
-  modal.addEventListener("click", (event) => {
+  modal.addEventListener("click", (event: MouseEvent) => {
     event.stopPropagation();
   });
 
@@ -945,7 +981,7 @@ function generateModuleForRangeSettings() {
   error.id = "rangeError";
   error.className = "modal-errormessage";
 
-  const onEnter = (event) => {
+  const onEnter = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
       saveButton.click();
@@ -1059,12 +1095,12 @@ function generateModalForSetSensitivity() {
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
   };
 
-  const onKeyDown = (e) => {
+  const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") close();
   };
 
   closeButton.addEventListener("click", close);
-  overlay.addEventListener("click", (e) => {
+  overlay.addEventListener("click", (e: MouseEvent) => {
     if (e.target === overlay) close();
   });
   document.addEventListener("keydown", onKeyDown);
@@ -1108,8 +1144,9 @@ function generateModalForSetSensitivity() {
   slider.value = String(current.replace("rem", ""));
   valueDisplay.textContent = current;
 
-  slider.addEventListener("input", (event: any) => {
-    const v = Math.round(+event.target.value * 100) / 100;
+  slider.addEventListener("input", (event: Event) => {
+    const target = event.target as HTMLInputElement | null;
+    const v = Math.round(+(target?.value ?? slider.value) * 100) / 100;
     valueDisplay.textContent = v + "rem";
   });
 
@@ -1144,7 +1181,7 @@ function generateModalForSetSensitivity() {
 function generateDropdownForSelectRecords() {
   let records = getAllRecords();
 
-  const container = document.getElementById("selRecordsContainer");
+  const container = elementById<HTMLElement>("selRecordsContainer");
   container.style.position = "relative";
 
   let selectButton = document.createElement("button");
@@ -1172,13 +1209,15 @@ function generateDropdownForSelectRecords() {
     recordsContainer.style.height = "12.5rem";
   }
 
-  recordsContainer.addEventListener("change", (event: any) => {
-    var line = document.getElementsByClassName(event.target.value);
+  recordsContainer.addEventListener("change", (event: Event) => {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    var line = document.getElementsByClassName(target.value);
     const element = line[0];
     const computedStyle = window.getComputedStyle(element);
     const strokeColor = computedStyle.stroke;
     if (strokeColor !== "rgb(211, 211, 211)") {
-      toggleSelection(event.target.value);
+      toggleSelection(target.value);
     }
   });
 
@@ -1206,17 +1245,19 @@ function generateDropdownForSelectRecords() {
 }
 
 function clearPlot() {
-  const parentElement = document.getElementById("parallelcoords");
-  const invertContainer = document.getElementById("invDimensionContainer");
-  const hideContainer = document.getElementById("hideDimensionContainer");
-  const moveContainer = document.getElementById("moDimensionContainer");
-  const filterDimensionContainer = document.getElementById(
+  const parentElement = elementById<HTMLElement>("parallelcoords");
+  const invertContainer = elementById<HTMLElement>("invDimensionContainer");
+  const hideContainer = elementById<HTMLElement>("hideDimensionContainer");
+  const moveContainer = elementById<HTMLElement>("moDimensionContainer");
+  const filterDimensionContainer = elementById<HTMLElement>(
     "filtDimensionContainer",
   );
-  const rangeDimensionContainer = document.getElementById(
+  const rangeDimensionContainer = elementById<HTMLElement>(
     "ranDimensionContainer",
   );
-  const selectRecordsContainer = document.getElementById("selRecordsContainer");
+  const selectRecordsContainer = elementById<HTMLElement>(
+    "selRecordsContainer",
+  );
 
   while (parentElement.firstChild) {
     parentElement.removeChild(parentElement.firstChild);

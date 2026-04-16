@@ -23,9 +23,8 @@ export function throttle<Params extends any[]>(
   delay: number,
 ): (...args: Params) => void {
   let lastExecTime = 0;
-  return function () {
+  return function (this: unknown, ...args: Params) {
     const context = this;
-    const args = arguments;
     const currentTime = Date.now();
     if (currentTime - lastExecTime >= delay) {
       func.apply(context, args);
@@ -44,9 +43,9 @@ export function addNumberOfDigs(
   dimensionName: any,
   key: any,
 ): void {
-  let newObject = {};
+  const newObject: Record<string, any> = {};
   newObject[key] = number;
-  const target = currentPosOfDims.find((obj) => obj.key == dimensionName);
+  const target = currentPosOfDims.find((obj: any) => obj.key == dimensionName);
   Object.assign(target, newObject);
 }
 

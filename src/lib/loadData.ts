@@ -240,7 +240,7 @@ function validateParsedCsv(data: CsvData): CsvValidationResult {
     (col) => !removedColumns.includes(col),
   );
 
-  const validData = [] as CsvData;
+  const validData = [] as unknown as CsvData;
   Object.defineProperty(validData, "columns", {
     value: columns,
     enumerable: false,
@@ -282,9 +282,10 @@ function removeDuplicateColumnNames(value: string): any {
   let completeArray = value.split(/\r?\n/);
   let column_string = csvParse(completeArray[0]);
   let n = 0;
-  const unique = (arr) =>
+  const unique = (arr: string[]) =>
     arr.map(
-      ((s) => (v) => (!s.has(v) && s.add(v) ? v : `${v}(${(n += 1)})`))(
+      ((s) => (v: string) =>
+        !s.has(v) && s.add(v) ? v : `${v}(${(n += 1)})`)(
         new Set(),
       ),
     );

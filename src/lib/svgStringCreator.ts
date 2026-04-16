@@ -19,7 +19,7 @@ export function setActivePathLinesToDownload(svg: any): void {
     .attr("id", (d: { [x: string]: string }) => {
       return utils.cleanString(d[key]);
     })
-    .each(function (d: any) {
+    .each(function (this: any, d: any) {
       select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
     });
 
@@ -66,7 +66,7 @@ export function setFeatureAxisToDownload(
       (d: { name: any }) => "translate(" + xScales(d.name) + ")",
     );
 
-  featureAxis.append("g").each(function (d: { name: string }) {
+  featureAxis.append("g").each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const max = api.getCurrentMaxRange(d.name);
     const min = api.getCurrentMinRange(d.name);
@@ -129,7 +129,7 @@ export function setFeatureAxisToDownload(
 }
 
 function setBrushDownToDownload(featureAxis: any): void {
-  featureAxis.each(function (d: { name: string }) {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const item = parcoords.currentPosOfDims.find(
       (object: { key: any }) => object.key == d.name,
@@ -147,7 +147,7 @@ function setBrushDownToDownload(featureAxis: any): void {
 }
 
 function setBrushUpToDownload(featureAxis: any): void {
-  featureAxis.each(function (d: { name: string }) {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const item = parcoords.currentPosOfDims.find(
       (object: { key: any }) => object.key == d.name,
@@ -165,7 +165,7 @@ function setBrushUpToDownload(featureAxis: any): void {
 }
 
 function setRectToDragToDownload(featureAxis: any): void {
-  featureAxis.each(function (d: { name: string }) {
+  featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
     const item = parcoords.currentPosOfDims.find(
       (object: { key: any }) => object.key == d.name,
@@ -194,7 +194,7 @@ function setInvertIconToDownload(featureAxis: any): void {
     .attr("height", 12)
     .attr("y", 0)
     .attr("x", 0)
-    .each(function (d: { name: string }) {
+    .each(function (this: any, d: { name: string }) {
       const processedDimensionName = utils.cleanString(d.name);
       if (api.getInversionStatus(processedDimensionName) == "descending") {
         select(this).attr("href", "#arrow_image_down");

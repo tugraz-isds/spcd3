@@ -19,6 +19,8 @@ import { line } from "d3-shape";
 import { interpolatePath } from "d3-interpolate-path";
 import { easeCubic } from "d3-ease";
 
+type StringKeyed = Record<string, any>;
+
 //---------- Show and Hide Functions ----------
 
 export function hide(dimension: string): void {
@@ -52,7 +54,7 @@ export function hide(dimension: string): void {
     .transition()
     .duration(1500)
     .style("opacity", 0)
-    .on("end", function () {
+    .on("end", function (this: any) {
       select(this).attr("visibility", "hidden");
     });
 
@@ -72,7 +74,7 @@ export function hide(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     helper.createToolTipForValues(path, true);
   });
 }
@@ -151,7 +153,7 @@ export function show(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     helper.createToolTipForValues(path, true);
   });
 }
@@ -235,7 +237,7 @@ export function moveByOne(dimension: string, direction: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -327,7 +329,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -401,7 +403,7 @@ export function setDimensionRange(
   addRange(max, parcoords.currentPosOfDims, dimension, "currentRangeTop");
 
   select("#dimension_axis_" + utils.cleanString(dimension))
-    .call(yAxis[dimension])
+    .call((yAxis as StringKeyed)[dimension])
     .transition()
     .duration(1000)
     .ease(easeCubic);
@@ -415,7 +417,7 @@ export function setDimensionRange(
     })
     .ease(easeCubic);
 
-  active_all.each(function (d: any) {
+  active_all.each(function (this: any, d: any) {
     select(this)
       .transition()
       .duration(1000)
@@ -573,7 +575,7 @@ export function setDimensionRangeRounded(
   }
 
   select("#dimension_axis_" + utils.cleanString(dimension))
-    .call(yAxis[dimension])
+    .call((yAxis as StringKeyed)[dimension])
     .transition()
     .duration(1000)
     .ease(easeCubic);
@@ -587,7 +589,7 @@ export function setDimensionRangeRounded(
     })
     .ease(easeCubic);
 
-  active.each(function (d: any) {
+  active.each(function (this: any, d: any) {
     select(this)
       .transition()
       .duration(1000)
@@ -603,7 +605,7 @@ function addRange(
   dimension: string,
   key: string,
 ): void {
-  let newObject = {};
+  const newObject: StringKeyed = {};
   newObject[key] = Number(value);
   const target = currentPosOfDims.find(
     (obj: { key: string }) => obj.key == dimension,
@@ -674,20 +676,20 @@ export function invertWoTransition(dimension: string): void {
   );
 
   select(dimensionId).call(
-    yAxis[dimension].scale(
+    (yAxis as StringKeyed)[dimension].scale(
       parcoords.yScales[dimension].domain(
         parcoords.yScales[dimension].domain().reverse(),
       ),
     ),
   );
 
-  helper.trans(active).each(function (d: any) {
+  helper.trans(active).each(function (this: any, d: any) {
     select(this).attr("d", (d: any) => {
       return helper.linePath(d, parcoords.newFeatures);
     });
   });
 
-  helper.trans(selectAll("path.hitarea")).each(function (d: any) {
+  helper.trans(selectAll("path.hitarea")).each(function (this: any, d: any) {
     select(this).attr("d", (d: any) => {
       return helper.linePath(d, parcoords.newFeatures);
     });
@@ -703,7 +705,7 @@ export function invertWoTransition(dimension: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -737,7 +739,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     .transition()
     .duration(1000)
     .call(
-      yAxis[dimension].scale(
+      (yAxis as StringKeyed)[dimension].scale(
         parcoords.yScales[dimension].domain(
           parcoords.yScales[dimension].domain().reverse(),
         ),
@@ -745,7 +747,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     )
     .ease(easeCubic);
 
-  helper.trans(active).each(function (d: any) {
+  helper.trans(active).each(function (this: any, d: any) {
     select(this)
       .transition()
       .duration(1000)
@@ -755,7 +757,7 @@ export function setInversionStatus(dimension: string, status: string): void {
       .ease(easeCubic);
   });
 
-  helper.trans(selectAll("path.hitarea")).each(function (d: any) {
+  helper.trans(selectAll("path.hitarea")).each(function (this: any, d: any) {
     select(this).attr("d", (d: any) => {
       return helper.linePath(d, parcoords.newFeatures);
     });
@@ -772,7 +774,7 @@ export function setInversionStatus(dimension: string, status: string): void {
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
-    const path = parcoords.newDataset.find((d) => d[hoverlabel] === record);
+    const path = parcoords.newDataset.find((d: any) => d[hoverlabel] === record);
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
     }
@@ -807,7 +809,7 @@ export function invert(dimension: string): void {
     .transition()
     .duration(1000)
     .call(
-      yAxis[dimension].scale(
+      (yAxis as StringKeyed)[dimension].scale(
         parcoords.yScales[dimension].domain(
           parcoords.yScales[dimension].domain().reverse(),
         ),
@@ -815,7 +817,7 @@ export function invert(dimension: string): void {
     )
     .ease(easeCubic);
 
-  helper.trans(active).each(function (d: any) {
+  helper.trans(active).each(function (this: any, d: any) {
     select(this)
       .transition()
       .duration(1000)
@@ -825,7 +827,7 @@ export function invert(dimension: string): void {
       .ease(easeCubic);
   });
 
-  helper.trans(selectAll("path.hitarea")).each(function (d: any) {
+  helper.trans(selectAll("path.hitarea")).each(function (this: any, d: any) {
     select(this).attr("d", (d: any) => {
       return helper.linePath(d, parcoords.newFeatures);
     });
@@ -835,7 +837,7 @@ export function invert(dimension: string): void {
   var selectedRecords = getSelected();
   selectedRecords.forEach((record) => {
     const path = parcoords.newDataset.find(
-      (d) => utils.cleanString(d[hoverlabel]) === record,
+      (d: any) => utils.cleanString(d[hoverlabel]) === record,
     );
     if (!isRecordInactive(record)) {
       helper.createToolTipForValues(path, true);
@@ -877,7 +879,7 @@ export function setSelection(records: string[]): void {
 
       records.forEach((record) => {
         const path = parcoords.newDataset.find(
-          (d) => utils.cleanString(d[hoverlabel]) === record,
+          (d: any) => utils.cleanString(d[hoverlabel]) === record,
         );
         helper.createToolTipForValues(path, true);
       });
@@ -1037,7 +1039,7 @@ export function isDimensionCategorical(dimension: string): boolean {
   const values = parcoords.newDataset.map(
     (o: { [x: string]: any }) => o[dimension],
   );
-  const isAllNumeric = values.every((v) => !isNaN(Number(v)));
+  const isAllNumeric = values.every((v: any) => !isNaN(Number(v)));
   return !isAllNumeric;
 }
 
@@ -1051,7 +1053,7 @@ export function hideMarker(dimension: string) {
   select("#marker_" + cleanDimensionName).classed("visible", false);
 }
 
-export function setClassColoredFalse(record) {
+export function setClassColoredFalse(record: string) {
   const path = selectAll("#" + utils.cleanString(record));
   path.classed("colored", false);
 }
@@ -1079,7 +1081,7 @@ export function enableInteractivity() {
 export function setSelectableWidth(width: string) {
   setLineThickness(width);
   let hitarea_active = selectAll("path.hitarea");
-  hitarea_active.each(function (d: any) {
+  hitarea_active.each(function (this: any, d: any) {
     const value = width;
     select(this).style("stroke-width", value);
   });
