@@ -102,7 +102,7 @@ export function setBrushUp(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 6 0, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 14)}') 7 7, auto`,
       );
 
     const hit = g
@@ -115,7 +115,7 @@ export function setBrushUp(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 13)}') 6 0, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 14)}') 7 7, auto`,
       );
 
     const makeDrag = () =>
@@ -183,7 +183,7 @@ export function setBrushDown(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 6 12, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 14)}') 7 7, auto`,
       );
 
     const hit = g
@@ -196,7 +196,7 @@ export function setBrushDown(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 13)}') 6 12, auto`,
+        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 14)}') 7 7, auto`,
       );
 
     const makeDrag = () =>

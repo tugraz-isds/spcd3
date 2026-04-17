@@ -1069,10 +1069,15 @@ export function setClassColoredFalse(record: string) {
 }
 
 export function disableInteractivity() {
-  select("#spcd3-toolbarRow").style("display", "none");
+  select("#spcd3-toolbarRow")
+    .style("pointer-events", "none")
+    .style("opacity", "0.45")
+    .style("filter", "grayscale(1)")
+    .style("cursor", "not-allowed");
+  selectAll("#spcd3-toolbarRow *").style("cursor", "not-allowed");
   select("#spcd3-parallelcoords").style("pointer-events", "none");
   select("#spcd3-parallelcoords")
-    .style("background", "lightgrey")
+    .style("background", "rgb(245, 245, 245)")
     .style("z-index", 1);
   selectAll(".hitarea").style("pointer-events", "none");
   selectAll(".spcd3-handle-hitbox").style("pointer-events", "none");
@@ -1080,7 +1085,12 @@ export function disableInteractivity() {
 }
 
 export function enableInteractivity() {
-  select("#spcd3-toolbarRow").style("display", "flex");
+  select("#spcd3-toolbarRow")
+    .style("pointer-events", "auto")
+    .style("opacity", "1")
+    .style("filter", "none")
+    .style("cursor", "auto");
+  selectAll("#spcd3-toolbarRow *").style("cursor", null);
   select("#spcd3-parallelcoords").style("pointer-events", "auto");
   select("#spcd3-parallelcoords").style("background", "white");
   selectAll(".hitarea").style("pointer-events", "stroke");

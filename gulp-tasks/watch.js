@@ -6,11 +6,13 @@ const ts = require("gulp-typescript");
 const tsProject = ts.createProject("tsconfig.json");
 
 function buildExampleTS() {
-  return tsProject.src().pipe(tsProject()).pipe(dest("./dist"));
+  return src("./src/example/**/*.ts").pipe(tsProject()).pipe(dest("./dist/example"));
 }
 
 function copyExampleFolder() {
-  return src("./src/example/**/*").pipe(dest("./dist/example"));
+  return src(["./src/example/**/*", "!./src/example/**/*.ts"]).pipe(
+    dest("./dist/example"),
+  );
 }
 
 function copyLibFileToExample() {

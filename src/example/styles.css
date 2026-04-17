@@ -553,7 +553,7 @@ div#selectRecordsHeader {
 .modal-input {
   width: 4.5rem;
   border: 0.1rem solid lightgrey;
-  border-radius: 0.1;
+  border-radius: 0.1rem;
 }
 
 .modal-errormessage {

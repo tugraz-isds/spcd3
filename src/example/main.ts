@@ -93,7 +93,6 @@ document.addEventListener(
     generateDropdownForFilter();
     generateDropdownForRange();
     generateDropdownForSelectRecords();
-    elementById<HTMLElement>("border").style.visibility = "visible";
   },
   false,
 );
@@ -170,7 +169,6 @@ function handleFileSelect(event: Event) {
       generateDropdownForRange();
       generateDropdownForSelectRecords();
 
-      elementById<HTMLElement>("border").style.visibility = "visible";
     };
     reader.readAsText(file);
   }
