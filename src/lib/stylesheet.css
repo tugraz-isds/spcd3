@@ -1,8 +1,32 @@
+#spcd3-parallelcoords,
+.spcd3-modal-overlay,
+.spcd3-modal,
+.spcd3-modal-tableoverlay,
+.spcd3-modal-tabledata,
+.spcd3-contextmenu-records,
+.spcd3-contextmenu-dimensions,
+.spcd3-toolbar-buttontip {
+  color-scheme: light;
+  forced-color-adjust: none;
+  font-size: 16px;
+}
+
 .spcd3-button {
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
+  box-sizing: border-box;
+  font: inherit;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
   background: #f6f6f6;
-  border: 0.08rem solid grey;
+  border: 0.03rem solid #b8b8b8;
   border-radius: 0.1rem;
+  color: #000;
+  opacity: 1;
+  box-shadow: none;
+  text-transform: none;
 }
 
 .spcd3-generic-button {
@@ -13,8 +37,10 @@
 
 .spcd3-save-button {
   margin-left: 0.5rem;
-  padding: 0 0.5rem;
+  min-height: 1.7rem;
+  padding: 0.2rem 0.5rem;
   display: inline-block;
+  vertical-align: middle;
 }
 
 .spcd3-save-csv-button {
@@ -25,12 +51,22 @@
 }
 
 .spcd3-close-button {
+  appearance: none;
+  -webkit-appearance: none;
   position: absolute;
   top: 0.625rem;
   right: 0.938rem;
+  border: 0;
+  background: transparent;
+  color: #000;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
   font-size: 1.25rem;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: none;
+  opacity: 1;
 }
 
 .spcd3-th {
@@ -71,12 +107,39 @@
 
 .spcd3-tablecontainer {
   width: 100%;
+  color: #000;
+  background: #fff;
+}
+
+.spcd3-tablecontainer table,
+table.spcd3-tablecontainer {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #000;
+  background: #fff;
+}
+
+.spcd3-tablecontainer thead,
+.spcd3-tablecontainer tbody,
+.spcd3-tablecontainer tr,
+.spcd3-tablecontainer th,
+.spcd3-tablecontainer td,
+table.spcd3-tablecontainer thead,
+table.spcd3-tablecontainer tbody,
+table.spcd3-tablecontainer tr,
+table.spcd3-tablecontainer th,
+table.spcd3-tablecontainer td {
+  color: #000;
+  background-clip: padding-box;
 }
 
 #spcd3-parallelcoords {
   display: block;
   width: 100%;
   text-align: left;
+  color: #000;
+  background: #fff;
 }
 
 #spcd3-pc_svg {
@@ -123,6 +186,7 @@
   margin: 0.5rem;
   padding: 0.12rem;
   background-color: lightgrey;
+  color: #000;
   visibility: hidden;
 }
 
@@ -165,6 +229,7 @@
   font-size: 0.75rem;
   z-index: 1000;
   white-space: pre-line;
+  color: #000;
 }
 
 .spcd3-tooltip-dimension {
@@ -175,6 +240,7 @@
   margin: 0.5rem;
   padding: 0.12rem;
   background-color: lightgrey;
+  color: #000;
   visibility: hidden;
 }
 
@@ -222,6 +288,8 @@
 }
 
 .spcd3-toolbar-button {
+  appearance: none;
+  -webkit-appearance: none;
   width: 1.4rem;
   height: 1.4rem;
   position: relative;
@@ -233,6 +301,16 @@
   justify-content: center;
   box-sizing: border-box;
   vertical-align: middle;
+  background: #f6f6f6;
+  color: #000;
+  font: inherit;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.1rem;
+  box-shadow: none;
+  opacity: 1;
+  text-transform: none;
 }
 
 .spcd3-toolbar-buttonicon {
@@ -254,6 +332,7 @@
   white-space: nowrap;
   line-height: 1.2;
   pointer-events: none;
+  color: #000;
 }
 
 .spcd3-toolbar-buttontip:popover-open {
@@ -287,6 +366,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: #000;
 }
 
 .spcd3-scroll-wrapper {
@@ -305,6 +385,7 @@
   background-color: white;
   cursor: pointer;
   z-index: 9999;
+  color: #000;
 }
 
 .spcd3-contextmenu-dimensions {
@@ -315,6 +396,7 @@
   background-color: white;
   cursor: pointer;
   z-index: 9999;
+  color: #000;
 }
 
 .spcd3-modal-overlay {
@@ -339,6 +421,7 @@
   border-radius: 0.5rem;
   box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2);
   display: none;
+  color: #000;
 }
 
 .spcd3-modal-header {
@@ -375,8 +458,13 @@
 
 .spcd3-modal-input {
   width: 4.5rem;
+  min-height: 1.7rem;
+  padding: 0.2rem 0.35rem;
   border: 0.1rem solid lightgrey;
   border-radius: 0.1rem;
+  box-sizing: border-box;
+  line-height: 1.2;
+  vertical-align: middle;
 }
 
 .spcd3-modal-errormessage {

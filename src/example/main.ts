@@ -455,7 +455,6 @@ function generateDropdownForMove() {
       arrowRight.id = "moveright_" + dimension;
       arrowRight.innerHTML =
         '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
-      arrowRight.style.paddingRight = "0.5rem";
       arrowRight.addEventListener("click", () => {
         const value = arrowRight.id.replace("moveright_", "");
         if (value != undefined) {
