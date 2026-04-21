@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 5">
-  <path fill="white" stroke="black" stroke-width="0.5" d="M 1 0 L 7 0 L 4 5 z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.4 -0.4 6.8 5.8">
+  <!-- spcd3-cursor-hotspot: 3 5 -->
+  <path fill="white" fill-opacity="0.5" stroke="black" stroke-width="0.4" d="M 0 0 L 6 0 L 3 5 z"/>
 </svg>

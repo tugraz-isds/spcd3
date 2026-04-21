@@ -559,11 +559,15 @@ function setInvertIcon(featureAxis: any): void {
     .style("pointer-events", "all")
     .each(function (this: any, d: { name: string }) {
       const processed = utils.cleanString(d.name);
+      const [hotspotX, hotspotY] = utils.getCursorHotspot(
+        icon.getArrowDownCursorMeta(),
+        12,
+      );
       select(this)
         .attr("id", "invert_hitbox_" + processed)
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 6 6, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowDownCursor(), 12))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 
@@ -576,12 +580,16 @@ function setInvertIcon(featureAxis: any): void {
     .attr("y", Number(value) - 33)
     .each(function (this: any, d: { name: string }) {
       const processed = utils.cleanString(d.name);
+      const [hotspotX, hotspotY] = utils.getCursorHotspot(
+        icon.getArrowDownCursorMeta(),
+        12,
+      );
       select(this)
         .attr("id", "dimension_invert_" + processed)
         .text("up")
         .style(
           "cursor",
-          `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowDownCursor()), 12)}') 6 6, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowDownCursor(), 12))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 

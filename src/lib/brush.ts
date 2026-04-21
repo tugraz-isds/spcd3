@@ -88,6 +88,10 @@ export function setBrushUp(
 ): void {
   featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
+    const [arrowTopHotspotX, arrowTopHotspotY] = utils.getCursorHotspot(
+      icon.getArrowTopCursorMeta(),
+      12,
+    );
     const g = select(this)
       .append("g")
       .attr("class", "brush_" + processedDimensionName);
@@ -102,7 +106,7 @@ export function setBrushUp(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 14)}') 7 7, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopCursor(), 12))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const hit = g
@@ -115,7 +119,7 @@ export function setBrushUp(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopCursor()), 14)}') 7 7, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopCursor(), 12))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -169,6 +173,10 @@ export function setBrushDown(
 ): void {
   featureAxis.each(function (this: any, d: { name: string }) {
     const processedDimensionName = utils.cleanString(d.name);
+    const [arrowBottomHotspotX, arrowBottomHotspotY] = utils.getCursorHotspot(
+      icon.getArrowBottomCursorMeta(),
+      12,
+    );
     const g = select(this)
       .append("g")
       .attr("class", "brush_" + processedDimensionName);
@@ -183,7 +191,7 @@ export function setBrushDown(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 14)}') 7 7, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowBottomCursor(), 12))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const hit = g
@@ -196,7 +204,7 @@ export function setBrushDown(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowBottomCursor()), 14)}') 7 7, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowBottomCursor(), 12))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -255,6 +263,8 @@ export function brushDown(
   tooltipValues: any,
   window: any,
 ): void {
+  const [arrowTopAndBottomHotspotX, arrowTopAndBottomHotspotY] =
+    utils.getCursorHotspot(icon.getArrowTopAndBottomMeta(), 20);
   const yPosBottom = Number(
     select("#triangle_up_" + cleanDimensionName).attr("y"),
   );
@@ -288,7 +298,7 @@ export function brushDown(
   } else {
     select("#rect_" + cleanDimensionName).style(
       "cursor",
-      `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 10 10, auto`,
+      `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopAndBottom(), 20))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
     );
   }
 
@@ -334,6 +344,8 @@ export function brushUp(
   tooltipValues: any,
   window: any,
 ): void {
+  const [arrowTopAndBottomHotspotX, arrowTopAndBottomHotspotY] =
+    utils.getCursorHotspot(icon.getArrowTopAndBottomMeta(), 20);
   const yPosTop = Number(
     select("#triangle_down_" + cleanDimensionName).attr("y"),
   );
@@ -363,7 +375,7 @@ export function brushUp(
       .attr("href", "#brush_image_top_active")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowTopAndBottom()), 20)}') 10 10, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopAndBottom(), 20))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
       )
       .style("fill", "rgb(255, 255, 0)")
       .style("opacity", "0.7");

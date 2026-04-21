@@ -435,34 +435,40 @@ function styleContextMenu(event: any): void {
 
 function setCursorForDimensions(d: any, featureAxis: any): void {
   if (api.getDimensionPosition(d.name) == 0) {
+    const [hotspotX, hotspotY] = utils.getCursorHotspot(
+      icon.getArrowRightMeta(),
+      14,
+    );
     featureAxis
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(encodeURIComponent(icon.getArrowRight()), 12)}') 12 6, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowRight(), 14))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else if (
     api.getDimensionPosition(d.name) ==
     parcoords.newFeatures.length - 1
   ) {
+    const [hotspotX, hotspotY] = utils.getCursorHotspot(
+      icon.getArrowLeftMeta(),
+      14,
+    );
     featureAxis
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(
-          encodeURIComponent(icon.getArrowLeft()),
-          12,
-        )}') 0 6, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowLeft(), 14))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else {
+    const [hotspotX, hotspotY] = utils.getCursorHotspot(
+      icon.getArrowLeftAndRightMeta(),
+      14,
+    );
     featureAxis
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${utils.setSize(
-          encodeURIComponent(icon.getArrowLeftAndRight()),
-          12,
-        )}') 6 6, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowLeftAndRight(), 14))}') ${hotspotX} ${hotspotY}, auto`,
       );
   }
 }

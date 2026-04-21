@@ -25,10 +25,8 @@ The SPCD3 library uses the following D3v7 modules:
 - d3-scale
 - d3-transition
 
-In addition to D3, the following JavaScript libraries are used:
+In addition to D3, the following JavaScript library are used:
 
-- [Mini SVG data: URI](https://github.com/tigt/mini-svg-data-uri#readme):
-  To convert SVGs into data URIs.
 - [xml-formatter](https://github.com/chrisbottin/xml-formatter#readme):
   To prettify the SVG file of the parallel coordinate plot for download.
 
@@ -49,26 +47,7 @@ yarn
 ### Build And Development
 
 Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
-defines four public tasks:
-
-<br/>
-
-`clean` removes the existing `dist/` directory in
-order to enable a clean rebuild of the project:
-
-```
-npx gulp clean
-```
-
-<br/>
-
-`cleanAll` restores the project folder to its virgin state,
-by deleting the existing `dist/`, `package/` and `node_modules/` directories
-and the `yarn.lock` file:
-
-```
-npx gulp cleanAll
-```
+defines six public tasks:
 
 <br/>
 
@@ -94,8 +73,37 @@ npx gulp dev
 
 <br/>
 
-Each of the public Gulp tasks can also be invoked by running the
-equivalent yarn script defined in `package.json`.
+`clean` removes the existing `dist/` directory in
+order to enable a clean rebuild of the project:
+
+```
+npx gulp clean
+```
+
+<br/>
+
+`cleanAll` restores the project folder to its virgin state,
+by deleting the existing `dist/`, `package/` and `node_modules/` directories
+and the `yarn.lock` file:
+
+```
+npx gulp cleanAll
+```
+
+<br/>
+
+`icons` regenerates the file `src/lib/icons/icons.ts` from the SVG sources in
+`src/lib/icons/svg/`. This task is also executed as part of the `build` task.
+Run it whenever an icon is added, removed, or modified:
+
+```
+npx gulp icons
+```
+
+<br/>
+
+The tasks `build`, `clean`, `dev`, `icons`, and `tauri` can also be invoked by
+running the equivalent yarn script defined in `package.json`.
 
 ### Build a native desktop app
 

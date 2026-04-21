@@ -18,6 +18,26 @@ export function setSize(stringValue: string, size: number): string {
   );
 }
 
+export function getCursorHotspot(
+  meta: {
+    hotspotX: number;
+    hotspotY: number;
+    viewBoxMinX: number;
+    viewBoxMinY: number;
+    viewBoxWidth: number;
+    viewBoxHeight: number;
+  },
+  size: number,
+): [number, number] {
+  const x = Math.round(
+    ((meta.hotspotX - meta.viewBoxMinX) / meta.viewBoxWidth) * size,
+  );
+  const y = Math.round(
+    ((meta.hotspotY - meta.viewBoxMinY) / meta.viewBoxHeight) * size,
+  );
+  return [x, y];
+}
+
 export function throttle<Params extends any[]>(
   func: (...args: Params) => any,
   delay: number,

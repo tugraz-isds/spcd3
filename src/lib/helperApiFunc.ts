@@ -667,20 +667,24 @@ export function invertWoTransition(dimension: string): void {
   const currentArrowStatus = textElement.text();
   const arrow =
     currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
-  const arrowStyle =
+  const arrowSvg =
     currentArrowStatus === "down"
       ? utils.setSize(icon.getArrowDownCursor(), 12)
       : utils.setSize(icon.getArrowUpCursor(), 12);
+  const [hotspotX, hotspotY] =
+    currentArrowStatus === "down"
+      ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
+      : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(currentArrowStatus === "down" ? "up" : "down");
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select(dimensionId).call(
@@ -729,20 +733,24 @@ export function setInversionStatus(dimension: string, status: string): void {
   const textElement = select(invertId);
   const arrow =
     status === "ascending" ? "#arrow_image_up" : "#arrow_image_down";
-  const arrowStyle =
+  const arrowSvg =
     status === "ascending"
       ? utils.setSize(icon.getArrowDownCursor(), 12)
       : utils.setSize(icon.getArrowUpCursor(), 12);
+  const [hotspotX, hotspotY] =
+    status === "ascending"
+      ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
+      : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(status === "ascending" ? "up" : "down");
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select(dimensionId)
@@ -801,20 +809,24 @@ export function invert(dimension: string): void {
   const currentArrowStatus = textElement.text();
   const arrow =
     currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
-  const arrowStyle =
+  const arrowSvg =
     currentArrowStatus === "down"
       ? utils.setSize(icon.getArrowDownCursor(), 12)
       : utils.setSize(icon.getArrowUpCursor(), 12);
+  const [hotspotX, hotspotY] =
+    currentArrowStatus === "down"
+      ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
+      : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(currentArrowStatus === "down" ? "up" : "down");
   textElement.attr("href", arrow);
   textElement.style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select("#invert_hitbox_" + cleanDimensionName).style(
     "cursor",
-    `url('data:image/svg+xml,${encodeURIComponent(arrowStyle)}') 6 6, auto`,
+    `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
   );
 
   select(dimensionId)
