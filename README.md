@@ -25,7 +25,7 @@ The SPCD3 library uses the following D3v7 modules:
 - d3-scale
 - d3-transition
 
-In addition to D3, the following JavaScript library are used:
+In addition to D3, the following JavaScript library is used:
 
 - [xml-formatter](https://github.com/chrisbottin/xml-formatter#readme):
   To prettify the SVG file of the parallel coordinate plot for download.
