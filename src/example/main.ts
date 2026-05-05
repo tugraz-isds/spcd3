@@ -43,31 +43,30 @@ let studentData =
 
 window.addEventListener("click", (event: MouseEvent) => {
   const target = event.target as HTMLElement | null;
-  const targetId = target?.id ?? "";
-  if (!targetId.includes("show")) {
+  if (!target?.closest("#showButton, #options")) {
     closeElements("options");
   }
-  if (!targetId.includes("invert")) {
+  if (!target?.closest("#invertButton, #invertOptions")) {
     closeElements("invertOptions");
   }
-  if (!targetId.includes("move")) {
+  if (!target?.closest("#moveButton, #moveOptions")) {
     closeElements("moveOptions");
   }
-  if (!targetId.includes("filter")) {
+  if (!target?.closest("#filterButton, #filterOptions, #filterContainer")) {
     closeElements("filterOptions");
     const filterContainer = document.getElementById("filterContainer");
     if (filterContainer) {
       filterContainer.remove();
     }
   }
-  if (!targetId.includes("range")) {
+  if (!target?.closest("#rangeButton, #rangeOptions, #rangeContainer")) {
     closeElements("rangeOptions");
     const rangeContainer = document.getElementById("rangeContainer");
     if (rangeContainer) {
       rangeContainer.remove();
     }
   }
-  if (!targetId.includes("sel")) {
+  if (!target?.closest("#selectButtonR, #options_r")) {
     closeElements("options_r");
   }
 });
@@ -168,7 +167,6 @@ function handleFileSelect(event: Event) {
       generateDropdownForFilter();
       generateDropdownForRange();
       generateDropdownForSelectRecords();
-
     };
     reader.readAsText(file);
   }
@@ -197,6 +195,35 @@ function closeElements(id: string) {
   }
 }
 
+function createDropdownButtonLabel(id: string, text: string): HTMLSpanElement {
+  const label = document.createElement("span");
+  label.id = id;
+  label.className = "labels";
+  label.append(document.createTextNode(text));
+
+  const icon = document.createElement("img");
+  icon.src = "./svg/dropdown-symbol.svg";
+  icon.alt = "";
+  icon.setAttribute("aria-hidden", "true");
+  label.appendChild(icon);
+
+  return label;
+}
+
+function createTextLabel(
+  text: string,
+  className = "label-text",
+  htmlFor?: string,
+): HTMLLabelElement {
+  const label = document.createElement("label");
+  label.className = className;
+  label.textContent = text;
+  if (htmlFor) {
+    label.htmlFor = htmlFor;
+  }
+  return label;
+}
+
 function showOptions(id: string, buttonId: string) {
   const options = document.getElementById(id);
   if (!options) return;
@@ -223,23 +250,13 @@ function showOptions(id: string, buttonId: string) {
   });
 }
 
-function showOptionsForRecords(id: string, buttonId: string) {
+function showOptionsForRecords(id: string) {
   let checkboxes = document.getElementById(id);
   if (!checkboxes) return;
 
   checkboxes.style.display == "none"
     ? (checkboxes.style.display = "block")
     : (checkboxes.style.display = "none");
-
-  let button = document.getElementById(buttonId);
-  if (!button) return;
-
-  checkboxes.style.display == "block"
-    ? (button.style.backgroundColor = "white")
-    : (button.style.backgroundColor = "white");
-  checkboxes.style.display == "block"
-    ? (button.style.color = "black")
-    : (button.style.color = "black");
 
   let records = getAllRecords();
   records.forEach(function (record: string) {
@@ -262,12 +279,9 @@ function generateDropdownForShow() {
   selectButton.id = "showButton";
   selectButton.className = "ddButton";
 
-  let textElement = document.createElement("span");
-  textElement.innerHTML =
-    'Show Dimensions <img src="./svg/dropdown-symbol.svg" id="show"/>';
-  textElement.id = "showText";
-  textElement.className = "labels";
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(
+    createDropdownButtonLabel("showText", "Show Dimensions"),
+  );
 
   let dimensionContainer = document.createElement("div");
   dimensionContainer.id = "options";
@@ -306,9 +320,10 @@ function generateDropdownForShow() {
       input.value = dimension;
       input.name = "dimension";
       input.checked = true;
-      let textLabel = document.createElement("label");
-      textLabel.textContent = dimension;
-      textLabel.id = "showLabel";
+      let textLabel = createTextLabel(
+        dimension,
+        "label-text dropdownOptionText",
+      );
       ddElement.appendChild(input);
       ddElement.appendChild(textLabel);
       dimensionContainer.appendChild(ddElement);
@@ -340,12 +355,9 @@ function generateDropdownForInvert() {
   selectButton.id = "invertButton";
   selectButton.className = "ddButton";
 
-  let textElement = document.createElement("span");
-  textElement.id = "invertText";
-  textElement.className = "labels";
-  textElement.innerHTML =
-    'Invert Dimensions <img src="./svg/dropdown-symbol.svg" id="invert"/>';
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(
+    createDropdownButtonLabel("invertText", "Invert Dimensions"),
+  );
 
   selectButton.addEventListener("click", () => {
     dimensionContainer.innerHTML = "";
@@ -378,10 +390,10 @@ function generateDropdownForInvert() {
         }
       });
 
-      let textLabel = document.createElement("label");
-      textLabel.className = "textLabel";
-      textLabel.textContent = dimension;
-      textLabel.id = "invertLabel";
+      let textLabel = createTextLabel(
+        dimension,
+        "label-text dropdownOptionText",
+      );
       ddElement.appendChild(inputButton);
       ddElement.appendChild(textLabel);
       dimensionContainer.appendChild(ddElement);
@@ -420,12 +432,9 @@ function generateDropdownForMove() {
   selectButton.id = "moveButton";
   selectButton.className = "ddButton";
 
-  let textElement = document.createElement("span");
-  textElement.id = "moveText";
-  textElement.className = "labels";
-  textElement.innerHTML =
-    'Move Dimensions <img src="./svg/dropdown-symbol.svg" id="move"/>';
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(
+    createDropdownButtonLabel("moveText", "Move Dimensions"),
+  );
 
   const dimensions = getAllVisibleDimensionNames();
   if (dimensions.length > 10) {
@@ -463,10 +472,10 @@ function generateDropdownForMove() {
           disableLeftAndRightButton();
         }
       });
-      let textLabel = document.createElement("label");
-      textLabel.textContent = dimension;
-      textLabel.id = "moveLabel";
-      textLabel.className = "textLabel";
+      let textLabel = createTextLabel(
+        dimension,
+        "label-text dropdownOptionText",
+      );
       dimensionLabel.appendChild(arrowLeft);
       dimensionLabel.appendChild(arrowRight);
       dimensionLabel.appendChild(textLabel);
@@ -553,12 +562,9 @@ function generateDropdownForFilter() {
   selectButton.id = "filterButton";
   selectButton.className = "ddButton";
 
-  let textElement = document.createElement("span");
-  textElement.id = "filterText";
-  textElement.className = "labels";
-  textElement.innerHTML =
-    'Set Filter <img src="./svg/dropdown-symbol.svg" id="filter"/>';
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(
+    createDropdownButtonLabel("filterText", "Set Filter"),
+  );
 
   const dimensions = getAllVisibleDimensionNames();
 
@@ -567,8 +573,7 @@ function generateDropdownForFilter() {
     getAllVisibleDimensionNames().forEach(function (dimension) {
       if (!isDimensionCategorical(dimension)) {
         let dimensionLabel = document.createElement("label");
-        dimensionLabel.className = "dropdownLabel";
-        dimensionLabel.id = "filterLabel";
+        dimensionLabel.className = "dropdownLabel dropdownActionLabel";
         let filterInput = document.createElement("input");
         filterInput.className = "inputText";
         filterInput.type = "image";
@@ -578,7 +583,9 @@ function generateDropdownForFilter() {
         filterInput.id = "filter_" + dimension;
         filterInput.style.height = "0rem";
         dimensionLabel.appendChild(filterInput);
-        dimensionLabel.appendChild(document.createTextNode(dimension));
+        dimensionLabel.appendChild(
+          createTextLabel(dimension, "label-text dropdownOptionText"),
+        );
         dimensionContainer.appendChild(dimensionLabel);
       }
     });
@@ -663,7 +670,7 @@ function generateModuleForSetFilter() {
   row.className = "modal-row";
 
   const labelMin = document.createElement("label");
-  labelMin.className = "modal-label";
+  labelMin.className = "modal-label label-text";
   labelMin.setAttribute("for", "filterMinValue");
   labelMin.textContent = "Min";
 
@@ -675,7 +682,7 @@ function generateModuleForSetFilter() {
   inputMin.value = Number(currentFilters[0]).toFixed(0);
 
   const labelMax = document.createElement("label");
-  labelMax.className = "modal-label";
+  labelMax.className = "modal-label label-text";
   labelMax.setAttribute("for", "filterMaxValue");
   labelMax.textContent = "Max";
 
@@ -801,12 +808,7 @@ function generateDropdownForRange() {
   selectButton.id = "rangeButton";
   selectButton.className = "ddButton";
 
-  let textElement = document.createElement("span");
-  textElement.id = "rangeText";
-  textElement.className = "labels";
-  textElement.innerHTML =
-    'Set Range <img src="./svg/dropdown-symbol.svg" id="range"/>';
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(createDropdownButtonLabel("rangeText", "Set Range"));
 
   const dimensions = getAllVisibleDimensionNames();
 
@@ -815,8 +817,7 @@ function generateDropdownForRange() {
     getAllVisibleDimensionNames().forEach(function (dimension) {
       if (!isDimensionCategorical(dimension)) {
         let dimensionLabel = document.createElement("label");
-        dimensionLabel.className = "dropdownLabel";
-        dimensionLabel.id = "rangeLabel";
+        dimensionLabel.className = "dropdownLabel dropdownActionLabel";
         let rangeInput = document.createElement("input");
         rangeInput.className = "inputText";
         rangeInput.type = "image";
@@ -826,7 +827,9 @@ function generateDropdownForRange() {
         rangeInput.id = "range_" + dimension;
         rangeInput.style.height = "0rem";
         dimensionLabel.appendChild(rangeInput);
-        dimensionLabel.appendChild(document.createTextNode(dimension));
+        dimensionLabel.appendChild(
+          createTextLabel(dimension, "label-text dropdownOptionText"),
+        );
         dimensionContainer.appendChild(dimensionLabel);
       }
     });
@@ -939,7 +942,7 @@ function generateModuleForRangeSettings() {
   const row = document.createElement("div");
 
   const labelMin = document.createElement("label");
-  labelMin.className = "modal-label";
+  labelMin.className = "modal-label label-text";
   labelMin.setAttribute("for", "rangeMinValue");
   labelMin.textContent = "Min";
 
@@ -951,7 +954,7 @@ function generateModuleForRangeSettings() {
   inputMin.value = minValue;
 
   const labelMax = document.createElement("label");
-  labelMax.className = "modal-label";
+  labelMax.className = "modal-label label-text";
   labelMax.setAttribute("for", "rangeMaxValue");
   labelMax.textContent = "Max";
 
@@ -1109,11 +1112,11 @@ function generateModalForSetSensitivity() {
   labelRow.className = "hitbox-label-row";
 
   const label = document.createElement("div");
-  label.className = "hitbox-label";
+  label.className = "hitbox-label label-text";
   label.textContent = "Selection Sensitivity";
 
   const valueDisplay = document.createElement("div");
-  valueDisplay.className = "hitbox-value";
+  valueDisplay.className = "hitbox-value label-support";
 
   labelRow.appendChild(label);
   labelRow.appendChild(valueDisplay);
@@ -1129,11 +1132,11 @@ function generateModalForSetSensitivity() {
   slider.step = "0.1";
 
   const minLabel = document.createElement("span");
-  minLabel.className = "hitbox-min";
+  minLabel.className = "hitbox-min label-support";
   minLabel.textContent = slider.min;
 
   const maxLabel = document.createElement("span");
-  maxLabel.className = "hitbox-max";
+  maxLabel.className = "hitbox-max label-support";
   maxLabel.textContent = slider.max;
 
   const current = getSelectableWith();
@@ -1150,7 +1153,7 @@ function generateModalForSetSensitivity() {
   const infoMessage = document.createElement("div");
   infoMessage.textContent =
     "Sets the sensitivity of polylines for hover and select.";
-  infoMessage.className = "info-text";
+  infoMessage.className = "info-text label-support";
 
   const button = document.createElement("button");
   button.className = "apply-button";
@@ -1185,16 +1188,13 @@ function generateDropdownForSelectRecords() {
   selectButton.id = "selectButtonR";
   selectButton.className = "ddButton";
   selectButton.addEventListener("click", () => {
-    showOptionsForRecords("options_r", "selectButtonR");
+    showOptionsForRecords("options_r");
     calcDDBehaviour(recordsContainer, selectButton);
   });
 
-  let textElement = document.createElement("span");
-  textElement.id = "selectText";
-  textElement.className = "labels";
-  textElement.innerHTML =
-    'Select Records <img src="./svg/dropdown-symbol.svg" id="select"/>';
-  selectButton.appendChild(textElement);
+  selectButton.appendChild(
+    createDropdownButtonLabel("selectText", "Select Records"),
+  );
 
   let recordsContainer = document.createElement("div");
   recordsContainer.id = "options_r";
@@ -1221,7 +1221,6 @@ function generateDropdownForSelectRecords() {
   records.forEach(function (record) {
     let label = document.createElement("div");
     label.className = "dropdownLabel";
-    label.id = "selectLabel";
     let input = document.createElement("input");
     input.type = "checkbox";
     input.className = "inputFields";
@@ -1229,9 +1228,7 @@ function generateDropdownForSelectRecords() {
     input.value = record;
     input.name = "record";
     input.checked = false;
-    let textLabel = document.createElement("label");
-    textLabel.textContent = record;
-    textLabel.id = "selectLabel";
+    let textLabel = createTextLabel(record, "label-text dropdownOptionText");
     label.appendChild(input);
     label.appendChild(textLabel);
     recordsContainer.appendChild(label);

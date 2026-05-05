@@ -90,7 +90,7 @@ function copyDimensionName(dimension: string): void {
 function showAllMenu(): void {
   select("#showAllMenu")
     .style("visibility", "visible")
-    .style("border-top", "0.08rem lightgrey solid")
+    .style("border-top", "0.08rem solid var(--spcd3-border-subtle)")
     .on("click", (event: { stopPropagation: () => void }) => {
       const hiddenDimensions = api.getAllHiddenDimensionNames();
       for (let i = 0; i < hiddenDimensions.length; i++) {
@@ -103,13 +103,13 @@ function showAllMenu(): void {
 
 function resetFilterMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
-    select("#resetfilterMenu").style("color", "lightgrey");
+    select("#resetfilterMenu").style("color", "var(--spcd3-text-disabled)");
     return;
   }
 
   select("#resetfilterMenu")
     .style("visibility", "visible")
-    .style("color", "black")
+    .style("color", "var(--spcd3-text)")
     .on("click", (event: { stopPropagation: () => void }) => {
       const range = api.getDimensionRange(dimension);
       const inverted = helper.isInverted(dimension);
@@ -126,10 +126,10 @@ function resetFilterMenu(dimension: string): void {
 function filterMenu(dimension: string): void {
   let filterMenu = select("#filterMenu");
 
-  filterMenu.style("border-top", "0.08rem lightgrey solid");
+  filterMenu.style("border-top", "0.08rem solid var(--spcd3-border-subtle)");
 
   if (api.isDimensionCategorical(dimension)) {
-    filterMenu.style("color", "lightgrey");
+    filterMenu.style("color", "var(--spcd3-text-disabled)");
     return;
   }
 
@@ -159,7 +159,7 @@ function filterMenu(dimension: string): void {
     },
   );
 
-  filterMenu.style("visibility", "visible").style("color", "black");
+  filterMenu.style("visibility", "visible").style("color", "var(--spcd3-text)");
 
   filterMenu.on("click", (event: { stopPropagation: () => void }) => {
     select("#modalOverlayFilter").style("display", "block");
@@ -233,13 +233,13 @@ function handleFilterButton(dimension: string): void {
 
 function resetRoundRangeMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
-    select("#resetRoundRangeMenu").style("color", "lightgrey");
+    select("#resetRoundRangeMenu").style("color", "var(--spcd3-text-disabled)");
     return;
   }
 
   select("#resetRoundRangeMenu")
     .style("visibility", "visible")
-    .style("color", "black")
+    .style("color", "var(--spcd3-text)")
     .on("click", (event: { stopPropagation: () => void }) => {
       api.setDimensionRangeRounded(
         dimension,
@@ -255,13 +255,13 @@ function resetRangeMenu(dimension: string): void {
   if (api.isDimensionCategorical(dimension)) {
     select("#resetRangeMenu")
       .style("display", "false")
-      .style("color", "lightgrey");
+      .style("color", "var(--spcd3-text-disabled)");
     return;
   }
 
   select("#resetRangeMenu")
     .style("visibility", "visible")
-    .style("color", "black")
+    .style("color", "var(--spcd3-text)")
     .on("click", (event: { stopPropagation: () => void }) => {
       api.setDimensionRange(
         dimension,
@@ -275,14 +275,14 @@ function resetRangeMenu(dimension: string): void {
 
 function setRangeMenu(dimension: string): void {
   let rangeMenu = select("#rangeMenu");
-  rangeMenu.style("border-top", "0.08rem lightgrey solid");
+  rangeMenu.style("border-top", "0.08rem solid var(--spcd3-border-subtle)");
 
   if (api.isDimensionCategorical(dimension)) {
-    rangeMenu.style("color", "lightgrey");
+    rangeMenu.style("color", "var(--spcd3-text-disabled)");
     return;
   }
 
-  rangeMenu.style("visibility", "visible").style("color", "black");
+  rangeMenu.style("visibility", "visible").style("color", "var(--spcd3-text)");
 
   rangeMenu.on("click", (event: { stopPropagation: () => void }) => {
     handleRangeButton(dimension);
@@ -409,7 +409,7 @@ function invertDimensionMenu(dimension: string): void {
 
 function hideDimensionMenu(dimension: string): void {
   select("#hideMenu")
-    .style("border-top", "0.08rem lightgrey solid")
+    .style("border-top", "0.08rem solid var(--spcd3-border-subtle)")
     .on("click", (event: { stopPropagation: () => void }) => {
       api.hide(dimension);
       select("#contextmenu").style("display", "none");
@@ -443,7 +443,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowRight(), 14))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else if (
     api.getDimensionPosition(d.name) ==
@@ -457,7 +457,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowLeft(), 14))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowLeft(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else {
     const [hotspotX, hotspotY] = utils.getCursorHotspot(
@@ -468,7 +468,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowLeftAndRight(), 14))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowLeftAndRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   }
 }
@@ -883,7 +883,7 @@ export function handleRecordContextMenu(
   });
 
   select("#toggleRecord")
-    .style("border-top", "0.08rem lightgrey solid")
+    .style("border-top", "0.08rem solid var(--spcd3-border-subtle)")
     .on("click", (event: any) => {
       cleanedItems.forEach((item: string) => {
         api.toggleSelection(item);
@@ -893,7 +893,7 @@ export function handleRecordContextMenu(
     });
 
   select("#addSelection")
-    .style("border-top", "0.08rem lightgrey solid")
+    .style("border-top", "0.08rem solid var(--spcd3-border-subtle)")
     .on("click", (event: any) => {
       let selectedRecords: string[] = [];
       selectedRecords = api.getSelected();

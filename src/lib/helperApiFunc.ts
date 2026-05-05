@@ -20,6 +20,11 @@ import { interpolatePath } from "d3-interpolate-path";
 import { easeCubic } from "d3-ease";
 
 type StringKeyed = Record<string, any>;
+const BRUSH_STATE_EPSILON = 0.75;
+
+function isNear(value: number, target: number): boolean {
+  return Math.abs(value - target) < BRUSH_STATE_EPSILON;
+}
 
 //---------- Show and Hide Functions ----------
 
@@ -498,7 +503,7 @@ function setFilterAfterSettingRanges(
 
   triUpHit.attr("y", rectY + rectH);
 
-  if (rectY == 50) {
+  if (isNear(rectY, 50)) {
     select("#triangle_down_" + cleanDimensionName).attr(
       "href",
       "#brush_image_bottom",
@@ -510,7 +515,7 @@ function setFilterAfterSettingRanges(
     );
   }
 
-  if (rectY + rectH == 350) {
+  if (isNear(rectY + rectH, 350)) {
     select("#triangle_up_" + cleanDimensionName).attr(
       "href",
       "#brush_image_top",
@@ -522,13 +527,13 @@ function setFilterAfterSettingRanges(
     );
   }
 
-  if (rectY != 50 || rectY + rectH != 350) {
+  if (!(isNear(rectY, 50) && isNear(rectY + rectH, 350))) {
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(255, 255, 0)")
+      .attr("fill", utils.BRUSH_ACTIVE_FILL)
       .attr("opacity", "0.7");
   } else {
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(242, 242, 76)")
+      .attr("fill", utils.BRUSH_IDLE_FILL)
       .attr("opacity", "0.5");
   }
 }
@@ -669,8 +674,8 @@ export function invertWoTransition(dimension: string): void {
     currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.setSize(icon.getArrowDownCursor(), 12)
-      : utils.setSize(icon.getArrowUpCursor(), 12);
+      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
@@ -735,8 +740,8 @@ export function setInversionStatus(dimension: string, status: string): void {
     status === "ascending" ? "#arrow_image_up" : "#arrow_image_down";
   const arrowSvg =
     status === "ascending"
-      ? utils.setSize(icon.getArrowDownCursor(), 12)
-      : utils.setSize(icon.getArrowUpCursor(), 12);
+      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     status === "ascending"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
@@ -811,8 +816,8 @@ export function invert(dimension: string): void {
     currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.setSize(icon.getArrowDownCursor(), 12)
-      : utils.setSize(icon.getArrowUpCursor(), 12);
+      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
@@ -949,7 +954,7 @@ export function isRecordInactive(record: string): boolean {
   const stroke = select("#" + utils.cleanString(record));
   let node = stroke.node();
   let style = node.style.stroke;
-  return style === "rgba(211, 211, 211, 0.4)" ? true : false;
+  return style === utils.getInactiveLineStroke();
 }
 
 //---------- Selection Functions With IDs ----------
@@ -1089,7 +1094,7 @@ export function disableInteractivity() {
   selectAll("#spcd3-toolbarRow *").style("cursor", "not-allowed");
   select("#spcd3-parallelcoords").style("pointer-events", "none");
   select("#spcd3-parallelcoords")
-    .style("background", "rgb(245, 245, 245)")
+    .style("background", "var(--spcd3-chart-disabled-bg)")
     .style("z-index", 1);
   selectAll(".hitarea").style("pointer-events", "none");
   selectAll(".spcd3-handle-hitbox").style("pointer-events", "none");
@@ -1104,7 +1109,7 @@ export function enableInteractivity() {
     .style("cursor", "auto");
   selectAll("#spcd3-toolbarRow *").style("cursor", null);
   select("#spcd3-parallelcoords").style("pointer-events", "auto");
-  select("#spcd3-parallelcoords").style("background", "white");
+  select("#spcd3-parallelcoords").style("background", "var(--spcd3-bg)");
   selectAll(".hitarea").style("pointer-events", "stroke");
   selectAll(".spcd3-handle-hitbox").style("pointer-events", "auto");
   selectAll(".hitbox").style("pointer-events", "auto");

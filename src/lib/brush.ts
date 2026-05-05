@@ -13,6 +13,23 @@ const TOP_AXIS_LOW_VALUE = 40;
 const TOP_AXIS_VALUE = 50;
 const BOTTOM_AXIS_VALUE = 350;
 const RECT_VALUE = 300;
+const BRUSH_STATE_EPSILON = 0.75;
+
+function toNumber(value: string | number): number {
+  return typeof value === "number" ? value : Number(value);
+}
+
+function isAtTopHandle(value: string | number): boolean {
+  return Math.abs(toNumber(value) - TOP_AXIS_LOW_VALUE) < BRUSH_STATE_EPSILON;
+}
+
+function isAtTopRect(value: string | number): boolean {
+  return Math.abs(toNumber(value) - TOP_AXIS_VALUE) < BRUSH_STATE_EPSILON;
+}
+
+function isAtBottom(value: string | number): boolean {
+  return Math.abs(toNumber(value) - BOTTOM_AXIS_VALUE) < BRUSH_STATE_EPSILON;
+}
 
 // Brushing
 
@@ -33,6 +50,8 @@ export function setRectToDrag(
       .attr("height", RECT_VALUE)
       .attr("x", -6)
       .attr("y", 50)
+      .attr("fill", utils.BRUSH_IDLE_FILL)
+      .attr("opacity", "0.5")
       .call(
         drag()
           .on("drag", (event: any, d: any) => {
@@ -106,7 +125,7 @@ export function setBrushUp(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopCursor(), 12))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const hit = g
@@ -119,7 +138,7 @@ export function setBrushUp(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopCursor(), 12))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -191,7 +210,7 @@ export function setBrushDown(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowBottomCursor(), 12))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const hit = g
@@ -204,7 +223,7 @@ export function setBrushDown(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowBottomCursor(), 12))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -293,22 +312,22 @@ export function brushDown(
 
   addPosition(yPosRect, d.name, "top");
 
-  if (yPosTop == TOP_AXIS_LOW_VALUE && yPosBottom == BOTTOM_AXIS_VALUE) {
+  if (isAtTopHandle(yPosTop) && isAtBottom(yPosBottom)) {
     select("#rect_" + cleanDimensionName).style("cursor", "default");
   } else {
     select("#rect_" + cleanDimensionName).style(
       "cursor",
-      `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopAndBottom(), 20))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
+      `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
     );
   }
 
-  if (yPosTop == TOP_AXIS_LOW_VALUE) {
+  if (isAtTopHandle(yPosTop)) {
     select("#triangle_down_" + cleanDimensionName).attr(
       "href",
       "#brush_image_bottom",
     );
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(242, 242, 76)")
+      .attr("fill", utils.BRUSH_IDLE_FILL)
       .attr("opacity", "0.5");
   } else {
     select("#triangle_down_" + cleanDimensionName).attr(
@@ -316,7 +335,7 @@ export function brushDown(
       "#brush_image_bottom_active",
     );
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(255, 255, 0)")
+      .attr("fill", utils.BRUSH_ACTIVE_FILL)
       .attr("opacity", "0.7");
   }
 
@@ -364,24 +383,24 @@ export function brushUp(
 
   addPosition(yPosBottom, d.name, "bottom");
 
-  if (yPosTop == TOP_AXIS_LOW_VALUE && yPosBottom == BOTTOM_AXIS_VALUE) {
+  if (isAtTopHandle(yPosTop) && isAtBottom(yPosBottom)) {
     select("#rect_" + cleanDimensionName)
       .attr("href", "#brush_image_top_active")
       .style("cursor", "default")
-      .style("fill", "rgb(234, 234, 40)")
+      .style("fill", utils.BRUSH_IDLE_FILL)
       .style("opacity", "0.5");
   } else {
     select("#rect_" + cleanDimensionName)
       .attr("href", "#brush_image_top_active")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowTopAndBottom(), 20))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
       )
-      .style("fill", "rgb(255, 255, 0)")
+      .style("fill", utils.BRUSH_ACTIVE_FILL)
       .style("opacity", "0.7");
   }
 
-  if (yPosBottom == BOTTOM_AXIS_VALUE) {
+  if (isAtBottom(yPosBottom)) {
     select("#triangle_up_" + cleanDimensionName).attr(
       "href",
       "#brush_image_top",
@@ -449,7 +468,7 @@ export function dragAndBrush(
   addPosition(yPosRect, d.name, "top");
   addPosition(yPosRect + rectHeight, d.name, "bottom");
 
-  if (yPosTop == TOP_AXIS_LOW_VALUE) {
+  if (isAtTopHandle(yPosTop)) {
     select("#triangle_down_" + cleanDimensionName).attr(
       "href",
       "#brush_image_bottom",
@@ -461,7 +480,7 @@ export function dragAndBrush(
     );
   }
 
-  if (yPosBottom == BOTTOM_AXIS_VALUE) {
+  if (isAtBottom(yPosBottom)) {
     select("#triangle_up_" + cleanDimensionName).attr(
       "href",
       "#brush_image_top",
@@ -538,7 +557,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
 
   select("#triangle_up_hit" + cleanDimensionName).attr("y", rectY + rectHeight);
 
-  if (topPosition == TOP_AXIS_VALUE) {
+  if (isAtTopRect(topPosition)) {
     select("#triangle_down_" + cleanDimensionName).attr(
       "href",
       "#brush_image_bottom",
@@ -550,7 +569,7 @@ export function filter(dimensionName: string, min: number, max: number): void {
     );
   }
 
-  if (bottomPosition == BOTTOM_AXIS_VALUE) {
+  if (isAtBottom(bottomPosition)) {
     select("#triangle_up_" + cleanDimensionName).attr(
       "href",
       "#brush_image_top",
@@ -562,13 +581,13 @@ export function filter(dimensionName: string, min: number, max: number): void {
     );
   }
 
-  if (topPosition != TOP_AXIS_VALUE || bottomPosition != BOTTOM_AXIS_VALUE) {
+  if (!(isAtTopRect(topPosition) && isAtBottom(bottomPosition))) {
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(255, 255, 0)")
+      .attr("fill", utils.BRUSH_ACTIVE_FILL)
       .attr("opacity", "0.7");
   } else {
     select("#rect_" + cleanDimensionName)
-      .attr("fill", "rgb(242, 242, 76)")
+      .attr("fill", utils.BRUSH_IDLE_FILL)
       .attr("opacity", "0.5");
   }
 
@@ -1134,7 +1153,7 @@ function makeInactive(
     .text(dimension)
     .transition()
     .duration(duration)
-    .style("stroke", "rgba(211, 211, 211, 0.4")
+    .style("stroke", utils.getInactiveLineStroke())
     .style("pointer-events", "none");
 
   selectAll(`#tooltip-record-select-${currentLineName}`).style(
@@ -1207,7 +1226,7 @@ export function addSettingsForBrushing(
 
   hitTriUp.attr("y", rectY + rectH);
 
-  if (rectY - 10 == TOP_AXIS_LOW_VALUE) {
+  if (isAtTopHandle(rectY - 10)) {
     select("#triangle_down_" + processedName).attr(
       "href",
       "#brush_image_bottom",
@@ -1219,7 +1238,7 @@ export function addSettingsForBrushing(
     );
   }
 
-  if (rectY + rectH == BOTTOM_AXIS_VALUE) {
+  if (isAtBottom(rectY + rectH)) {
     select("#triangle_up_" + processedName).attr("href", "#brush_image_top");
   } else {
     select("#triangle_up_" + processedName).attr(

@@ -19,15 +19,15 @@ export function getArrowBottomCursorMeta(): CursorIconMeta {
 }
 
 export function getArrowBottom(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(242, 242, 76)\" fill-opacity=\"0.5\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(214, 176, 28)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
 }
 
 export function getArrowBottomActive(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(255, 255, 0)\" fill-opacity=\"0.7\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(235, 196, 44)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
 }
 
 export function getArrowDown(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 6 10\">\n  <path d=\"M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 6 10\">\n  <path fill=\"currentColor\" d=\"M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z\"/>\n</svg>";
 }
 
 export function getArrowDownCursor(): string {
@@ -79,15 +79,15 @@ export function getArrowTopCursorMeta(): CursorIconMeta {
 }
 
 export function getArrowTop(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(242, 242, 76)\" fill-opacity=\"0.5\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(214, 176, 28)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
 }
 
 export function getArrowTopActive(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(255, 255, 0)\" fill-opacity=\"0.7\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.4 -0.4 6.8 5.8\">\n  <path fill=\"rgb(235, 196, 44)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
 }
 
 export function getArrowUp(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 6 10\">\n  <path d=\"M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 6 10\">\n  <path fill=\"currentColor\" d=\"M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 z\"/>\n</svg>";
 }
 
 export function getArrowUpCursor(): string {
@@ -99,25 +99,25 @@ export function getArrowUpCursorMeta(): CursorIconMeta {
 }
 
 export function getRefreshIcon(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <polyline points=\"6.5 4 8.5 4 8.5 2\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <path d=\"M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <polyline points=\"3.5 6 1.5 6 1.5 8\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <path d=\"M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <polyline points=\"6.5 4 8.5 4 8.5 2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <path d=\"M8.5 4 L 7 2.5 A 3 3 0 0 0 2.5 2.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <polyline points=\"3.5 6 1.5 6 1.5 8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <path d=\"M1.5 6 L 2.5 7 A 3 3 0 0 0 7 7\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n</svg>";
 }
 
 export function getTableIcon(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <rect x=\"0.5\" y=\"0.5\" width=\"9\" height=\"9\" rx=\"1\" ry=\"1\" stroke=\"black\" stroke-width=\"0.5\" fill=\"none\" />\n  <line x1=\"0.5\" y1=\"3.3\" x2=\"9.5\" y2=\"3.3\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <line x1=\"0.5\" y1=\"6.6\" x2=\"9.5\" y2=\"6.6\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <line x1=\"3.3\" y1=\"0.5\" x2=\"3.3\" y2=\"9.5\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <line x1=\"6.6\" y1=\"0.5\" x2=\"6.6\" y2=\"9.5\" stroke=\"black\" stroke-width=\"0.5\"/>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <rect x=\"0.5\" y=\"0.5\" width=\"9\" height=\"9\" rx=\"1\" ry=\"1\" stroke=\"currentColor\" stroke-width=\"0.5\" fill=\"none\" />\n  <line x1=\"0.5\" y1=\"3.3\" x2=\"9.5\" y2=\"3.3\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <line x1=\"0.5\" y1=\"6.6\" x2=\"9.5\" y2=\"6.6\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <line x1=\"3.3\" y1=\"0.5\" x2=\"3.3\" y2=\"9.5\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <line x1=\"6.6\" y1=\"0.5\" x2=\"6.6\" y2=\"9.5\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n</svg>";
 }
 
 export function getExpandToolbarIcon(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 -0.5 6 6\">\n  <polyline points=\"1 0.75 3 2.75 1 4.75\" fill=\"none\" stroke=\"black\" stroke-width=\"0.25\"/>\n  <polyline points=\"3 0.75 5 2.75 3 4.75\" fill=\"none\" stroke=\"black\" stroke-width=\"0.25\"/>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 -0.5 6 6\">\n  <polyline points=\"1 0.75 3 2.75 1 4.75\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.25\"/>\n  <polyline points=\"3 0.75 5 2.75 3 4.75\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.25\"/>\n</svg>";
 }
 
 export function getCollapseToolbarIcon(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 -0.5 6 6\">\n  <polyline points=\"3 0.75 1 2.75 3 4.75\" fill=\"none\" stroke=\"black\" stroke-width=\"0.25\"/>\n  <polyline points=\"5 0.75 3 2.75 5 4.75\" fill=\"none\" stroke=\"black\" stroke-width=\"0.25\"/>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 -0.5 6 6\">\n  <polyline points=\"3 0.75 1 2.75 3 4.75\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.25\"/>\n  <polyline points=\"5 0.75 3 2.75 5 4.75\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.25\"/>\n</svg>";
 }
 
 export function getResetIcon(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <g transform=\"scale(1,0.833) translate(0,1.2)\">\n    <path d=\"M8 4 A4 3.5 0 1 1 2 4\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n    <polyline points=\"3 5.5 2 4 0 4\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n    <path d=\"M5 1 L 5 6.5\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n  </g>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <g transform=\"scale(1,0.833) translate(0,1.2)\">\n    <path d=\"M8 4 A4 3.5 0 1 1 2 4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n    <polyline points=\"3 5.5 2 4 0 4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n    <path d=\"M5 1 L 5 6.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  </g>\n</svg>";
 }
 
 export function getDownloadButton(): string {
-  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <path d=\"M 4.65 7 L 4.65 1.4 L 5.25 1.4 L 5.25 7 z\"/>\n  <polyline points=\"2.07 5.00 4.93 7.14 7.79 5.00\" fill=\"none\" stroke=\"black\" stroke-width=\"0.5\"/>\n  <path d=\"M 2 8.5 L 8 8.5 L 8 9 L 2 9 z\"/>\n</svg>";
+  return "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 10 10\">\n  <path fill=\"currentColor\" d=\"M 4.65 7 L 4.65 1.4 L 5.25 1.4 L 5.25 7 z\"/>\n  <polyline points=\"2.07 5.00 4.93 7.14 7.79 5.00\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.5\"/>\n  <path fill=\"currentColor\" d=\"M 2 8.5 L 8 8.5 L 8 9 L 2 9 z\"/>\n</svg>";
 }

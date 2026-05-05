@@ -171,6 +171,7 @@ function setRectToDragToDownload(featureAxis: any): void {
       (object: { key: any }) => object.key == d.name,
     );
     let height = item.bottom - item.top;
+    const isIdle = item.top == 50 && item.bottom == 350;
     select(this)
       .append("g")
       .append("rect")
@@ -179,8 +180,8 @@ function setRectToDragToDownload(featureAxis: any): void {
       .attr("height", height)
       .attr("x", -6)
       .attr("y", item.top)
-      .attr("fill", "rgb(255, 255, 0)")
-      .attr("opacity", "0.4");
+      .attr("fill", isIdle ? utils.BRUSH_IDLE_FILL : utils.BRUSH_ACTIVE_FILL)
+      .attr("opacity", isIdle ? "0.5" : "0.7");
   });
 }
 

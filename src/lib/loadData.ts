@@ -195,7 +195,9 @@ export function renderInvalidTable(
 
       td.textContent = displayValue;
 
-      td.style.background = isInvalid ? "#ffb3b3" : "white";
+      td.style.background = isInvalid
+        ? "var(--spcd3-invalid-bg)"
+        : "var(--spcd3-surface)";
       td.style.textAlign = align;
       td.style.fontSize = "0.85rem";
       td.style.padding = "4px 8px";

@@ -18,6 +18,88 @@ export function setSize(stringValue: string, size: number): string {
   );
 }
 
+export const BRUSH_IDLE_FILL = "rgb(242, 242, 76)";
+export const BRUSH_ACTIVE_FILL = "rgb(255, 255, 0)";
+
+export function getInactiveLineStroke(): string {
+  const isDark =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  return isDark ? "rgba(177, 188, 199, 0.18)" : "rgba(211, 211, 211, 0.4)";
+}
+
+export function applyThemeToSvg(svg: string): string {
+  const isDark =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  const textColor = isDark ? "#eef3f7" : "#000000";
+  const surfaceColor = isDark ? "#1b2126" : "#dbe3ea";
+  const cursorSurfaceColor = isDark ? "#1b2126" : "#e7edf3";
+  const handleColor = BRUSH_IDLE_FILL;
+  const handleActiveColor = BRUSH_ACTIVE_FILL;
+
+  return svg
+    .replaceAll("currentColor", textColor)
+    .replaceAll('stroke="black"', `stroke="${textColor}"`)
+    .replaceAll('stroke="#000"', `stroke="${textColor}"`)
+    .replaceAll('fill="black"', `fill="${textColor}"`)
+    .replaceAll('fill="#000"', `fill="${textColor}"`)
+    .replaceAll('stroke="white"', `stroke="${surfaceColor}"`)
+    .replaceAll('fill="white"', `fill="${surfaceColor}"`)
+    .replaceAll('fill="#fff"', `fill="${surfaceColor}"`)
+    .replaceAll('fill="#ffffff"', `fill="${surfaceColor}"`)
+    .replaceAll('fill="rgb(242, 242, 76)"', `fill="${handleColor}"`)
+    .replaceAll('fill="rgb(255, 255, 0)"', `fill="${handleActiveColor}"`)
+    .replaceAll('fill="rgb(214, 176, 28)"', `fill="${handleColor}"`)
+    .replaceAll('fill="rgb(235, 196, 44)"', `fill="${handleActiveColor}"`)
+    .replaceAll('fill="#f9f9f9"', `fill="${cursorSurfaceColor}"`);
+}
+
+export function applyThemeToBrushSvg(svg: string): string {
+  const isDark =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  const strokeColor = isDark ? "#10233a" : "black";
+  const handleColor = BRUSH_IDLE_FILL;
+  const handleActiveColor = BRUSH_ACTIVE_FILL;
+  const surfaceColor = isDark ? "#1b2126" : "#dbe3ea";
+
+  let themed = svg
+    .replaceAll('stroke="#000000"', `stroke="${strokeColor}"`)
+    .replaceAll('stroke="#000"', `stroke="${strokeColor}"`)
+    .replaceAll('stroke="black"', `stroke="${strokeColor}"`)
+    .replaceAll('fill="rgb(242, 242, 76)"', `fill="${handleColor}"`)
+    .replaceAll('fill="rgb(255, 255, 0)"', `fill="${handleActiveColor}"`)
+    .replaceAll('fill="rgb(214, 176, 28)"', `fill="${handleColor}"`)
+    .replaceAll('fill="rgb(235, 196, 44)"', `fill="${handleActiveColor}"`)
+    .replaceAll('fill="white"', `fill="${surfaceColor}"`)
+    .replaceAll('fill="#fff"', `fill="${surfaceColor}"`)
+    .replaceAll('fill="#ffffff"', `fill="${surfaceColor}"`);
+
+  if (isDark) {
+    themed = themed
+      .replaceAll('stroke-width="0.4"', 'stroke-width="0.22"')
+      .replaceAll('stroke-width="0.400000"', 'stroke-width="0.22"');
+  }
+
+  return themed;
+}
+
+export function applySvgColor(svg: string, color: string): string {
+  return svg
+    .replaceAll("currentColor", color)
+    .replaceAll('stroke="black"', `stroke="${color}"`)
+    .replaceAll('stroke="#000"', `stroke="${color}"`)
+    .replaceAll('fill="black"', `fill="${color}"`)
+    .replaceAll('fill="#000"', `fill="${color}"`);
+}
+
 export function getCursorHotspot(
   meta: {
     hotspotX: number;

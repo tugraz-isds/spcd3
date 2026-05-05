@@ -1,3 +1,55 @@
+:root {
+  --spcd3-theme: light;
+  --spcd3-page-bg: #ffffff;
+  --spcd3-panel-bg: #ffffff;
+  --spcd3-control-bg: #f6f6f6;
+  --spcd3-control-bg-hover: #e7ebef;
+  --spcd3-backdrop: rgba(0, 0, 0, 0.5);
+  --spcd3-border-subtle: #b8b8b8;
+  --spcd3-border-emphasis: #8f8f8f;
+  --spcd3-text-primary: #000000;
+  --spcd3-text-secondary: #6f6f6f;
+  --spcd3-text-disabled: #a5a5a5;
+  --spcd3-tooltip-surface: #d3d3d3;
+  --spcd3-tooltip-record-bg: rgba(211, 211, 211, 0.5);
+  --spcd3-input-invalid-bg: #ffb3b3;
+  --spcd3-highlight-fill: rgba(242, 242, 76, 0.5);
+  --spcd3-highlight-fill-strong: rgba(255, 255, 0, 0.7);
+  --spcd3-chart-disabled-bg: #f5f5f5;
+  --spcd3-tooltip-record-text: #ff0000;
+  --spcd3-tooltip-record-selected-text: #ffa500;
+  --spcd3-marker-stroke: #e45a0f;
+  --spcd3-shadow-popover: rgba(0, 0, 0, 0.2);
+  --spcd3-shadow-modal: rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --spcd3-theme: dark;
+    --spcd3-page-bg: #10233a;
+    --spcd3-panel-bg: #17314d;
+    --spcd3-control-bg: #21415f;
+    --spcd3-control-bg-hover: #2c5377;
+    --spcd3-backdrop: rgba(7, 17, 30, 0.74);
+    --spcd3-border-subtle: #4d6d90;
+    --spcd3-border-emphasis: #6e90b5;
+    --spcd3-text-primary: #eef3f7;
+    --spcd3-text-secondary: #b1bcc7;
+    --spcd3-text-disabled: #7f8a95;
+    --spcd3-tooltip-surface: #264664;
+    --spcd3-tooltip-record-bg: rgba(38, 70, 100, 0.76);
+    --spcd3-input-invalid-bg: #6a2f35;
+    --spcd3-highlight-fill: rgba(234, 209, 83, 0.38);
+    --spcd3-highlight-fill-strong: rgba(255, 224, 102, 0.58);
+    --spcd3-chart-disabled-bg: #132942;
+    --spcd3-tooltip-record-text: #ff9b9b;
+    --spcd3-tooltip-record-selected-text: #ffd27a;
+    --spcd3-marker-stroke: #ffb46b;
+    --spcd3-shadow-popover: rgba(7, 17, 30, 0.35);
+    --spcd3-shadow-modal: rgba(7, 17, 30, 0.45);
+  }
+}
+
 #spcd3-parallelcoords,
 .spcd3-modal-overlay,
 .spcd3-modal,
@@ -6,7 +58,7 @@
 .spcd3-contextmenu-records,
 .spcd3-contextmenu-dimensions,
 .spcd3-toolbar-buttontip {
-  color-scheme: light;
+  color-scheme: var(--spcd3-theme);
   forced-color-adjust: none;
   font-size: 16px;
 }
@@ -20,10 +72,10 @@
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
-  background: #f6f6f6;
-  border: 0.03rem solid #b8b8b8;
+  background: var(--spcd3-control-bg);
+  border: 0.03rem solid var(--spcd3-border-subtle);
   border-radius: 0.1rem;
-  color: #000;
+  color: var(--spcd3-text-primary);
   opacity: 1;
   box-shadow: none;
   text-transform: none;
@@ -58,7 +110,7 @@
   right: 0.938rem;
   border: 0;
   background: transparent;
-  color: #000;
+  color: var(--spcd3-text-primary);
   line-height: 1;
   text-align: center;
   text-decoration: none;
@@ -72,15 +124,15 @@
 .spcd3-th {
   position: sticky;
   top: 0;
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   padding: 0.5rem;
-  background-color: rgb(201, 212, 221);
+  background-color: var(--spcd3-control-bg-hover);
   white-space: nowrap;
   overflow: hidden;
 }
 
 .spcd3-td {
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   padding: 0.5rem;
 }
 
@@ -107,8 +159,8 @@
 
 .spcd3-tablecontainer {
   width: 100%;
-  color: #000;
-  background: #fff;
+  color: var(--spcd3-text-primary);
+  background: var(--spcd3-panel-bg);
 }
 
 .spcd3-tablecontainer table,
@@ -116,8 +168,8 @@ table.spcd3-tablecontainer {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
-  color: #000;
-  background: #fff;
+  color: var(--spcd3-text-primary);
+  background: var(--spcd3-panel-bg);
 }
 
 .spcd3-tablecontainer thead,
@@ -130,7 +182,7 @@ table.spcd3-tablecontainer tbody,
 table.spcd3-tablecontainer tr,
 table.spcd3-tablecontainer th,
 table.spcd3-tablecontainer td {
-  color: #000;
+  color: var(--spcd3-text-primary);
   background-clip: padding-box;
 }
 
@@ -138,8 +190,8 @@ table.spcd3-tablecontainer td {
   display: block;
   width: 100%;
   text-align: left;
-  color: #000;
-  background: #fff;
+  color: var(--spcd3-text-primary);
+  background: var(--spcd3-page-bg);
 }
 
 #spcd3-pc_svg {
@@ -161,13 +213,13 @@ table.spcd3-tablecontainer td {
 
 .spcd3-dimensions-axis path,
 .spcd3-dimensions-axis line {
-  stroke: black;
+  stroke: var(--spcd3-text-primary);
 }
 
 .spcd3-dimensions-axis text {
   stroke: none;
   stroke-width: 0;
-  fill: black;
+  fill: var(--spcd3-text-primary);
   font-weight: normal;
   paint-order: fill;
 }
@@ -175,18 +227,30 @@ table.spcd3-tablecontainer td {
 .spcd3-dimensions-axis .tick text {
   stroke: none;
   stroke-width: 0;
-  fill: black;
+  fill: var(--spcd3-text-primary);
   font-weight: 400;
+}
+
+.dimensions > text,
+.spcd3-dimensions-axis + text {
+  fill: var(--spcd3-text-primary);
+  stroke: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  use[id^="dimension_invert_"] {
+    filter: brightness(0) invert(1);
+  }
 }
 
 .spcd3-tooltip-values {
   position: absolute;
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.12rem;
-  background-color: lightgrey;
-  color: #000;
+  background-color: var(--spcd3-tooltip-surface);
+  color: var(--spcd3-text-primary);
   visibility: hidden;
 }
 
@@ -197,8 +261,8 @@ table.spcd3-tablecontainer td {
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.12rem;
-  background-color: rgba(211, 211, 211, 0.5);
-  color: red;
+  background-color: var(--spcd3-tooltip-record-bg);
+  color: var(--spcd3-tooltip-record-text);
   font-size: 0.65rem;
   font-weight: bold;
   z-index: 999;
@@ -211,8 +275,8 @@ table.spcd3-tablecontainer td {
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.12rem;
-  background-color: rgba(211, 211, 211, 0.5);
-  color: orange;
+  background-color: var(--spcd3-tooltip-record-bg);
+  color: var(--spcd3-tooltip-record-selected-text);
   font-size: 0.65rem;
   font-weight: bolder;
   z-index: 999;
@@ -222,31 +286,31 @@ table.spcd3-tablecontainer td {
   position: absolute;
   visibility: hidden;
   pointer-events: none;
-  background: lightgrey;
+  background: var(--spcd3-tooltip-surface);
   padding: 0.2rem;
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   font-size: 0.75rem;
   z-index: 1000;
   white-space: pre-line;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-tooltip-dimension {
   position: absolute;
   pointer-events: none;
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.12rem;
-  background-color: lightgrey;
-  color: #000;
+  background-color: var(--spcd3-tooltip-surface);
+  color: var(--spcd3-text-primary);
   visibility: hidden;
 }
 
 .spcd3-marker {
   fill: none;
-  stroke: rgb(228, 90, 15);
+  stroke: var(--spcd3-marker-stroke);
   stroke-width: 0.1rem;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -257,7 +321,7 @@ table.spcd3-tablecontainer td {
 }
 
 .spcd3-rect {
-  fill: rgba(242, 242, 76, 0.5);
+  fill: var(--spcd3-highlight-fill);
   cursor: default;
 }
 
@@ -301,8 +365,8 @@ table.spcd3-tablecontainer td {
   justify-content: center;
   box-sizing: border-box;
   vertical-align: middle;
-  background: #f6f6f6;
-  color: #000;
+  background: var(--spcd3-control-bg);
+  color: var(--spcd3-text-primary);
   font: inherit;
   line-height: 1;
   text-align: center;
@@ -322,17 +386,32 @@ table.spcd3-tablecontainer td {
   pointer-events: none;
 }
 
+.spcd3-toolbar-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  color: inherit;
+}
+
+.spcd3-toolbar-svg [stroke]:not([stroke="none"]) {
+  stroke: currentColor;
+}
+
+.spcd3-toolbar-svg [fill]:not([fill="none"]) {
+  fill: currentColor;
+}
+
 .spcd3-toolbar-buttontip {
   inset: auto;
   margin: 0;
-  background: lightgrey;
+  background: var(--spcd3-tooltip-surface);
   padding: 0.2rem;
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   white-space: nowrap;
   line-height: 1.2;
   pointer-events: none;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-toolbar-buttontip:popover-open {
@@ -345,7 +424,7 @@ table.spcd3-tablecontainer td {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--spcd3-backdrop);
   z-index: 999;
   display: block;
 }
@@ -355,10 +434,10 @@ table.spcd3-tablecontainer td {
   left: 50%;
   transform: translate(-50%, -50%);
   position: fixed;
-  background: white;
+  background: var(--spcd3-panel-bg);
   padding: 1rem;
-  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.3);
-  border: 0.08rem solid grey;
+  box-shadow: 0 0 0.625rem var(--spcd3-shadow-modal);
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.5rem;
   max-height: 80vh;
   max-width: 90vh;
@@ -366,7 +445,7 @@ table.spcd3-tablecontainer td {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-scroll-wrapper {
@@ -378,25 +457,25 @@ table.spcd3-tablecontainer td {
 }
 
 .spcd3-contextmenu-records {
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.35rem;
-  background-color: white;
+  background-color: var(--spcd3-panel-bg);
   cursor: pointer;
   z-index: 9999;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-contextmenu-dimensions {
-  border: 0.08rem solid grey;
+  border: 0.08rem solid var(--spcd3-border-emphasis);
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.35rem;
-  background-color: white;
+  background-color: var(--spcd3-panel-bg);
   cursor: pointer;
   z-index: 9999;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-modal-overlay {
@@ -405,7 +484,7 @@ table.spcd3-tablecontainer td {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--spcd3-backdrop);
   display: none;
   z-index: 9999;
 }
@@ -416,12 +495,12 @@ table.spcd3-tablecontainer td {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
-  background-color: white;
+  background-color: var(--spcd3-panel-bg);
   padding: 1rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.25rem 0.625rem var(--spcd3-shadow-popover);
   display: none;
-  color: #000;
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-modal-header {
@@ -447,7 +526,7 @@ table.spcd3-tablecontainer td {
 }
 
 .spcd3-modal-notes {
-  color: grey;
+  color: var(--spcd3-text-secondary);
   font-size: smaller;
   padding: 1rem 0 0.5rem 0.5rem;
 }
@@ -460,11 +539,13 @@ table.spcd3-tablecontainer td {
   width: 4.5rem;
   min-height: 1.7rem;
   padding: 0.2rem 0.35rem;
-  border: 0.1rem solid lightgrey;
+  border: 0.1rem solid var(--spcd3-border-subtle);
   border-radius: 0.1rem;
   box-sizing: border-box;
   line-height: 1.2;
   vertical-align: middle;
+  background: var(--spcd3-control-bg);
+  color: var(--spcd3-text-primary);
 }
 
 .spcd3-modal-errormessage {
@@ -472,7 +553,7 @@ table.spcd3-tablecontainer td {
   display: none;
   padding-left: 0.5rem;
   padding-top: 0.5rem;
-  color: red;
+  color: var(--spcd3-tooltip-record-text);
   font-size: x-small;
 }
 
@@ -480,7 +561,7 @@ table.spcd3-tablecontainer td {
   display: block;
   padding-left: 0.5rem;
   padding-top: 0.5rem;
-  color: red;
+  color: var(--spcd3-tooltip-record-text);
   font-size: x-small;
 }
 

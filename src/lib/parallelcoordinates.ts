@@ -450,7 +450,12 @@ export const throttleShowValues = utils.throttle(
   50,
 );
 
-function setFeatureAxis(svg: any, yAxis: any, parcoords: any, width: any): void {
+function setFeatureAxis(
+  svg: any,
+  yAxis: any,
+  parcoords: any,
+  width: any,
+): void {
   let featureAxis = svg
     .selectAll("g.feature")
     .data(parcoords.features)
@@ -525,13 +530,26 @@ function setDefsForIcons(): void {
   );
 }
 
-function createImage(defs: any, id: any, width: any, height: any, image: any): void {
+function createImage(
+  defs: any,
+  id: any,
+  width: any,
+  height: any,
+  image: any,
+): void {
+  const themedImage =
+    id === "arrow_image_up" || id === "arrow_image_down"
+      ? utils.applySvgColor(image, "#000000")
+      : id.startsWith("brush_image_")
+        ? utils.applyThemeToBrushSvg(image)
+        : utils.applyThemeToSvg(image);
+
   defs
     .append("image")
     .attr("id", id)
     .attr("width", width)
     .attr("height", height)
-    .attr("href", "data:image/svg+xml;," + image);
+    .attr("href", "data:image/svg+xml," + encodeURIComponent(themedImage));
 }
 
 function setInvertIcon(featureAxis: any): void {
@@ -567,7 +585,7 @@ function setInvertIcon(featureAxis: any): void {
         .attr("id", "invert_hitbox_" + processed)
         .style(
           "cursor",
-          `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowDownCursor(), 12))}') ${hotspotX} ${hotspotY}, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 
@@ -589,7 +607,7 @@ function setInvertIcon(featureAxis: any): void {
         .text("up")
         .style(
           "cursor",
-          `url('data:image/svg+xml,${encodeURIComponent(utils.setSize(icon.getArrowDownCursor(), 12))}') ${hotspotX} ${hotspotY}, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 
