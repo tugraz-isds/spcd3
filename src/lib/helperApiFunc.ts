@@ -671,7 +671,7 @@ export function invertWoTransition(dimension: string): void {
   const textElement = select(invertId);
   const currentArrowStatus = textElement.text();
   const arrow =
-    currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
+    currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
       ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
@@ -681,7 +681,7 @@ export function invertWoTransition(dimension: string): void {
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
       : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(currentArrowStatus === "down" ? "up" : "down");
-  textElement.attr("href", arrow);
+  textElement.attr("d", arrow);
   textElement.style(
     "cursor",
     `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
@@ -737,7 +737,7 @@ export function setInversionStatus(dimension: string, status: string): void {
   const dimensionId = "#dimension_axis_" + cleanDimensionName;
   const textElement = select(invertId);
   const arrow =
-    status === "ascending" ? "#arrow_image_up" : "#arrow_image_down";
+    status === "ascending" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     status === "ascending"
       ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
@@ -747,7 +747,7 @@ export function setInversionStatus(dimension: string, status: string): void {
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
       : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(status === "ascending" ? "up" : "down");
-  textElement.attr("href", arrow);
+  textElement.attr("d", arrow);
   textElement.style(
     "cursor",
     `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,
@@ -813,7 +813,7 @@ export function invert(dimension: string): void {
   const textElement = select(invertId);
   const currentArrowStatus = textElement.text();
   const arrow =
-    currentArrowStatus === "down" ? "#arrow_image_up" : "#arrow_image_down";
+    currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
       ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
@@ -823,7 +823,7 @@ export function invert(dimension: string): void {
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
       : utils.getCursorHotspot(icon.getArrowUpCursorMeta(), 12);
   textElement.text(currentArrowStatus === "down" ? "up" : "down");
-  textElement.attr("href", arrow);
+  textElement.attr("d", arrow);
   textElement.style(
     "cursor",
     `url('data:image/svg+xml,${encodeURIComponent(arrowSvg)}') ${hotspotX} ${hotspotY}, auto`,

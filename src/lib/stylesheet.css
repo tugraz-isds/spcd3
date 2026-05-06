@@ -1,53 +1,36 @@
 :root {
-  --spcd3-theme: light;
-  --spcd3-page-bg: #ffffff;
-  --spcd3-panel-bg: #ffffff;
-  --spcd3-control-bg: #f6f6f6;
-  --spcd3-control-bg-hover: #e7ebef;
-  --spcd3-backdrop: rgba(0, 0, 0, 0.5);
-  --spcd3-border-subtle: #b8b8b8;
-  --spcd3-border-emphasis: #8f8f8f;
-  --spcd3-text-primary: #000000;
-  --spcd3-text-secondary: #6f6f6f;
-  --spcd3-text-disabled: #a5a5a5;
-  --spcd3-tooltip-surface: #d3d3d3;
-  --spcd3-tooltip-record-bg: rgba(211, 211, 211, 0.5);
-  --spcd3-input-invalid-bg: #ffb3b3;
-  --spcd3-highlight-fill: rgba(242, 242, 76, 0.5);
-  --spcd3-highlight-fill-strong: rgba(255, 255, 0, 0.7);
-  --spcd3-chart-disabled-bg: #f5f5f5;
-  --spcd3-tooltip-record-text: #ff0000;
-  --spcd3-tooltip-record-selected-text: #ffa500;
-  --spcd3-marker-stroke: #e45a0f;
-  --spcd3-shadow-popover: rgba(0, 0, 0, 0.2);
-  --spcd3-shadow-modal: rgba(0, 0, 0, 0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --spcd3-theme: dark;
-    --spcd3-page-bg: #10233a;
-    --spcd3-panel-bg: #17314d;
-    --spcd3-control-bg: #21415f;
-    --spcd3-control-bg-hover: #2c5377;
-    --spcd3-backdrop: rgba(7, 17, 30, 0.74);
-    --spcd3-border-subtle: #4d6d90;
-    --spcd3-border-emphasis: #6e90b5;
-    --spcd3-text-primary: #eef3f7;
-    --spcd3-text-secondary: #b1bcc7;
-    --spcd3-text-disabled: #7f8a95;
-    --spcd3-tooltip-surface: #264664;
-    --spcd3-tooltip-record-bg: rgba(38, 70, 100, 0.76);
-    --spcd3-input-invalid-bg: #6a2f35;
-    --spcd3-highlight-fill: rgba(234, 209, 83, 0.38);
-    --spcd3-highlight-fill-strong: rgba(255, 224, 102, 0.58);
-    --spcd3-chart-disabled-bg: #132942;
-    --spcd3-tooltip-record-text: #ff9b9b;
-    --spcd3-tooltip-record-selected-text: #ffd27a;
-    --spcd3-marker-stroke: #ffb46b;
-    --spcd3-shadow-popover: rgba(7, 17, 30, 0.35);
-    --spcd3-shadow-modal: rgba(7, 17, 30, 0.45);
-  }
+  color-scheme: light dark;
+  --spcd3-theme: light dark;
+  --spcd3-page-bg: light-dark(#ffffff, #10233a);
+  --spcd3-panel-bg: light-dark(#ffffff, #17314d);
+  --spcd3-control-bg: light-dark(#f6f6f6, #21415f);
+  --spcd3-control-bg-hover: light-dark(#e7ebef, #2c5377);
+  --spcd3-backdrop: light-dark(rgba(0, 0, 0, 0.5), rgba(7, 17, 30, 0.74));
+  --spcd3-border-subtle: light-dark(#b8b8b8, #4d6d90);
+  --spcd3-border-emphasis: light-dark(#8f8f8f, #6e90b5);
+  --spcd3-text-primary: light-dark(#000000, #eef3f7);
+  --spcd3-text-secondary: light-dark(#6f6f6f, #b1bcc7);
+  --spcd3-text-disabled: light-dark(#a5a5a5, #7f8a95);
+  --spcd3-tooltip-surface: light-dark(#d3d3d3, #264664);
+  --spcd3-tooltip-record-bg: light-dark(
+    rgba(211, 211, 211, 0.5),
+    rgba(38, 70, 100, 0.76)
+  );
+  --spcd3-input-invalid-bg: light-dark(#ffb3b3, #6a2f35);
+  --spcd3-highlight-fill: light-dark(
+    rgba(242, 242, 76, 0.5),
+    rgba(234, 209, 83, 0.38)
+  );
+  --spcd3-highlight-fill-strong: light-dark(
+    rgba(255, 255, 0, 0.7),
+    rgba(255, 224, 102, 0.58)
+  );
+  --spcd3-chart-disabled-bg: light-dark(#f5f5f5, #132942);
+  --spcd3-tooltip-record-text: light-dark(#ff0000, #ff9b9b);
+  --spcd3-tooltip-record-selected-text: light-dark(#ffa500, #ffd27a);
+  --spcd3-marker-stroke: light-dark(#e45a0f, #ffb46b);
+  --spcd3-shadow-popover: light-dark(rgba(0, 0, 0, 0.2), rgba(7, 17, 30, 0.35));
+  --spcd3-shadow-modal: light-dark(rgba(0, 0, 0, 0.3), rgba(7, 17, 30, 0.45));
 }
 
 #spcd3-parallelcoords,
@@ -235,12 +218,6 @@ table.spcd3-tablecontainer td {
 .spcd3-dimensions-axis + text {
   fill: var(--spcd3-text-primary);
   stroke: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  use[id^="dimension_invert_"] {
-    filter: brightness(0) invert(1);
-  }
 }
 
 .spcd3-tooltip-values {

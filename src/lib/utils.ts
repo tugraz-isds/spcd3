@@ -20,6 +20,8 @@ export function setSize(stringValue: string, size: number): string {
 
 export const BRUSH_IDLE_FILL = "rgb(242, 242, 76)";
 export const BRUSH_ACTIVE_FILL = "rgb(255, 255, 0)";
+export const ARROW_UP_PATH = "M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 z";
+export const ARROW_DOWN_PATH = "M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 z";
 
 export function getInactiveLineStroke(): string {
   const isDark =

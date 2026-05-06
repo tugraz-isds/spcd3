@@ -1,47 +1,30 @@
 :root {
-  --example-theme: light;
-  --example-page-bg: #ffffff;
-  --example-panel-bg: #ffffff;
-  --example-control-bg: #f6f8fb;
-  --example-control-bg-hover: #e4edf6;
-  --example-header-surface: #88bbdd;
-  --example-border-subtle: rgba(27, 31, 35, 0.15);
-  --example-border-emphasis: #b7c4d1;
-  --example-text-primary: #2b2b2b;
-  --example-text-secondary: #66717d;
-  --example-action-bg: #a9d0f8;
-  --example-focus-ring: #4a84ba;
-  --example-action-text: #10233a;
-  --example-backdrop: rgba(0, 0, 0, 0.5);
-  --example-shadow-button: rgba(27, 31, 35, 0.04);
-  --example-shadow-inset: rgba(255, 255, 255, 0.25);
-  --example-shadow-popover: rgba(0, 0, 0, 0.2);
-  --example-text-error: #b91c1c;
-  --example-icon-treatment: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --example-theme: dark;
-    --example-page-bg: #10233a;
-    --example-panel-bg: #17314d;
-    --example-control-bg: #21415f;
-    --example-control-bg-hover: #2c5377;
-    --example-header-surface: #264664;
-    --example-border-subtle: #4d6d90;
-    --example-border-emphasis: #6e90b5;
-    --example-text-primary: #eef3f7;
-    --example-text-secondary: #b1bcc7;
-    --example-action-bg: #5e9fdd;
-    --example-focus-ring: #89bbe8;
-    --example-action-text: #f4f8fb;
-    --example-backdrop: rgba(7, 17, 30, 0.74);
-    --example-shadow-button: rgba(7, 17, 30, 0.35);
-    --example-shadow-inset: rgba(255, 255, 255, 0.04);
-    --example-shadow-popover: rgba(0, 0, 0, 0.45);
-    --example-text-error: #ff9b9b;
-    --example-icon-treatment: brightness(0) invert(1);
-  }
+  color-scheme: light dark;
+  --example-theme: light dark;
+  --example-page-bg: light-dark(#ffffff, #10233a);
+  --example-panel-bg: light-dark(#ffffff, #17314d);
+  --example-control-bg: light-dark(#f6f8fb, #21415f);
+  --example-control-bg-hover: light-dark(#e4edf6, #2c5377);
+  --example-header-surface: light-dark(#88bbdd, #264664);
+  --example-border-subtle: light-dark(rgba(27, 31, 35, 0.15), #4d6d90);
+  --example-border-emphasis: light-dark(#b7c4d1, #6e90b5);
+  --example-text-primary: light-dark(#2b2b2b, #eef3f7);
+  --example-text-secondary: light-dark(#66717d, #b1bcc7);
+  --example-action-bg: light-dark(#a9d0f8, #5e9fdd);
+  --example-focus-ring: light-dark(#4a84ba, #89bbe8);
+  --example-action-text: light-dark(#10233a, #f4f8fb);
+  --example-backdrop: light-dark(rgba(0, 0, 0, 0.5), rgba(7, 17, 30, 0.74));
+  --example-shadow-button: light-dark(
+    rgba(27, 31, 35, 0.04),
+    rgba(7, 17, 30, 0.35)
+  );
+  --example-shadow-inset: light-dark(
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.04)
+  );
+  --example-shadow-popover: light-dark(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.45));
+  --example-text-error: light-dark(#b91c1c, #ff9b9b);
+  --example-icon-treatment: light-dark(none, brightness(0) invert(1));
 }
 
 header {

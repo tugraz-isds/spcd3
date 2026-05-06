@@ -539,7 +539,7 @@ function createImage(
 ): void {
   const themedImage =
     id === "arrow_image_up" || id === "arrow_image_down"
-      ? utils.applySvgColor(image, "#000000")
+      ? utils.applyThemeToSvg(image)
       : id.startsWith("brush_image_")
         ? utils.applyThemeToBrushSvg(image)
         : utils.applyThemeToSvg(image);
@@ -590,12 +590,15 @@ function setInvertIcon(featureAxis: any): void {
     });
 
   invertIcon
-    .append("use")
-    .attr("href", "#arrow_image_up")
+    .append("svg")
     .attr("width", 12)
     .attr("height", 12)
     .attr("x", 22.5)
     .attr("y", Number(value) - 33)
+    .attr("viewBox", "0 0 6 10")
+    .append("path")
+    .attr("d", utils.ARROW_UP_PATH)
+    .attr("fill", "currentColor")
     .each(function (this: any, d: { name: string }) {
       const processed = utils.cleanString(d.name);
       const [hotspotX, hotspotY] = utils.getCursorHotspot(
