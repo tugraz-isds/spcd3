@@ -9,16 +9,16 @@ const ICON_MANIFEST = [
   ["getArrowBottom", "arrow-bottom.svg"],
   ["getArrowBottomActive", "arrow-bottom-active.svg"],
   ["getArrowDown", "arrow-down.svg"],
-  ["getArrowDownCursor", "arrow-down-cursor.svg"],
-  ["getArrowLeftAndRight", "arrow-left-and-right.svg"],
-  ["getArrowLeft", "arrow-left.svg"],
-  ["getArrowRight", "arrow-right.svg"],
-  ["getArrowTopAndBottom", "arrow-top-and-bottom.svg"],
+  ["getArrowDownCursor", "arrow-curved-down-cursor.svg"],
+  ["getArrowLeftAndRight", "arrow-left-and-right-cursor.svg"],
+  ["getArrowLeft", "arrow-left-cursor.svg"],
+  ["getArrowRight", "arrow-right-cursor.svg"],
+  ["getArrowTopAndBottom", "arrow-top-and-bottom-cursor.svg"],
   ["getArrowTopCursor", "arrow-top-cursor.svg"],
   ["getArrowTop", "arrow-top.svg"],
   ["getArrowTopActive", "arrow-top-active.svg"],
   ["getArrowUp", "arrow-up.svg"],
-  ["getArrowUpCursor", "arrow-up-cursor.svg"],
+  ["getArrowUpCursor", "arrow-curved-up-cursor.svg"],
   ["getRefreshIcon", "refresh.svg"],
   ["getTableIcon", "table.svg"],
   ["getExpandToolbarIcon", "toolbar_expand.svg"],
@@ -99,9 +99,7 @@ function createIconModule() {
     lines.push("");
 
     if (cursorMeta) {
-      lines.push(
-        `export function ${exportName}Meta(): CursorIconMeta {`,
-      );
+      lines.push(`export function ${exportName}Meta(): CursorIconMeta {`);
       lines.push(`  return ${JSON.stringify(cursorMeta)};`);
       lines.push("}");
       lines.push("");
