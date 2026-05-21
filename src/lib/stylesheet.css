@@ -175,16 +175,29 @@ table.spcd3-tablecontainer td {
   text-align: left;
   color: var(--spcd3-text-primary);
   background: var(--spcd3-page-bg);
+  box-sizing: border-box;
 }
 
 #spcd3-pc_svg {
+  display: block;
+  inline-size: var(--spcd3-chart-svg-width, auto);
+  block-size: var(--spcd3-chart-svg-height, auto);
   padding-bottom: 1rem;
+  box-sizing: border-box;
+  touch-action: none;
 }
 
 .spcd3-chartWrapper {
   position: relative;
-  overflow-x: auto;
+  inline-size: var(--spcd3-chart-width, auto);
+  block-size: var(--spcd3-chart-height, auto);
+  min-inline-size: var(--spcd3-chart-min-width, 0);
+  min-block-size: var(--spcd3-chart-min-height, 0);
+  max-inline-size: var(--spcd3-chart-max-width, none);
+  resize: var(--spcd3-chart-resize, none);
+  overflow: var(--spcd3-chart-overflow, auto);
   margin-left: 1rem;
+  box-sizing: border-box;
 }
 
 .spcd3-tip-layer {
@@ -326,6 +339,7 @@ table.spcd3-tablecontainer td {
   justify-content: flex-start;
   overflow: visible;
   padding-left: 1rem;
+  visibility: hidden;
 }
 
 .spcd3-toolbar-button {

@@ -82,7 +82,10 @@ export function drawChart(content: []): void {
     chartWrapper
       .append("svg")
       .attr("id", "spcd3-pc_svg")
-      .attr("viewBox", [0, 0, width, 360]),
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [0, 0, width, height])
+      .attr("preserveAspectRatio", "none"),
   );
 
   const plot = svg.append("g").attr("class", "plot");
@@ -92,6 +95,7 @@ export function drawChart(content: []): void {
   setActive(setActivePathLines(plot, content, parcoords));
 
   setFeatureAxis(plot, yAxis, parcoords, width);
+  realignToolbar();
 
   svg
     .on("contextmenu", function (event: any) {
@@ -169,12 +173,6 @@ function setUpParcoordData(data: any, newFeatures: []): void {
   setInitDimension(newFeatures);
   setHeight(400);
 
-  if (newFeatures.length <= 6) {
-    setWidth(newFeatures.length * 180);
-  } else {
-    setWidth(newFeatures.length * 100);
-  }
-
   const label = newFeatures[newFeatures.length - 1];
 
   data.sort((a: { [x: string]: any }, b: { [x: string]: any }) => {
@@ -191,7 +189,7 @@ function setUpParcoordData(data: any, newFeatures: []): void {
   });
 
   let dataset = helper.prepareData(data, newFeatures);
-
+  setWidth(helper.calculateChartLayout(dataset[0], dataset[1]).chartWidth);
   setFeatures(dataset[0]);
   setNewDataset(dataset[1]);
 
@@ -295,6 +293,39 @@ function clearExistingDelay() {
     clearTimeout(delay);
     delay = null;
   }
+}
+
+export function realignToolbar(): void {
+  window.requestAnimationFrame(alignToolbarWithLeftmostAxisLabels);
+}
+
+function alignToolbarWithLeftmostAxisLabels(): void {
+  const toolbarRow =
+    document.querySelector<HTMLDivElement>("#spcd3-toolbarRow");
+  const svgNode = document.querySelector<SVGSVGElement>("#spcd3-pc_svg");
+  const axisNodes = Array.from(
+    document.querySelectorAll<SVGGElement>("#spcd3-pc_svg .dimensions"),
+  );
+  if (!toolbarRow || !svgNode || axisNodes.length === 0) {
+    return;
+  }
+  const toolbarRect = toolbarRow.getBoundingClientRect();
+  const leftmostAxis = axisNodes.reduce(
+    (leftmost, axis) =>
+      axis.getBoundingClientRect().left < leftmost.getBoundingClientRect().left
+        ? axis
+        : leftmost,
+    axisNodes[0],
+  );
+  const labelNodes = Array.from(
+    leftmostAxis.querySelectorAll<SVGTextElement>(".tick text"),
+  );
+  const leftEdge = labelNodes.reduce(
+    (minLeft, label) => Math.min(minLeft, label.getBoundingClientRect().left),
+    leftmostAxis.getBoundingClientRect().left,
+  );
+  toolbarRow.style.paddingLeft = `${Math.max(0, leftEdge - toolbarRect.left) / 16}rem`;
+  toolbarRow.style.visibility = "visible";
 }
 
 function handlePointerEnter(event: any, d: any) {

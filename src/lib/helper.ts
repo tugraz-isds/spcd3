@@ -92,50 +92,69 @@ function getTextWidthSVG(text: string, font: string): number {
   return width;
 }
 
-function getLongestTickLabel(data: DataRow[], labelKey: string): string {
-  const uniqueLabels = Array.from(
-    new Set<string>(data.map((d: DataRow) => String(d[labelKey] ?? ""))),
-  ).filter((s) => s.length > 0);
-  const ticks =
-    uniqueLabels.length > 30
-      ? uniqueLabels.filter((_, i) => i % 4 === 0)
-      : uniqueLabels;
-
-  return ticks.reduce((longest, v) => {
-    return v.length > longest.length ? v : longest;
+function shortenAxisLabel(value: DataValue): string {
+  const label = String(value ?? "");
+  return label.length > 10 ? label.substr(0, 10) + "..." : label;
+}
+function getLongestVisibleTickLabel(
+  data: DataRow[],
+  header: DimensionHeader[],
+): string {
+  return header.reduce((longest: string, column: DimensionHeader) => {
+    const values = data.map((d: DataRow) => d[column.name]);
+    const numericValues = values.every((v: DataValue) => !isNaN(Number(v)));
+    const labels = numericValues
+      ? values.map((value: DataValue) => String(value ?? ""))
+      : values.map(shortenAxisLabel);
+    return labels.reduce(
+      (currentLongest: string, label: string) =>
+        label.length > currentLongest.length ? label : currentLongest,
+      longest,
+    );
   }, "");
 }
 
-function detectLastStringKey(data: DataRow[]): string {
-  const keys = Object.keys(data[0]);
-
-  const stringKeys = keys.filter(
-    (key) => typeof data[0][key] === "string" && isNaN(Number(data[0][key])),
+export function calculateChartLayout(
+  header: DimensionHeader[],
+  dataset: DataRow[],
+): {
+  axisGap: number;
+  chartWidth: number;
+  leftPadding: number;
+  rightPadding: number;
+} {
+  const n = header.length;
+  const longestDimensionLabel = header.reduce(
+    (longest: string, column: DimensionHeader) => {
+      const label = shortenAxisLabel(column.name);
+      return label.length > longest.length ? label : longest;
+    },
+    "",
   );
-
-  return stringKeys[stringKeys.length - 1];
+  const longestTickLabel = getLongestVisibleTickLabel(dataset, header);
+  const dimensionLabelWidth = getTextWidthSVG(
+    longestDimensionLabel,
+    "0.7rem Verdana",
+  );
+  const tickLabelWidth = getTextWidthSVG(longestTickLabel, "0.75rem Verdana");
+  const axisGap = Math.max(96, Math.ceil(dimensionLabelWidth + 56));
+  const leftPadding = Math.max(72, Math.ceil(tickLabelWidth + 44));
+  const rightPadding = Math.max(48, Math.ceil(dimensionLabelWidth / 2 + 36));
+  const chartWidth = Math.ceil(
+    leftPadding + rightPadding + Math.max(0, n - 1) * axisGap,
+  );
+  return { axisGap, chartWidth, leftPadding, rightPadding };
 }
 
 export function setupXScales(
   header: DimensionHeader[],
   dataset: DataRow[],
 ): any {
-  const labelKey = detectLastStringKey(dataset);
-
-  const longest = getLongestTickLabel(dataset, labelKey);
-
-  const longestTicklabel =
-    longest.length > 10 ? longest.substr(0, 10) + "......." : longest;
-
-  const labelWidth = getTextWidthSVG(longestTicklabel, "0.75rem Verdana");
-
-  const margin = labelWidth * 0.6 + 16;
-  const n = header.length;
-  const pad = n <= 4 ? 0.1 : 0.2;
+  const { leftPadding, rightPadding } = calculateChartLayout(header, dataset);
   return scalePoint()
     .domain(header.map((x: DimensionHeader) => x.name))
-    .range([width - margin, margin])
-    .padding(pad)
+    .range([width - rightPadding, leftPadding])
+    .padding(0)
     .align(0.5);
 }
 
