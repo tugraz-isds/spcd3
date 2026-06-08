@@ -11,19 +11,19 @@ export type CursorIconMeta = {
 };
 
 export function getArrowBottomCursor(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.2 6.6 5.6\">\n  <path fill=\"white\" fill-opacity=\"0.5\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"white\" fill-opacity=\"0.5\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 7 L 93 7 L 50 79 z\"/>\n</svg>";
 }
 
 export function getArrowBottomCursorMeta(): CursorIconMeta {
-  return {"hotspotX":3,"hotspotY":5,"viewBoxMinX":-0.2,"viewBoxMinY":-0.2,"viewBoxWidth":6.6,"viewBoxHeight":5.6};
+  return {"hotspotX":50,"hotspotY":86,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":100,"viewBoxHeight":86};
 }
 
 export function getArrowBottom(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.2 6.6 5.6\">\n  <path fill=\"rgb(214, 176, 28)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"rgb(242, 242, 76)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 7 L 93 7 L 50 79 z\"/>\n</svg>";
 }
 
 export function getArrowBottomActive(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.2 6.6 5.6\">\n  <path fill=\"rgb(235, 210, 44)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 0 L 6 0 L 3 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"rgb(255, 255, 0)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 7 L 93 7 L 50 79 z\"/>\n</svg>";
 }
 
 export function getArrowDown(): string {
@@ -39,51 +39,51 @@ export function getArrowDownCursorMeta(): CursorIconMeta {
 }
 
 export function getArrowLeftAndRight(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.7 -0.7 11.2 7.4\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"0.6\" d=\"M 0 3 L 3 0 L 3 2 L 7 2 L 7 0 L 10 3 L 7 6 L 7 4 L 3 4 L 3 6 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 61\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"6\" d=\"M 7 30 L 30 7 L 30 20 L 70 20 L 70 7 L 93 30 L 70 54 L 70 40 L 30 40 L 30 54 z\"/>\n</svg>";
 }
 
 export function getArrowLeftAndRightMeta(): CursorIconMeta {
-  return {"hotspotX":5,"hotspotY":3,"viewBoxMinX":-0.7,"viewBoxMinY":-0.7,"viewBoxWidth":11.2,"viewBoxHeight":7.4};
+  return {"hotspotX":50,"hotspotY":33.5,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":100,"viewBoxHeight":61};
 }
 
 export function getArrowLeft(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.6 -0.6 11 7.2\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"0.6\" d=\"M 0 2 L 6 2 L 6 0 L 10 3 L 6 6 L 6 4 L 0 4 z\" />\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 61\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"6\" d=\"M 7 20 L 60 20 L 60 7 L 93 30 L 60 55 L 60 40 L 7 40 z\" />\n</svg>";
 }
 
 export function getArrowLeftMeta(): CursorIconMeta {
-  return {"hotspotX":10,"hotspotY":3,"viewBoxMinX":-0.6,"viewBoxMinY":-0.6,"viewBoxWidth":11,"viewBoxHeight":7.2};
+  return {"hotspotX":100,"hotspotY":30.5,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":100,"viewBoxHeight":61};
 }
 
 export function getArrowRight(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.6 -0.6 11 7.2\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"0.6\" d=\"M 0 3 L 4 0 L 4 2 L 10 2 L 10 4 L 4 4 L 4 6 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 61\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"6\" d=\"M 7 30 L 40 7 L 40 20 L 93 20 L 93 40 L 40 40 L 40 54 z\"/>\n</svg>";
 }
 
 export function getArrowRightMeta(): CursorIconMeta {
-  return {"hotspotX":0,"hotspotY":3,"viewBoxMinX":-0.6,"viewBoxMinY":-0.6,"viewBoxWidth":11,"viewBoxHeight":7.2};
+  return {"hotspotX":0,"hotspotY":30.5,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":100,"viewBoxHeight":61};
 }
 
 export function getArrowTopAndBottom(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0.6 6 10.9\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5.5 L 3 1 L 6 5.5 z\"/>\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 6.5 L 3 11 L 6 6.5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 90 110\">\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"6\" d=\"M 7 50 L 45 7 L 83 50 z\"/>\n  <path fill=\"white\" stroke=\"black\" stroke-width=\"6\" d=\"M 7 60 L 45 103 L 83 60 z\"/>\n</svg>";
 }
 
 export function getArrowTopAndBottomMeta(): CursorIconMeta {
-  return {"hotspotX":3,"hotspotY":6,"viewBoxMinX":0,"viewBoxMinY":0.6,"viewBoxWidth":6,"viewBoxHeight":10.9};
+  return {"hotspotX":45,"hotspotY":55,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":90,"viewBoxHeight":110};
 }
 
 export function getArrowTopCursor(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.4 6.6 5.6\">\n  <path fill=\"white\" fill-opacity=\"0.7\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"white\" fill-opacity=\"0.7\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 79 L 50 7 L 93 79 z\"/>\n</svg>";
 }
 
 export function getArrowTopCursorMeta(): CursorIconMeta {
-  return {"hotspotX":3,"hotspotY":0,"viewBoxMinX":-0.2,"viewBoxMinY":-0.4,"viewBoxWidth":6.6,"viewBoxHeight":5.6};
+  return {"hotspotX":50,"hotspotY":0,"viewBoxMinX":0,"viewBoxMinY":0,"viewBoxWidth":100,"viewBoxHeight":86};
 }
 
 export function getArrowTop(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.4 6.6 5.6\">\n  <path fill=\"rgb(214, 176, 28)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"rgb(242, 242, 76)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 79 L 50 7 L 93 79 z\"/>\n</svg>";
 }
 
 export function getArrowTopActive(): string {
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.2 -0.4 6.6 5.6\">\n  <path fill=\"rgb(235, 210, 44)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"0.4\" d=\"M 0 5 L 3 0 L 6 5 z\"/>\n</svg>";
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 86\">\n  <path fill=\"rgb(255, 255, 0)\" fill-opacity=\"1\" stroke=\"black\" stroke-width=\"7\" d=\"M 7 79 L 50 7 L 93 79 z\"/>\n</svg>";
 }
 
 export function getArrowUp(): string {
