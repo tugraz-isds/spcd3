@@ -13,8 +13,8 @@
   --spcd3-text-disabled: light-dark(#a5a5a5, #7f8a95);
   --spcd3-tooltip-surface: light-dark(#d3d3d3, #264664);
   --spcd3-tooltip-record-bg: light-dark(
-    rgba(211, 211, 211, 0.5),
-    rgba(38, 70, 100, 0.76)
+    rgba(128, 128, 128, 0.8),
+    rgba(38, 70, 100, 0.8)
   );
   --spcd3-input-invalid-bg: light-dark(#ffb3b3, #6a2f35);
   --spcd3-highlight-fill: light-dark(
@@ -31,6 +31,10 @@
   --spcd3-marker-stroke: light-dark(#e45a0f, #ffb46b);
   --spcd3-shadow-popover: light-dark(rgba(0, 0, 0, 0.2), rgba(7, 17, 30, 0.35));
   --spcd3-shadow-modal: light-dark(rgba(0, 0, 0, 0.3), rgba(7, 17, 30, 0.45));
+  --spcd3-active-records: light-dark(
+    rgba(0, 129, 175, 0.5),
+    rgba(50, 150, 200, 0.5)
+  );
 }
 
 #spcd3-parallelcoords,

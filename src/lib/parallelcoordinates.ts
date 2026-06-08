@@ -471,7 +471,7 @@ function setActivePathLines(svg: any, content: any, parcoords: any): any {
     .attr("id", (d: any) => utils.cleanString(d[key]))
     .attr("d", (d: any) => helper.linePath(d, parcoords.newFeatures))
     .style("pointer-events", "none")
-    .style("stroke", "rgba(0, 129, 175, 0.5)")
+    .style("stroke", "var(--spcd3-active-records)")
     .style("stroke-width", "0.12rem")
     .style("fill", "none");
 }

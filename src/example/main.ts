@@ -1127,7 +1127,7 @@ function generateModalForSetSensitivity() {
   const slider = document.createElement("input");
   slider.className = "hitbox-slider";
   slider.type = "range";
-  slider.min = "0";
+  slider.min = "0.1";
   slider.max = "1";
   slider.step = "0.1";
 
