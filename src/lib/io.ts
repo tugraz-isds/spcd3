@@ -1,5 +1,4 @@
 import xmlFormat from "xml-formatter";
-import * as icon from "./icons/icons";
 import * as svgcreator from "./svgStringCreator";
 import * as api from "./helperApiFunc";
 import * as helper from "./helper";
@@ -36,33 +35,34 @@ export function createSvgString(): string {
 
   let defs = svg.append("defs");
 
-  defs
-    .append("image")
-    .attr("id", "arrow_image_up")
-    .attr("width", 12)
-    .attr("height", 12)
-    .attr("href", "data:image/svg+xml;," + icon.getArrowUp());
-
-  defs
-    .append("image")
-    .attr("id", "arrow_image_down")
-    .attr("width", 12)
-    .attr("height", 12)
-    .attr("href", "data:image/svg+xml;," + icon.getArrowDown());
-
-  defs
-    .append("image")
-    .attr("id", "brush_image_top")
-    .attr("width", 14)
-    .attr("height", 10)
-    .attr("href", "data:image/svg+xml;," + icon.getArrowTop());
-
-  defs
-    .append("image")
-    .attr("id", "brush_image_bottom")
-    .attr("width", 14)
-    .attr("height", 10)
-    .attr("href", "data:image/svg+xml;," + icon.getArrowBottom());
+  appendSymbol(defs, "arrow_image_up", "0 0 6 10", [
+    {
+      fill: "black",
+      d: "M 0 4 L 3 0 L 6 4 L 4 4 L 4 10 L 2 10 L 2 4 Z",
+    },
+  ]);
+  appendSymbol(defs, "arrow_image_down", "0 0 6 10", [
+    {
+      fill: "black",
+      d: "M 0 6 L 2 6 L 2 0 L 4 0 L 4 6 L 6 6 L 3 10 Z",
+    },
+  ]);
+  appendSymbol(defs, "brush_image_top", "0 0 100 86", [
+    {
+      fill: "rgb(242, 242, 76)",
+      stroke: "black",
+      strokeWidth: "7",
+      d: "M 7 79 L 50 7 L 93 79 Z",
+    },
+  ]);
+  appendSymbol(defs, "brush_image_bottom", "0 0 100 86", [
+    {
+      fill: "rgb(242, 242, 76)",
+      stroke: "black",
+      strokeWidth: "7",
+      d: "M 7 7 L 93 7 L 50 79 Z",
+    },
+  ]);
 
   svgcreator.setFeatureAxisToDownload(
     svg,
@@ -78,40 +78,6 @@ export function createSvgString(): string {
 
 export function saveAsSvg(): void {
   let svgString = createSvgString();
-
-  let svgArrowUp = encodeURIComponent(icon.getArrowUp());
-  let svgArrowDown = encodeURIComponent(icon.getArrowDown());
-  let svgArrowBottom = encodeURIComponent(icon.getArrowBottom());
-  let svgArrowTop = encodeURIComponent(icon.getArrowTop());
-
-  let regexUp =
-    /<image id="arrow_image_up"[^>]*href="data:image\/svg\+xml[^"]*">/g;
-
-  let regexDown =
-    /<image id="arrow_image_down"[^>]*href="data:image\/svg\+xml[^"]*">/g;
-
-  let regexTop =
-    /<image id="brush_image_top"[^>]*href="data:image\/svg\+xml[^"]*">/g;
-
-  let regexBottom =
-    /<image id="brush_image_bottom"[^>]*href="data:image\/svg\+xml[^"]*">/g;
-
-  svgString = svgString.replaceAll(
-    regexUp,
-    getImageTag("arrow_image_up", svgArrowUp),
-  );
-  svgString = svgString.replaceAll(
-    regexDown,
-    getImageTag("arrow_image_down", svgArrowDown),
-  );
-  svgString = svgString.replaceAll(
-    regexBottom,
-    getImageTag("brush_image_bottom", svgArrowBottom),
-  );
-  svgString = svgString.replaceAll(
-    regexTop,
-    getImageTag("brush_image_top", svgArrowTop),
-  );
   svgString = svgString.replaceAll("currentColor", "black");
   svgString = svgString.replaceAll('stroke="black"', "");
   svgString = svgString.replaceAll('fill="black"', "");
@@ -285,8 +251,33 @@ function setOptionsAndDownload(svgString: string) {
   });
 }
 
-function getImageTag(key: string, svg: string): string {
-  return `<image id="${key}" width="12" height="12" href="data:image/svg+xml,${svg}">`;
+type SymbolPathDefinition = {
+  d: string;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: string;
+};
+
+function appendSymbol(
+  defs: any,
+  id: string,
+  viewBox: string,
+  paths: SymbolPathDefinition[],
+): void {
+  const symbol = defs.append("symbol").attr("id", id).attr("viewBox", viewBox);
+
+  paths.forEach((pathDefinition) => {
+    const path = symbol.append("path").attr("d", pathDefinition.d);
+    if (pathDefinition.fill) {
+      path.attr("fill", pathDefinition.fill);
+    }
+    if (pathDefinition.stroke) {
+      path.attr("stroke", pathDefinition.stroke);
+    }
+    if (pathDefinition.strokeWidth) {
+      path.attr("stroke-width", pathDefinition.strokeWidth);
+    }
+  });
 }
 
 function roundDecimals(svgString: string, decimals: number): string {

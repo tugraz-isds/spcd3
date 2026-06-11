@@ -28,6 +28,7 @@ import {
   isDimensionCategorical,
   setSelectableWidth,
   getSelectableWith,
+  setDimensionSpacing,
 } from "pc-lib";
 
 type ParsedData = ReturnType<typeof loadCSV>;
@@ -40,6 +41,9 @@ let rangeDimensionData = "";
 
 let studentData =
   "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
+
+const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
+const DEFAULT_DIMENSION_SPACING_REM = 6;
 
 window.addEventListener("click", (event: MouseEvent) => {
   const target = event.target as HTMLElement | null;
@@ -84,8 +88,10 @@ document.addEventListener(
   function () {
     data = studentData;
     newData = loadCSV(data);
+    setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
     showButtons();
     drawChart(newData);
+    syncSelectionSensitivityFromChart();
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -95,6 +101,62 @@ document.addEventListener(
   },
   false,
 );
+
+const selectionSensitivitySlider = elementById<HTMLInputElement>(
+  "selectionSensitivitySlider",
+);
+const selectionSensitivityValue = elementById<HTMLOutputElement>(
+  "selectionSensitivityValue",
+);
+const dimensionSpacingSlider = elementById<HTMLInputElement>(
+  "dimensionSpacingSlider",
+);
+const dimensionSpacingValue = elementById<HTMLOutputElement>(
+  "dimensionSpacingValue",
+);
+
+function updateSelectionSensitivityLabel(value: number): void {
+  const label = `${value.toFixed(2)} rem`;
+  selectionSensitivityValue.value = label;
+  selectionSensitivityValue.textContent = label;
+}
+
+function updateDimensionSpacingLabel(value: number): void {
+  const label = `${value.toFixed(2)} rem`;
+  dimensionSpacingValue.value = label;
+  dimensionSpacingValue.textContent = label;
+}
+
+function syncSelectionSensitivityFromChart(): void {
+  const current = getSelectableWith();
+  const value = current
+    ? Number(current.replace("rem", "").trim())
+    : DEFAULT_SELECTION_SENSITIVITY_REM;
+  selectionSensitivitySlider.value = value.toString();
+  updateSelectionSensitivityLabel(value);
+}
+
+selectionSensitivitySlider.value = DEFAULT_SELECTION_SENSITIVITY_REM.toString();
+updateSelectionSensitivityLabel(DEFAULT_SELECTION_SENSITIVITY_REM);
+
+selectionSensitivitySlider.addEventListener("input", (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  if (!target) return;
+  const value = Number(target.value);
+  updateSelectionSensitivityLabel(value);
+  setSelectableWidth(`${value}rem`);
+});
+
+dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
+updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
+
+dimensionSpacingSlider.addEventListener("input", (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  if (!target) return;
+  const value = Number(target.value);
+  updateDimensionSpacingLabel(value);
+  setDimensionSpacing(value);
+});
 
 let inputButton = elementById<HTMLElement>("input");
 inputButton.addEventListener("click", openFileDialog, false);
@@ -130,16 +192,6 @@ let resetAllButton = elementById<HTMLButtonElement>("resetAll");
 resetAllButton.addEventListener("click", resetAll, false);
 resetAllButton.style.visibility = "hidden";
 
-let sensitivityButton = elementById<HTMLButtonElement>(
-  "setSelectionSensitivity",
-);
-sensitivityButton.addEventListener(
-  "click",
-  generateModalForSetSensitivity,
-  false,
-);
-sensitivityButton.style.visibility = "hidden";
-
 function openFileDialog() {
   elementById<HTMLInputElement>("fileInput").click();
 }
@@ -158,6 +210,7 @@ function handleFileSelect(event: Event) {
       data = result;
       newData = loadCSV(data);
       drawChart(newData);
+      syncSelectionSensitivityFromChart();
 
       showButtons();
 
@@ -177,7 +230,6 @@ function showButtons() {
   resetRangesButton.style.visibility = "visible";
   resetRoundedRangesButton.style.visibility = "visible";
   resetAllButton.style.visibility = "visible";
-  sensitivityButton.style.visibility = "visible";
 }
 
 function updateDimensions(dimension: string) {
@@ -1077,105 +1129,7 @@ function resetToRoundedRange() {
 function resetAll() {
   let reloadedData = loadCSV(data);
   drawChart(reloadedData);
-}
-
-function generateModalForSetSensitivity() {
-  const overlay = document.createElement("div");
-  overlay.className = "modal-overlay-test";
-
-  const modal = document.createElement("div");
-  modal.className = "modal-content-test";
-
-  const closeButton = document.createElement("span");
-  closeButton.className = "close-button";
-  closeButton.innerHTML = "&times;";
-
-  const close = () => {
-    document.removeEventListener("keydown", onKeyDown);
-    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-  };
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") close();
-  };
-
-  closeButton.addEventListener("click", close);
-  overlay.addEventListener("click", (e: MouseEvent) => {
-    if (e.target === overlay) close();
-  });
-  document.addEventListener("keydown", onKeyDown);
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "hitbox-control";
-
-  const labelRow = document.createElement("div");
-  labelRow.className = "hitbox-label-row";
-
-  const label = document.createElement("div");
-  label.className = "hitbox-label label-text";
-  label.textContent = "Selection Sensitivity";
-
-  const valueDisplay = document.createElement("div");
-  valueDisplay.className = "hitbox-value label-support";
-
-  labelRow.appendChild(label);
-  labelRow.appendChild(valueDisplay);
-
-  const sliderRow = document.createElement("div");
-  sliderRow.className = "hitbox-slider-row";
-
-  const slider = document.createElement("input");
-  slider.className = "hitbox-slider";
-  slider.type = "range";
-  slider.min = "0.1";
-  slider.max = "1";
-  slider.step = "0.1";
-
-  const minLabel = document.createElement("span");
-  minLabel.className = "hitbox-min label-support";
-  minLabel.textContent = slider.min;
-
-  const maxLabel = document.createElement("span");
-  maxLabel.className = "hitbox-max label-support";
-  maxLabel.textContent = slider.max;
-
-  const current = getSelectableWith();
-
-  slider.value = String(current.replace("rem", ""));
-  valueDisplay.textContent = current;
-
-  slider.addEventListener("input", (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const v = Math.round(+(target?.value ?? slider.value) * 100) / 100;
-    valueDisplay.textContent = v + "rem";
-  });
-
-  const infoMessage = document.createElement("div");
-  infoMessage.textContent =
-    "Sets the sensitivity of polylines for hover and select.";
-  infoMessage.className = "info-text label-support";
-
-  const button = document.createElement("button");
-  button.className = "apply-button";
-  button.textContent = "Save";
-  button.addEventListener("click", () => {
-    setSelectableWidth(slider.value + "rem");
-    overlay.remove();
-  });
-
-  sliderRow.appendChild(minLabel);
-  sliderRow.appendChild(slider);
-  sliderRow.appendChild(maxLabel);
-
-  wrapper.appendChild(labelRow);
-  wrapper.appendChild(sliderRow);
-  wrapper.appendChild(infoMessage);
-  wrapper.appendChild(button);
-
-  modal.appendChild(closeButton);
-  modal.appendChild(wrapper);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  syncSelectionSensitivityFromChart();
 }
 
 function generateDropdownForSelectRecords() {

@@ -9,6 +9,9 @@ import {
   setLineThickness,
   getLineThickness,
   hoverlabel,
+  setDimensionSpacingVar,
+  setWidth,
+  height,
 } from "./globals";
 import * as utils from "./utils";
 import * as helper from "./helper";
@@ -24,6 +27,42 @@ const BRUSH_STATE_EPSILON = 0.75;
 
 function isNear(value: number, target: number): boolean {
   return Math.abs(value - target) < BRUSH_STATE_EPSILON;
+}
+
+function remToPixels(value: number): number {
+  const rootFontSize = parseFloat(
+    getComputedStyle(document.documentElement).fontSize,
+  );
+  const baseFontSize =
+    Number.isFinite(rootFontSize) && rootFontSize > 0 ? rootFontSize : 16;
+  return value * baseFontSize;
+}
+
+function realignToolbarAfterSpacingChange(): void {
+  window.requestAnimationFrame(() => {
+    const toolbarRow =
+      document.querySelector<HTMLDivElement>("#spcd3-toolbarRow");
+    const svgNode = document.querySelector<SVGSVGElement>("#spcd3-pc_svg");
+    const axisNodes = Array.from(
+      document.querySelectorAll<SVGGElement>("#spcd3-pc_svg .dimensions"),
+    );
+
+    if (!toolbarRow || !svgNode || axisNodes.length === 0) {
+      return;
+    }
+
+    const leftmostAxis = axisNodes.reduce((leftmost, axis) =>
+      axis.getBoundingClientRect().left < leftmost.getBoundingClientRect().left
+        ? axis
+        : leftmost,
+    );
+    const toolbarRect = toolbarRow.getBoundingClientRect();
+    const svgRect = svgNode.getBoundingClientRect();
+    const axisRect = leftmostAxis.getBoundingClientRect();
+    const leftEdge = axisRect.left - svgRect.left + toolbarRect.left;
+
+    toolbarRow.style.paddingLeft = `${Math.max(0, leftEdge - toolbarRect.left) / 16}rem`;
+  });
 }
 
 //---------- Show and Hide Functions ----------
@@ -1126,4 +1165,60 @@ export function setSelectableWidth(width: string) {
 
 export function getSelectableWith(): string {
   return getLineThickness();
+}
+
+export function setDimensionSpacing(spacingRem: number): void {
+  setDimensionSpacingVar(remToPixels(spacingRem));
+
+  if (!parcoords.features.length || !parcoords.newDataset) {
+    return;
+  }
+
+  const layout = helper.calculateChartLayout(
+    parcoords.features,
+    parcoords.newDataset,
+  );
+
+  setWidth(layout.chartWidth);
+  parcoords.xScales = helper.setupXScales(
+    parcoords.features,
+    parcoords.newDataset,
+  );
+
+  select("#spcd3-pc_svg")
+    .attr("width", layout.chartWidth)
+    .attr("viewBox", [0, 0, layout.chartWidth, height]);
+
+  select("#spcd3-pc_svg .plot > rect").attr("width", layout.chartWidth);
+
+  selectAll(".dimensions")
+    .transition()
+    .duration(300)
+    .attr(
+      "transform",
+      (d: { name: string }) =>
+        "translate(" +
+        helper.position(d.name || d, parcoords.dragging, parcoords.xScales) +
+        ")",
+    );
+
+  select("g.active")
+    .selectAll("path")
+    .transition()
+    .duration(300)
+    .attr("d", function (d: any) {
+      return helper.linePath(d, parcoords.newFeatures);
+    });
+
+  helper.cleanTooltipSelect();
+  getSelected().forEach((record) => {
+    const path = parcoords.newDataset.find(
+      (d: any) => d[hoverlabel] === record,
+    );
+    if (path && !isRecordInactive(record)) {
+      helper.createToolTipForValues(path, true);
+    }
+  });
+
+  realignToolbarAfterSpacingChange();
 }

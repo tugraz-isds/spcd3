@@ -3,7 +3,13 @@ import { scalePoint, scaleLinear } from "d3-scale";
 import { axisLeft } from "d3-axis";
 import { line } from "d3-shape";
 import * as utils from "./utils";
-import { parcoords, height, width, padding, hoverlabel } from "./globals";
+import {
+  parcoords,
+  height,
+  width,
+  hoverlabel,
+  dimensionSpacingVar,
+} from "./globals";
 
 const PADDING = 50;
 
@@ -137,7 +143,8 @@ export function calculateChartLayout(
     "0.7rem Verdana",
   );
   const tickLabelWidth = getTextWidthSVG(longestTickLabel, "0.75rem Verdana");
-  const axisGap = Math.max(96, Math.ceil(dimensionLabelWidth + 56));
+  const axisGap =
+    dimensionSpacingVar ?? Math.max(96, Math.ceil(dimensionLabelWidth + 56));
   const leftPadding = Math.max(72, Math.ceil(tickLabelWidth + 44));
   const rightPadding = Math.max(48, Math.ceil(dimensionLabelWidth / 2 + 36));
   const chartWidth = Math.ceil(

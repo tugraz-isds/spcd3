@@ -36,6 +36,7 @@ export let thickness: any;
 export let numberOfRecords: number;
 export let numberOfDimensions: number;
 export let resetContentData: any;
+export let dimensionSpacingVar: number | null = null;
 
 export function setContent(contentdata: any): void {
   resetContentData = contentdata;
@@ -143,4 +144,8 @@ export function setNumberOfRecords(value: number): void {
 
 export function setNumberOfDimensions(value: number): void {
   numberOfDimensions = value;
+}
+
+export function setDimensionSpacingVar(value: number | null): void {
+  dimensionSpacingVar = value;
 }
