@@ -13,7 +13,11 @@
   --spcd3-text-disabled: light-dark(#a5a5a5, #7f8a95);
   --spcd3-tooltip-surface: light-dark(#d3d3d3, #264664);
   --spcd3-tooltip-record-bg: light-dark(
-    rgba(128, 128, 128, 0.8),
+    rgba(196, 194, 194, 0.8),
+    rgba(38, 70, 100, 0.8)
+  );
+  --spcd3-tooltip-record-select-bg: light-dark(
+    rgba(130, 127, 127, 0.8),
     rgba(38, 70, 100, 0.8)
   );
   --spcd3-input-invalid-bg: light-dark(#ffb3b3, #6a2f35);
@@ -33,7 +37,7 @@
   --spcd3-shadow-modal: light-dark(rgba(0, 0, 0, 0.3), rgba(7, 17, 30, 0.45));
   --spcd3-active-records: light-dark(
     rgba(0, 129, 175, 0.5),
-    rgba(50, 150, 200, 0.5)
+    rgba(76, 164, 208, 0.5)
   );
 }
 
@@ -269,7 +273,7 @@ table.spcd3-tablecontainer td {
   border-radius: 0.1rem;
   margin: 0.5rem;
   padding: 0.12rem;
-  background-color: var(--spcd3-tooltip-record-bg);
+  background-color: var(--spcd3-tooltip-record-select-bg);
   color: var(--spcd3-tooltip-record-selected-text);
   font-size: 0.65rem;
   font-weight: bolder;

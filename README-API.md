@@ -36,13 +36,11 @@ Uses the given dataset to create a parallel coordinates chart, using
 D3 to dynamically create SVG elements in the DOM. This chart is
 considered to be the current chart.
 
-
 #### deleteChart
 
 `function deleteChart(): void`
 
 Deletes the current parallel coordinates chart.
-
 
 #### refresh
 
@@ -50,13 +48,11 @@ Deletes the current parallel coordinates chart.
 
 Refreshes the current parallel coordinates chart.
 
-
 #### reset
 
 `function reset(): void`
 
 Resets the current parallel coordinates chart.
-
 
 #### saveAsSvg
 
@@ -64,7 +60,6 @@ Resets the current parallel coordinates chart.
 
 Saves the current parallel coordinates chart as an SVG file with a
 default name of **'parcoords.svg'**.
-
 
 <br/>
 
@@ -76,13 +71,11 @@ default name of **'parcoords.svg'**.
 
 Makes a hidden dimension visible. The dimension is assigned the status **shown**.
 
-
 #### hide
 
 `function hide(dimension: string): void`
 
 Hides the given dimension. The dimension is assigned the status **hidden**.
-
 
 #### getHiddenStatus
 
@@ -100,13 +93,11 @@ Returns the visibility status of the dimension, which can be either **shown** or
 
 Inverts the given dimension.
 
-
 #### getInversionStatus
 
 `function getInversionStatus(dimension: any): string`
 
 Returns the inversion status of a dimension, which can be either **ascending** or **descending**.
-
 
 #### setInversionStatus
 
@@ -124,13 +115,11 @@ Sets the inversion status of the given dimension to one of **ascending** and **d
 
 Moves dimension A either to the left side of dimension B or to the right side of dimension B.
 
-
 #### moveByOne
 
 `function moveByOne(dimension: string, direction: string): void`
 
 Moves a dimension one position to the left or right, independent of other dimensions.
-
 
 #### swap
 
@@ -138,13 +127,11 @@ Moves a dimension one position to the left or right, independent of other dimens
 
 Swaps the positions of the given dimensions.
 
-
 #### getDimensionPosition
 
 `function getDimensionPosition(dimension: string): number`
 
 Returns the position of the given dimension (0...n-1).
-
 
 #### setDimensionPosition
 
@@ -162,13 +149,11 @@ Sets the position of the given dimension (0...n-1).
 
 Returns the given dimension’s current range (min, max).
 
-
 #### setDimensionRange
 
 `function setDimensionRange(dimension: string, min: number, max: number): void`
 
 Sets the range of the given dimension to specific values (min, max).
-
 
 #### setDimensionRangeRounded
 
@@ -176,13 +161,11 @@ Sets the range of the given dimension to specific values (min, max).
 
 Sets the range of the given dimension to rounded specific values (min, max).
 
-
 #### getMinValue
 
 `function getMinValue(dimension: string): number`
 
 Returns the minimum data value of a dimension.
-
 
 #### getMaxValue
 
@@ -190,13 +173,11 @@ Returns the minimum data value of a dimension.
 
 Returns the maximum data value of a dimension.
 
-
 #### getCurrentMinRange
 
 `function getCurrentMinRange(dimension: string): number`
 
 Returns the current minimum value of a dimension’s range (in data coordinates).
-
 
 #### getCurrentMaxRange
 
@@ -213,7 +194,6 @@ Returns the current maximum value of a dimension’s range (in data coordinates)
 `function getFilter(dimension: string): [min, max]`
 
 Returns the minimum and maximum values of the filter of a dimension.
-
 
 #### setFilter
 
@@ -235,20 +215,17 @@ the filter maximum is set to the current range maximum.
 Returns all selected records in the chart as an array, where each record is
 identified with its label, taken by default from the first column of the dataset.
 
-
 #### setSelection
 
 `function setSelection(records: []): void`
 
 Selects one or more records by handing over an array of labels.
 
-
 #### toggleSelection
 
 `function toggleSelection(record: string): void`
 
 Toggles the selection of a given record by specifying its label.
-
 
 #### isSelected
 
@@ -257,13 +234,11 @@ Toggles the selection of a given record by specifying its label.
 Returns a boolean for the selection status of a given record by
 specifying its label: true if the record is selected and false if not.
 
-
 #### setSelected
 
 `function setSelected(record: string): void`
 
 Selects a given record by specifying its label.
-
 
 #### setUnselected
 
@@ -281,13 +256,11 @@ Deselects a given record by specifying its label.
 
 Selects one or more records by handing over an array of IDs.
 
-
 #### toggleSelectionWithId
 
 `function toggleSelectionWithId(recordId: number): void`
 
 Toggles the selection of a given record by specifying its ID.
-
 
 #### isSelectedWithId
 
@@ -296,13 +269,11 @@ Toggles the selection of a given record by specifying its ID.
 Returns a boolean for the selection status of a given record by specifying
 its ID: true if the record is selected and false if not.
 
-
 #### setSelectedWithId
 
 `function setSelectedWithId(recordId: number): void`
 
 Selects a given record by specifying its ID.
-
 
 #### setUnselectedWithId
 
@@ -320,13 +291,11 @@ Deselects a given record by specifying its ID.
 
 Returns an array of all dimensions names in order.
 
-
 #### getAllHiddenDimensionNames
 
 `function getAllHiddenDimensionNames(): string[]`
 
 Returns an array of all hidden dimensions names in order.
-
 
 #### getAllVisibleDimensionNames
 
@@ -334,13 +303,11 @@ Returns an array of all hidden dimensions names in order.
 
 Returns an array of all visible dimensions names in order.
 
-
 #### getAllRecords
 
 `function getAllRecords(): []`
 
 Returns all records as an array.
-
 
 #### getNumberofDimensions
 
@@ -348,13 +315,11 @@ Returns all records as an array.
 
 Returns the number of dimensions.
 
-
 #### getDimensionPosition
 
 `function getDimensionPosition(dimension: string): number`
 
 Returns the position of a dimension (0..𝑚 − 1).
-
 
 #### isDimensionCategorical
 
@@ -362,13 +327,11 @@ Returns the position of a dimension (0..𝑚 − 1).
 
 Returns true if a dimension is categorial and false if not (i.e. it is numerical).
 
-
 #### setDimensionForHovering
 
 `function setDimensionForHovering(dimension: string): void`
 
 Sets the dimension as label for hovering.
-
 
 #### getRecordWithId
 
@@ -376,20 +339,17 @@ Sets the dimension as label for hovering.
 
 Returns the label of a record.
 
-
 #### isRecordInactive
 
 `function isRecordInactive(record: string): boolean`
 
 Returns true if a record is inactive and false if not.
 
-
 #### colorRecord
 
 `function colorRecord(record: string, color: string): void`
 
 Change the color of a record.
-
 
 #### uncolorRecord
 

@@ -89,7 +89,7 @@ export function setRectToDrag(
             let hitarea = selectAll("path.hitarea");
             active.each(function (this: any, d: any) {
               const isActive = select(this).style("stroke");
-              if (isActive === "rgba(0, 129, 175, 0.5)") {
+              if (isActive === "var(--spcd3-active-records)") {
                 hitarea
                   .filter((d: any) => d[hoverlabel] === this.id)
                   .style("pointer-events", "stroke");
@@ -1131,7 +1131,7 @@ function makeActive(
       .text("")
       .transition()
       .duration(duration)
-      .style("stroke", "rgba(0, 129, 175, 0.5)");
+      .style("stroke", "var(--spcd3-active-records)");
 
     select("#area_" + currentLineName)
       .style("pointer-events", "stroke")

@@ -961,7 +961,7 @@ export function clearSelection(): void {
     select("#" + utils.cleanString(element))
       .classed("selected", false)
       .transition()
-      .style("stroke", "rgba(0, 129, 175, 0.5)");
+      .style("stroke", "var(--spcd3-active-records)");
   });
   helper.cleanTooltipSelect();
 }
@@ -984,7 +984,7 @@ export function setSelected(record: string): void {
 export function setUnselected(record: string): void {
   selectAll("#" + utils.cleanString(record))
     .classed("selected", false)
-    .style("stroke", "rgba(0, 129, 175, 0.5)");
+    .style("stroke", "var(--spcd3-active-records)");
 
   selectAll(`#tooltip-record-select-${record}`).style("display", "none");
 }
@@ -1048,9 +1048,9 @@ export function uncolorRecord(record: string): void {
 
   path
     .classed("colored", false)
-    .property("clusterColor", "rgba(0, 129, 175, 0.5)");
+    .property("clusterColor", "var(--spcd3-active-records)");
 
-  path.transition().style("stroke", "rgba(0, 129, 175, 0.5)");
+  path.transition().style("stroke", "var(--spcd3-active-records)");
 }
 
 //---------- Helper Functions ----------

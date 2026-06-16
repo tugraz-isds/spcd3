@@ -668,8 +668,9 @@ function highlight(data: any[]) {
 
   cleanedItems.forEach((item: string) => {
     select("#" + item)
+      .interrupt()
       .transition()
-      .duration(5)
+      .duration(40)
       .style("stroke", "rgba(200, 28, 38, 0.7)");
   });
 }
@@ -680,12 +681,12 @@ function doNotHighlight() {
   currentlyHighlightedItems.forEach((item: string) => {
     const line = select("#" + item);
     if (line.classed("selected")) {
-      line.transition().style("stroke", "rgba(255, 165, 0, 1)");
+      line.interrupt().style("stroke", "rgba(255, 165, 0, 1)");
     } else if (line.classed("colored")) {
       const color = line.property("clusterColor");
-      line.transition().style("stroke", color);
+      line.interrupt().style("stroke", color);
     } else {
-      line.transition().style("stroke", "rgba(0, 129, 175, 0.5)");
+      line.interrupt().style("stroke", "var(--spcd3-active-records)");
     }
   });
 
