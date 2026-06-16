@@ -417,14 +417,44 @@ function hideDimensionMenu(dimension: string): void {
     });
 }
 
+function getContextMenuLeftPosition(
+  container: Element,
+  menuElement: HTMLElement,
+  clickX: number,
+): number {
+  const containerRect = container.getBoundingClientRect();
+  const previousDisplay = menuElement.style.display;
+  const previousVisibility = menuElement.style.visibility;
+
+  if (getComputedStyle(menuElement).display === "none") {
+    menuElement.style.visibility = "hidden";
+    menuElement.style.display = "block";
+  }
+
+  const menuWidth = menuElement.getBoundingClientRect().width;
+
+  menuElement.style.display = previousDisplay;
+  menuElement.style.visibility = previousVisibility;
+  const availableRightSpace = containerRect.width - clickX;
+
+  if (menuWidth > availableRightSpace) {
+    return Math.max(0, clickX - menuWidth);
+  }
+
+  return clickX;
+}
+
 function styleContextMenu(event: any): void {
   const container = document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
+  const menuElement = document.querySelector("#contextmenu") as HTMLElement | null;
+  if (!menuElement) return;
   const rect = container.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
+  const left = getContextMenuLeftPosition(container, menuElement, x);
   select("#contextmenu")
-    .style("left", x + "px")
+    .style("left", left + "px")
     .style("top", y + "px")
     .style("display", "block")
     .on("click", (event: { stopPropagation: () => void }) => {
@@ -842,6 +872,8 @@ export function handleRecordContextMenu(
 ): void {
   const container = document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
+  const menuElement = contextMenu.node() as HTMLElement | null;
+  if (!menuElement) return;
   const rect = container.getBoundingClientRect();
   const data = helper.getAllPointerEventsData(event);
   const cleanedItems = data.map((item: string) =>
@@ -858,10 +890,11 @@ export function handleRecordContextMenu(
     select("#toggleRecord").text("Toggle Record");
   }
 
-  const x = (event.clientX - rect.left) / 16;
+  const x = event.clientX - rect.left;
   const y = (event.clientY - rect.top) / 16;
+  const left = getContextMenuLeftPosition(container, menuElement, x) / 16;
   contextMenu
-    .style("left", x + "rem")
+    .style("left", left + "rem")
     .style("top", y + "rem")
     .style("display", "block")
     .on("click", (event: { stopPropagation: () => void }) => {
