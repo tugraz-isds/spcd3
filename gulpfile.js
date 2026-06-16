@@ -8,6 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
 const ts = require("gulp-typescript");
+const { version } = require("./package.json");
 
 const tsProject = ts.createProject("tsconfig.json");
 const typesProject = ts.createProject("tsconfig.json", {
@@ -50,9 +51,11 @@ function buildLibraryStyles(done) {
   const targetGzipFile = path.resolve(targetDir, "spcd3.css.gz");
   const targetMinFile = path.resolve(targetDir, "spcd3.min.css");
   const targetMinGzipFile = path.resolve(targetDir, "spcd3.min.gz.css");
+  const banner = `/*! SPCD3 version ${version} */\n`;
 
-  const css = `${styleFiles.map((file) => fs.readFileSync(file, "utf8").trim()).join("\n\n")}\n`;
-  const minifiedCss = `${minifyCss(css)}\n`;
+  const cssContent = `${styleFiles.map((file) => fs.readFileSync(file, "utf8").trim()).join("\n\n")}\n`;
+  const css = `${banner}${cssContent}`;
+  const minifiedCss = `${banner}${minifyCss(cssContent)}\n`;
 
   fs.mkdirSync(targetDir, { recursive: true });
   fs.writeFileSync(targetFile, css, "utf8");

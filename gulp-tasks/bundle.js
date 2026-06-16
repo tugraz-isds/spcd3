@@ -6,6 +6,7 @@ const { default: rollupNodeResolve } = require("@rollup/plugin-node-resolve");
 const terser = require("@rollup/plugin-terser");
 const fs = require("fs");
 const zlib = require("zlib");
+const { version } = require("../package.json");
 
 function gzipFile(file) {
   const source = fs.readFileSync(file);
@@ -67,7 +68,7 @@ async function bundle() {
         name: "spcd3",
         plugins: conf.plugins,
         sourcemap: conf.sourcemap,
-        banner: `// SPCD3 version 1.0.0 ${formatString}`,
+        banner: `// SPCD3 version ${version} ${formatString}`,
       });
 
       if (!fs.existsSync(file)) {

@@ -447,7 +447,9 @@ function getContextMenuLeftPosition(
 function styleContextMenu(event: any): void {
   const container = document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
-  const menuElement = document.querySelector("#contextmenu") as HTMLElement | null;
+  const menuElement = document.querySelector(
+    "#contextmenu",
+  ) as HTMLElement | null;
   if (!menuElement) return;
   const rect = container.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -830,8 +832,8 @@ export function createContextMenuForRecords(): any {
     contextMenu,
     "toggleRecord",
     "contextmenu",
-    "Toggle Record",
-    "Toggle Record(s)",
+    "Toggle Selection",
+    "Toggle Selection",
   );
   createContextMenuItem(
     contextMenu,
@@ -883,11 +885,11 @@ export function handleRecordContextMenu(
   if (cleanedItems.length > 1) {
     select("#selectRecord").text("Select Records");
     select("#unSelectRecord").text("Unselect Records");
-    select("#toggleRecord").text("Toggle Records");
+    select("#toggleRecord").text("Toggle Selection");
   } else {
     select("#selectRecord").text("Select Record");
     select("#unSelectRecord").text("Unselect Record");
-    select("#toggleRecord").text("Toggle Record");
+    select("#toggleRecord").text("Toggle Selection");
   }
 
   const x = event.clientX - rect.left;
