@@ -21,6 +21,7 @@
     rgba(38, 70, 100, 0.8)
   );
   --spcd3-input-invalid-bg: light-dark(#ffb3b3, #6a2f35);
+  --spcd3-table-invalid-bg: light-dark(#f8d7da, #5a2830);
   --spcd3-highlight-fill: light-dark(
     rgba(242, 242, 76, 0.5),
     rgba(234, 209, 83, 0.38)
@@ -175,6 +176,10 @@ table.spcd3-tablecontainer th,
 table.spcd3-tablecontainer td {
   color: var(--spcd3-text-primary);
   background-clip: padding-box;
+}
+
+.spcd3-invalid-cell {
+  background: var(--spcd3-table-invalid-bg);
 }
 
 #spcd3-parallelcoords {

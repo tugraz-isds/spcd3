@@ -79,7 +79,7 @@ export function setPaddingXaxis(value: number): void {
 }
 
 export function setInitDimension(dimensions: any): void {
-  initDimension = dimensions;
+  initDimension = Array.isArray(dimensions) ? [...dimensions] : dimensions;
 }
 
 export function setActive(paths: any): void {

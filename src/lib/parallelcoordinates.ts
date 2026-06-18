@@ -510,6 +510,7 @@ function setFeatureAxis(
 
   const brushOverlay = svg
     .append("rect")
+    .attr("class", "spcd3-brush-overlay")
     .attr("x", 0)
     .attr("y", 0)
     .attr("width", width)

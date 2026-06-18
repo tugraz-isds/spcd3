@@ -3,6 +3,7 @@ import {
   parcoords,
   setHoverLabel,
   initDimension,
+  setInitDimension,
   setYaxis,
   yAxis,
   columns,
@@ -18,12 +19,11 @@ import * as helper from "./helper";
 import * as brush from "./brush";
 import * as icon from "./icons/icons";
 import { select, selectAll } from "d3-selection";
-import { line } from "d3-shape";
-import { interpolatePath } from "d3-interpolate-path";
 import { easeCubic } from "d3-ease";
 
 type StringKeyed = Record<string, any>;
 const BRUSH_STATE_EPSILON = 0.75;
+const AXIS_VISIBILITY_DURATION = 1500;
 
 function isNear(value: number, target: number): boolean {
   return Math.abs(value - target) < BRUSH_STATE_EPSILON;
@@ -36,6 +36,15 @@ function remToPixels(value: number): number {
   const baseFontSize =
     Number.isFinite(rootFontSize) && rootFontSize > 0 ? rootFontSize : 16;
   return value * baseFontSize;
+}
+
+function pixelsToRem(value: number): string {
+  const rootFontSize = parseFloat(
+    getComputedStyle(document.documentElement).fontSize,
+  );
+  const baseFontSize =
+    Number.isFinite(rootFontSize) && rootFontSize > 0 ? rootFontSize : 16;
+  return `${value / baseFontSize}rem`;
 }
 
 function realignToolbarAfterSpacingChange(): void {
@@ -65,26 +74,105 @@ function realignToolbarAfterSpacingChange(): void {
   });
 }
 
+function getDimensionOrderIndex(dimension: string): number {
+  const index = initDimension.indexOf(dimension);
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+}
+
+function restoreVisibleDimensionOrder(): void {
+  parcoords.newFeatures = [...parcoords.newFeatures].sort(
+    (a: string, b: string) =>
+      getDimensionOrderIndex(a) - getDimensionOrderIndex(b),
+  );
+  parcoords.features = [...parcoords.features].sort(
+    (a: { name: string }, b: { name: string }) =>
+      getDimensionOrderIndex(a.name) - getDimensionOrderIndex(b.name),
+  );
+}
+
+function syncFeatureObjectsToVisibleOrder(): void {
+  parcoords.features = parcoords.newFeatures.map((dimension: string) => {
+    const existingFeature = parcoords.features.find(
+      (feature: { name: string }) => feature.name === dimension,
+    );
+    return existingFeature ?? { name: dimension };
+  });
+}
+
+export function syncDimensionOrderWithVisible(): void {
+  if (!Array.isArray(initDimension) || !Array.isArray(parcoords.newFeatures)) {
+    return;
+  }
+
+  const visibleDimensions = [...parcoords.newFeatures];
+  let visibleIndex = 0;
+
+  setInitDimension(
+    initDimension.map((dimension: string) =>
+      visibleDimensions.includes(dimension)
+        ? visibleDimensions[visibleIndex++]
+        : dimension,
+    ),
+  );
+
+  syncFeatureObjectsToVisibleOrder();
+}
+
+function refreshChartLayoutForVisibleDimensions(): void {
+  if (!parcoords.features.length || !parcoords.newDataset) {
+    return;
+  }
+
+  const layout = helper.calculateChartLayout(
+    parcoords.features,
+    parcoords.newDataset,
+  );
+
+  setWidth(layout.chartWidth);
+  parcoords.xScales = helper.setupXScales(
+    parcoords.features,
+    parcoords.newDataset,
+  );
+
+  select("#spcd3-pc_svg")
+    .attr("width", layout.chartWidth)
+    .attr("viewBox", [0, 0, layout.chartWidth, height])
+    .style("inline-size", pixelsToRem(layout.chartWidth));
+
+  select(".spcd3-chartWrapper").style(
+    "inline-size",
+    pixelsToRem(layout.chartWidth),
+  );
+
+  select(".spcd3-brush-overlay").attr("width", layout.chartWidth);
+}
+
+function refreshRecordPathsForVisibleDimensions(): void {
+  select("g.active")
+    .selectAll("path")
+    .interrupt()
+    .attr("d", (d: any) => helper.linePath(d, parcoords.newFeatures))
+    .style("opacity", 1);
+}
+
 //---------- Show and Hide Functions ----------
 
 export function hide(dimension: string): void {
-  const newDimensions = parcoords.newFeatures.filter(
+  parcoords.newFeatures = parcoords.newFeatures.filter(
     (d: string) => d !== dimension,
   );
-  const featureSet = parcoords.features.filter(
+  parcoords.features = parcoords.features.filter(
     (d: { name: string }) => d.name !== dimension,
   );
-
-  parcoords.features = featureSet;
-  parcoords.newFeatures = newDimensions;
-
-  const oldxScales = parcoords.xScales.copy();
-  parcoords.xScales.domain(newDimensions);
+  restoreVisibleDimensionOrder();
+  refreshChartLayoutForVisibleDimensions();
 
   selectAll(".dimensions")
-    .filter((d: { name: string }) => newDimensions.includes(d.name || d))
+    .filter((d: { name: string }) =>
+      parcoords.newFeatures.includes(d.name || d),
+    )
     .transition()
-    .duration(1500)
+    .duration(AXIS_VISIBILITY_DURATION)
     .attr(
       "transform",
       (d: { name: string }) =>
@@ -96,24 +184,13 @@ export function hide(dimension: string): void {
   selectAll(".dimensions")
     .filter((d: { name: string }) => d.name === dimension)
     .transition()
-    .duration(1500)
+    .duration(AXIS_VISIBILITY_DURATION)
     .style("opacity", 0)
     .on("end", function (this: any) {
       select(this).attr("visibility", "hidden");
     });
 
-  select("g.active")
-    .selectAll("path")
-    .transition()
-    .duration(1500)
-    .attrTween("d", (d: { [x: string]: any }) =>
-      generateLineTween(
-        oldxScales,
-        parcoords.xScales,
-        newDimensions,
-        parcoords.yScales,
-      )(d),
-    );
+  refreshRecordPathsForVisibleDimensions();
 
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
@@ -123,41 +200,20 @@ export function hide(dimension: string): void {
     );
     helper.createToolTipForValues(path, true);
   });
-}
 
-function generateLineTween(
-  oldXscales: (arg0: string | number) => any,
-  newXscales: (arg0: string | number) => any,
-  newDimensions: any[],
-  yScales: { [x: string]: (arg0: any) => any },
-) {
-  const path = line().defined((d: null) => d != null);
-
-  return function (d: { [x: string]: any }) {
-    const oldPoints = newDimensions.map((dim: string | number) => [
-      oldXscales(dim),
-      yScales[dim](d[dim]),
-    ]);
-    const newPoints = newDimensions.map((dim: string | number) => [
-      newXscales(dim),
-      yScales[dim](d[dim]),
-    ]);
-
-    return interpolatePath(path(oldPoints), path(newPoints));
-  };
+  realignToolbarAfterSpacingChange();
 }
 
 export function show(dimension: string): void {
   if (parcoords.newFeatures.includes(dimension)) return;
 
-  const existingIndex = initDimension.indexOf(dimension);
-  if (existingIndex !== -1) {
-    parcoords.newFeatures.splice(existingIndex, 0, dimension);
-    const removedItem = { name: dimension };
-    parcoords.features.splice(existingIndex, 0, removedItem);
+  if (initDimension.includes(dimension)) {
+    parcoords.newFeatures.push(dimension);
+    parcoords.features.push({ name: dimension });
+    restoreVisibleDimensionOrder();
   }
 
-  parcoords.xScales.domain(parcoords.newFeatures);
+  refreshChartLayoutForVisibleDimensions();
 
   selectAll(".dimensions")
     .filter(
@@ -167,7 +223,7 @@ export function show(dimension: string): void {
     .style("opacity", 0)
     .transition()
     .attr("visibility", "visible")
-    .duration(1500)
+    .duration(AXIS_VISIBILITY_DURATION)
     .style("opacity", 1);
 
   selectAll(".dimensions")
@@ -175,7 +231,7 @@ export function show(dimension: string): void {
       parcoords.newFeatures.includes(typeof d === "object" ? d.name : d),
     )
     .transition()
-    .duration(1500)
+    .duration(AXIS_VISIBILITY_DURATION)
     .attr(
       "transform",
       (d: { name: string }) =>
@@ -185,16 +241,7 @@ export function show(dimension: string): void {
     )
     .style("opacity", 1);
 
-  select("g.active")
-    .selectAll("path")
-    .attr("d", function (d: { [x: string]: any }) {
-      const points = parcoords.newFeatures.map((p: string | number) => {
-        const x = parcoords.xScales(p);
-        const y = parcoords.yScales[p](d[p]);
-        return [x, y];
-      });
-      return line()(points);
-    });
+  refreshRecordPathsForVisibleDimensions();
 
   helper.cleanTooltipSelect();
   var selectedRecords = getSelected();
@@ -204,6 +251,8 @@ export function show(dimension: string): void {
     );
     helper.createToolTipForValues(path, true);
   });
+
+  realignToolbarAfterSpacingChange();
 }
 
 export function getHiddenStatus(dimension: string): string {
@@ -253,6 +302,8 @@ export function moveByOne(dimension: string, direction: string): void {
       parcoords.newFeatures[indexOfDimension + 1],
     ];
   }
+
+  syncDimensionOrderWithVisible();
 
   parcoords.xScales.domain(parcoords.newFeatures);
 
@@ -348,6 +399,8 @@ export function swap(dimensionA: string, dimensionB: string): void {
     parcoords.newFeatures[indexOfDimensionB],
     parcoords.newFeatures[indexOfDimensionA],
   ];
+
+  syncDimensionOrderWithVisible();
 
   parcoords.xScales.domain(parcoords.newFeatures);
 
@@ -1072,7 +1125,7 @@ export function getAllVisibleDimensionNames(): string[] {
 }
 
 export function getAllDimensionNames(): string[] {
-  return columns;
+  return Array.isArray(initDimension) ? initDimension : columns;
 }
 
 export function getAllHiddenDimensionNames(): string[] {
@@ -1187,7 +1240,13 @@ export function setDimensionSpacing(spacingRem: number): void {
 
   select("#spcd3-pc_svg")
     .attr("width", layout.chartWidth)
-    .attr("viewBox", [0, 0, layout.chartWidth, height]);
+    .attr("viewBox", [0, 0, layout.chartWidth, height])
+    .style("inline-size", pixelsToRem(layout.chartWidth));
+
+  select(".spcd3-chartWrapper").style(
+    "inline-size",
+    pixelsToRem(layout.chartWidth),
+  );
 
   select("#spcd3-pc_svg .plot > rect").attr("width", layout.chartWidth);
 

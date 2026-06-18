@@ -595,6 +595,8 @@ function onDragEndEventHandler(featureAxis: any): any {
       delete parcoords.dragging[d.subject.name];
       delete parcoords.dragPosStart[d.subject.name];
 
+      api.syncDimensionOrderWithVisible();
+
       helper.trans(active).each(function (this: any, d: any) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });

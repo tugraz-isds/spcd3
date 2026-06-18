@@ -1185,13 +1185,24 @@ export function addSettingsForBrushing(
   let top: number, bottom: number;
   if (isDimensionCategorical(dimension)) {
     const domain = yScale.domain();
-    const sorted = domain
-      .slice()
-      .sort((a: any, b: any) => yScale(a) - yScale(b));
-    const topCategory = sorted[0];
-    const bottomCategory = sorted[sorted.length - 1];
-    top = yScale(topCategory);
-    bottom = yScale(bottomCategory);
+    const filteredCategories = dimensionSettings.currentFilterCategories;
+    const hasActiveCategoryFilter =
+      Array.isArray(filteredCategories) &&
+      filteredCategories.length > 0 &&
+      filteredCategories.length < domain.length;
+
+    if (!hasActiveCategoryFilter) {
+      top = TOP_AXIS_VALUE;
+      bottom = BOTTOM_AXIS_VALUE;
+    } else {
+      const sorted = filteredCategories
+        .slice()
+        .sort((a: any, b: any) => yScale(a) - yScale(b));
+      const topCategory = sorted[0];
+      const bottomCategory = sorted[sorted.length - 1];
+      top = yScale(topCategory);
+      bottom = yScale(bottomCategory);
+    }
   } else {
     top = yScale(dimensionSettings.currentFilterTop);
     bottom = yScale(dimensionSettings.currentFilterBottom);

@@ -158,7 +158,9 @@ export function renderInvalidTable(
     th.textContent = c;
 
     th.style.textAlign = "left";
-    th.style.background = isRemoved ? "#ffb3b3" : "rgb(201, 212, 221)";
+    if (isRemoved) {
+      th.classList.add("spcd3-invalid-cell");
+    }
 
     headRow.appendChild(th);
   });
@@ -174,6 +176,7 @@ export function renderInvalidTable(
       td.className = "spcd3-td";
 
       const rawValue = row[col];
+      const isEmptyOrNull = isEmptyCell(rawValue);
 
       const isInvalid =
         row.__invalidColumns?.includes(col) || removedColumns.includes(col);
@@ -189,15 +192,15 @@ export function renderInvalidTable(
       const displayValue =
         rawValue === null
           ? "(null)"
-          : isEmptyCell(rawValue)
+          : isEmptyOrNull
             ? "null"
             : rawValue;
 
       td.textContent = displayValue;
 
-      td.style.background = isInvalid
-        ? "var(--spcd3-invalid-bg)"
-        : "var(--spcd3-surface)";
+      if (isInvalid || isEmptyOrNull) {
+        td.classList.add("spcd3-invalid-cell");
+      }
       td.style.textAlign = align;
       td.style.fontSize = "0.85rem";
       td.style.padding = "4px 8px";
