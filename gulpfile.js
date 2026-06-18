@@ -50,7 +50,7 @@ function buildLibraryStyles(done) {
   const targetFile = path.resolve(targetDir, "spcd3.css");
   const targetGzipFile = path.resolve(targetDir, "spcd3.css.gz");
   const targetMinFile = path.resolve(targetDir, "spcd3.min.css");
-  const targetMinGzipFile = path.resolve(targetDir, "spcd3.min.gz.css");
+  const targetMinGzipFile = path.resolve(targetDir, "spcd3.min.css.gz");
   const banner = `/*! SPCD3 version ${version} */\n`;
 
   const cssContent = `${styleFiles.map((file) => fs.readFileSync(file, "utf8").trim()).join("\n\n")}\n`;
@@ -84,6 +84,10 @@ function cleanPackage() {
   return deleteAsync("package", { force: true });
 }
 
+function cleanTauriTarget() {
+  return deleteAsync("src-tauri/target", { force: true });
+}
+
 function copyExampleFolder() {
   return src(["./src/example/**/*", "!./src/example/**/*.ts"]).pipe(
     dest("./dist/example"),
@@ -107,6 +111,7 @@ function copyLibFileToExample() {
 }
 
 exports.clean = cleanDistFolder;
+exports.cleanTauri = cleanTauriTarget;
 exports.icons = generateIcons;
 
 exports.cleanAll = parallel(
@@ -114,6 +119,7 @@ exports.cleanAll = parallel(
   cleanNodeModules,
   cleanPackageLock,
   cleanPackage,
+  cleanTauriTarget,
 );
 
 exports.build = series(
