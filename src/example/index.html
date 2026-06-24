@@ -63,14 +63,17 @@
       <div class="slider-row">
         <div class="range-control" id="selectionSensitivityControl">
           <label for="selectionSensitivitySlider">Selection Sensitivity</label>
-          <input
-            type="range"
-            id="selectionSensitivitySlider"
-            min="0.1"
-            max="1"
-            step="0.1"
-            value="0.4"
-          />
+          <div class="range-slider-shell">
+            <span class="range-default-marker"></span>
+            <input
+              type="range"
+              id="selectionSensitivitySlider"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value="0.4"
+            />
+          </div>
           <output
             id="selectionSensitivityValue"
             for="selectionSensitivitySlider"
@@ -79,14 +82,17 @@
         </div>
         <div class="range-control" id="dimensionSpacingControl">
           <label for="dimensionSpacingSlider">Dimension Spacing</label>
-          <input
-            type="range"
-            id="dimensionSpacingSlider"
-            min="3"
-            max="12"
-            step="0.25"
-            value="6"
-          />
+          <div class="range-slider-shell">
+            <span class="range-default-marker"></span>
+            <input
+              type="range"
+              id="dimensionSpacingSlider"
+              min="3"
+              max="12"
+              step="0.25"
+              value="6"
+            />
+          </div>
           <output id="dimensionSpacingValue" for="dimensionSpacingSlider"
             >6.00 rem</output
           >

@@ -45,6 +45,16 @@ let studentData =
 const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
 const DEFAULT_DIMENSION_SPACING_REM = 6;
 
+function closeFilterModal(): void {
+  document.getElementById("filterOverlay")?.remove();
+  document.getElementById("filterContainer")?.remove();
+}
+
+function closeRangeModal(): void {
+  document.getElementById("rangeOverlay")?.remove();
+  document.getElementById("rangeContainer")?.remove();
+}
+
 window.addEventListener("click", (event: MouseEvent) => {
   const target = event.target as HTMLElement | null;
   if (!target?.closest("#showButton, #options")) {
@@ -58,17 +68,11 @@ window.addEventListener("click", (event: MouseEvent) => {
   }
   if (!target?.closest("#filterButton, #filterOptions, #filterContainer")) {
     closeElements("filterOptions");
-    const filterContainer = document.getElementById("filterContainer");
-    if (filterContainer) {
-      filterContainer.remove();
-    }
+    closeFilterModal();
   }
   if (!target?.closest("#rangeButton, #rangeOptions, #rangeContainer")) {
     closeElements("rangeOptions");
-    const rangeContainer = document.getElementById("rangeContainer");
-    if (rangeContainer) {
-      rangeContainer.remove();
-    }
+    closeRangeModal();
   }
   if (!target?.closest("#selectButtonR, #options_r")) {
     closeElements("options_r");
@@ -115,6 +119,23 @@ const dimensionSpacingValue = elementById<HTMLOutputElement>(
   "dimensionSpacingValue",
 );
 
+function setSliderDefaultMarker(slider: HTMLInputElement): void {
+  const shell = slider.closest<HTMLElement>(".range-slider-shell");
+  if (!shell) return;
+
+  const min = Number(slider.min);
+  const max = Number(slider.max);
+  const defaultValue = Number(slider.defaultValue || slider.value);
+
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) {
+    shell.style.setProperty("--default-ratio", "0.5");
+    return;
+  }
+
+  const ratio = (defaultValue - min) / (max - min);
+  shell.style.setProperty("--default-ratio", `${ratio}`);
+}
+
 function updateSelectionSensitivityLabel(value: number): void {
   const label = `${value.toFixed(2)} rem`;
   selectionSensitivityValue.value = label;
@@ -127,6 +148,17 @@ function updateDimensionSpacingLabel(value: number): void {
   dimensionSpacingValue.textContent = label;
 }
 
+function resetSlidersToDefaults(): void {
+  selectionSensitivitySlider.value =
+    DEFAULT_SELECTION_SENSITIVITY_REM.toString();
+  updateSelectionSensitivityLabel(DEFAULT_SELECTION_SENSITIVITY_REM);
+  setSelectableWidth(`${DEFAULT_SELECTION_SENSITIVITY_REM}rem`);
+
+  dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
+  updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
+  setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
+}
+
 function syncSelectionSensitivityFromChart(): void {
   const current = getSelectableWith();
   const value = current
@@ -137,6 +169,7 @@ function syncSelectionSensitivityFromChart(): void {
 }
 
 selectionSensitivitySlider.value = DEFAULT_SELECTION_SENSITIVITY_REM.toString();
+setSliderDefaultMarker(selectionSensitivitySlider);
 updateSelectionSensitivityLabel(DEFAULT_SELECTION_SENSITIVITY_REM);
 
 selectionSensitivitySlider.addEventListener("input", (event: Event) => {
@@ -148,6 +181,7 @@ selectionSensitivitySlider.addEventListener("input", (event: Event) => {
 });
 
 dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
+setSliderDefaultMarker(dimensionSpacingSlider);
 updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
 
 dimensionSpacingSlider.addEventListener("input", (event: Event) => {
@@ -247,6 +281,11 @@ function closeElements(id: string) {
   }
 }
 
+function isDropdownOpen(id: string): boolean {
+  const options = document.getElementById(id);
+  return options?.style.display === "block";
+}
+
 function createDropdownButtonLabel(id: string, text: string): HTMLSpanElement {
   const label = document.createElement("span");
   label.id = id;
@@ -266,14 +305,39 @@ function createTextLabel(
   text: string,
   className = "label-text",
   htmlFor?: string,
-): HTMLLabelElement {
-  const label = document.createElement("label");
+): HTMLSpanElement {
+  const label = document.createElement("span");
   label.className = className;
   label.textContent = text;
   if (htmlFor) {
-    label.htmlFor = htmlFor;
+    label.dataset.htmlFor = htmlFor;
   }
   return label;
+}
+
+function getDimensionValueFromDropdownClick(
+  event: MouseEvent,
+): string | undefined {
+  const target = event.target as HTMLElement | null;
+  if (!target) return undefined;
+
+  const option = target.closest<HTMLElement>("[data-dimension]");
+  if (typeof option?.dataset.dimension === "string") {
+    return option.dataset.dimension;
+  }
+
+  if (
+    target instanceof HTMLInputElement &&
+    target.name === "dimension" &&
+    typeof target.value === "string"
+  ) {
+    return target.value;
+  }
+
+  const fallbackOption = target.closest(".dropdownActionLabel");
+  const input =
+    fallbackOption?.querySelector<HTMLInputElement>('input[name="dimension"]');
+  return input?.value;
 }
 
 function showOptions(id: string, buttonId: string) {
@@ -320,6 +384,96 @@ function showOptionsForRecords(id: string) {
     if (checkbox) {
       checkbox.checked = selected;
     }
+  });
+}
+
+function buildInvertOptions(dimensionContainer: HTMLDivElement): void {
+  dimensionContainer.innerHTML = "";
+
+  getAllVisibleDimensionNames().forEach(function (dimension) {
+    let ddElement = document.createElement("div");
+    ddElement.className = "dropdownLabel";
+    ddElement.id = "invertElement";
+    let inputButton = document.createElement("button");
+    inputButton.className = "inputButton";
+    inputButton.id = "invert_" + dimension;
+    inputButton.type = "button";
+    if (getInversionStatus(dimension) == "ascending") {
+      inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
+    } else {
+      inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
+    }
+
+    inputButton.addEventListener("click", (event: MouseEvent) => {
+      event.stopPropagation();
+      const value = inputButton.id.replace("invert_", "");
+      if (value != undefined) {
+        invert(value);
+        if (getInversionStatus(value) == "ascending") {
+          inputButton.innerHTML =
+            '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
+        } else {
+          inputButton.innerHTML =
+            '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
+        }
+      }
+    });
+
+    let textLabel = createTextLabel(
+      dimension,
+      "label-text dropdownOptionText",
+    );
+    ddElement.appendChild(inputButton);
+    ddElement.appendChild(textLabel);
+    dimensionContainer.appendChild(ddElement);
+  });
+}
+
+function buildMoveOptions(dimensionContainer: HTMLDivElement): void {
+  dimensionContainer.innerHTML = "";
+
+  getAllVisibleDimensionNames().forEach(function (dimension) {
+    let dimensionLabel = document.createElement("div");
+    dimensionLabel.className = "dropdownLabel";
+    dimensionLabel.id = "move";
+    let arrowLeft = document.createElement("button");
+    arrowLeft.className = "inputButtonMoveLeft";
+    arrowLeft.id = "moveleft_" + dimension;
+    arrowLeft.type = "button";
+    arrowLeft.innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
+    arrowLeft.addEventListener("click", (event: MouseEvent) => {
+      event.stopPropagation();
+      const value = arrowLeft.id.replace("moveleft_", "");
+      if (value != undefined) {
+        moveDimensionData = value;
+        moveDimensionLeft();
+        buildMoveOptions(dimensionContainer);
+        disableLeftAndRightButton();
+      }
+    });
+    let arrowRight = document.createElement("button");
+    arrowRight.className = "inputButtonMoveRight";
+    arrowRight.id = "moveright_" + dimension;
+    arrowRight.type = "button";
+    arrowRight.innerHTML = '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
+    arrowRight.addEventListener("click", (event: MouseEvent) => {
+      event.stopPropagation();
+      const value = arrowRight.id.replace("moveright_", "");
+      if (value != undefined) {
+        moveDimensionData = value;
+        moveDimensionRight();
+        buildMoveOptions(dimensionContainer);
+        disableLeftAndRightButton();
+      }
+    });
+    let textLabel = createTextLabel(
+      dimension,
+      "label-text dropdownOptionText",
+    );
+    dimensionLabel.appendChild(arrowLeft);
+    dimensionLabel.appendChild(arrowRight);
+    dimensionLabel.appendChild(textLabel);
+    dimensionContainer.appendChild(dimensionLabel);
   });
 }
 
@@ -403,6 +557,10 @@ function generateDropdownForInvert() {
     dimensionContainer.style.height = "12.5rem";
   }
 
+  dimensionContainer.addEventListener("click", (event: MouseEvent) => {
+    event.stopPropagation();
+  });
+
   let selectButton = document.createElement("button");
   selectButton.id = "invertButton";
   selectButton.className = "ddButton";
@@ -412,58 +570,14 @@ function generateDropdownForInvert() {
   );
 
   selectButton.addEventListener("click", () => {
-    dimensionContainer.innerHTML = "";
-    getAllVisibleDimensionNames().forEach(function (dimension) {
-      let ddElement = document.createElement("div");
-      ddElement.className = "dropdownLabel";
-      ddElement.id = "invertElement";
-      let inputButton = document.createElement("button");
-      inputButton.className = "inputButton";
-      inputButton.id = "invert_" + dimension;
-      if (getInversionStatus(dimension) == "ascending") {
-        inputButton.innerHTML =
-          '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
-      } else {
-        inputButton.innerHTML =
-          '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
-      }
+    if (isDropdownOpen("invertOptions")) {
+      closeElements("invertOptions");
+      return;
+    }
 
-      inputButton.addEventListener("click", () => {
-        const value = inputButton.id.replace("invert_", "");
-        if (value != undefined) {
-          invert(value);
-          if (getInversionStatus(value) == "ascending") {
-            inputButton.innerHTML =
-              '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
-          } else {
-            inputButton.innerHTML =
-              '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
-          }
-        }
-      });
-
-      let textLabel = createTextLabel(
-        dimension,
-        "label-text dropdownOptionText",
-      );
-      ddElement.appendChild(inputButton);
-      ddElement.appendChild(textLabel);
-      dimensionContainer.appendChild(ddElement);
-    });
-
+    buildInvertOptions(dimensionContainer);
     showOptions("invertOptions", "invertButton");
     calcDDBehaviour(dimensionContainer, selectButton);
-    for (let i = 0; i < dimensions.length; i++) {
-      document.addEventListener("DOMContentLoaded", function () {
-        if (getInversionStatus(dimensions[i]) == "ascending") {
-          inputButton.innerHTML =
-            '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
-        } else {
-          inputButton.innerHTML =
-            '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
-        }
-      });
-    }
   });
 
   container.appendChild(selectButton);
@@ -493,46 +607,17 @@ function generateDropdownForMove() {
     dimensionContainer.style.height = "12.5rem";
   }
 
+  dimensionContainer.addEventListener("click", (event: MouseEvent) => {
+    event.stopPropagation();
+  });
+
   selectButton.addEventListener("click", () => {
-    dimensionContainer.innerHTML = "";
-    getAllVisibleDimensionNames().forEach(function (dimension) {
-      let dimensionLabel = document.createElement("div");
-      dimensionLabel.className = "dropdownLabel";
-      dimensionLabel.id = "move";
-      let arrowLeft = document.createElement("button");
-      arrowLeft.className = "inputButtonMoveLeft";
-      arrowLeft.id = "moveleft_" + dimension;
-      arrowLeft.innerHTML = '<img src="./svg/arrow-left.svg" id="moveArrow"/>';
-      arrowLeft.addEventListener("click", () => {
-        const value = arrowLeft.id.replace("moveleft_", "");
-        if (value != undefined) {
-          moveDimensionData = value;
-          moveDimensionLeft();
-          disableLeftAndRightButton();
-        }
-      });
-      let arrowRight = document.createElement("button");
-      arrowRight.className = "inputButtonMoveRight";
-      arrowRight.id = "moveright_" + dimension;
-      arrowRight.innerHTML =
-        '<img src="./svg/arrow-right.svg" id="moveArrow"/>';
-      arrowRight.addEventListener("click", () => {
-        const value = arrowRight.id.replace("moveright_", "");
-        if (value != undefined) {
-          moveDimensionData = value;
-          moveDimensionRight();
-          disableLeftAndRightButton();
-        }
-      });
-      let textLabel = createTextLabel(
-        dimension,
-        "label-text dropdownOptionText",
-      );
-      dimensionLabel.appendChild(arrowLeft);
-      dimensionLabel.appendChild(arrowRight);
-      dimensionLabel.appendChild(textLabel);
-      dimensionContainer.appendChild(dimensionLabel);
-    });
+    if (isDropdownOpen("moveOptions")) {
+      closeElements("moveOptions");
+      return;
+    }
+
+    buildMoveOptions(dimensionContainer);
     showOptions("moveOptions", "moveButton");
     calcDDBehaviour(dimensionContainer, selectButton);
   });
@@ -624,17 +709,10 @@ function generateDropdownForFilter() {
     dimensionContainer.innerHTML = "";
     getAllVisibleDimensionNames().forEach(function (dimension) {
       if (!isDimensionCategorical(dimension)) {
-        let dimensionLabel = document.createElement("label");
+        let dimensionLabel = document.createElement("button");
         dimensionLabel.className = "dropdownLabel dropdownActionLabel";
-        let filterInput = document.createElement("input");
-        filterInput.className = "inputText";
-        filterInput.type = "image";
-        filterInput.name = "dimension";
-        filterInput.value = dimension;
-        filterInput.src = "./svg/dropdown-symbol.svg";
-        filterInput.id = "filter_" + dimension;
-        filterInput.style.height = "0rem";
-        dimensionLabel.appendChild(filterInput);
+        dimensionLabel.type = "button";
+        dimensionLabel.dataset.dimension = dimension;
         dimensionLabel.appendChild(
           createTextLabel(dimension, "label-text dropdownOptionText"),
         );
@@ -656,9 +734,9 @@ function generateDropdownForFilter() {
   }
 
   dimensionContainer.addEventListener("click", (event: MouseEvent) => {
-    const target = event.target as HTMLInputElement | null;
-    if (target?.value != undefined) {
-      filterDimensionData = target.value;
+    const dimension = getDimensionValueFromDropdownClick(event);
+    if (dimension !== undefined) {
+      filterDimensionData = dimension;
       generateModuleForSetFilter();
       dimensionContainer.style.display == "none"
         ? (dimensionContainer.style.display = "block")
@@ -780,10 +858,7 @@ function generateModuleForSetFilter() {
     error.style.display = "none";
   };
 
-  const close = () => {
-    overlay.remove();
-    modal.remove();
-  };
+  const close = () => closeFilterModal();
 
   content.appendChild(row);
   content.appendChild(error);
@@ -868,17 +943,10 @@ function generateDropdownForRange() {
     dimensionContainer.innerHTML = "";
     getAllVisibleDimensionNames().forEach(function (dimension) {
       if (!isDimensionCategorical(dimension)) {
-        let dimensionLabel = document.createElement("label");
+        let dimensionLabel = document.createElement("button");
         dimensionLabel.className = "dropdownLabel dropdownActionLabel";
-        let rangeInput = document.createElement("input");
-        rangeInput.className = "inputText";
-        rangeInput.type = "image";
-        rangeInput.name = "dimension";
-        rangeInput.value = dimension;
-        rangeInput.src = "./svg/dropdown-symbol.svg";
-        rangeInput.id = "range_" + dimension;
-        rangeInput.style.height = "0rem";
-        dimensionLabel.appendChild(rangeInput);
+        dimensionLabel.type = "button";
+        dimensionLabel.dataset.dimension = dimension;
         dimensionLabel.appendChild(
           createTextLabel(dimension, "label-text dropdownOptionText"),
         );
@@ -900,9 +968,9 @@ function generateDropdownForRange() {
   }
 
   dimensionContainer.addEventListener("click", (event: MouseEvent) => {
-    const target = event.target as HTMLInputElement | null;
-    if (target?.value != undefined) {
-      rangeDimensionData = target.value;
+    const dimension = getDimensionValueFromDropdownClick(event);
+    if (dimension !== undefined) {
+      rangeDimensionData = dimension;
       generateModuleForRangeSettings();
       dimensionContainer.style.display == "none"
         ? (dimensionContainer.style.display = "block")
@@ -1051,10 +1119,7 @@ function generateModuleForRangeSettings() {
   section.appendChild(overlay);
   section.appendChild(modal);
 
-  const close = () => {
-    overlay.remove();
-    modal.remove();
-  };
+  const close = () => closeRangeModal();
 
   closeButton.onclick = close;
   overlay.onclick = close;
@@ -1128,6 +1193,7 @@ function resetToRoundedRange() {
 
 function resetAll() {
   let reloadedData = loadCSV(data);
+  resetSlidersToDefaults();
   drawChart(reloadedData);
   syncSelectionSensitivityFromChart();
 }
