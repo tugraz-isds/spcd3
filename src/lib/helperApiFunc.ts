@@ -766,8 +766,8 @@ export function invertWoTransition(dimension: string): void {
     currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
-      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
+      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
@@ -832,8 +832,8 @@ export function setInversionStatus(dimension: string, status: string): void {
     status === "ascending" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     status === "ascending"
-      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
-      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
+      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     status === "ascending"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)
@@ -908,8 +908,8 @@ export function invert(dimension: string): void {
     currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12))
-      : utils.applyThemeToSvg(utils.setSize(icon.getArrowUpCursor(), 12));
+      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
       ? utils.getCursorHotspot(icon.getArrowDownCursorMeta(), 12)

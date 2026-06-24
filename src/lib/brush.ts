@@ -125,7 +125,7 @@ export function setBrushUp(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const hit = g
@@ -138,7 +138,7 @@ export function setBrushUp(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowTopCursor(), 12)))}') ${arrowTopHotspotX} ${arrowTopHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -210,7 +210,7 @@ export function setBrushDown(
       .attr("pointer-events", "none")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const hit = g
@@ -223,7 +223,7 @@ export function setBrushDown(
       .attr("height", 30)
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowBottomCursor(), 12)))}') ${arrowBottomHotspotX} ${arrowBottomHotspotY}, auto`,
       );
 
     const makeDrag = () =>
@@ -317,7 +317,7 @@ export function brushDown(
   } else {
     select("#rect_" + cleanDimensionName).style(
       "cursor",
-      `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
+      `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
     );
   }
 
@@ -394,7 +394,7 @@ export function brushUp(
       .attr("href", "#brush_image_top_active")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
       )
       .style("fill", utils.BRUSH_ACTIVE_FILL)
       .style("opacity", "0.7");

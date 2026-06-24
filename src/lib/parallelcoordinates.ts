@@ -95,6 +95,8 @@ export function drawChart(content: []): void {
   setActive(setActivePathLines(plot, content, parcoords));
 
   setFeatureAxis(plot, yAxis, parcoords, width);
+  ensureCursorThemeSync();
+  refreshThemedCursors();
   realignToolbar();
 
   svg
@@ -287,11 +289,99 @@ function setUpParcoordData(data: any, newFeatures: []): void {
 
 let delay: ReturnType<typeof setTimeout> | null = null;
 let cleanupTimeout: ReturnType<typeof setTimeout> | null = null;
+let removeCursorThemeListener: (() => void) | null = null;
 
 function clearExistingDelay() {
   if (delay) {
     clearTimeout(delay);
     delay = null;
+  }
+}
+
+function createThemedCursor(
+  svgMarkup: string,
+  size: number,
+  meta: icon.CursorIconMeta,
+): string {
+  const [hotspotX, hotspotY] = utils.getCursorHotspot(meta, size);
+  const themedSvg = utils.applyThemeToCursorSvg(
+    utils.setSize(svgMarkup, size),
+  );
+  return `url('data:image/svg+xml,${encodeURIComponent(themedSvg)}') ${hotspotX} ${hotspotY}, auto`;
+}
+
+function refreshThemedCursors(): void {
+  if (!Array.isArray(parcoords.newFeatures)) {
+    return;
+  }
+
+  const topCursor = createThemedCursor(
+    icon.getArrowTopCursor(),
+    12,
+    icon.getArrowTopCursorMeta(),
+  );
+  const bottomCursor = createThemedCursor(
+    icon.getArrowBottomCursor(),
+    12,
+    icon.getArrowBottomCursorMeta(),
+  );
+  const rangeCursor = createThemedCursor(
+    icon.getArrowTopAndBottom(),
+    20,
+    icon.getArrowTopAndBottomMeta(),
+  );
+
+  parcoords.newFeatures.forEach((dimension: string) => {
+    const processed = utils.cleanString(dimension);
+    const invertStatus = api.getInversionStatus(dimension);
+    const invertCursor =
+      invertStatus === "ascending"
+        ? createThemedCursor(
+            icon.getArrowDownCursor(),
+            12,
+            icon.getArrowDownCursorMeta(),
+          )
+        : createThemedCursor(
+            icon.getArrowUpCursor(),
+            12,
+            icon.getArrowUpCursorMeta(),
+          );
+
+    select(`#invert_hitbox_${processed}`).style("cursor", invertCursor);
+    select(`#dimension_invert_${processed}`).style("cursor", invertCursor);
+    select(`#triangle_up_${processed}`).style("cursor", topCursor);
+    select(`#triangle_up_hit${processed}`).style("cursor", topCursor);
+    select(`#triangle_down_${processed}`).style("cursor", bottomCursor);
+    select(`#triangle_down_hit${processed}`).style("cursor", bottomCursor);
+
+    const rect = select(`#rect_${processed}`);
+    if (rect.style("cursor") && rect.style("cursor") !== "default") {
+      rect.style("cursor", rangeCursor);
+    }
+  });
+}
+
+function ensureCursorThemeSync(): void {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function" ||
+    removeCursorThemeListener
+  ) {
+    return;
+  }
+
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const handler = () => {
+    window.requestAnimationFrame(refreshThemedCursors);
+  };
+
+  if (typeof mediaQuery.addEventListener === "function") {
+    mediaQuery.addEventListener("change", handler);
+    removeCursorThemeListener = () =>
+      mediaQuery.removeEventListener("change", handler);
+  } else if (typeof mediaQuery.addListener === "function") {
+    mediaQuery.addListener(handler);
+    removeCursorThemeListener = () => mediaQuery.removeListener(handler);
   }
 }
 
@@ -617,7 +707,7 @@ function setInvertIcon(featureAxis: any): void {
         .attr("id", "invert_hitbox_" + processed)
         .style(
           "cursor",
-          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 
@@ -642,7 +732,7 @@ function setInvertIcon(featureAxis: any): void {
         .text("up")
         .style(
           "cursor",
-          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
+          `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12)))}') ${hotspotX} ${hotspotY}, auto`,
         );
     });
 

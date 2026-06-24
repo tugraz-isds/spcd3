@@ -61,6 +61,24 @@ export function applyThemeToSvg(svg: string): string {
     .replaceAll('fill="#f9f9f9"', `fill="${cursorSurfaceColor}"`);
 }
 
+export function applyThemeToCursorSvg(svg: string): string {
+  return svg
+    .replaceAll("currentColor", "#000000")
+    .replaceAll('stroke="black"', 'stroke="#000000"')
+    .replaceAll('stroke="#000"', 'stroke="#000000"')
+    .replaceAll('stroke="#000000"', 'stroke="#000000"')
+    .replaceAll('fill="black"', 'fill="#000000"')
+    .replaceAll('fill="#000"', 'fill="#000000"')
+    .replaceAll('fill="#000000"', 'fill="#000000"')
+    .replaceAll('stroke="white"', 'stroke="#000000"')
+    .replaceAll('fill="white"', 'fill="#ffffff"')
+    .replaceAll('fill="#fff"', 'fill="#ffffff"')
+    .replaceAll('fill="#ffffff"', 'fill="#ffffff"')
+    .replaceAll('fill="#f9f9f9"', 'fill="#ffffff"')
+    .replaceAll('fill-opacity="0.5"', 'fill-opacity="1"')
+    .replaceAll('fill-opacity="0.7"', 'fill-opacity="1"');
+}
+
 export function applyThemeToBrushSvg(svg: string): string {
   const isDark =
     typeof window !== "undefined" &&

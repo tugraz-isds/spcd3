@@ -475,7 +475,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else if (
     api.getDimensionPosition(d.name) ==
@@ -489,7 +489,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowLeft(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowLeft(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   } else {
     const [hotspotX, hotspotY] = utils.getCursorHotspot(
@@ -500,7 +500,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToSvg(utils.setSize(icon.getArrowLeftAndRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowLeftAndRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   }
 }
@@ -568,36 +568,31 @@ function onDragEventHandler(featureAxis: any): any {
 function onDragEndEventHandler(featureAxis: any): any {
   {
     return function onDragEnd(this: any, d: { subject: any }) {
-      const distance = (width - 80) / parcoords.newFeatures.length;
-      const init = parcoords.dragPosStart[d.subject.name];
-
-      if (
-        parcoords.dragPosStart[d.subject.name] >
-        parcoords.dragging[d.subject.name]
-      ) {
-        featureAxis.attr("transform", (d: { name: any }) => {
-          return (
-            "translate(" +
-            helper.position(d.name, init - distance, parcoords.xScales) +
-            ")"
-          );
-        });
-      } else {
-        featureAxis.attr("transform", (d: { name: any }) => {
-          return (
-            "translate(" +
-            helper.position(d.name, init - distance, parcoords.xScales) +
-            ")"
-          );
-        });
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
       }
+
       delete this.__origin__;
       delete parcoords.dragging[d.subject.name];
       delete parcoords.dragPosStart[d.subject.name];
 
       api.syncDimensionOrderWithVisible();
+      parcoords.xScales.domain(parcoords.newFeatures);
+
+      featureAxis.attr("transform", (d: { name: any }) => {
+        return (
+          "translate(" +
+          helper.position(d.name, parcoords.dragging, parcoords.xScales) +
+          ")"
+        );
+      });
 
       helper.trans(active).each(function (this: any, d: any) {
+        select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
+      });
+
+      helper.trans(selectAll("path.hitarea")).each(function (this: any, d: any) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
