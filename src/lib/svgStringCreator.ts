@@ -2,7 +2,7 @@ import { select } from "d3-selection";
 import * as helper from "./helper";
 import * as utils from "./utils";
 import * as api from "./helperApiFunc";
-import { parcoords, key, padding } from "./globals";
+import { parcoords, key, hoverlabel } from "./globals";
 
 export function setActivePathLinesToDownload(svg: any): void {
   svg
@@ -127,6 +127,24 @@ export function setFeatureAxisToDownload(
   setBrushUpToDownload(featureAxis);
   setRectToDragToDownload(featureAxis);
   setInvertIconToDownload(featureAxis);
+}
+
+export function setSelectedRecordValuesToDownload(
+  svg: any,
+  xScales: any,
+  yScales: any,
+): void {
+  const selectedRecords = api.getSelected();
+  if (selectedRecords.length === 0) return;
+
+  const selectedDataset = parcoords.newDataset.filter(
+    (record: { [x: string]: any }) => selectedRecords.includes(record[hoverlabel]),
+  );
+  if (selectedDataset.length === 0) return;
+
+  selectedDataset.forEach((record: { [x: string]: any }) => {
+    helper.createToolTipForValues(record, true, svg, xScales, yScales);
+  });
 }
 
 function setBrushDownToDownload(featureAxis: any): void {

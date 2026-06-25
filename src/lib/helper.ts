@@ -258,10 +258,15 @@ function getAllVisibleDimensionNames(): string[] {
 
 type ToolTipItem = {
   dim: string;
-  pageX: number;
-  pageY: number;
+  x: number;
+  y: number;
   text: string;
 };
+
+const TOOLTIP_LABEL_HEIGHT = 16;
+const TOOLTIP_LABEL_GAP = 3;
+const TOOLTIP_LABEL_X_OFFSET = 10;
+const TOOLTIP_LEADER_PADDING = 4;
 
 function recordIdOf(
   rec: DataRow & { id?: string; _id?: string; key?: string },
@@ -272,98 +277,230 @@ function recordIdOf(
 export function createToolTipForValues(
   records: DataRow & { id?: string; _id?: string; key?: string },
   isSelect: boolean,
+  svgSelection: any = select("#spcd3-pc_svg"),
+  xScales: any = parcoords.xScales,
+  yScales: any = parcoords.yScales,
 ): void {
   const dimensions = getAllVisibleDimensionNames();
-  const svg = select("#spcd3-pc_svg").node() as SVGSVGElement;
-  if (!svg) return;
-  const plotG =
-    document.querySelector<SVGGElement>("#spcd3-pc_svg g.plot") ?? svg;
-  const ctm = plotG.getScreenCTM();
-  if (!ctm) return;
+  const svgNode = svgSelection?.node?.();
+  if (!svgNode) return;
 
-  const recordId = recordIdOf(records);
-
-  const wrapper = document.querySelector<HTMLDivElement>(
-    "#spcd3-parallelcoords .spcd3-chartWrapper",
+  const recordId = utils.cleanString(
+    String(records[hoverlabel] ?? recordIdOf(records) ?? ""),
   );
-  if (!wrapper) return;
+  if (!recordId) return;
+  const tooltipType = isSelect ? "selected" : "hover";
 
-  const layer = select(wrapper)
-    .selectAll(`div.tip-layer[data-record="${recordId}"]`)
+  const layer = svgSelection
+    .selectAll(
+      `g.spcd3-tip-layer[data-record="${recordId}"][data-tooltip-type="${tooltipType}"]`,
+    )
     .data([recordId])
-    .join("div")
+    .join("g")
     .attr("class", "spcd3-tip-layer")
-    .attr("data-record", recordId);
-
-  const wrapperRect = wrapper.getBoundingClientRect();
+    .attr("data-record", recordId)
+    .attr("data-tooltip-type", tooltipType)
+    .style("display", null);
+  layer.attr("id", isSelect ? `tooltip-record-select-${recordId}` : null);
 
   const data: ToolTipItem[] = dimensions.map((dim) => {
-    const yScale = parcoords.yScales[dim];
-    const x = parcoords.xScales(dim);
+    const yScale = yScales[dim];
+    const x = xScales(dim);
     const record = records[dim];
-    const recordText = String(record ?? "");
-    const cleanRecord =
-      recordText.length > 10 ? recordText.substr(0, 10) + "..." : recordText;
-    const y = yScale(cleanRecord);
-
-    const pt = svg.createSVGPoint();
-    pt.x = x;
-    pt.y = y;
-    const sp = pt.matrixTransform(ctm);
+    const scaleValue =
+      typeof record === "string" ? shortenAxisLabel(record) : record;
+    const y = yScale(scaleValue);
 
     return {
       dim,
-      pageX: sp.x - wrapperRect.left + wrapper.scrollLeft,
-      pageY: sp.y - wrapperRect.top + wrapper.scrollTop,
-      text: String(records[dim]),
+      x,
+      y,
+      text: String(record ?? ""),
     };
+  }).filter(
+    (item) => Number.isFinite(item.x) && Number.isFinite(item.y),
+  );
+
+  const tipClass = isSelect
+    ? "spcd3-tooltip-record-select"
+    : "spcd3-tooltip-record";
+
+  layer
+    .selectAll(`g.${tipClass}`)
+    .data(data, (d: any) => d.dim)
+    .join(
+      (enter: any) => enter.append("g").attr("class", tipClass),
+      (update: any) => update,
+      (exit: any) => exit.remove(),
+    )
+    .attr(
+      "transform",
+      (d: ToolTipItem) => `translate(${d.x + 8}, ${d.y - 9})`,
+    )
+    .style("pointer-events", "none")
+    .each(function (this: SVGGElement, d: ToolTipItem) {
+      const label = select(this);
+      const badgeWidth = Math.max(d.text.length * 6 + 8, 18);
+
+      label
+        .attr("data-dim", d.dim)
+        .attr("data-anchor-x", d.x)
+        .attr("data-anchor-y", d.y)
+        .attr("data-badge-width", badgeWidth)
+        .attr("data-priority", isSelect ? 2 : 1)
+        .attr("data-tooltip-type", tooltipType);
+
+      label
+        .selectAll("line")
+        .data([d])
+        .join("line")
+        .attr("class", "spcd3-tooltip-leader")
+        .attr("stroke", isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-text-primary)")
+        .attr("stroke-width", isSelect ? 1.2 : 1)
+        .attr("stroke-opacity", isSelect ? 0.9 : 0.45);
+
+      label
+        .selectAll("rect")
+        .data([d])
+        .join("rect")
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("width", badgeWidth)
+        .attr("height", 16)
+        .attr(
+          "fill",
+          isSelect
+            ? "rgb(255, 165, 0)"
+            : "var(--spcd3-tooltip-record-bg)",
+        )
+        .attr(
+          "stroke",
+          isSelect
+            ? "rgb(255, 165, 0)"
+            : "var(--spcd3-tooltip-record-bg)",
+        )
+        .attr("stroke-width", 1);
+
+      label
+        .selectAll("text")
+        .data([d])
+        .join("text")
+        .attr("x", 4)
+        .attr("y", 11)
+        .attr("font-size", 10)
+        .attr(
+          "fill",
+          isSelect
+            ? "black"
+            : "var(--spcd3-tooltip-record-text)",
+        )
+        .text(d.text);
+    });
+
+  relayoutValueTooltips(svgSelection);
+}
+
+type TooltipLayoutNode = {
+  anchorX: number;
+  anchorY: number;
+  badgeWidth: number;
+  node: SVGGElement;
+  priority: number;
+};
+
+function relayoutValueTooltips(svgSelection: any): void {
+  const root = svgSelection?.node?.() as SVGSVGElement | null;
+  if (!root) return;
+
+  const hoverLabels = Array.from(
+    root.querySelectorAll<SVGGElement>("g.spcd3-tip-layer g.spcd3-tooltip-record"),
+  );
+  hoverLabels.forEach((labelNode) => {
+    const anchorX = Number(labelNode.getAttribute("data-anchor-x"));
+    const anchorY = Number(labelNode.getAttribute("data-anchor-y"));
+    if (!Number.isFinite(anchorX) || !Number.isFinite(anchorY)) return;
+
+    const top = anchorY - TOOLTIP_LABEL_HEIGHT / 2;
+    select(labelNode).attr(
+      "transform",
+      `translate(${anchorX + TOOLTIP_LABEL_X_OFFSET}, ${top})`,
+    );
+    select(labelNode)
+      .select("line")
+      .attr("x1", 0)
+      .attr("y1", TOOLTIP_LABEL_HEIGHT / 2)
+      .attr("x2", -TOOLTIP_LABEL_X_OFFSET + TOOLTIP_LEADER_PADDING)
+      .attr("y2", TOOLTIP_LABEL_HEIGHT / 2);
   });
 
-  if (isSelect) {
-    const tips = layer
-      .selectAll("div.spcd3-tooltip-record-select")
-      .data(data, (d: any) => d.dim);
+  const labels = Array.from(
+    root.querySelectorAll<SVGGElement>("g.spcd3-tip-layer g.spcd3-tooltip-record-select"),
+  );
+  if (labels.length === 0) return;
 
-    tips.join(
-      (enter: any) =>
-        enter
-          .append("div")
-          .attr(
-            "id",
-            `tooltip-record-select-${utils.cleanString(String(records[hoverlabel] ?? ""))}`,
-          )
-          .attr("class", "spcd3-tooltip-record-select")
-          .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
-          .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
-          .text((d: ToolTipItem) => d.text),
-      (update: any) =>
-        update
-          .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
-          .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
-          .text((d: ToolTipItem) => d.text),
-      (exit: any) => exit.remove(),
-    );
-  } else {
-    const tips = layer
-      .selectAll("div.spcd3-tooltip-record")
-      .data(data, (d: any) => dimensions);
+  const labelsByDimension = new Map<string, TooltipLayoutNode[]>();
 
-    tips.join(
-      (enter: any) =>
-        enter
-          .append("div")
-          .attr("class", "spcd3-tooltip-record")
-          .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
-          .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
-          .text((d: ToolTipItem) => d.text),
-      (update: any) =>
-        update
-          .style("left", (d: ToolTipItem) => `${d.pageX / 16}rem`)
-          .style("top", (d: ToolTipItem) => `${d.pageY / 16}rem`)
-          .text((d: ToolTipItem) => d.text),
-      (exit: any) => exit.remove(),
-    );
-  }
+  labels.forEach((labelNode) => {
+    const dim = labelNode.getAttribute("data-dim");
+    const anchorX = Number(labelNode.getAttribute("data-anchor-x"));
+    const anchorY = Number(labelNode.getAttribute("data-anchor-y"));
+    const badgeWidth = Number(labelNode.getAttribute("data-badge-width"));
+    const priority = Number(labelNode.getAttribute("data-priority") ?? "0");
+
+    if (!dim || !Number.isFinite(anchorX) || !Number.isFinite(anchorY)) return;
+
+    const items = labelsByDimension.get(dim) ?? [];
+    items.push({
+      anchorX,
+      anchorY,
+      badgeWidth: Number.isFinite(badgeWidth) ? badgeWidth : 18,
+      node: labelNode,
+      priority,
+    });
+    labelsByDimension.set(dim, items);
+  });
+
+  labelsByDimension.forEach((dimensionLabels) => {
+    dimensionLabels.sort((a, b) => {
+      if (b.priority !== a.priority) return b.priority - a.priority;
+      return a.anchorY - b.anchorY;
+    });
+
+    let currentBottom = 0;
+    dimensionLabels.forEach((item) => {
+      const preferredTop = item.anchorY - TOOLTIP_LABEL_HEIGHT / 2;
+      const minTop = TOOLTIP_LEADER_PADDING;
+      const maxTop = height - TOOLTIP_LABEL_HEIGHT - TOOLTIP_LEADER_PADDING;
+      const top = Math.max(
+        minTop,
+        Math.min(
+          maxTop,
+          Math.max(preferredTop, currentBottom + TOOLTIP_LABEL_GAP),
+        ),
+      );
+      currentBottom = top + TOOLTIP_LABEL_HEIGHT;
+
+      const translateX = item.anchorX + TOOLTIP_LABEL_X_OFFSET;
+      select(item.node).attr("transform", `translate(${translateX}, ${top})`);
+
+      select(item.node)
+        .select("line")
+        .attr("x1", 0)
+        .attr("y1", TOOLTIP_LABEL_HEIGHT / 2)
+        .attr("x2", -TOOLTIP_LABEL_X_OFFSET + TOOLTIP_LEADER_PADDING)
+        .attr("y2", item.anchorY - top);
+
+      select(item.node)
+        .select("rect")
+        .attr("width", item.badgeWidth)
+        .attr("height", TOOLTIP_LABEL_HEIGHT);
+
+      select(item.node)
+        .select("text")
+        .attr("x", 4)
+        .attr("y", 11);
+    });
+  });
 }
 
 export function getAllPointerEventsData(event: MouseEvent): string[] {
@@ -412,9 +549,9 @@ export function position(dimension: any, dragging: any, xScales: any): any {
 }
 
 export function cleanTooltip(): void {
-  selectAll(".spcd3-tooltip-record").remove();
+  selectAll('.spcd3-tip-layer[data-tooltip-type="hover"]').remove();
 }
 
 export function cleanTooltipSelect(): void {
-  selectAll(".spcd3-tooltip-record-select").remove();
+  selectAll('.spcd3-tip-layer[data-tooltip-type="selected"]').remove();
 }

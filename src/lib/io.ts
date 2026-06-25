@@ -5,7 +5,7 @@ import * as helper from "./helper";
 import { create } from "d3-selection";
 import { parcoords, height, width } from "./globals";
 
-export function createSvgString(): string {
+export function createSvgString(includeDataValues = false): string {
   type Feature = { name: string };
   const orderedFeatures: Feature[] = parcoords.newFeatures.map((name: any) => ({
     name,
@@ -72,31 +72,22 @@ export function createSvgString(): string {
   );
 
   svgcreator.setActivePathLinesToDownload(svg);
+  if (includeDataValues) {
+    svgcreator.setSelectedRecordValuesToDownload(
+      svg,
+      xScalesForDownload,
+      yScalesForDownload,
+    );
+  }
 
   return svg.node().outerHTML;
 }
 
 export function saveAsSvg(): void {
-  let svgString = createSvgString();
-  svgString = svgString.replaceAll("currentColor", "black");
-  svgString = svgString.replaceAll('stroke="black"', "");
-  svgString = svgString.replaceAll('fill="black"', "");
-  svgString = svgString.replaceAll('dy="0"', "");
-  svgString = svgString.replaceAll(
-    'fill="none" font-size="10" font-family="sans-serif" text-anchor="end"',
-    'fill="none" font-size="8" text-anchor="end" stroke="black"',
-  );
-  svgString = svgString.replaceAll("domain", "dimension");
-  svgString = svgString.replaceAll("12px", "12");
-  svgString = svgString.replaceAll(
-    'class="tick" opacity="1"',
-    'class="tick" fill="black" stroke="none"',
-  );
-
-  setOptionsAndDownload(svgString);
+  setOptionsAndDownload();
 }
 
-function setOptionsAndDownload(svgString: string) {
+function setOptionsAndDownload() {
   let name = "parcoords.svg";
 
   const modalOverlay = document.createElement("div");
@@ -164,21 +155,37 @@ function setOptionsAndDownload(svgString: string) {
   rowKeepClasses.appendChild(labelKeepClasses);
   rowKeepClasses.appendChild(inputKeepClasses);
 
-  const rowRemoveUiControls = document.createElement("div");
-  rowRemoveUiControls.className = "spcd3-options-div";
+  const rowIncludeUiControls = document.createElement("div");
+  rowIncludeUiControls.className = "spcd3-options-div";
 
-  const labelRemoveUiControls = document.createElement("label");
-  labelRemoveUiControls.className = "spcd3-label";
-  labelRemoveUiControls.textContent = "Download without UI controls: ";
+  const labelIncludeUiControls = document.createElement("label");
+  labelIncludeUiControls.className = "spcd3-label";
+  labelIncludeUiControls.textContent = "Include UI controls: ";
 
-  const inputRemoveUiControls = document.createElement("input");
-  inputRemoveUiControls.className = "spcd3-input";
-  inputRemoveUiControls.type = "checkbox";
-  inputRemoveUiControls.id = "removeUiControlsInput";
-  inputRemoveUiControls.checked = true;
+  const inputIncludeUiControls = document.createElement("input");
+  inputIncludeUiControls.className = "spcd3-input";
+  inputIncludeUiControls.type = "checkbox";
+  inputIncludeUiControls.id = "includeUiControlsInput";
+  inputIncludeUiControls.checked = true;
 
-  rowRemoveUiControls.appendChild(labelRemoveUiControls);
-  rowRemoveUiControls.appendChild(inputRemoveUiControls);
+  rowIncludeUiControls.appendChild(labelIncludeUiControls);
+  rowIncludeUiControls.appendChild(inputIncludeUiControls);
+
+  const rowIncludeDataValues = document.createElement("div");
+  rowIncludeDataValues.className = "spcd3-options-div";
+
+  const labelIncludeDataValues = document.createElement("label");
+  labelIncludeDataValues.className = "spcd3-label";
+  labelIncludeDataValues.textContent = "Include data values: ";
+
+  const inputIncludeDataValues = document.createElement("input");
+  inputIncludeDataValues.className = "spcd3-input";
+  inputIncludeDataValues.type = "checkbox";
+  inputIncludeDataValues.id = "includeDataValuesInput";
+  inputIncludeDataValues.checked = true;
+
+  rowIncludeDataValues.appendChild(labelIncludeDataValues);
+  rowIncludeDataValues.appendChild(inputIncludeDataValues);
 
   const button = document.createElement("button");
   button.textContent = "Download";
@@ -186,7 +193,8 @@ function setOptionsAndDownload(svgString: string) {
 
   form.appendChild(rowDecimals);
   form.appendChild(rowKeepClasses);
-  form.appendChild(rowRemoveUiControls);
+  form.appendChild(rowIncludeUiControls);
+  form.appendChild(rowIncludeDataValues);
   form.appendChild(button);
   modal.appendChild(form);
   modalOverlay.appendChild(modal);
@@ -202,6 +210,22 @@ function setOptionsAndDownload(svgString: string) {
       return;
     }
 
+    let svgString = createSvgString(inputIncludeDataValues.checked);
+    svgString = svgString.replaceAll("currentColor", "black");
+    svgString = svgString.replaceAll('stroke="black"', "");
+    svgString = svgString.replaceAll('fill="black"', "");
+    svgString = svgString.replaceAll('dy="0"', "");
+    svgString = svgString.replaceAll(
+      'fill="none" font-size="10" font-family="sans-serif" text-anchor="end"',
+      'fill="none" font-size="8" text-anchor="end" stroke="black"',
+    );
+    svgString = svgString.replaceAll("domain", "dimension");
+    svgString = svgString.replaceAll("12px", "12");
+    svgString = svgString.replaceAll(
+      'class="tick" opacity="1"',
+      'class="tick" fill="black" stroke="none"',
+    );
+
     let updatedSVG = roundDecimals(svgString, decimals);
 
     updatedSVG = updatedSVG.replaceAll(
@@ -213,7 +237,7 @@ function setOptionsAndDownload(svgString: string) {
       updatedSVG = removeClasses(updatedSVG);
     }
 
-    if (inputRemoveUiControls.checked) {
+    if (!inputIncludeUiControls.checked) {
       updatedSVG = removeUiControls(updatedSVG);
       updatedSVG = updatedSVG.replaceAll(
         '<svg y="25" x="-6"><use width="12" height="12" y="0" x="0" href="#arrow_image_up"></use></svg>',
