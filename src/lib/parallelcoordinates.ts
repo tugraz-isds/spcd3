@@ -608,17 +608,20 @@ function setFeatureAxis(
     .style("fill", "transparent")
     .style("pointer-events", "none");
 
-  let tooltipValues = select("#spcd3-parallelcoords")
-    .append("div")
-    .attr("class", "spcd3-tooltip-values");
+  let tooltipValues = svg
+    .append("g")
+    .attr("class", "spcd3-tooltip-values")
+    .style("visibility", "hidden");
 
-  let tooltipValuesTop = select("#spcd3-parallelcoords")
-    .append("div")
-    .attr("class", "spcd3-tooltip-values");
+  let tooltipValuesTop = svg
+    .append("g")
+    .attr("class", "spcd3-tooltip-values")
+    .style("visibility", "hidden");
 
-  let tooltipValuesDown = select("#spcd3-parallelcoords")
-    .append("div")
-    .attr("class", "spcd3-tooltip-values");
+  let tooltipValuesDown = svg
+    .append("g")
+    .attr("class", "spcd3-tooltip-values")
+    .style("visibility", "hidden");
 
   brush.setBrushDown(featureAxis, brushOverlay, tooltipValues);
 

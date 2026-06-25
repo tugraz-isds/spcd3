@@ -14,6 +14,9 @@ const TOP_AXIS_VALUE = 50;
 const BOTTOM_AXIS_VALUE = 350;
 const RECT_VALUE = 300;
 const BRUSH_STATE_EPSILON = 0.75;
+const BRUSH_TOOLTIP_HEIGHT = 16;
+const BRUSH_TOOLTIP_X_OFFSET = 12;
+const BRUSH_HANDLE_CENTER_OFFSET = 5;
 
 function toNumber(value: string | number): number {
   return typeof value === "number" ? value : Number(value);
@@ -275,6 +278,43 @@ function cleanup(brushOverlay: any, tooltipValues: any) {
   tooltipValues.style("visibility", "hidden");
 }
 
+function setBrushTooltipPosition(
+  tooltipValues: any,
+  textValue: string,
+  x: number,
+  y: number,
+): void {
+  const badgeWidth = Math.max(textValue.length * 6 + 8, 18);
+  tooltipValues
+    .style("visibility", "visible")
+    .attr(
+      "transform",
+      `translate(${x + BRUSH_TOOLTIP_X_OFFSET}, ${y - BRUSH_TOOLTIP_HEIGHT / 2})`,
+    );
+
+  tooltipValues
+    .selectAll("rect")
+    .data([textValue])
+    .join("rect")
+    .attr("rx", 2)
+    .attr("ry", 2)
+    .attr("width", badgeWidth)
+    .attr("height", BRUSH_TOOLTIP_HEIGHT)
+    .attr("fill", "var(--spcd3-tooltip-surface)")
+    .attr("stroke", "var(--spcd3-border-emphasis)")
+    .attr("stroke-width", 1);
+
+  tooltipValues
+    .selectAll("text")
+    .data([textValue])
+    .join("text")
+    .attr("x", 4)
+    .attr("y", 11)
+    .attr("font-size", 10)
+    .attr("fill", "var(--spcd3-text-primary)")
+    .text(textValue);
+}
+
 export function brushDown(
   cleanDimensionName: string,
   event: any,
@@ -350,7 +390,12 @@ export function brushDown(
     .attr("height", RECT_VALUE - heightTopRect - heightBottomRect);
 
   if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-    setToolTipBrush(tooltipValues, d, event, window, true);
+    setToolTipBrush(
+      tooltipValues,
+      d,
+      yPosTop + BRUSH_HANDLE_CENTER_OFFSET,
+      true,
+    );
   }
 
   updateLines(d.name, cleanDimensionName);
@@ -424,7 +469,12 @@ export function brushUp(
   );
 
   if (!isNaN(parcoords.yScales[d.name].domain()[0])) {
-    setToolTipBrush(tooltipValues, d, event, window, false);
+    setToolTipBrush(
+      tooltipValues,
+      d,
+      yPosBottom + BRUSH_HANDLE_CENTER_OFFSET,
+      false,
+    );
   }
 
   updateLines(d.name, cleanDimensionName);
@@ -510,10 +560,9 @@ export function dragAndBrush(
         tooltipValuesTop,
         tooltipValuesDown,
         d,
-        window,
         true,
-        yPosTop,
-        yPosRect + rectHeight,
+        yPosTop + BRUSH_HANDLE_CENTER_OFFSET,
+        yPosRect + rectHeight + BRUSH_HANDLE_CENTER_OFFSET,
       );
     }
     updateLines(d.name, cleanDimensionName);
@@ -750,8 +799,7 @@ export function addPosition(
 function setToolTipBrush(
   tooltipValues: any,
   d: any,
-  event: any,
-  window: any,
+  anchorY: number,
   direction: any,
 ): void {
   const range = parcoords.yScales[d.name].domain();
@@ -765,13 +813,21 @@ function setToolTipBrush(
   if (invertStatus) {
     tooltipValue =
       direction == true
-        ? (event.y - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale) + minValue
-        : (event.y - TOP_AXIS_VALUE) / (RECT_VALUE / scale) + minValue;
+        ? (anchorY - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue
+        : (anchorY - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue;
   } else {
     tooltipValue =
       direction == true
-        ? maxValue - (event.y - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale)
-        : maxValue - (event.y - TOP_AXIS_VALUE) / (RECT_VALUE / scale);
+        ? maxValue -
+          (anchorY - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale)
+        : maxValue -
+          (anchorY - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale);
   }
 
   if (!invertStatus) {
@@ -791,21 +847,18 @@ function setToolTipBrush(
   }
 
   const digs = getSigDig(d.name);
-  tooltipValues.text(
+  const valueText = String(
     Math.round(tooltipValue.toPrecision(digs).toLocaleString("en-GB") * 10) /
       10,
   );
-  tooltipValues.style("visibility", "visible");
-  tooltipValues
-    .style("top", window.event.pageY / 16 + "rem")
-    .style("left", window.event.pageX / 16 + "rem");
+  const anchorX = Number(parcoords.xScales(d.name));
+  setBrushTooltipPosition(tooltipValues, valueText, anchorX, anchorY);
 }
 
 function setToolTipDragAndBrush(
   tooltipValuesTop: any,
   tooltipValuesDown: any,
   d: any,
-  window: any,
   direction: any,
   yPosTop: number,
   yPosBottom: number,
@@ -822,21 +875,37 @@ function setToolTipDragAndBrush(
   if (invertStatus) {
     tooltipValueTop =
       direction == true
-        ? (yPosTop - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale) + minValue
-        : (yPosTop - TOP_AXIS_VALUE) / (RECT_VALUE / scale) + minValue;
+        ? (yPosTop - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue
+        : (yPosTop - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue;
     tooltipValueBottom =
       direction == true
-        ? (yPosBottom - TOP_AXIS_VALUE) / (RECT_VALUE / scale) + minValue
-        : (yPosBottom - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale) + minValue;
+        ? (yPosBottom - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue
+        : (yPosBottom - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale) +
+          minValue;
   } else {
     tooltipValueTop =
       direction == true
-        ? maxValue - (yPosTop - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale)
-        : maxValue - (yPosTop - TOP_AXIS_VALUE) / (RECT_VALUE / scale);
+        ? maxValue -
+          (yPosTop - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale)
+        : maxValue -
+          (yPosTop - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale);
     tooltipValueBottom =
       direction == true
-        ? maxValue - (yPosBottom - TOP_AXIS_VALUE) / (RECT_VALUE / scale)
-        : maxValue - (yPosBottom - TOP_AXIS_LOW_VALUE) / (RECT_VALUE / scale);
+        ? maxValue -
+          (yPosBottom - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_VALUE) /
+            (RECT_VALUE / scale)
+        : maxValue -
+          (yPosBottom - BRUSH_HANDLE_CENTER_OFFSET - TOP_AXIS_LOW_VALUE) /
+            (RECT_VALUE / scale);
   }
 
   if (
@@ -845,11 +914,12 @@ function setToolTipDragAndBrush(
   ) {
     tooltipValuesTop.style("visibility", "hidden");
   } else {
-    tooltipValuesTop.text(Math.round(tooltipValueTop));
-    tooltipValuesTop.style("visibility", "visible");
-    tooltipValuesTop
-      .style("top", Number(yPosTop + 180) / 16 + "rem")
-      .style("left", window.event.pageX / 16 + "rem");
+    setBrushTooltipPosition(
+      tooltipValuesTop,
+      String(Math.round(tooltipValueTop)),
+      Number(parcoords.xScales(d.name)),
+      yPosTop,
+    );
   }
 
   if (
@@ -858,11 +928,12 @@ function setToolTipDragAndBrush(
   ) {
     tooltipValuesDown.style("visibility", "hidden");
   } else {
-    tooltipValuesDown.text(Math.round(tooltipValueBottom));
-    tooltipValuesDown.style("visibility", "visible");
-    tooltipValuesDown
-      .style("top", Number(yPosBottom + 180) / 16 + "rem")
-      .style("left", window.event.pageX / 16 + "rem");
+    setBrushTooltipPosition(
+      tooltipValuesDown,
+      String(Math.round(tooltipValueBottom)),
+      Number(parcoords.xScales(d.name)),
+      yPosBottom,
+    );
   }
 }
 
