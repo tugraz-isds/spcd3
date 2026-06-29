@@ -110,6 +110,10 @@ function copyLibFileToExample() {
   return src(sourceFiles).pipe(dest(targetDir));
 }
 
+function copyPackageJsonToExample() {
+  return src("./package.json").pipe(dest("./dist/example"));
+}
+
 exports.clean = cleanDistFolder;
 exports.cleanTauri = cleanTauriTarget;
 exports.icons = generateIcons;
@@ -131,6 +135,7 @@ exports.build = series(
   copyExampleFolder,
   bundle,
   copyLibFileToExample,
+  copyPackageJsonToExample,
 );
 
 exports.dev = series(exports.build, watcher);

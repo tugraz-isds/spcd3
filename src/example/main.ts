@@ -44,6 +44,11 @@ let studentData =
 
 const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
 const DEFAULT_DIMENSION_SPACING_REM = 6;
+const REPOSITORY_URL = "https://github.com/tugraz-isds/spcd3";
+
+type PackageMetadata = {
+  version?: string;
+};
 
 function closeFilterModal(): void {
   document.getElementById("filterOverlay")?.remove();
@@ -53,6 +58,31 @@ function closeFilterModal(): void {
 function closeRangeModal(): void {
   document.getElementById("rangeOverlay")?.remove();
   document.getElementById("rangeContainer")?.remove();
+}
+
+function openAboutModal(): void {
+  const modal = elementById<HTMLElement>("aboutModal");
+  modal.hidden = false;
+  elementById<HTMLButtonElement>("aboutCloseButton").focus();
+}
+
+function closeAboutModal(): void {
+  elementById<HTMLElement>("aboutModal").hidden = true;
+  elementById<HTMLButtonElement>("aboutButton").focus();
+}
+
+async function loadExampleVersion(): Promise<void> {
+  const versionElement = elementById<HTMLElement>("aboutVersion");
+
+  const response = await fetch("./package.json");
+  if (!response.ok) {
+    throw new Error(`Failed to load package.json: ${response.status}`);
+  }
+
+  const packageMetadata = (await response.json()) as PackageMetadata;
+  if (packageMetadata.version) {
+    versionElement.textContent = packageMetadata.version;
+  }
 }
 
 window.addEventListener("click", (event: MouseEvent) => {
@@ -79,6 +109,13 @@ window.addEventListener("click", (event: MouseEvent) => {
   }
 });
 
+window.addEventListener("keydown", (event: KeyboardEvent) => {
+  const aboutModal = document.getElementById("aboutModal");
+  if (event.key === "Escape" && aboutModal && !aboutModal.hidden) {
+    closeAboutModal();
+  }
+});
+
 function elementById<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id) as T | null;
   if (!element) {
@@ -90,6 +127,21 @@ function elementById<T extends HTMLElement>(id: string): T {
 document.addEventListener(
   "DOMContentLoaded",
   function () {
+    elementById<HTMLAnchorElement>("repoButton").href = REPOSITORY_URL;
+    elementById<HTMLButtonElement>("aboutButton").addEventListener(
+      "click",
+      openAboutModal,
+    );
+    elementById<HTMLButtonElement>("aboutCloseButton").addEventListener(
+      "click",
+      closeAboutModal,
+    );
+    elementById<HTMLElement>("aboutModalBackdrop").addEventListener(
+      "click",
+      closeAboutModal,
+    );
+    void loadExampleVersion();
+
     data = studentData;
     newData = loadCSV(data);
     setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
@@ -335,8 +387,9 @@ function getDimensionValueFromDropdownClick(
   }
 
   const fallbackOption = target.closest(".dropdownActionLabel");
-  const input =
-    fallbackOption?.querySelector<HTMLInputElement>('input[name="dimension"]');
+  const input = fallbackOption?.querySelector<HTMLInputElement>(
+    'input[name="dimension"]',
+  );
   return input?.value;
 }
 
@@ -399,9 +452,11 @@ function buildInvertOptions(dimensionContainer: HTMLDivElement): void {
     inputButton.id = "invert_" + dimension;
     inputButton.type = "button";
     if (getInversionStatus(dimension) == "ascending") {
-      inputButton.innerHTML = '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
+      inputButton.innerHTML =
+        '<img src="./svg/arrow-up.svg" id="invertArrow"/>';
     } else {
-      inputButton.innerHTML = '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
+      inputButton.innerHTML =
+        '<img src="./svg/arrow-down.svg" id="invertArrow"/>';
     }
 
     inputButton.addEventListener("click", (event: MouseEvent) => {
@@ -419,10 +474,7 @@ function buildInvertOptions(dimensionContainer: HTMLDivElement): void {
       }
     });
 
-    let textLabel = createTextLabel(
-      dimension,
-      "label-text dropdownOptionText",
-    );
+    let textLabel = createTextLabel(dimension, "label-text dropdownOptionText");
     ddElement.appendChild(inputButton);
     ddElement.appendChild(textLabel);
     dimensionContainer.appendChild(ddElement);
@@ -466,10 +518,7 @@ function buildMoveOptions(dimensionContainer: HTMLDivElement): void {
         disableLeftAndRightButton();
       }
     });
-    let textLabel = createTextLabel(
-      dimension,
-      "label-text dropdownOptionText",
-    );
+    let textLabel = createTextLabel(dimension, "label-text dropdownOptionText");
     dimensionLabel.appendChild(arrowLeft);
     dimensionLabel.appendChild(arrowRight);
     dimensionLabel.appendChild(textLabel);
