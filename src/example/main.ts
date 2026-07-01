@@ -38,6 +38,7 @@ let newData: ParsedData;
 let moveDimensionData = "";
 let filterDimensionData = "";
 let rangeDimensionData = "";
+let multiRangeDimensionsData: string[] = [];
 
 let studentData =
   "Name,Maths,English,PE,Art,History,IT,Biology,German\nAdrian,95,24,82,49,58,85,21,24\nAmelia,92,98,60,45,82,85,78,92\nBrooke,27,35,84,45,23,50,15,22\nChloe,78,9,83,66,80,63,29,12\nDylan,92,47,91,56,47,81,60,51\nEmily,67,3,98,77,25,100,50,34\nEvan,53,60,97,74,21,78,72,75\nFinn,42,73,65,52,43,61,82,85\nGia,50,81,85,80,43,46,73,91\nGrace,24,95,98,94,89,25,91,69\nHarper,69,9,97,77,56,94,38,2\nHayden,2,72,74,53,40,40,66,64\nIsabella,8,99,84,69,86,20,86,85\nJesse,63,39,93,84,30,71,86,19\nJordan,11,80,87,68,88,20,96,81\nKai,27,65,62,92,81,28,94,84\nKaitlyn,7,70,51,77,79,29,96,73\nLydia,75,49,98,55,68,67,91,87\nMark,51,70,87,40,97,94,60,95\nMonica,62,89,98,90,85,66,84,99\nNicole,70,8,84,64,26,70,12,8\nOswin,96,14,62,35,56,98,5,12\nPeter,98,10,71,41,55,66,38,29\nRenette,96,39,82,43,26,92,20,2\nRobert,78,32,98,55,56,81,46,29\nSasha,87,1,84,70,56,88,49,2\nSylvia,86,12,97,4,19,80,36,8\nThomas,76,47,99,34,48,92,30,38\nVictor,5,60,70,65,97,19,63,83\nZack,19,84,83,42,93,15,98,95";
@@ -58,6 +59,11 @@ function closeFilterModal(): void {
 function closeRangeModal(): void {
   document.getElementById("rangeOverlay")?.remove();
   document.getElementById("rangeContainer")?.remove();
+}
+
+function closeMultiRangeModal(): void {
+  document.getElementById("multiRangeOverlay")?.remove();
+  document.getElementById("multiRangeContainer")?.remove();
 }
 
 function openAboutModal(): void {
@@ -103,6 +109,14 @@ window.addEventListener("click", (event: MouseEvent) => {
   if (!target?.closest("#rangeButton, #rangeOptions, #rangeContainer")) {
     closeElements("rangeOptions");
     closeRangeModal();
+  }
+  if (
+    !target?.closest(
+      "#multiRangeButton, #multiRangeOptions, #multiRangeContainer",
+    )
+  ) {
+    closeElements("multiRangeOptions");
+    closeMultiRangeModal();
   }
   if (!target?.closest("#selectButtonR, #options_r")) {
     closeElements("options_r");
@@ -153,6 +167,7 @@ document.addEventListener(
     generateDropdownForMove();
     generateDropdownForFilter();
     generateDropdownForRange();
+    generateDropdownForMultiRange();
     generateDropdownForSelectRecords();
   },
   false,
@@ -305,10 +320,65 @@ function handleFileSelect(event: Event) {
       generateDropdownForMove();
       generateDropdownForFilter();
       generateDropdownForRange();
+      generateDropdownForMultiRange();
       generateDropdownForSelectRecords();
     };
     reader.readAsText(file);
   }
+}
+
+function getVisibleNumericDimensions(): string[] {
+  return getAllVisibleDimensionNames().filter(
+    (dimension) => !isDimensionCategorical(dimension),
+  );
+}
+
+function formatCurrentRangeValues(dimension: string): {
+  minValue: string;
+  maxValue: string;
+} {
+  const resultMin =
+    getCurrentMinRange(dimension) -
+      Math.floor(getCurrentMinRange(dimension)) !==
+    0;
+  const resultMax =
+    getCurrentMaxRange(dimension) -
+      Math.floor(getCurrentMaxRange(dimension)) !==
+    0;
+
+  let minValue = String(getCurrentMinRange(dimension));
+  let maxValue = String(getCurrentMaxRange(dimension));
+
+  if (resultMin && !resultMax) {
+    const count = minValue.split(".")[1].length;
+    maxValue = getCurrentMaxRange(dimension).toFixed(count);
+  } else if (!resultMin && resultMax) {
+    const count = maxValue.split(".")[1].length;
+    minValue = getCurrentMinRange(dimension).toFixed(count);
+  }
+
+  return { minValue, maxValue };
+}
+
+function validateRangeForDimension(
+  dimension: string,
+  min: number,
+  max: number,
+): string | undefined {
+  const currentMin = Number(getCurrentMinRange(dimension));
+  const currentMax = Number(getCurrentMaxRange(dimension));
+  const lowerBound = Math.min(currentMin, currentMax);
+  const upperBound = Math.max(currentMin, currentMax);
+
+  if (min >= max) {
+    return "Min must be smaller than max.";
+  }
+
+  if (min > lowerBound || max < upperBound) {
+    return `${dimension} requires a range covering ${lowerBound} to ${upperBound}.`;
+  }
+
+  return undefined;
 }
 
 function showButtons() {
@@ -1031,6 +1101,123 @@ function generateDropdownForRange() {
   container.appendChild(dimensionContainer);
 }
 
+function generateDropdownForMultiRange() {
+  const container = elementById<HTMLElement>("multiRangeDimensionContainer");
+  container.style.position = "relative";
+
+  const selectButton = document.createElement("button");
+  selectButton.id = "multiRangeButton";
+  selectButton.className = "ddButton";
+  selectButton.appendChild(
+    createDropdownButtonLabel("multiRangeText", "Set Range for Multiple"),
+  );
+
+  const dimensionContainer = document.createElement("div");
+  dimensionContainer.id = "multiRangeOptions";
+  dimensionContainer.className = "ddList";
+  dimensionContainer.style.display = "none";
+  dimensionContainer.setAttribute("name", "multiRangeOptions");
+
+  const buildOptions = () => {
+    dimensionContainer.innerHTML = "";
+
+    const numericDimensions = getVisibleNumericDimensions();
+    if (numericDimensions.length > 15) {
+      dimensionContainer.style.height = "12.5rem";
+    } else {
+      dimensionContainer.style.height = "";
+    }
+
+    numericDimensions.forEach((dimension) => {
+      const option = document.createElement("label");
+      option.className = "dropdownLabel";
+      option.htmlFor = `multirange_${dimension}`;
+
+      const input = document.createElement("input");
+      input.className = "inputFields";
+      input.type = "checkbox";
+      input.id = `multirange_${dimension}`;
+      input.name = "multiRangeDimension";
+      input.value = dimension;
+      input.checked = multiRangeDimensionsData.includes(dimension);
+
+      option.appendChild(input);
+      option.appendChild(
+        createTextLabel(dimension, "label-text dropdownOptionText"),
+      );
+      dimensionContainer.appendChild(option);
+    });
+
+    const footer = document.createElement("div");
+    footer.className = "dropdownLabel";
+
+    const applyButton = document.createElement("button");
+    applyButton.type = "button";
+    applyButton.className = "apply-button";
+    applyButton.textContent = "Set Shared Range";
+
+    const syncApplyState = () => {
+      const selectedCount = dimensionContainer.querySelectorAll(
+        'input[name="multiRangeDimension"]:checked',
+      ).length;
+      applyButton.disabled = selectedCount === 0;
+    };
+
+    dimensionContainer
+      .querySelectorAll<HTMLInputElement>('input[name="multiRangeDimension"]')
+      .forEach((input) => {
+        input.addEventListener("change", syncApplyState);
+      });
+
+    applyButton.addEventListener("click", (event: MouseEvent) => {
+      event.stopPropagation();
+      const selected = Array.from(
+        dimensionContainer.querySelectorAll<HTMLInputElement>(
+          'input[name="multiRangeDimension"]:checked',
+        ),
+      ).map((input) => input.value);
+
+      if (selected.length === 0) {
+        return;
+      }
+
+      multiRangeDimensionsData = selected;
+      generateModuleForMultiRangeSettings();
+      closeElements("multiRangeOptions");
+    });
+
+    footer.appendChild(applyButton);
+    dimensionContainer.appendChild(footer);
+    syncApplyState();
+  };
+
+  dimensionContainer.addEventListener("click", (event: MouseEvent) => {
+    event.stopPropagation();
+  });
+
+  dimensionContainer.addEventListener("change", () => {
+    multiRangeDimensionsData = Array.from(
+      dimensionContainer.querySelectorAll<HTMLInputElement>(
+        'input[name="multiRangeDimension"]:checked',
+      ),
+    ).map((input) => input.value);
+  });
+
+  selectButton.addEventListener("click", () => {
+    if (isDropdownOpen("multiRangeOptions")) {
+      closeElements("multiRangeOptions");
+      return;
+    }
+
+    buildOptions();
+    showOptions("multiRangeOptions", "multiRangeButton");
+    calcDDBehaviour(dimensionContainer, selectButton);
+  });
+
+  container.appendChild(selectButton);
+  container.appendChild(dimensionContainer);
+}
+
 function generateModuleForRangeSettings() {
   const section = elementById<HTMLElement>("bottom-controls");
 
@@ -1071,25 +1258,7 @@ function generateModuleForRangeSettings() {
   const content = document.createElement("div");
   content.className = "modal-content";
 
-  const resultMin =
-    getCurrentMinRange(rangeDimensionData) -
-      Math.floor(getCurrentMinRange(rangeDimensionData)) !==
-    0;
-  const resultMax =
-    getCurrentMaxRange(rangeDimensionData) -
-      Math.floor(getCurrentMaxRange(rangeDimensionData)) !==
-    0;
-
-  let minValue = String(getCurrentMinRange(rangeDimensionData));
-  let maxValue = String(getCurrentMaxRange(rangeDimensionData));
-
-  if (resultMin && !resultMax) {
-    const count = minValue.split(".")[1].length;
-    maxValue = getCurrentMaxRange(rangeDimensionData).toFixed(count);
-  } else if (!resultMin && resultMax) {
-    const count = maxValue.split(".")[1].length;
-    minValue = getCurrentMinRange(rangeDimensionData).toFixed(count);
-  }
+  const { minValue, maxValue } = formatCurrentRangeValues(rangeDimensionData);
 
   const notes = document.createElement("div");
   notes.className = "modal-notes";
@@ -1218,6 +1387,160 @@ function generateModuleForRangeSettings() {
   };
 }
 
+function generateModuleForMultiRangeSettings() {
+  const section = elementById<HTMLElement>("bottom-controls");
+  closeMultiRangeModal();
+
+  const overlay = document.createElement("div");
+  overlay.id = "multiRangeOverlay";
+  overlay.className = "modal-overlay";
+
+  const modal = document.createElement("div");
+  modal.id = "multiRangeContainer";
+  modal.className = "modal";
+
+  modal.addEventListener("click", (event: MouseEvent) => {
+    event.stopPropagation();
+  });
+
+  const title = document.createElement("div");
+  title.className = "modal-title";
+  title.textContent = "Set Shared Range";
+
+  const closeButton = document.createElement("span");
+  closeButton.id = "multiRangeCloseButton";
+  closeButton.className = "close-button";
+  closeButton.innerHTML = "&times;";
+
+  const header = document.createElement("div");
+  header.className = "modal-title";
+  header.textContent = `${multiRangeDimensionsData.length} selected dimensions`;
+
+  modal.appendChild(title);
+  modal.appendChild(closeButton);
+  modal.appendChild(header);
+
+  const notes = document.createElement("div");
+  notes.className = "modal-notes";
+  notes.textContent =
+    "Enter one shared min/max pair that will be applied to all selected numeric dimensions.";
+  modal.appendChild(notes);
+
+  const selectedList = document.createElement("ul");
+  selectedList.className = "modal-selected-list";
+  multiRangeDimensionsData.forEach((dimension) => {
+    const item = document.createElement("li");
+    const currentRange = formatCurrentRangeValues(dimension);
+    const bounds = `${currentRange.minValue} to ${currentRange.maxValue}`;
+    item.textContent = `${dimension}: ${bounds}`;
+    selectedList.appendChild(item);
+  });
+  modal.appendChild(selectedList);
+
+  const content = document.createElement("div");
+  content.className = "modal-content";
+
+  const firstDimension = multiRangeDimensionsData[0];
+  const { minValue, maxValue } = formatCurrentRangeValues(firstDimension);
+
+  const row = document.createElement("div");
+  row.className = "modal-row";
+
+  const labelMin = document.createElement("label");
+  labelMin.className = "modal-label label-text";
+  labelMin.setAttribute("for", "multiRangeMinValue");
+  labelMin.textContent = "Min";
+
+  const inputMin = document.createElement("input");
+  inputMin.id = "multiRangeMinValue";
+  inputMin.type = "number";
+  inputMin.lang = "en";
+  inputMin.className = "modal-input";
+  inputMin.value = minValue;
+
+  const labelMax = document.createElement("label");
+  labelMax.className = "modal-label label-text";
+  labelMax.setAttribute("for", "multiRangeMaxValue");
+  labelMax.textContent = "Max";
+
+  const inputMax = document.createElement("input");
+  inputMax.id = "multiRangeMaxValue";
+  inputMax.type = "number";
+  inputMax.lang = "en";
+  inputMax.className = "modal-input";
+  inputMax.value = maxValue;
+
+  const saveButton = document.createElement("button");
+  saveButton.id = "onMultiRangeButton";
+  saveButton.className = "save-button";
+  saveButton.type = "button";
+  saveButton.textContent = "Save";
+
+  row.appendChild(labelMin);
+  row.appendChild(inputMin);
+  row.appendChild(labelMax);
+  row.appendChild(inputMax);
+  row.appendChild(saveButton);
+
+  const error = document.createElement("div");
+  error.id = "multiRangeError";
+  error.className = "modal-errormessage";
+
+  const onEnter = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      saveButton.click();
+    }
+  };
+
+  inputMin.addEventListener("keydown", onEnter);
+  inputMax.addEventListener("keydown", onEnter);
+
+  content.appendChild(row);
+  content.appendChild(error);
+  modal.appendChild(content);
+
+  section.appendChild(overlay);
+  section.appendChild(modal);
+
+  const close = () => closeMultiRangeModal();
+
+  closeButton.onclick = close;
+  overlay.onclick = close;
+
+  overlay.style.display = "block";
+  modal.style.display = "block";
+
+  saveButton.onclick = () => {
+    const min = Number(inputMin.value);
+    const max = Number(inputMax.value);
+
+    if (Number.isNaN(min) || Number.isNaN(max)) {
+      error.textContent = "Attention: Values are not numbers!";
+      error.style.display = "block";
+      return;
+    }
+
+    const invalidDimension = multiRangeDimensionsData.find((dimension) =>
+      validateRangeForDimension(dimension, min, max),
+    );
+
+    if (invalidDimension) {
+      error.textContent =
+        validateRangeForDimension(invalidDimension, min, max) ?? "";
+      error.style.display = "block";
+      return;
+    }
+
+    error.style.display = "none";
+    multiRangeDimensionsData.forEach((dimension) => {
+      setDimensionRange(dimension, min, max);
+    });
+    multiRangeDimensionsData = [];
+    close();
+  };
+}
+
 function resetToOriginalRange() {
   const dimensions = getAllVisibleDimensionNames();
   dimensions.forEach(function (dimension) {
@@ -1308,6 +1631,10 @@ function generateDropdownForSelectRecords() {
 }
 
 function clearPlot() {
+  closeFilterModal();
+  closeRangeModal();
+  closeMultiRangeModal();
+
   const parentElement = elementById<HTMLElement>("spcd3-parallelcoords");
   const invertContainer = elementById<HTMLElement>("invDimensionContainer");
   const hideContainer = elementById<HTMLElement>("hideDimensionContainer");
@@ -1317,6 +1644,9 @@ function clearPlot() {
   );
   const rangeDimensionContainer = elementById<HTMLElement>(
     "ranDimensionContainer",
+  );
+  const multiRangeDimensionContainer = elementById<HTMLElement>(
+    "multiRangeDimensionContainer",
   );
   const selectRecordsContainer = elementById<HTMLElement>(
     "selRecordsContainer",
@@ -1339,6 +1669,11 @@ function clearPlot() {
   }
   while (rangeDimensionContainer.firstChild) {
     rangeDimensionContainer.removeChild(rangeDimensionContainer.firstChild);
+  }
+  while (multiRangeDimensionContainer.firstChild) {
+    multiRangeDimensionContainer.removeChild(
+      multiRangeDimensionContainer.firstChild,
+    );
   }
   while (selectRecordsContainer.firstChild) {
     selectRecordsContainer.removeChild(selectRecordsContainer.firstChild);

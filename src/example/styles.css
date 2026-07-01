@@ -375,6 +375,10 @@ input::file-selector-button:hover {
   grid-column: span 1;
 }
 
+.item7 {
+  grid-column: span 1;
+}
+
 input {
   text-align: right;
 }
@@ -761,6 +765,13 @@ div#selectRecordsHeader {
   position: relative;
 }
 
+.modal-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .modal-info {
   margin-top: 0.15rem;
 }
@@ -769,6 +780,17 @@ div#selectRecordsHeader {
   color: var(--example-text-secondary);
   font-size: 0.82rem;
   padding: 0.5rem 0 0.5rem 0.5rem;
+}
+
+.modal-selected-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.4rem;
+  color: var(--example-text-secondary);
+  font-size: 0.82rem;
+}
+
+.modal-selected-list li + li {
+  margin-top: 0.2rem;
 }
 
 .modal-label {
@@ -806,6 +828,11 @@ div#selectRecordsHeader {
 .apply-button:hover,
 .save-button:hover {
   background: var(--example-control-bg-hover);
+}
+
+.apply-button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .ddButton:focus-visible,
