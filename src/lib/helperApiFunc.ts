@@ -155,6 +155,14 @@ function refreshRecordPathsForVisibleDimensions(): void {
     .style("opacity", 1);
 }
 
+function isColoredRecord(record: string): boolean {
+  return select("#" + utils.cleanString(record)).classed("colored");
+}
+
+function shouldShowSelectedValues(record: string): boolean {
+  return !isRecordInactive(record) && !isColoredRecord(record);
+}
+
 //---------- Show and Hide Functions ----------
 
 export function hide(dimension: string): void {
@@ -198,7 +206,9 @@ export function hide(dimension: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    helper.createToolTipForValues(path, true);
+    if (shouldShowSelectedValues(record)) {
+      helper.createToolTipForValues(path, true);
+    }
   });
 
   realignToolbarAfterSpacingChange();
@@ -249,7 +259,9 @@ export function show(dimension: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    helper.createToolTipForValues(path, true);
+    if (shouldShowSelectedValues(record)) {
+      helper.createToolTipForValues(path, true);
+    }
   });
 
   realignToolbarAfterSpacingChange();
@@ -339,7 +351,7 @@ export function moveByOne(dimension: string, direction: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    if (!isRecordInactive(record)) {
+    if (shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });
@@ -435,7 +447,7 @@ export function swap(dimensionA: string, dimensionB: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    if (!isRecordInactive(record)) {
+    if (shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });
@@ -817,7 +829,7 @@ export function invertWoTransition(dimension: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    if (!isRecordInactive(record)) {
+    if (shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });
@@ -892,7 +904,7 @@ export function setInversionStatus(dimension: string, status: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    if (!isRecordInactive(record)) {
+    if (shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });
@@ -960,7 +972,7 @@ export function invert(dimension: string): void {
     const path = parcoords.newDataset.find(
       (d: any) => utils.cleanString(d[hoverlabel]) === record,
     );
-    if (!isRecordInactive(record)) {
+    if (shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });
@@ -1002,7 +1014,9 @@ export function setSelection(records: string[]): void {
         const path = parcoords.newDataset.find(
           (d: any) => utils.cleanString(d[hoverlabel]) === record,
         );
-        helper.createToolTipForValues(path, true);
+        if (shouldShowSelectedValues(record)) {
+          helper.createToolTipForValues(path, true);
+        }
       });
     }
   }
@@ -1049,6 +1063,10 @@ export function isRecordInactive(record: string): boolean {
   return style === utils.getInactiveLineStroke();
 }
 
+export function isRecordColored(record: string): boolean {
+  return isColoredRecord(record);
+}
+
 //---------- Selection Functions With IDs ----------
 
 export function setSelectionWithId(recordIds: string[]): void {
@@ -1092,6 +1110,12 @@ export function colorRecord(record: string, color: string): void {
   const path = selectAll("#" + utils.cleanString(record));
 
   path.classed("colored", true).property("clusterColor", color);
+
+  if (isSelected(record)) {
+    selectAll(
+      `#tooltip-record-select-${utils.cleanString(record)}`,
+    ).remove();
+  }
 
   path.transition().style("stroke", color);
 }
@@ -1274,7 +1298,7 @@ export function setDimensionSpacing(spacingRem: number): void {
     const path = parcoords.newDataset.find(
       (d: any) => d[hoverlabel] === record,
     );
-    if (path && !isRecordInactive(record)) {
+    if (path && shouldShowSelectedValues(record)) {
       helper.createToolTipForValues(path, true);
     }
   });

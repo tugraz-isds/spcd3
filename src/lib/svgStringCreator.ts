@@ -138,7 +138,9 @@ export function setSelectedRecordValuesToDownload(
   if (selectedRecords.length === 0) return;
 
   const selectedDataset = parcoords.newDataset.filter(
-    (record: { [x: string]: any }) => selectedRecords.includes(record[hoverlabel]),
+    (record: { [x: string]: any }) =>
+      selectedRecords.includes(record[hoverlabel]) &&
+      !api.isRecordColored(record[hoverlabel]),
   );
   if (selectedDataset.length === 0) return;
 

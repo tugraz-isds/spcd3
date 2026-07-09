@@ -1183,7 +1183,9 @@ function makeActive(
       .style("stroke-width", getLineThickness() + "rem")
       .text("");
 
-    helper.createToolTipForValues(record, true);
+    if (!select("." + currentLineName).classed("colored")) {
+      helper.createToolTipForValues(record, true);
+    }
   } else if (select("." + currentLineName).classed("colored")) {
     let color = select("." + currentLineName).property("clusterColor");
     select("." + currentLineName)

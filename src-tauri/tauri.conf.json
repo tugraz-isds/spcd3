@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "spcd3",
+  "productName": "SPCD3",
   "version": "1.0.0",
   "identifier": "com.spcd3.dev",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "spcd3",
+        "title": "SPCD3",
         "width": 800,
         "height": 600,
         "resizable": true,

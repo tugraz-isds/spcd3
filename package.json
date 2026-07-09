@@ -1,5 +1,5 @@
 {
-  "name": "spcd3",
+  "name": "SPCD3",
   "version": "1.0.0",
   "description": "Steerable Parallel Coordinates in D3",
   "main": "./dist/library/cjs/spcd3.js",

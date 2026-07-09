@@ -474,7 +474,7 @@ function handleClick(event: any, d: any) {
 
         data.forEach((item: any, i: number) => {
           const rec = datasetMap.get(item);
-          if (rec) {
+          if (rec && !api.isRecordColored(item)) {
             helper.createToolTipForValues(rec, true);
           }
         });
@@ -494,7 +494,7 @@ function handleClick(event: any, d: any) {
 
         data.forEach((item: any, i: number) => {
           const rec = datasetMap.get(item);
-          if (rec) {
+          if (rec && !api.isRecordColored(item)) {
             helper.createToolTipForValues(rec, true);
           }
         });
@@ -510,7 +510,7 @@ function handleClick(event: any, d: any) {
 
     data.forEach((item: any, i: number) => {
       const rec = datasetMap.get(item);
-      if (rec) {
+      if (rec && !api.isRecordColored(item)) {
         helper.createToolTipForValues(rec, true);
       }
     });

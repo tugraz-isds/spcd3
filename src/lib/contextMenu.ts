@@ -602,7 +602,10 @@ function onDragEndEventHandler(featureAxis: any): any {
         const path = parcoords.newDataset.find(
           (d: any) => d[hoverlabel] === record,
         );
-        if (!api.isRecordInactive(record)) {
+        if (
+          !api.isRecordInactive(record) &&
+          !api.isRecordColored(record)
+        ) {
           helper.createToolTipForValues(path, true);
         }
       });
