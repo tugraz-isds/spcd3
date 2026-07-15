@@ -462,6 +462,29 @@ button.dropdownActionLabel {
   min-width: 0;
 }
 
+.dropdownBulkActions {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.12rem 0.2rem;
+  border-bottom: 0.04rem solid var(--example-border-subtle);
+}
+
+.dropdownBulkActionButton {
+  flex: 1;
+  padding: 0.1rem 0.2rem;
+  background: transparent;
+  color: var(--example-text-secondary);
+  border: 0;
+  border-radius: 0.2rem;
+  font-size: 0.72rem;
+}
+
+.dropdownFooterAction {
+  margin-top: 0.12rem;
+  padding-top: 0.2rem;
+  border-top: 0.04rem solid var(--example-border-subtle);
+}
+
 .inputFields {
   height: 1rem;
   margin-top: 0.1rem;
@@ -677,12 +700,12 @@ div#selectRecordsHeader {
 
 .apply-button {
   align-self: center;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  background: var(--example-control-bg);
-  color: var(--example-text-primary);
-  border: 0.04rem solid var(--example-border-subtle);
+  padding: 0.1rem 0.2rem;
+  background: transparent;
+  color: var(--example-text-secondary);
+  border: 0;
   border-radius: 0.2rem;
+  font-size: 0.72rem;
 }
 
 .hitbox-control {
@@ -765,6 +788,14 @@ div#selectRecordsHeader {
   position: relative;
 }
 
+.modal-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.5rem 0.5rem;
+  color: var(--example-text-primary);
+}
+
 .modal-row {
   display: flex;
   flex-wrap: wrap;
@@ -825,9 +856,14 @@ div#selectRecordsHeader {
 }
 
 .ddButton:hover,
-.apply-button:hover,
 .save-button:hover {
   background: var(--example-control-bg-hover);
+}
+
+.apply-button:hover,
+.dropdownBulkActionButton:hover {
+  background: transparent;
+  color: var(--example-text-primary);
 }
 
 .apply-button[disabled] {
@@ -840,6 +876,7 @@ div#selectRecordsHeader {
 .inputButton:focus-visible,
 .inputButtonMoveLeft:focus-visible,
 .inputButtonMoveRight:focus-visible,
+.dropdownBulkActionButton:focus-visible,
 .apply-button:focus-visible,
 .save-button:focus-visible,
 .modal-input:focus-visible {

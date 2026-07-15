@@ -5,6 +5,8 @@ import * as helper from "./helper";
 import { create } from "d3-selection";
 import { parcoords, height, width } from "./globals";
 
+const DOWNLOAD_TOP_PADDING = 50;
+
 export function createSvgString(includeDataValues = false): string {
   type Feature = { name: string };
   const orderedFeatures: Feature[] = parcoords.newFeatures.map((name: any) => ({
@@ -30,8 +32,14 @@ export function createSvgString(includeDataValues = false): string {
   let svg = create("svg")
     .attr("xmlns", "http://www.w3.org/2000/svg")
     .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-    .attr("viewBox", [0, 0, width, height])
+    .attr("viewBox", [
+      0,
+      -DOWNLOAD_TOP_PADDING,
+      width,
+      height + DOWNLOAD_TOP_PADDING,
+    ])
     .attr("font-family", "Verdana, sans-serif");
+  const contentRoot = svg.append("g");
 
   let defs = svg.append("defs");
 
@@ -65,16 +73,16 @@ export function createSvgString(includeDataValues = false): string {
   ]);
 
   svgcreator.setFeatureAxisToDownload(
-    svg,
+    contentRoot,
     yAxisForDownload,
     yScalesForDownload,
     xScalesForDownload,
   );
 
-  svgcreator.setActivePathLinesToDownload(svg);
+  svgcreator.setActivePathLinesToDownload(contentRoot);
   if (includeDataValues) {
     svgcreator.setSelectedRecordValuesToDownload(
-      svg,
+      contentRoot,
       xScalesForDownload,
       yScalesForDownload,
     );
@@ -176,7 +184,8 @@ function setOptionsAndDownload() {
 
   const labelIncludeDataValues = document.createElement("label");
   labelIncludeDataValues.className = "spcd3-label";
-  labelIncludeDataValues.textContent = "Include data values: ";
+  labelIncludeDataValues.textContent =
+    "Include data values of selected records: ";
 
   const inputIncludeDataValues = document.createElement("input");
   inputIncludeDataValues.className = "spcd3-input";

@@ -266,6 +266,7 @@ type ToolTipItem = {
 const TOOLTIP_LABEL_HEIGHT = 16;
 const TOOLTIP_LABEL_GAP = 3;
 const TOOLTIP_LABEL_X_OFFSET = 10;
+const TOOLTIP_LABEL_X_OFFSET_SELECTED = 4;
 const TOOLTIP_LEADER_PADDING = 4;
 
 function recordIdOf(
@@ -324,6 +325,9 @@ export function createToolTipForValues(
   const tipClass = isSelect
     ? "spcd3-tooltip-record-select"
     : "spcd3-tooltip-record";
+  const labelOffsetX = isSelect
+    ? TOOLTIP_LABEL_X_OFFSET_SELECTED
+    : TOOLTIP_LABEL_X_OFFSET;
 
   layer
     .selectAll(`g.${tipClass}`)
@@ -335,7 +339,7 @@ export function createToolTipForValues(
     )
     .attr(
       "transform",
-      (d: ToolTipItem) => `translate(${d.x + 8}, ${d.y - 9})`,
+      (d: ToolTipItem) => `translate(${d.x + labelOffsetX}, ${d.y - 9})`,
     )
     .style("pointer-events", "none")
     .each(function (this: SVGGElement, d: ToolTipItem) {
@@ -352,7 +356,7 @@ export function createToolTipForValues(
 
       label
         .selectAll("line")
-        .data([d])
+        .data(isSelect ? [] : [d])
         .join("line")
         .attr("class", "spcd3-tooltip-leader")
         .attr("stroke", isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-text-primary)")
@@ -480,11 +484,14 @@ function relayoutValueTooltips(svgSelection: any): void {
       );
       currentBottom = top + TOOLTIP_LABEL_HEIGHT;
 
-      const translateX = item.anchorX + TOOLTIP_LABEL_X_OFFSET;
+      const line = select(item.node).select("line");
+      const hasLeader = !line.empty();
+      const translateX = item.anchorX + (hasLeader
+        ? TOOLTIP_LABEL_X_OFFSET
+        : TOOLTIP_LABEL_X_OFFSET_SELECTED);
       select(item.node).attr("transform", `translate(${translateX}, ${top})`);
 
-      select(item.node)
-        .select("line")
+      line
         .attr("x1", 0)
         .attr("y1", TOOLTIP_LABEL_HEIGHT / 2)
         .attr("x2", -TOOLTIP_LABEL_X_OFFSET + TOOLTIP_LEADER_PADDING)

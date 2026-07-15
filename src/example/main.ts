@@ -437,6 +437,62 @@ function createTextLabel(
   return label;
 }
 
+function createDropdownBulkActions(
+  isAllSelected: () => boolean,
+  onSelectAll: () => void,
+  onDeselectAll: () => void,
+): {
+  element: HTMLDivElement;
+  syncLabel: () => void;
+} {
+  const actionRow = document.createElement("div");
+  actionRow.className = "dropdownBulkActions";
+
+  const toggleButton = document.createElement("button");
+  toggleButton.type = "button";
+  toggleButton.className = "dropdownBulkActionButton";
+
+  const syncLabel = () => {
+    toggleButton.textContent = isAllSelected()
+      ? "Deselect all"
+      : "Select all";
+  };
+
+  toggleButton.addEventListener("click", (event: MouseEvent) => {
+    event.stopPropagation();
+    if (isAllSelected()) {
+      onDeselectAll();
+    } else {
+      onSelectAll();
+    }
+    syncLabel();
+  });
+
+  actionRow.appendChild(toggleButton);
+  syncLabel();
+
+  return { element: actionRow, syncLabel };
+}
+
+function isRecordSelectable(record: string): boolean {
+  const line = document.getElementsByClassName(record)[0];
+  if (!(line instanceof Element)) {
+    return false;
+  }
+
+  return window.getComputedStyle(line).stroke !== "rgb(211, 211, 211)";
+}
+
+function setRecordSelection(record: string, selected: boolean): void {
+  if (isSelected(record) === selected) {
+    return;
+  }
+
+  if (!selected || isRecordSelectable(record)) {
+    toggleSelection(record);
+  }
+}
+
 function getDimensionValueFromDropdownClick(
   event: MouseEvent,
 ): string | undefined {
@@ -617,6 +673,7 @@ function generateDropdownForShow() {
   let dimensions = getAllDimensionNames();
   let copyDimensions = dimensions.slice();
   let reverseDimensions = copyDimensions.reverse();
+  let currentDimensions: string[] = [];
 
   if (reverseDimensions.length > 10) {
     dimensionContainer.style.height = "12.5rem";
@@ -626,15 +683,52 @@ function generateDropdownForShow() {
     const target = event.target as HTMLInputElement | null;
     if (target) {
       updateDimensions(target.value);
+      bulkActions.syncLabel();
     }
   });
+
+  const bulkActions = createDropdownBulkActions(
+    () =>
+      currentDimensions.length > 0 &&
+      currentDimensions.every((dimension) => getHiddenStatus(dimension) === "shown"),
+    () => {
+      currentDimensions.forEach((dimension) => {
+        if (getHiddenStatus(dimension) === "hidden") {
+          show(dimension);
+        }
+      });
+
+      dimensionContainer
+        .querySelectorAll<HTMLInputElement>('input[name="dimension"]')
+        .forEach((input) => {
+          input.checked = true;
+        });
+    },
+    () => {
+      currentDimensions.forEach((dimension) => {
+        if (getHiddenStatus(dimension) === "shown") {
+          hide(dimension);
+        }
+      });
+
+      dimensionContainer
+        .querySelectorAll<HTMLInputElement>('input[name="dimension"]')
+        .forEach((input) => {
+          input.checked = false;
+        });
+    },
+  );
 
   selectButton.addEventListener("click", () => {
     dimensionContainer.innerHTML = "";
     let test1 = getAllVisibleDimensionNames();
     let test2 = getAllHiddenDimensionNames();
-    var result = test1.concat(test2);
-    result.forEach(function (dimension) {
+    currentDimensions = test1.concat(test2);
+
+    dimensionContainer.appendChild(bulkActions.element);
+    bulkActions.syncLabel();
+
+    currentDimensions.forEach(function (dimension) {
       let ddElement = document.createElement("div");
       ddElement.className = "dropdownLabel";
       ddElement.id = "show";
@@ -1109,7 +1203,7 @@ function generateDropdownForMultiRange() {
   selectButton.id = "multiRangeButton";
   selectButton.className = "ddButton";
   selectButton.appendChild(
-    createDropdownButtonLabel("multiRangeText", "Set Range for Multiple"),
+    createDropdownButtonLabel("multiRangeText", "Set Multiple Ranges"),
   );
 
   const dimensionContainer = document.createElement("div");
@@ -1127,6 +1221,58 @@ function generateDropdownForMultiRange() {
     } else {
       dimensionContainer.style.height = "";
     }
+
+    const syncSelectedDimensions = () => {
+      multiRangeDimensionsData = Array.from(
+        dimensionContainer.querySelectorAll<HTMLInputElement>(
+          'input[name="multiRangeDimension"]:checked',
+        ),
+      ).map((input) => input.value);
+    };
+
+    const applyButton = document.createElement("button");
+    applyButton.type = "button";
+    applyButton.className = "apply-button";
+    applyButton.textContent = "Set Shared Range";
+
+    const syncApplyState = () => {
+      const selectedCount = dimensionContainer.querySelectorAll(
+        'input[name="multiRangeDimension"]:checked',
+      ).length;
+      applyButton.disabled = selectedCount === 0;
+    };
+
+    const bulkActions = createDropdownBulkActions(
+      () =>
+        numericDimensions.length > 0 &&
+        numericDimensions.every((dimension) =>
+          multiRangeDimensionsData.includes(dimension),
+        ),
+      () => {
+        dimensionContainer
+          .querySelectorAll<HTMLInputElement>(
+            'input[name="multiRangeDimension"]',
+          )
+          .forEach((input) => {
+            input.checked = true;
+          });
+        syncSelectedDimensions();
+        syncApplyState();
+      },
+      () => {
+        dimensionContainer
+          .querySelectorAll<HTMLInputElement>(
+            'input[name="multiRangeDimension"]',
+          )
+          .forEach((input) => {
+            input.checked = false;
+          });
+        syncSelectedDimensions();
+        syncApplyState();
+      },
+    );
+
+    dimensionContainer.appendChild(bulkActions.element);
 
     numericDimensions.forEach((dimension) => {
       const option = document.createElement("label");
@@ -1149,24 +1295,15 @@ function generateDropdownForMultiRange() {
     });
 
     const footer = document.createElement("div");
-    footer.className = "dropdownLabel";
-
-    const applyButton = document.createElement("button");
-    applyButton.type = "button";
-    applyButton.className = "apply-button";
-    applyButton.textContent = "Set Shared Range";
-
-    const syncApplyState = () => {
-      const selectedCount = dimensionContainer.querySelectorAll(
-        'input[name="multiRangeDimension"]:checked',
-      ).length;
-      applyButton.disabled = selectedCount === 0;
-    };
+    footer.className = "dropdownLabel dropdownFooterAction";
 
     dimensionContainer
       .querySelectorAll<HTMLInputElement>('input[name="multiRangeDimension"]')
       .forEach((input) => {
-        input.addEventListener("change", syncApplyState);
+        input.addEventListener("change", () => {
+          syncApplyState();
+          bulkActions.syncLabel();
+        });
       });
 
     applyButton.addEventListener("click", (event: MouseEvent) => {
@@ -1443,6 +1580,20 @@ function generateModuleForMultiRangeSettings() {
   const firstDimension = multiRangeDimensionsData[0];
   const { minValue, maxValue } = formatCurrentRangeValues(firstDimension);
 
+  const adjustFilterRow = document.createElement("label");
+  adjustFilterRow.className = "modal-checkbox-row";
+  adjustFilterRow.htmlFor = "multiRangeAdjustFilter";
+
+  const adjustFilterCheckbox = document.createElement("input");
+  adjustFilterCheckbox.id = "multiRangeAdjustFilter";
+  adjustFilterCheckbox.type = "checkbox";
+  adjustFilterCheckbox.checked = false;
+
+  adjustFilterRow.appendChild(adjustFilterCheckbox);
+  adjustFilterRow.appendChild(
+    createTextLabel("Adjust filter to range", "label-text"),
+  );
+
   const row = document.createElement("div");
   row.className = "modal-row";
 
@@ -1496,6 +1647,7 @@ function generateModuleForMultiRangeSettings() {
   inputMin.addEventListener("keydown", onEnter);
   inputMax.addEventListener("keydown", onEnter);
 
+  content.appendChild(adjustFilterRow);
   content.appendChild(row);
   content.appendChild(error);
   modal.appendChild(content);
@@ -1535,6 +1687,9 @@ function generateModuleForMultiRangeSettings() {
     error.style.display = "none";
     multiRangeDimensionsData.forEach((dimension) => {
       setDimensionRange(dimension, min, max);
+      if (adjustFilterCheckbox.checked) {
+        setFilter(dimension, min, max);
+      }
     });
     multiRangeDimensionsData = [];
     close();
@@ -1601,14 +1756,37 @@ function generateDropdownForSelectRecords() {
   recordsContainer.addEventListener("change", (event: Event) => {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
-    var line = document.getElementsByClassName(target.value);
-    const element = line[0];
-    const computedStyle = window.getComputedStyle(element);
-    const strokeColor = computedStyle.stroke;
-    if (strokeColor !== "rgb(211, 211, 211)") {
-      toggleSelection(target.value);
-    }
+    setRecordSelection(target.value, target.checked);
+    bulkActions.syncLabel();
   });
+
+  const bulkActions = createDropdownBulkActions(
+    () => records.length > 0 && records.every((record) => isSelected(record)),
+    () => {
+      records.forEach((record) => {
+        setRecordSelection(record, true);
+      });
+
+      recordsContainer
+        .querySelectorAll<HTMLInputElement>('input[name="record"]')
+        .forEach((input) => {
+          input.checked = isSelected(input.value);
+        });
+    },
+    () => {
+      records.forEach((record) => {
+        setRecordSelection(record, false);
+      });
+
+      recordsContainer
+        .querySelectorAll<HTMLInputElement>('input[name="record"]')
+        .forEach((input) => {
+          input.checked = false;
+        });
+    },
+  );
+
+  recordsContainer.appendChild(bulkActions.element);
 
   records.forEach(function (record) {
     let label = document.createElement("div");

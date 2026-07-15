@@ -48,11 +48,9 @@
 .spcd3-modal-tableoverlay,
 .spcd3-modal-tabledata,
 .spcd3-contextmenu-records,
-.spcd3-contextmenu-dimensions,
-.spcd3-toolbar-buttontip {
+.spcd3-contextmenu-dimensions {
   color-scheme: var(--spcd3-theme);
   forced-color-adjust: none;
-  font-size: 16px;
 }
 
 .spcd3-button {
@@ -416,6 +414,7 @@ table.spcd3-tablecontainer td {
   line-height: 1.2;
   pointer-events: none;
   color: var(--spcd3-text-primary);
+  font-size: 0.7rem;
 }
 
 .spcd3-toolbar-buttontip:popover-open {

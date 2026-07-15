@@ -500,7 +500,7 @@ function setCursorForDimensions(d: any, featureAxis: any): void {
       .select(".dimension")
       .style(
         "cursor",
-        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowLeftAndRight(), 14)))}') ${hotspotX} ${hotspotY}, auto`,
+        `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowLeftAndRight(), 15)))}') ${hotspotX} ${hotspotY}, auto`,
       );
   }
 }
@@ -592,7 +592,10 @@ function onDragEndEventHandler(featureAxis: any): any {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
-      helper.trans(selectAll("path.hitarea")).each(function (this: any, d: any) {
+      helper.trans(selectAll("path.hitarea")).each(function (
+        this: any,
+        d: any,
+      ) {
         select(this).attr("d", helper.linePath(d, parcoords.newFeatures));
       });
 
@@ -602,10 +605,7 @@ function onDragEndEventHandler(featureAxis: any): any {
         const path = parcoords.newDataset.find(
           (d: any) => d[hoverlabel] === record,
         );
-        if (
-          !api.isRecordInactive(record) &&
-          !api.isRecordColored(record)
-        ) {
+        if (!api.isRecordInactive(record) && !api.isRecordColored(record)) {
           helper.createToolTipForValues(path, true);
         }
       });
