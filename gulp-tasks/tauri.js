@@ -6,7 +6,9 @@ const path = require("path");
 
 function runTauriBuild() {
   return new Promise((resolve, reject) => {
-    const p = spawn("npx", ["tauri", "build"], {
+    const args = ["tauri", "build"];
+    const tauriBin = process.platform === "win32" ? "tauri.cmd" : "tauri";
+    const p = spawn(tauriBin, args.slice(1), {
       stdio: "inherit",
       shell: process.platform === "win32",
     });
@@ -21,29 +23,50 @@ function runTauriBuild() {
 }
 
 function platformFolder() {
-  if (process.platform === "win32") return "win";
-  if (process.platform === "darwin") return "mac";
+  if (process.platform === "win32") return "windows";
+  if (process.platform === "darwin") return "macos";
   if (process.platform === "linux") return "linux";
   return process.platform;
 }
 
-async function copyExactlyOneFile(pattern, outDir) {
-  const matches = await fg([pattern], { onlyFiles: true });
-  if (matches.length !== 1) {
-    throw new Error(
-      `Expected exactly 1 file for pattern "${pattern}", got ${matches.length}:\n${matches.join("\n")}`,
-    );
-  }
-
-  await fs.mkdir(outDir, { recursive: true });
-
-  const src = matches[0];
+async function copyArtifact(src, outDir) {
   const dest = path.join(outDir, path.basename(src));
+  const stats = await fs.stat(src);
+
+  if (stats.isDirectory()) {
+    await fs.rm(dest, { recursive: true, force: true });
+    await fs.cp(src, dest, { recursive: true });
+    return;
+  }
 
   await fs.copyFile(src, dest);
 
-  if (process.platform === "linux" && dest.endsWith(".AppImage")) {
+  if (
+    process.platform === "linux" &&
+    (dest.endsWith(".AppImage") || path.extname(dest) === "")
+  ) {
     await fs.chmod(dest, 0o755);
+  }
+}
+
+async function collectArtifacts(patterns, outDir) {
+  const matches = await fg(patterns, {
+    onlyFiles: false,
+    markDirectories: false,
+    unique: true,
+  });
+
+  if (matches.length === 0) {
+    throw new Error(
+      `No build artifacts found for ${process.platform} using patterns:\n${patterns.join("\n")}`,
+    );
+  }
+
+  await fs.rm(outDir, { recursive: true, force: true });
+  await fs.mkdir(outDir, { recursive: true });
+
+  for (const match of matches.sort()) {
+    await copyArtifact(match, outDir);
   }
 }
 
@@ -51,17 +74,32 @@ async function copyTauriExecutable() {
   const outDir = path.join("package", platformFolder());
 
   if (process.platform === "darwin") {
-    return copyExactlyOneFile(
-      "src-tauri/target/**/release/bundle/dmg/*.dmg",
+    return collectArtifacts(
+      [
+        "src-tauri/target/**/release/bundle/macos/*.app",
+        "src-tauri/target/**/release/bundle/dmg/*",
+      ],
       outDir,
     );
   }
   if (process.platform === "win32") {
-    return copyExactlyOneFile("src-tauri/target/**/release/*.exe", outDir);
+    return collectArtifacts(
+      [
+        "src-tauri/target/**/release/*.exe",
+        "src-tauri/target/**/release/bundle/msi/*",
+        "src-tauri/target/**/release/bundle/nsis/*",
+      ],
+      outDir,
+    );
   }
   if (process.platform === "linux") {
-    return copyExactlyOneFile(
-      "src-tauri/target/**/release/bundle/appimage/*.AppImage",
+    return collectArtifacts(
+      [
+        "src-tauri/target/**/release/spcd3",
+        "src-tauri/target/**/release/bundle/appimage/*",
+        "src-tauri/target/**/release/bundle/deb/*",
+        "src-tauri/target/**/release/bundle/rpm/*",
+      ],
       outDir,
     );
   }

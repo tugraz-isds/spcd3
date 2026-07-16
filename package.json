@@ -10,11 +10,12 @@
     "/dist/library"
   ],
   "scripts": {
-    "clean": "npx gulp clean",
-    "build": "npx gulp build",
-    "dev": "npx gulp dev",
-    "icons": "npx gulp icons",
-    "tauri": "npx gulp tauri"
+    "clean": "gulp clean",
+    "cleanAll": "gulp cleanAll",
+    "build": "gulp build",
+    "dev": "gulp dev",
+    "icons": "gulp icons",
+    "tauri": "gulp tauri"
   },
   "repository": "git+https://github.com/tugraz-isds/spcd3",
   "keywords": [

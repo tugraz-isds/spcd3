@@ -1,5 +1,5 @@
 [package]
-name = "SPCD3"
+name = "spcd3"
 version = "1.0.0"
 description = "Steerable Parallel Coordinates in D3 (SPCD3)"
 authors = ["Romana Gruber"]
