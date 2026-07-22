@@ -3,8 +3,8 @@ name: publish
 on:
   workflow_dispatch:
   push:
-    branches:
-      - release
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -113,33 +113,30 @@ jobs:
       - name: Show collected files
         run: find release-assets -type f | sort
 
-      - name: Sort files into OS folders
+      - name: Rename release assets
         run: |
-          mkdir -p \
-            release-assets/by-os/macos \
-            release-assets/by-os/linux \
-            release-assets/by-os/windows
+          LIBNAME=$(node -p "require('./package.json').name.toLowerCase()")
+          mkdir -p release-assets/final
 
-          find release-assets/macos-aarch64 -type f \( -name '*.dmg' \) -exec cp {} release-assets/by-os/macos/ \;
-          find release-assets/linux -type f \( -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -exec cp {} release-assets/by-os/linux/ \;
-          find release-assets/windows -type f \( -name '*.msi' -o -name '*.exe' \) -exec cp {} release-assets/by-os/windows/ \;
+          find release-assets/macos-aarch64 -type f -name '*.dmg' -exec cp {} "release-assets/final/${LIBNAME}-macos.dmg" \;
 
-      - name: Show sorted files
-        run: find release-assets/by-os -type f | sort
+          find release-assets/linux -type f -name '*.AppImage' -exec cp {} "release-assets/final/${LIBNAME}-linux.AppImage" \;
+          find release-assets/linux -type f -name '*.deb' -exec cp {} "release-assets/final/${LIBNAME}-linux.deb" \;
+          find release-assets/linux -type f -name '*.rpm' -exec cp {} "release-assets/final/${LIBNAME}-linux.rpm" \;
 
-      - name: Create per-OS archives
-        run: |
-          cd release-assets/by-os
-          zip -r ../spcd3-macos.zip macos
-          zip -r ../spcd3-linux.zip linux
-          zip -r ../spcd3-windows.zip windows
+          find release-assets/windows -type f -path '*/bundle/nsis/*.exe' -exec cp {} "release-assets/final/${LIBNAME}-windows-setup.exe" \;
+          find release-assets/windows -type f -path '*/release/*.exe' ! -path '*/bundle/*' -exec cp {} "release-assets/final/${LIBNAME}-windows.exe" \;
+          find release-assets/windows -type f -name '*.msi' -exec cp {} "release-assets/final/${LIBNAME}-windows.msi" \;
+
+      - name: Show renamed files
+        run: find release-assets/final -type f | sort
 
       - name: Create or update draft release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          TAG="app-v$VERSION"
+          TAG="v$VERSION"
           TITLE="App v$VERSION"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
@@ -159,5 +156,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          TAG="app-v$VERSION"
-          find release-assets -maxdepth 1 -type f -name 'spcd3-*.zip' -print0 | xargs -0 gh release upload "$TAG" --clobber
+          TAG="v$VERSION"
+          find release-assets/final -maxdepth 1 -type f -print0 | xargs -0 gh release upload "$TAG" --clobber

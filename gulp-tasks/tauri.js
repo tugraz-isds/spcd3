@@ -7,7 +7,19 @@ const path = require("path");
 function runTauriBuild() {
   return new Promise((resolve, reject) => {
     const args = ["tauri", "build"];
-    const tauriBin = process.platform === "win32" ? "tauri.cmd" : "tauri";
+    const bundleTargets = process.env.TAURI_BUNDLES;
+
+    if (bundleTargets) {
+      args.push("--bundles", bundleTargets);
+    }
+
+    const tauriBin = path.resolve(
+      __dirname,
+      "..",
+      "node_modules",
+      ".bin",
+      process.platform === "win32" ? "tauri.cmd" : "tauri",
+    );
     const p = spawn(tauriBin, args.slice(1), {
       stdio: "inherit",
       shell: process.platform === "win32",
@@ -23,8 +35,8 @@ function runTauriBuild() {
 }
 
 function platformFolder() {
-  if (process.platform === "win32") return "windows";
-  if (process.platform === "darwin") return "macos";
+  if (process.platform === "win32") return "win";
+  if (process.platform === "darwin") return "mac";
   if (process.platform === "linux") return "linux";
   return process.platform;
 }
@@ -76,8 +88,9 @@ async function copyTauriExecutable() {
   if (process.platform === "darwin") {
     return collectArtifacts(
       [
+        "src-tauri/target/**/release/spcd3",
         "src-tauri/target/**/release/bundle/macos/*.app",
-        "src-tauri/target/**/release/bundle/dmg/*",
+        "src-tauri/target/**/release/bundle/dmg/*.dmg",
       ],
       outDir,
     );
@@ -86,8 +99,8 @@ async function copyTauriExecutable() {
     return collectArtifacts(
       [
         "src-tauri/target/**/release/*.exe",
-        "src-tauri/target/**/release/bundle/msi/*",
-        "src-tauri/target/**/release/bundle/nsis/*",
+        "src-tauri/target/**/release/bundle/msi/*.msi",
+        "src-tauri/target/**/release/bundle/nsis/*.exe",
       ],
       outDir,
     );
