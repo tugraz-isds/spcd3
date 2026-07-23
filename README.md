@@ -24,6 +24,8 @@ The SPCD3 library uses the following D3v7 modules:
 - d3-axis
 - d3-scale
 - d3-transition
+- d3-ease
+- d3-interpolate-path
 
 In addition to D3, the following JavaScript library is used:
 
@@ -47,7 +49,7 @@ yarn
 ### Build And Development
 
 Gulp is used to automate repeatable tasks. The file [gulpfile.js](gulpfile.js)
-defines six public tasks:
+defines seven public tasks:
 
 <br/>
 
@@ -56,7 +58,9 @@ and stores the generated library packages into the `dist/library/` folder.
 Additionally, the example folder is copied to `dist/example/`:
 
 ```
-npx gulp build
+gulp build
+# or
+yarn build
 ```
 
 To run the example, a live web server must be started in the
@@ -68,7 +72,9 @@ folder `dist/example/`.
 called watcher, which starts a live web server in the `dist/example/` folder:
 
 ```
-npx gulp dev
+gulp dev
+# or
+yarn dev
 ```
 
 <br/>
@@ -77,17 +83,21 @@ npx gulp dev
 order to enable a clean rebuild of the project:
 
 ```
-npx gulp clean
+gulp clean
+# or
+yarn clean
 ```
 
 <br/>
 
 `cleanAll` restores the project folder to its virgin state,
-by deleting the existing `dist/`, `package/` and `node_modules/` directories
-and the `yarn.lock` file:
+by deleting the existing `dist/`, `package/`, `node_modules/`
+and `src-tauri/target/` directories and the `yarn.lock` file:
 
 ```
-npx gulp cleanAll
+gulp cleanAll
+# or
+yarn cleanAll
 ```
 
 <br/>
@@ -97,13 +107,12 @@ npx gulp cleanAll
 Run it whenever an icon is added, removed, or modified:
 
 ```
-npx gulp icons
+gulp icons
+# or
+yarn icons
 ```
 
 <br/>
-
-The tasks `build`, `clean`, `dev`, `icons`, and `tauri` can also be invoked by
-running the equivalent yarn script defined in `package.json`.
 
 ### Build a native desktop app
 
@@ -112,26 +121,34 @@ Prerequisites: To build a native desktop app, Rust, Cargo and Tauri 2.0 needs to
 `tauri` builds a native desktop app with Tauri 2.0 and copies the executable to `package/`:
 
 ```
-npx gulp tauri
+gulp tauri
+# or
+yarn tauri
+```
+
+<br/>
+
+`cleanTauri` removes the `src-tauri/target/` directory to
+enable a clean build of the native desktop app:
+
+```
+gulp cleanTauri
+# or
+yarn cleanTauri
 ```
 
 ## Usage
 
-As mentioned in the beginning, an example was implemented to show how
-the library works and what the parallel coordinate plot will look like
-in addition to the library.
+SPCD3 includes an example application that demonstrates how the library is
+used and what a parallel coordinates plot built with SPCD3 looks like.
 
-The [API Guide](./README-API.md) lists all available functions in SPCD3's
-API.
+The [API Guide](./README-API.md) lists all available functions in SPCD3's API.
 
-An example application was built to illustrate the use of the SPCD3
-library. It is described in the [Example Application
+The example application is described in the [Example Application
 Guide](./README-EXAMPLE.md).
 
 Note: SPCD3 includes its own [`reset.css`](./src/lib/reset.css), which is
 imported by the library together with [`stylesheet.css`](./src/lib/stylesheet.css).
-This means the library also applies baseline reset styles to standard HTML
-elements.
 
 ## Data-Handling
 

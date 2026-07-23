@@ -1,6 +1,6 @@
 # SPCD3 API Guide
 
-The SPCD3 API comprises 49 functions grouped into nine categories.
+The SPCD3 API comprises public functions grouped into nine categories.
 
 <br/>
 
@@ -61,6 +61,14 @@ Resets the current parallel coordinates chart.
 Saves the current parallel coordinates chart as an SVG file with a
 default name of **'parcoords.svg'**.
 
+#### createSvgString
+
+`function createSvgString(includeDataValues = false): string`
+
+Creates and returns the current chart as an SVG string. If
+`includeDataValues` is set to `true`, selected record values are included
+in the exported SVG.
+
 <br/>
 
 ## 2. Show And Hide Functions
@@ -105,6 +113,12 @@ Returns the inversion status of a dimension, which can be either **ascending** o
 
 Sets the inversion status of the given dimension to one of **ascending** and **descending**.
 
+#### invertWoTransition
+
+`function invertWoTransition(dimension: string): void`
+
+Inverts the given dimension without animation.
+
 <br/>
 
 ## 4. Move Functions
@@ -132,12 +146,6 @@ Swaps the positions of the given dimensions.
 `function getDimensionPosition(dimension: string): number`
 
 Returns the position of the given dimension (0...n-1).
-
-#### setDimensionPosition
-
-`function setDimensionPosition(dimension: string, position: number): void`
-
-Sets the position of the given dimension (0...n-1).
 
 <br/>
 
@@ -246,6 +254,12 @@ Selects a given record by specifying its label.
 
 Deselects a given record by specifying its label.
 
+#### clearSelection
+
+`function clearSelection(): void`
+
+Clears the current selection and deselects all selected records.
+
 <br/>
 
 ## 8. Selection Functions with ID
@@ -309,7 +323,7 @@ Returns an array of all visible dimensions names in order.
 
 Returns all records as an array.
 
-#### getNumberofDimensions
+#### getNumberOfDimensions
 
 `function getNumberOfDimensions(): number`
 
@@ -345,6 +359,12 @@ Returns the label of a record.
 
 Returns true if a record is inactive and false if not.
 
+#### isRecordColored
+
+`function isRecordColored(record: string): boolean`
+
+Returns true if a record has a custom color assigned and false if not.
+
 #### colorRecord
 
 `function colorRecord(record: string, color: string): void`
@@ -356,6 +376,18 @@ Change the color of a record.
 `function uncolorRecord(record: string): void`
 
 Reset the color of a record to its default color.
+
+#### showMarker
+
+`function showMarker(dimension: string): void`
+
+Shows the marker for the given dimension.
+
+#### hideMarker
+
+`function hideMarker(dimension: string): void`
+
+Hides the marker for the given dimension.
 
 #### disableInteractivity
 
@@ -374,3 +406,16 @@ Enables the interactivity of the chart.
 `function setSelectableWidth(width: string)`
 
 Sets the width of the invisible hitbox used for line interaction.
+
+#### getSelectableWith
+
+`function getSelectableWith(): string`
+
+Returns the current width of the invisible hitbox used for line
+interaction.
+
+#### setDimensionSpacing
+
+`function setDimensionSpacing(spacingRem: number): void`
+
+Sets the spacing between dimensions in `rem`.

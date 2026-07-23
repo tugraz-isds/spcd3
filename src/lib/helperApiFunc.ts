@@ -793,7 +793,9 @@ export function invertWoTransition(dimension: string): void {
     currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      ? utils.applyThemeToCursorSvg(
+          utils.setSize(icon.getArrowDownCursor(), 12),
+        )
       : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
@@ -859,7 +861,9 @@ export function setInversionStatus(dimension: string, status: string): void {
     status === "ascending" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     status === "ascending"
-      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      ? utils.applyThemeToCursorSvg(
+          utils.setSize(icon.getArrowDownCursor(), 12),
+        )
       : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     status === "ascending"
@@ -935,7 +939,9 @@ export function invert(dimension: string): void {
     currentArrowStatus === "down" ? utils.ARROW_UP_PATH : utils.ARROW_DOWN_PATH;
   const arrowSvg =
     currentArrowStatus === "down"
-      ? utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowDownCursor(), 12))
+      ? utils.applyThemeToCursorSvg(
+          utils.setSize(icon.getArrowDownCursor(), 12),
+        )
       : utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowUpCursor(), 12));
   const [hotspotX, hotspotY] =
     currentArrowStatus === "down"
@@ -1093,7 +1099,7 @@ export function setSelectionWithId(recordIds: string[]): void {
   setSelection(records);
 }
 
-export function isSelectedWithRecordId(recordId: string): boolean {
+export function isSelectedWithId(recordId: string): boolean {
   let record = getRecordWithId(recordId);
   return isSelected(record);
 }
@@ -1127,9 +1133,7 @@ export function colorRecord(record: string, color: string): void {
   path.classed("colored", true).property("clusterColor", color);
 
   if (isSelected(record)) {
-    selectAll(
-      `#tooltip-record-select-${utils.cleanString(record)}`,
-    ).remove();
+    selectAll(`#tooltip-record-select-${utils.cleanString(record)}`).remove();
   }
 
   path.transition().style("stroke", color);

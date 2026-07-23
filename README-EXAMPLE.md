@@ -1,4 +1,3 @@
-
 # Example Application of SPCD3
 
 An example application is deployed to
@@ -10,9 +9,7 @@ The example application loads an example dataset of student marks
 and provides buttons and dropdown menus to manipulate the
 parallel coordinates plot via the API.
 
-![screenshot](screenshots/startScreen.png)
-
-
+![screenshot](screenshots/exampleSpcd3.png)
 
 ## Student Marks Dataset
 
@@ -26,14 +23,12 @@ relationships. Each row represents one student and their marks in 8
 subjects. Each dimension, apart from the first, represents one
 subject.
 
-
 ## Built-In Interactivity
 
 There are several built-in functions to manipulate the visualisation.
 The user can invert dimensions, move dimensions, hide dimensions,
 adjust dimension ranges, filter records, hover over records, and
 select records.
-
 
 ### Hovering over Records
 
@@ -46,7 +41,6 @@ displays a tooltip with the labels of the corresponding records. By
 default, the label is taken from the first column of the dataset.
 
 ![screenshot](screenshots/hoverRecords.png)
-
 
 ### Selecting Records
 
@@ -71,7 +65,6 @@ suspected correlation between adjacent dimensions.
 
 ![screenshot](screenshots/invertDimension.png)
 
-
 ### Moving Dimensions
 
 When looking for correlations between dimensions, meaningful
@@ -82,14 +75,12 @@ at the desired position.
 
 ![screenshot](screenshots/moveDimension.png)
 
-
 ### Opening Context Menu
 
 Each dimension in the application offers a versatile context menu, as
 depicted in the next Figure. This menu is easily accessible with a
 right-mouse click on the dimension name, providing a range of
-options. Users can hide or invert the dimension, set or reset the
-range, and set or reset the filter of the dimension. This flexibility
+options. Users can copy the dimension name, hide or invert the dimension, set the range, set range from data, set rounded range from data, set or reset the filter of the dimension, and show all dimensions. This flexibility
 allows users to adapt the visualisation to their specific needs and
 preferences.
 
@@ -100,15 +91,14 @@ to be able to hide individual dimensions. A dimension can hidden by
 right-clicking the dimension name to activate the context menu and
 selecting **Hide**.
 
-By default, the range of the dimension’s axis is set to the rounded
-minimum and rounded maximum values present in the current dataset. The
+By default, the range of the dimension’s axis is set to the
+minimum and maximum values present in the current dataset. The
 user can adjust the range of a dimension from its context menu, where
 two options are available: **Set Range** to set the range to
-specific values and **Reset Range** to reset the dimension to the
-original range.
+specific values and **Set Range from Data** to reset the dimension to the
+original range or **Set Rounded Range from Data** to reset the dimension to the rounded minimum and maximum values in the dataset.
 
 ![screenshot](screenshots/setRange.png)
-
 
 ### Filtering Records
 
@@ -117,12 +107,21 @@ more dimensions. A double-edged range slider can be manipulated on
 every dimension to filter out records by values on that dimension.
 Records outside of the range are automatically deactivated and greyed
 out. A further option is to set and reset filters from a dimension's
-context menu: \uiname{Set Filter} sets a filter to specific values and
-\uiname{Reset Filter} reset the filter to include all records.
+context menu: **Set Filter** sets a filter to specific values and
+**Reset Filter** reset the filter to include all records.
 
 ![screenshot](screenshots/filterDimension.png)
 
+### Toolbar
 
+The toolbar above the chart provides several utility functions. **Show
+Table** opens a dialog that displays the currently loaded dataset in a
+tabular view. This dialog also provides an option to download the
+dataset as a CSV file. **Download Chart** exports the current chart as
+an SVG file. **Refresh Chart** redraws the current chart, and **Reset
+Chart** restores the chart to its original state.
+
+![screenshot](screenshots/toolbar.png)
 
 ## Steerable API
 
@@ -132,25 +131,35 @@ In the example application, the following API functions were
 integrated:
 
 - Uploading File
-- Downloading SVG File
+- Downloading SVG
 - Adjusting Dimension Ranges
 - Resetting the Plot
+- Setting Selection Sensitivity
+- Setting Dimension Spacing
 - Showing and Hiding Dimensions
 - Inverting Dimensions
 - Moving Dimensions
 - Setting Filter
+- Setting Range
+- Setting Multiple Ranges
 - Selecting Records
 
 ![screenshot](screenshots/outsideFunc.png)
 
-Five buttons, located above the plot, serve specific functions. The
-first button is for uploading a CSV file containing a dataset. The
-second button enables downloading the plot as an SVG file. The
-remaining three buttons facilitate resetting the ranges of all
-dimensions to their original or rounded range, respectively and
-resetting the entire plot.
+Five buttons, located above the plot, serve specific functions.
+The first button is for uploading a CSV file containing a dataset.
+The second button enables downloading the plot as an SVG file.
+The remaining three buttons facilitate resetting the ranges of all
+dimensions to their original or rounded range, respectively and resetting
+the entire plot.
 
-Six additional functionalities are available below the plot. Clicking
+Two sliders are also available above the plot. **Selection Sensitivity**
+controls the width of the invisible interaction area around each
+polyline, making record hovering and selection either more precise or
+more tolerant. **Dimension Spacing** adjusts the horizontal distance
+between adjacent axes and therefore changes the overall plot layout.
+
+Seven additional functionalities are available below the plot. Clicking
 on **Show Dimension** opens a box where users can control the
 visibility of one or more dimensions. All dimensions are visible by
 default, and with this feature, a more customised plot view is
@@ -160,18 +169,24 @@ Clicking on **Invert Dimensions** opens a box with all dimensions,
 where one or more dimensions can be inverted.
 
 A dropdown menu was implemented for **Moving Dimensions** where a
-single dimension can be selected, and with the arrows on the left and
-right, the dimension can be moved to the corresponding side.
+single dimension can be selected. The arrow controls placed before the
+dimension name trigger a positional update of the selected dimension by
+one slot to the left or right within the current axis order.
 
 **Filtering records** is a breeze with the application by using the
 dropdown menu to choose a dimension. After selecting a dimension,
 two input fields appear, where a minimum and maximum value can be
 easily entered. Information about the filter range is shown, making
 it easy to understand the impact of the filter. Similar to the set
-filter, a Set Range is implemented, and information about the
+filter, a **Set Range** is implemented, and information about the
 original range is shown.
+
+Clicking on **Set Multiple Ranges** opens a dialog where several numeric
+dimensions can be selected at once. A shared minimum and maximum value
+can then be applied to all selected dimensions in one operation. If the
+corresponding checkbox is enabled, the filter is adjusted together with
+the updated ranges.
 
 By clicking on **Select Record(s)**, a box with all records opens,
 where one or more records can be selected. When a record is selected,
 the associated polyline is highlighted in orange.
-

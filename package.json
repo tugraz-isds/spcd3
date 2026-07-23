@@ -15,7 +15,8 @@
     "build": "gulp build",
     "dev": "gulp dev",
     "icons": "gulp icons",
-    "tauri": "gulp tauri"
+    "tauri": "gulp tauri",
+    "cleanTauri": "gulp cleanTauri"
   },
   "repository": "git+https://github.com/tugraz-isds/spcd3",
   "keywords": [

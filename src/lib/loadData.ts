@@ -19,7 +19,7 @@ export function loadCSV(csv: string): any {
   return data.validData;
 }
 
-export function showInvalidRowsMessage(
+function showInvalidRowsMessage(
   invalidRows: any[],
   columns: string[],
   removedColumns: string[],
@@ -141,7 +141,7 @@ function showInvalidRowsPopup(
   document.body.appendChild(overlay);
 }
 
-export function renderInvalidTable(
+function renderInvalidTable(
   rows: any[],
   columns: string[],
   removedColumns: string[] = [],
@@ -190,11 +190,7 @@ export function renderInvalidTable(
       const align = isNumber ? "right" : "left";
 
       const displayValue =
-        rawValue === null
-          ? "(null)"
-          : isEmptyOrNull
-            ? "null"
-            : rawValue;
+        rawValue === null ? "(null)" : isEmptyOrNull ? "null" : rawValue;
 
       td.textContent = displayValue;
 

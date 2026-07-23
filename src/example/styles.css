@@ -25,10 +25,7 @@
   --example-shadow-popover: light-dark(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.45));
   --example-text-error: light-dark(#b91c1c, #ff9b9b);
   --example-icon-treatment: light-dark(none, brightness(0) invert(1));
-  --example-header-icon-color: light-dark(
-    var(--example-text-primary),
-    #ffffff
-  );
+  --example-header-icon-color: light-dark(var(--example-text-primary), #ffffff);
 }
 
 header {
@@ -313,7 +310,6 @@ input::file-selector-button:hover {
 
 #bottom-controls {
   border-top: var(--example-header-surface) 0.4rem solid;
-  margin-top: 2rem;
   margin-bottom: 4rem;
   padding-top: 2rem;
   padding-left: 2rem;
