@@ -23,10 +23,25 @@ import { easeCubic } from "d3-ease";
 
 type StringKeyed = Record<string, any>;
 const BRUSH_STATE_EPSILON = 0.75;
+const FILTER_STATE_EPSILON = 0.75;
 const AXIS_VISIBILITY_DURATION = 1500;
 
 function isNear(value: number, target: number): boolean {
   return Math.abs(value - target) < BRUSH_STATE_EPSILON;
+}
+
+function hasActiveBrushFilterState(dimension: string): boolean {
+  const settings = parcoords.currentPosOfDims.find(
+    (d: { key: string }) => d.key === dimension,
+  );
+  if (!settings) return false;
+
+  return (
+    Math.abs(settings.currentFilterTop - settings.currentRangeTop) >
+      FILTER_STATE_EPSILON ||
+    Math.abs(settings.currentFilterBottom - settings.currentRangeBottom) >
+      FILTER_STATE_EPSILON
+  );
 }
 
 function remToPixels(value: number): number {
@@ -631,7 +646,7 @@ function setFilterAfterSettingRanges(
     );
   }
 
-  if (!(isNear(rectY, 50) && isNear(rectY + rectH, 350))) {
+  if (hasActiveBrushFilterState(dimension)) {
     select("#rect_" + cleanDimensionName)
       .attr("fill", utils.BRUSH_ACTIVE_FILL)
       .attr("opacity", "0.7");

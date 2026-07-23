@@ -266,7 +266,7 @@ type ToolTipItem = {
 const TOOLTIP_LABEL_HEIGHT = 16;
 const TOOLTIP_LABEL_GAP = 3;
 const TOOLTIP_LABEL_X_OFFSET = 10;
-const TOOLTIP_LABEL_X_OFFSET_SELECTED = 4;
+const TOOLTIP_LABEL_X_OFFSET_SELECTED = TOOLTIP_LABEL_X_OFFSET;
 const TOOLTIP_LEADER_PADDING = 4;
 
 function recordIdOf(
@@ -304,23 +304,23 @@ export function createToolTipForValues(
     .style("display", null);
   layer.attr("id", isSelect ? `tooltip-record-select-${recordId}` : null);
 
-  const data: ToolTipItem[] = dimensions.map((dim) => {
-    const yScale = yScales[dim];
-    const x = xScales(dim);
-    const record = records[dim];
-    const scaleValue =
-      typeof record === "string" ? shortenAxisLabel(record) : record;
-    const y = yScale(scaleValue);
+  const data: ToolTipItem[] = dimensions
+    .map((dim) => {
+      const yScale = yScales[dim];
+      const x = xScales(dim);
+      const record = records[dim];
+      const scaleValue =
+        typeof record === "string" ? shortenAxisLabel(record) : record;
+      const y = yScale(scaleValue);
 
-    return {
-      dim,
-      x,
-      y,
-      text: String(record ?? ""),
-    };
-  }).filter(
-    (item) => Number.isFinite(item.x) && Number.isFinite(item.y),
-  );
+      return {
+        dim,
+        x,
+        y,
+        text: String(record ?? ""),
+      };
+    })
+    .filter((item) => Number.isFinite(item.x) && Number.isFinite(item.y));
 
   const tipClass = isSelect
     ? "spcd3-tooltip-record-select"
@@ -356,10 +356,13 @@ export function createToolTipForValues(
 
       label
         .selectAll("line")
-        .data(isSelect ? [] : [d])
+        .data([])
         .join("line")
         .attr("class", "spcd3-tooltip-leader")
-        .attr("stroke", isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-text-primary)")
+        .attr(
+          "stroke",
+          isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-text-primary)",
+        )
         .attr("stroke-width", isSelect ? 1.2 : 1)
         .attr("stroke-opacity", isSelect ? 0.9 : 0.45);
 
@@ -373,15 +376,11 @@ export function createToolTipForValues(
         .attr("height", 16)
         .attr(
           "fill",
-          isSelect
-            ? "rgb(255, 165, 0)"
-            : "var(--spcd3-tooltip-record-bg)",
+          isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-tooltip-record-bg)",
         )
         .attr(
           "stroke",
-          isSelect
-            ? "rgb(255, 165, 0)"
-            : "var(--spcd3-tooltip-record-bg)",
+          isSelect ? "rgb(255, 165, 0)" : "var(--spcd3-tooltip-record-bg)",
         )
         .attr("stroke-width", 1);
 
@@ -392,12 +391,7 @@ export function createToolTipForValues(
         .attr("x", 4)
         .attr("y", 11)
         .attr("font-size", 10)
-        .attr(
-          "fill",
-          isSelect
-            ? "black"
-            : "var(--spcd3-tooltip-record-text)",
-        )
+        .attr("fill", isSelect ? "black" : "var(--spcd3-tooltip-record-text)")
         .text(d.text);
     });
 
@@ -417,7 +411,9 @@ function relayoutValueTooltips(svgSelection: any): void {
   if (!root) return;
 
   const hoverLabels = Array.from(
-    root.querySelectorAll<SVGGElement>("g.spcd3-tip-layer g.spcd3-tooltip-record"),
+    root.querySelectorAll<SVGGElement>(
+      "g.spcd3-tip-layer g.spcd3-tooltip-record",
+    ),
   );
   hoverLabels.forEach((labelNode) => {
     const anchorX = Number(labelNode.getAttribute("data-anchor-x"));
@@ -438,7 +434,9 @@ function relayoutValueTooltips(svgSelection: any): void {
   });
 
   const labels = Array.from(
-    root.querySelectorAll<SVGGElement>("g.spcd3-tip-layer g.spcd3-tooltip-record-select"),
+    root.querySelectorAll<SVGGElement>(
+      "g.spcd3-tip-layer g.spcd3-tooltip-record-select",
+    ),
   );
   if (labels.length === 0) return;
 
@@ -486,9 +484,9 @@ function relayoutValueTooltips(svgSelection: any): void {
 
       const line = select(item.node).select("line");
       const hasLeader = !line.empty();
-      const translateX = item.anchorX + (hasLeader
-        ? TOOLTIP_LABEL_X_OFFSET
-        : TOOLTIP_LABEL_X_OFFSET_SELECTED);
+      const translateX =
+        item.anchorX +
+        (hasLeader ? TOOLTIP_LABEL_X_OFFSET : TOOLTIP_LABEL_X_OFFSET_SELECTED);
       select(item.node).attr("transform", `translate(${translateX}, ${top})`);
 
       line
@@ -502,10 +500,7 @@ function relayoutValueTooltips(svgSelection: any): void {
         .attr("width", item.badgeWidth)
         .attr("height", TOOLTIP_LABEL_HEIGHT);
 
-      select(item.node)
-        .select("text")
-        .attr("x", 4)
-        .attr("y", 11);
+      select(item.node).select("text").attr("x", 4).attr("y", 11);
     });
   });
 }

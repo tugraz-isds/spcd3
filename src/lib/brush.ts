@@ -17,6 +17,7 @@ const BRUSH_STATE_EPSILON = 0.75;
 const BRUSH_TOOLTIP_HEIGHT = 16;
 const BRUSH_TOOLTIP_X_OFFSET = 12;
 const BRUSH_HANDLE_CENTER_OFFSET = 5;
+const FILTER_STATE_EPSILON = 0.75;
 
 function toNumber(value: string | number): number {
   return typeof value === "number" ? value : Number(value);
@@ -32,6 +33,30 @@ function isAtTopRect(value: string | number): boolean {
 
 function isAtBottom(value: string | number): boolean {
   return Math.abs(toNumber(value) - BOTTOM_AXIS_VALUE) < BRUSH_STATE_EPSILON;
+}
+
+function hasActiveBrushFilter(dimension: string): boolean {
+  const settings = parcoords.currentPosOfDims.find(
+    (d: { key: string }) => d.key === dimension,
+  );
+  if (!settings) return false;
+
+  if (isDimensionCategorical(dimension)) {
+    const domain = parcoords.yScales[dimension].domain();
+    const filteredCategories = settings.currentFilterCategories;
+    return (
+      Array.isArray(filteredCategories) &&
+      filteredCategories.length > 0 &&
+      filteredCategories.length < domain.length
+    );
+  }
+
+  return (
+    Math.abs(settings.currentFilterTop - settings.currentRangeTop) >
+      FILTER_STATE_EPSILON ||
+    Math.abs(settings.currentFilterBottom - settings.currentRangeBottom) >
+      FILTER_STATE_EPSILON
+  );
 }
 
 // Brushing
@@ -432,8 +457,8 @@ export function brushUp(
     select("#rect_" + cleanDimensionName)
       .attr("href", "#brush_image_top_active")
       .style("cursor", "default")
-      .style("fill", utils.BRUSH_IDLE_FILL)
-      .style("opacity", "0.5");
+      .attr("fill", utils.BRUSH_IDLE_FILL)
+      .attr("opacity", "0.5");
   } else {
     select("#rect_" + cleanDimensionName)
       .attr("href", "#brush_image_top_active")
@@ -441,8 +466,8 @@ export function brushUp(
         "cursor",
         `url('data:image/svg+xml,${encodeURIComponent(utils.applyThemeToCursorSvg(utils.setSize(icon.getArrowTopAndBottom(), 20)))}') ${arrowTopAndBottomHotspotX} ${arrowTopAndBottomHotspotY}, auto`,
       )
-      .style("fill", utils.BRUSH_ACTIVE_FILL)
-      .style("opacity", "0.7");
+      .attr("fill", utils.BRUSH_ACTIVE_FILL)
+      .attr("opacity", "0.7");
   }
 
   if (isAtBottom(yPosBottom)) {
@@ -1329,6 +1354,12 @@ export function addSettingsForBrushing(
       "href",
       "#brush_image_top_active",
     );
+  }
+
+  if (hasActiveBrushFilter(dimension)) {
+    rect.attr("fill", utils.BRUSH_ACTIVE_FILL).attr("opacity", "0.7");
+  } else {
+    rect.attr("fill", utils.BRUSH_IDLE_FILL).attr("opacity", "0.5");
   }
 
   if (isDimensionCategorical(dimension)) {

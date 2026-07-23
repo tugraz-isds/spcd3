@@ -45,6 +45,7 @@ let studentData =
 
 const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
 const DEFAULT_DIMENSION_SPACING_REM = 6;
+const RANGE_TRANSITION_DURATION_MS = 1000;
 const REPOSITORY_URL = "https://github.com/tugraz-isds/spcd3";
 
 type PackageMetadata = {
@@ -453,9 +454,7 @@ function createDropdownBulkActions(
   toggleButton.className = "dropdownBulkActionButton";
 
   const syncLabel = () => {
-    toggleButton.textContent = isAllSelected()
-      ? "Deselect all"
-      : "Select all";
+    toggleButton.textContent = isAllSelected() ? "Deselect all" : "Select all";
   };
 
   toggleButton.addEventListener("click", (event: MouseEvent) => {
@@ -690,7 +689,9 @@ function generateDropdownForShow() {
   const bulkActions = createDropdownBulkActions(
     () =>
       currentDimensions.length > 0 &&
-      currentDimensions.every((dimension) => getHiddenStatus(dimension) === "shown"),
+      currentDimensions.every(
+        (dimension) => getHiddenStatus(dimension) === "shown",
+      ),
     () => {
       currentDimensions.forEach((dimension) => {
         if (getHiddenStatus(dimension) === "hidden") {
@@ -1664,6 +1665,7 @@ function generateModuleForMultiRangeSettings() {
   modal.style.display = "block";
 
   saveButton.onclick = () => {
+    const selectedDimensions = [...multiRangeDimensionsData];
     const min = Number(inputMin.value);
     const max = Number(inputMax.value);
 
@@ -1673,7 +1675,7 @@ function generateModuleForMultiRangeSettings() {
       return;
     }
 
-    const invalidDimension = multiRangeDimensionsData.find((dimension) =>
+    const invalidDimension = selectedDimensions.find((dimension) =>
       validateRangeForDimension(dimension, min, max),
     );
 
@@ -1685,12 +1687,17 @@ function generateModuleForMultiRangeSettings() {
     }
 
     error.style.display = "none";
-    multiRangeDimensionsData.forEach((dimension) => {
+    selectedDimensions.forEach((dimension) => {
       setDimensionRange(dimension, min, max);
-      if (adjustFilterCheckbox.checked) {
-        setFilter(dimension, min, max);
-      }
     });
+
+    if (adjustFilterCheckbox.checked) {
+      window.setTimeout(() => {
+        selectedDimensions.forEach((dimension) => {
+          resetFilterToCurrentRange(dimension);
+        });
+      }, RANGE_TRANSITION_DURATION_MS + 50);
+    }
     multiRangeDimensionsData = [];
     close();
   };
@@ -1705,6 +1712,19 @@ function resetToOriginalRange() {
       setDimensionRange(dimension, min, max);
     }
   });
+}
+
+function resetFilterToCurrentRange(dimension: string): void {
+  const range = getDimensionRange(dimension);
+  const inversionStatus = getInversionStatus(dimension);
+  const lowerBound = Number(range[0]);
+  const upperBound = Number(range[1]);
+
+  if (inversionStatus === "descending") {
+    setFilter(dimension, lowerBound, upperBound);
+  } else {
+    setFilter(dimension, upperBound, lowerBound);
+  }
 }
 
 function resetToRoundedRange() {
