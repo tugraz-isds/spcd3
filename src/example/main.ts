@@ -1255,7 +1255,7 @@ function generateDropdownForMultiRange() {
     const applyButton = document.createElement("button");
     applyButton.type = "button";
     applyButton.className = "apply-button";
-    applyButton.textContent = "Set Shared Range";
+    applyButton.textContent = "Set Multiple Ranges";
 
     const syncApplyState = () => {
       const selectedCount = dimensionContainer.querySelectorAll(
@@ -1564,7 +1564,7 @@ function generateModuleForMultiRangeSettings() {
 
   const title = document.createElement("div");
   title.className = "modal-title";
-  title.textContent = "Set Shared Range";
+  title.textContent = "Set Multiple Ranges";
 
   const closeButton = document.createElement("span");
   closeButton.id = "multiRangeCloseButton";
@@ -1582,7 +1582,7 @@ function generateModuleForMultiRangeSettings() {
   const notes = document.createElement("div");
   notes.className = "modal-notes";
   notes.textContent =
-    "Enter one shared min/max pair that will be applied to all selected numeric dimensions.";
+    "Enter min and max that will be applied to all selected dimensions.";
   modal.appendChild(notes);
 
   const selectedList = document.createElement("ul");
@@ -1613,7 +1613,7 @@ function generateModuleForMultiRangeSettings() {
 
   adjustFilterRow.appendChild(adjustFilterCheckbox);
   adjustFilterRow.appendChild(
-    createTextLabel("Adjust filter to range", "label-text"),
+    createTextLabel("Reset all filters to new range", "label-text"),
   );
 
   const row = document.createElement("div");

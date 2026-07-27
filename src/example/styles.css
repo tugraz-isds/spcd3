@@ -398,6 +398,8 @@ input[type="checkbox"] {
   appearance: none;
   width: 1.2rem;
   height: 1rem;
+  display: inline-grid;
+  place-items: center;
   border: 0.09rem solid var(--example-border-emphasis);
   border-radius: 0.1rem;
   background-color: var(--example-panel-bg);
@@ -412,9 +414,12 @@ input[type="checkbox"]:checked {
 
 input[type="checkbox"]:checked::after {
   content: "\2713";
-  left: 0.2rem;
   position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -56%);
   font-size: small;
+  line-height: 1;
   color: var(--example-action-text);
 }
 
@@ -478,14 +483,32 @@ button.dropdownActionLabel {
   border-bottom: 0.04rem solid var(--example-border-subtle);
 }
 
+.dropdownBulkActionButton,
+.apply-button {
+  appearance: none;
+  min-height: 1.75rem;
+  padding: 0.22rem 0.55rem;
+  background: var(--example-control-bg);
+  color: var(--example-text-primary);
+  border: 0.04rem solid var(--example-border-subtle);
+  border-radius: 0.35rem;
+  box-shadow:
+    var(--example-shadow-button) 0 0.01rem 0,
+    var(--example-shadow-inset) 0 0.01rem 0 inset;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
 .dropdownBulkActionButton {
   flex: 1;
-  padding: 0.1rem 0.2rem;
-  background: transparent;
-  color: var(--example-text-secondary);
-  border: 0;
-  border-radius: 0.2rem;
-  font-size: 0.72rem;
 }
 
 .dropdownFooterAction {
@@ -709,12 +732,8 @@ div#selectRecordsHeader {
 
 .apply-button {
   align-self: center;
-  padding: 0.1rem 0.2rem;
-  background: transparent;
-  color: var(--example-text-secondary);
-  border: 0;
-  border-radius: 0.2rem;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  font-weight: 500;
 }
 
 .hitbox-control {
@@ -871,7 +890,7 @@ div#selectRecordsHeader {
 
 .apply-button:hover,
 .dropdownBulkActionButton:hover {
-  background: transparent;
+  background: var(--example-control-bg-hover);
   color: var(--example-text-primary);
 }
 
