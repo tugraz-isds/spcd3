@@ -121,7 +121,6 @@ exports.icons = generateIcons;
 exports.cleanAll = parallel(
   cleanDistFolder,
   cleanNodeModules,
-  cleanPackageLock,
   cleanPackage,
   cleanTauriTarget,
 );

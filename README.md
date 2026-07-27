@@ -40,10 +40,11 @@ is used to bundle and build the library.
 
 ### Prerequisites
 
-Open terminal and execute the following command to install all the dependencies:
+Open terminal and execute the following commands to install all the dependencies:
 
 ```
-yarn
+corepack enable
+yarn install
 ```
 
 ### Build And Development
@@ -58,9 +59,9 @@ and stores the generated library packages into the `dist/library/` folder.
 Additionally, the example folder is copied to `dist/example/`:
 
 ```
-gulp build
-# or
 yarn build
+# or
+yarn exec gulp build
 ```
 
 To run the example, a live web server must be started in the
@@ -72,9 +73,9 @@ folder `dist/example/`.
 called watcher, which starts a live web server in the `dist/example/` folder:
 
 ```
-gulp dev
-# or
 yarn dev
+# or
+yarn exec gulp dev
 ```
 
 <br/>
@@ -83,21 +84,21 @@ yarn dev
 order to enable a clean rebuild of the project:
 
 ```
-gulp clean
-# or
 yarn clean
+# or
+yarn exec gulp clean
 ```
 
 <br/>
 
 `cleanAll` restores the project folder to its virgin state,
 by deleting the existing `dist/`, `package/`, `node_modules/`
-and `src-tauri/target/` directories and the `yarn.lock` file:
+and `src-tauri/target/` directories:
 
 ```
-gulp cleanAll
-# or
 yarn cleanAll
+# or
+yarn exec gulp cleanAll
 ```
 
 <br/>
@@ -107,9 +108,9 @@ yarn cleanAll
 Run it whenever an icon is added, removed, or modified:
 
 ```
-gulp icons
-# or
 yarn icons
+# or
+yarn exec gulp icons
 ```
 
 <br/>
@@ -121,9 +122,9 @@ Prerequisites: To build a native desktop app, Rust, Cargo and Tauri 2.0 needs to
 `tauri` builds a native desktop app with Tauri 2.0 and copies the executable to `package/`:
 
 ```
-gulp tauri
-# or
 yarn tauri
+# or
+yarn exec gulp tauri
 ```
 
 <br/>
@@ -132,9 +133,9 @@ yarn tauri
 enable a clean build of the native desktop app:
 
 ```
-gulp cleanTauri
-# or
 yarn cleanTauri
+# or
+yarn exec gulp cleanTauri
 ```
 
 ## Usage

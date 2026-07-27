@@ -1,6 +1,7 @@
 {
   "name": "SPCD3",
   "version": "1.0.0",
+  "packageManager": "yarn@4.17.1",
   "releaseDate": "2026-07-26",
   "description": "Steerable Parallel Coordinates in D3",
   "main": "./dist/library/cjs/spcd3.js",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
     "@tauri-apps/cli": "^2.10.1",
     "browser-sync": "^3.0.4",
@@ -41,7 +43,6 @@
     "postcss": "^8.5.10",
     "rollup": "^4.60.2",
     "rollup-plugin-postcss": "^4.0.2",
-    "@rollup/plugin-terser": "^1.0.0",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3"
   },
