@@ -190,10 +190,23 @@ header {
 }
 
 .about-modal__version {
-  margin-top: 1.5rem;
+  margin-top: 0;
+  padding-top: 0.9rem;
   color: var(--example-text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.65rem;
   text-align: center;
+}
+
+.about-modal__version-label {
+  margin-right: -0.2rem;
+}
+
+.about-modal__version #aboutReleaseDate {
+  margin-left: 0;
 }
 
 body {

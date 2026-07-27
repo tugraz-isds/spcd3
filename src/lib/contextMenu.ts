@@ -10,6 +10,25 @@ import { parcoords, active, width, paddingXaxis, hoverlabel } from "./globals";
 let scrollXPos: number;
 let timer: ReturnType<typeof setInterval> | null = null;
 
+function getDragBounds(): { min: number; max: number } {
+  const range = parcoords.xScales?.range?.();
+  if (!Array.isArray(range) || range.length < 2) {
+    return {
+      min: paddingXaxis,
+      max: width - paddingXaxis,
+    };
+  }
+
+  const minRange = Math.min(...range);
+  const maxRange = Math.max(...range);
+  const edgeSlack = Math.max(0, minRange - paddingXaxis);
+
+  return {
+    min: minRange - edgeSlack,
+    max: maxRange + edgeSlack,
+  };
+}
+
 export function setContextMenu(featureAxis: any): void {
   createContextMenu();
   createModalToSetRange();
@@ -529,9 +548,10 @@ function onDragEventHandler(featureAxis: any): any {
         (scroll(d), 100);
       });
 
+      const { min, max } = getDragBounds();
       parcoords.dragging[d.subject.name] = Math.min(
-        width - paddingXaxis,
-        Math.max(paddingXaxis, (this.__origin__ += d.x)),
+        max,
+        Math.max(min, (this.__origin__ += d.x)),
       );
 
       active.each(function (this: any, d: any) {
@@ -547,8 +567,7 @@ function onDragEventHandler(featureAxis: any): any {
       parcoords.newFeatures.sort((a: any, b: any) => {
         return (
           helper.position(b, parcoords.dragging, parcoords.xScales) -
-          helper.position(a, parcoords.dragging, parcoords.xScales) -
-          1
+          helper.position(a, parcoords.dragging, parcoords.xScales)
         );
       });
 
@@ -572,6 +591,19 @@ function onDragEndEventHandler(featureAxis: any): any {
         clearInterval(timer);
         timer = null;
       }
+
+      const { min, max } = getDragBounds();
+      parcoords.dragging[d.subject.name] = Math.min(
+        max,
+        Math.max(min, this.__origin__),
+      );
+
+      parcoords.newFeatures.sort((a: any, b: any) => {
+        return (
+          helper.position(b, parcoords.dragging, parcoords.xScales) -
+          helper.position(a, parcoords.dragging, parcoords.xScales)
+        );
+      });
 
       delete this.__origin__;
       delete parcoords.dragging[d.subject.name];

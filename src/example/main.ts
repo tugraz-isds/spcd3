@@ -50,7 +50,22 @@ const REPOSITORY_URL = "https://github.com/tugraz-isds/spcd3";
 
 type PackageMetadata = {
   version?: string;
+  releaseDate?: string;
 };
+
+function formatReleaseDate(dateString: string): string {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
 
 function closeFilterModal(): void {
   document.getElementById("filterOverlay")?.remove();
@@ -80,6 +95,7 @@ function closeAboutModal(): void {
 
 async function loadExampleVersion(): Promise<void> {
   const versionElement = elementById<HTMLElement>("aboutVersion");
+  const releaseDateElement = elementById<HTMLElement>("aboutReleaseDate");
 
   const response = await fetch("./package.json");
   if (!response.ok) {
@@ -89,6 +105,11 @@ async function loadExampleVersion(): Promise<void> {
   const packageMetadata = (await response.json()) as PackageMetadata;
   if (packageMetadata.version) {
     versionElement.textContent = packageMetadata.version;
+  }
+  if (packageMetadata.releaseDate) {
+    releaseDateElement.textContent = formatReleaseDate(
+      packageMetadata.releaseDate,
+    );
   }
 }
 
