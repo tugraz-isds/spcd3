@@ -142,9 +142,9 @@ yarn cleanTauri
 SPCD3 includes an example application that demonstrates how the library is
 used and what a parallel coordinates plot built with SPCD3 looks like.
 
-The [API Guide](./README-API.md) lists all available functions in SPCD3's API.
+The [SPCD3 API Guide](./README-API.md) lists all available functions in SPCD3's API.
 
-The example application is described in the [Example Application
+The example application is described in the [SPCD3 Example Application
 Guide](./README-EXAMPLE.md).
 
 Note: SPCD3 includes its own [`reset.css`](./src/lib/reset.css), which is

@@ -1,4 +1,5 @@
-# Example Application of SPCD3
+
+# SPCD3 Example Application Guide
 
 An example application is deployed to
 [https://tugraz-isds.github.io/spcd3](https://tugraz-isds.github.io/spcd3),
