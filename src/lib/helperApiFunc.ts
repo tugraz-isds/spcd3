@@ -783,7 +783,7 @@ export function setDimensionForHovering(dimension: string): void {
 
 //---------- Invert Functions ----------
 
-export function invertWoTransition(dimension: string): void {
+export function invertWithoutTransition(dimension: string): void {
   const cleanDimensionName = utils.cleanString(dimension);
   const invertId = "#dimension_invert_" + cleanDimensionName;
   const dimensionId = "#dimension_axis_" + cleanDimensionName;

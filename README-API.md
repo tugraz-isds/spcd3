@@ -113,9 +113,9 @@ Returns the inversion status of a dimension, which can be either **ascending** o
 
 Sets the inversion status of the given dimension to one of **ascending** and **descending**.
 
-#### invertWoTransition
+#### invertWithoutTransition
 
-`function invertWoTransition(dimension: string): void`
+`function invertWithoutTransition(dimension: string): void`
 
 Inverts the given dimension without animation.
 
