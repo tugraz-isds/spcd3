@@ -48,6 +48,9 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
+      - name: Activate repository Yarn version
+        run: corepack prepare yarn@4.17.1 --activate
+
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
