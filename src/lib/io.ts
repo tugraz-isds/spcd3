@@ -5,13 +5,22 @@ import * as helper from "./helper";
 import { create } from "d3-selection";
 import { parcoords, height, width } from "./globals";
 
-const DOWNLOAD_TOP_PADDING = 50;
+const DOWNLOAD_TOP_BALANCE_PADDING = 32;
 
 export function createSvgString(includeDataValues = false): string {
   type Feature = { name: string };
   const orderedFeatures: Feature[] = parcoords.newFeatures.map((name: any) => ({
     name,
   }));
+  const layout = helper.calculateChartLayout(
+    orderedFeatures,
+    parcoords.newDataset,
+  );
+  const leftBalancePadding = Math.max(0, layout.rightPadding - layout.leftPadding);
+  const rightBalancePadding = Math.max(
+    0,
+    layout.leftPadding - layout.rightPadding,
+  );
 
   const hiddenDims = api.getAllHiddenDimensionNames();
 
@@ -33,10 +42,10 @@ export function createSvgString(includeDataValues = false): string {
     .attr("xmlns", "http://www.w3.org/2000/svg")
     .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
     .attr("viewBox", [
-      0,
-      -DOWNLOAD_TOP_PADDING,
-      width,
-      height + DOWNLOAD_TOP_PADDING,
+      -leftBalancePadding,
+      -DOWNLOAD_TOP_BALANCE_PADDING,
+      width + leftBalancePadding + rightBalancePadding,
+      height + DOWNLOAD_TOP_BALANCE_PADDING,
     ])
     .attr("font-family", "Verdana, sans-serif");
   const contentRoot = svg.append("g");
@@ -196,6 +205,22 @@ function setOptionsAndDownload() {
   rowIncludeDataValues.appendChild(labelIncludeDataValues);
   rowIncludeDataValues.appendChild(inputIncludeDataValues);
 
+  const rowConvertSymbols = document.createElement("div");
+  rowConvertSymbols.className = "spcd3-options-div";
+
+  const labelConvertSymbols = document.createElement("label");
+  labelConvertSymbols.className = "spcd3-label";
+  labelConvertSymbols.textContent = "Convert symbols to paths: ";
+
+  const inputConvertSymbols = document.createElement("input");
+  inputConvertSymbols.className = "spcd3-input";
+  inputConvertSymbols.type = "checkbox";
+  inputConvertSymbols.id = "convertSymbolsInput";
+  inputConvertSymbols.checked = false;
+
+  rowConvertSymbols.appendChild(labelConvertSymbols);
+  rowConvertSymbols.appendChild(inputConvertSymbols);
+
   const button = document.createElement("button");
   button.textContent = "Download";
   button.className = "spcd3-button spcd3-generic-button";
@@ -204,6 +229,7 @@ function setOptionsAndDownload() {
   form.appendChild(rowKeepClasses);
   form.appendChild(rowIncludeUiControls);
   form.appendChild(rowIncludeDataValues);
+  form.appendChild(rowConvertSymbols);
   form.appendChild(button);
   modal.appendChild(form);
   modalOverlay.appendChild(modal);
@@ -252,6 +278,10 @@ function setOptionsAndDownload() {
         '<svg y="25" x="-6"><use width="12" height="12" y="0" x="0" href="#arrow_image_up"></use></svg>',
         "",
       );
+    }
+
+    if (inputConvertSymbols.checked) {
+      updatedSVG = convertSymbolsToPaths(updatedSVG);
     }
 
     let processedData = xmlFormat(updatedSVG, {
@@ -329,4 +359,108 @@ function removeUiControls(svgString: string): string {
   svgString = svgString.replace(/<g><rect[\s\S]*?<\/rect><\/g>/g, "");
   svgString = svgString.replace(/y\s*=\s*["']?18["']?/g, 'y="29"');
   return svgString;
+}
+
+function convertSymbolsToPaths(svgString: string): string {
+  const parser = new DOMParser();
+  const documentSvg = parser.parseFromString(svgString, "image/svg+xml");
+  const svgRoot = documentSvg.documentElement;
+  const defs = svgRoot.querySelector("defs");
+  if (!defs) return svgString;
+
+  const symbols = new Map<string, SVGSymbolElement>();
+  defs.querySelectorAll("symbol").forEach((symbol) => {
+    const id = symbol.getAttribute("id");
+    if (id) {
+      symbols.set(id, symbol as SVGSymbolElement);
+    }
+  });
+
+  svgRoot.querySelectorAll("use").forEach((useNode) => {
+    const href =
+      useNode.getAttribute("href") || useNode.getAttribute("xlink:href");
+    if (!href || !href.startsWith("#")) return;
+
+    const symbol = symbols.get(href.slice(1));
+    if (!symbol) return;
+
+    const replacement = createPathsFromSymbol(documentSvg, symbol, useNode);
+    const parent = useNode.parentElement;
+    if (!parent) return;
+
+    if (
+      parent.tagName.toLowerCase() === "svg" &&
+      parent.childElementCount === 1 &&
+      parent.parentElement
+    ) {
+      parent.parentElement.replaceChild(replacement, parent);
+    } else {
+      parent.replaceChild(replacement, useNode);
+    }
+  });
+
+  defs.remove();
+  return new XMLSerializer().serializeToString(svgRoot);
+}
+
+function createPathsFromSymbol(
+  documentSvg: Document,
+  symbol: SVGSymbolElement,
+  useNode: Element,
+): SVGGElement {
+  const group = documentSvg.createElementNS("http://www.w3.org/2000/svg", "g");
+  const symbolSvgParent =
+    useNode.parentElement?.tagName.toLowerCase() === "svg"
+      ? useNode.parentElement
+      : null;
+
+  const symbolX = parseSvgNumber(symbolSvgParent?.getAttribute("x"));
+  const symbolY = parseSvgNumber(symbolSvgParent?.getAttribute("y"));
+  const useX = parseSvgNumber(useNode.getAttribute("x"));
+  const useY = parseSvgNumber(useNode.getAttribute("y"));
+  const width = parseSvgNumber(useNode.getAttribute("width"), 0);
+  const height = parseSvgNumber(useNode.getAttribute("height"), 0);
+
+  const [minX, minY, viewBoxWidth, viewBoxHeight] = parseViewBox(
+    symbol.getAttribute("viewBox"),
+  );
+  const scaleX = viewBoxWidth === 0 ? 1 : width / viewBoxWidth;
+  const scaleY = viewBoxHeight === 0 ? 1 : height / viewBoxHeight;
+
+  const transforms = [
+    `translate(${symbolX + useX} ${symbolY + useY})`,
+    `scale(${scaleX} ${scaleY})`,
+  ];
+  if (minX !== 0 || minY !== 0) {
+    transforms.push(`translate(${-minX} ${-minY})`);
+  }
+  group.setAttribute("transform", transforms.join(" "));
+
+  symbol.querySelectorAll("path").forEach((pathNode) => {
+    const path = documentSvg.createElementNS("http://www.w3.org/2000/svg", "path");
+    Array.from(pathNode.attributes).forEach((attribute) => {
+      path.setAttribute(attribute.name, attribute.value);
+    });
+    group.appendChild(path);
+  });
+
+  return group;
+}
+
+function parseViewBox(viewBox: string | null): [number, number, number, number] {
+  if (!viewBox) return [0, 0, 0, 0];
+  const values = viewBox
+    .trim()
+    .split(/[\s,]+/)
+    .map((value) => Number.parseFloat(value));
+  if (values.length !== 4 || values.some((value) => Number.isNaN(value))) {
+    return [0, 0, 0, 0];
+  }
+  return [values[0], values[1], values[2], values[3]];
+}
+
+function parseSvgNumber(value: string | null | undefined, fallback = 0): number {
+  if (value == null || value === "") return fallback;
+  const parsed = Number.parseFloat(value);
+  return Number.isNaN(parsed) ? fallback : parsed;
 }

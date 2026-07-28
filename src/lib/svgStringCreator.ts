@@ -4,6 +4,13 @@ import * as utils from "./utils";
 import * as api from "./helperApiFunc";
 import { parcoords, key, hoverlabel } from "./globals";
 
+const DOWNLOAD_BRUSH_ARROW_WIDTH = 11;
+const DOWNLOAD_BRUSH_ARROW_HEIGHT = 8;
+const DOWNLOAD_BRUSH_ARROW_X = -4.5;
+const DOWNLOAD_INVERT_ARROW_WIDTH = 6.8;
+const DOWNLOAD_INVERT_ARROW_HEIGHT = 11;
+const DOWNLOAD_INVERT_ARROW_X = -3.4;
+
 export function setActivePathLinesToDownload(svg: any): void {
   svg
     .append("g")
@@ -159,10 +166,10 @@ function setBrushDownToDownload(featureAxis: any): void {
       .append("g")
       .append("use")
       .attr("id", "triangle_down_" + processedDimensionName)
-      .attr("y", item.top == 50 ? 40 : item.top - 10)
-      .attr("x", -6)
-      .attr("width", 14)
-      .attr("height", 10)
+      .attr("y", item.top == 50 ? 41 : item.top - DOWNLOAD_BRUSH_ARROW_HEIGHT)
+      .attr("x", DOWNLOAD_BRUSH_ARROW_X)
+      .attr("width", DOWNLOAD_BRUSH_ARROW_WIDTH)
+      .attr("height", DOWNLOAD_BRUSH_ARROW_HEIGHT)
       .attr("href", "#brush_image_bottom");
   });
 }
@@ -178,9 +185,9 @@ function setBrushUpToDownload(featureAxis: any): void {
       .append("use")
       .attr("id", "triangle_up_" + processedDimensionName)
       .attr("y", item.bottom)
-      .attr("x", -6)
-      .attr("width", 14)
-      .attr("height", 10)
+      .attr("x", DOWNLOAD_BRUSH_ARROW_X)
+      .attr("width", DOWNLOAD_BRUSH_ARROW_WIDTH)
+      .attr("height", DOWNLOAD_BRUSH_ARROW_HEIGHT)
       .attr("href", "#brush_image_top");
   });
 }
@@ -209,11 +216,11 @@ function setRectToDragToDownload(featureAxis: any): void {
 function setInvertIconToDownload(featureAxis: any): void {
   featureAxis
     .append("svg")
-    .attr("y", 25)
-    .attr("x", -6)
+    .attr("y", 24)
+    .attr("x", DOWNLOAD_INVERT_ARROW_X)
     .append("use")
-    .attr("width", 12)
-    .attr("height", 12)
+    .attr("width", DOWNLOAD_INVERT_ARROW_WIDTH)
+    .attr("height", DOWNLOAD_INVERT_ARROW_HEIGHT)
     .attr("y", 0)
     .attr("x", 0)
     .each(function (this: any, d: { name: string }) {
