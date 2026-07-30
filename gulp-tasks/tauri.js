@@ -3,6 +3,11 @@ const { spawn } = require("child_process");
 const fg = require("fast-glob");
 const fs = require("fs/promises");
 const path = require("path");
+const pkg = require("../package.json");
+
+function releaseBaseName() {
+  return `${pkg.name.toLowerCase()}-v${pkg.version}`;
+}
 
 function runTauriBuild() {
   return new Promise((resolve, reject) => {
@@ -41,8 +46,34 @@ function platformFolder() {
   return process.platform;
 }
 
+function artifactFileName(src) {
+  const baseName = releaseBaseName();
+  const ext = path.extname(src);
+  const normalized = src.replaceAll("\\", "/");
+
+  if (process.platform === "darwin") {
+    if (ext === ".app") return `${baseName}.app`;
+    if (ext === ".dmg") return `${baseName}.dmg`;
+  }
+
+  if (process.platform === "win32") {
+    if (normalized.includes("/bundle/nsis/")) return `${baseName}-setup.exe`;
+    if (ext === ".msi") return `${baseName}.msi`;
+    if (ext === ".exe") return `${baseName}.exe`;
+  }
+
+  if (process.platform === "linux") {
+    if (ext === ".AppImage") return `${baseName}.AppImage`;
+    if (ext === ".deb") return `${baseName}.deb`;
+    if (ext === ".rpm") return `${baseName}.rpm`;
+    if (!ext) return baseName;
+  }
+
+  return path.basename(src);
+}
+
 async function copyArtifact(src, outDir) {
-  const dest = path.join(outDir, path.basename(src));
+  const dest = path.join(outDir, artifactFileName(src));
   const stats = await fs.stat(src);
 
   if (stats.isDirectory()) {
