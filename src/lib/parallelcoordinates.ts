@@ -38,6 +38,7 @@ import {
   setNumberOfRecords,
   setContent,
   resetContentData,
+  setHoveredRecords,
 } from "./globals";
 
 import "./reset.css";
@@ -423,6 +424,7 @@ function handlePointerEnter(event: any, d: any) {
   doNotHighlight();
 
   const data = helper.getAllPointerEventsData(event);
+  setHoveredRecords(data);
   const tooltipLabel = selectAll(".spcd3-tooltip-label");
 
   highlight(data);
@@ -444,6 +446,7 @@ function handlePointerEnter(event: any, d: any) {
 function handlePointerLeaveOrOut() {
   doNotHighlight();
   clearExistingDelay();
+  setHoveredRecords([]);
   selectAll(".spcd3-tooltip-label").style("visibility", "hidden");
   helper.cleanTooltip();
 }

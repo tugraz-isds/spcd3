@@ -37,9 +37,14 @@ export let numberOfRecords: number;
 export let numberOfDimensions: number;
 export let resetContentData: any;
 export let dimensionSpacingVar: number | null = null;
+export let hoveredRecords: string[] = [];
 
 export function setContent(contentdata: any): void {
   resetContentData = contentdata;
+}
+
+export function setHoveredRecords(records: string[]): void {
+  hoveredRecords = records;
 }
 
 export function setHoverLabel(label: string): void {

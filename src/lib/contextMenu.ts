@@ -5,7 +5,14 @@ import * as utils from "./utils";
 import * as helper from "./helper";
 import * as api from "./helperApiFunc";
 import * as icon from "./icons/icons";
-import { parcoords, active, width, paddingXaxis, hoverlabel } from "./globals";
+import {
+  parcoords,
+  active,
+  width,
+  paddingXaxis,
+  hoverlabel,
+  hoveredRecords,
+} from "./globals";
 
 let scrollXPos: number;
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -441,19 +448,10 @@ function getContextMenuLeftPosition(
   menuElement: HTMLElement,
   clickX: number,
 ): number {
-  const containerRect = container.getBoundingClientRect();
-  const previousDisplay = menuElement.style.display;
-  const previousVisibility = menuElement.style.visibility;
-
-  if (getComputedStyle(menuElement).display === "none") {
-    menuElement.style.visibility = "hidden";
-    menuElement.style.display = "block";
-  }
-
-  const menuWidth = menuElement.getBoundingClientRect().width;
-
-  menuElement.style.display = previousDisplay;
-  menuElement.style.visibility = previousVisibility;
+  const { width: menuWidth, containerRect } = getContextMenuMeasurements(
+    container,
+    menuElement,
+  );
   const availableRightSpace = containerRect.width - clickX;
 
   if (menuWidth > availableRightSpace) {
@@ -463,8 +461,65 @@ function getContextMenuLeftPosition(
   return clickX;
 }
 
+function getContextMenuTopPosition(
+  container: Element,
+  menuElement: HTMLElement,
+  clickY: number,
+): number {
+  const { height: menuHeight, containerRect } = getContextMenuMeasurements(
+    container,
+    menuElement,
+  );
+  const availableBottomSpace = containerRect.height - clickY;
+
+  if (menuHeight > availableBottomSpace) {
+    return Math.max(0, clickY - menuHeight);
+  }
+
+  return clickY;
+}
+
+function getContextMenuMeasurements(
+  container: Element,
+  menuElement: HTMLElement,
+): { width: number; height: number; containerRect: DOMRect } {
+  const containerRect = container.getBoundingClientRect();
+  const previousDisplay = menuElement.style.display;
+  const previousVisibility = menuElement.style.visibility;
+
+  if (getComputedStyle(menuElement).display === "none") {
+    menuElement.style.visibility = "hidden";
+    menuElement.style.display = "block";
+  }
+
+  const menuRect = menuElement.getBoundingClientRect();
+
+  menuElement.style.display = previousDisplay;
+  menuElement.style.visibility = previousVisibility;
+
+  return {
+    width: menuRect.width,
+    height: menuRect.height,
+    containerRect,
+  };
+}
+
+function pxToRem(value: number): number {
+  const rootFontSize = Number(
+    getComputedStyle(document.documentElement).fontSize.replace("px", ""),
+  );
+
+  if (!Number.isFinite(rootFontSize) || rootFontSize <= 0) {
+    return value / 16;
+  }
+
+  return value / rootFontSize;
+}
+
 function styleContextMenu(event: any): void {
-  const container = document.querySelector("#spcd3-parallelcoords");
+  const container =
+    document.querySelector("#spcd3-parallelcoords .spcd3-chartWrapper") ??
+    document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
   const menuElement = document.querySelector(
     "#contextmenu",
@@ -474,9 +529,10 @@ function styleContextMenu(event: any): void {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
   const left = getContextMenuLeftPosition(container, menuElement, x);
+  const top = getContextMenuTopPosition(container, menuElement, y);
   select("#contextmenu")
-    .style("left", left + "px")
-    .style("top", y + "px")
+    .style("left", pxToRem(left) + "rem")
+    .style("top", pxToRem(top) + "rem")
     .style("display", "block")
     .on("click", (event: { stopPropagation: () => void }) => {
       event.stopPropagation();
@@ -658,8 +714,13 @@ function scroll(d: { subject: any }): void {
 }
 
 function createContextMenu(): void {
-  let contextMenu = select("#spcd3-parallelcoords")
-    .append("g")
+  const menuHost =
+    select("#spcd3-parallelcoords .spcd3-chartWrapper").empty()
+      ? select("#spcd3-parallelcoords")
+      : select("#spcd3-parallelcoords .spcd3-chartWrapper");
+
+  let contextMenu = menuHost
+    .append("div")
     .attr("class", "spcd3-contextmenu-dimensions")
     .attr("id", "contextmenu")
     .style("position", "absolute")
@@ -839,8 +900,13 @@ function createErrorMessage(modal: any, id: string): void {
 }
 
 export function createContextMenuForRecords(): any {
-  let contextMenu = select("#spcd3-parallelcoords")
-    .append("g")
+  const menuHost =
+    select("#spcd3-parallelcoords .spcd3-chartWrapper").empty()
+      ? select("#spcd3-parallelcoords")
+      : select("#spcd3-parallelcoords .spcd3-chartWrapper");
+
+  let contextMenu = menuHost
+    .append("div")
     .attr("class", "spcd3-contextmenu-records")
     .attr("id", "contextmenuRecords")
     .style("position", "absolute")
@@ -904,17 +970,35 @@ export function handleRecordContextMenu(
   event: any,
   d: any,
 ): void {
-  const container = document.querySelector("#spcd3-parallelcoords");
+  const container =
+    document.querySelector("#spcd3-parallelcoords .spcd3-chartWrapper") ??
+    document.querySelector("#spcd3-parallelcoords");
   if (!container) return;
   const menuElement = contextMenu.node() as HTMLElement | null;
   if (!menuElement) return;
   const rect = container.getBoundingClientRect();
-  const data = helper.getAllPointerEventsData(event);
-  const cleanedItems = data.map((item: string) =>
-    utils.cleanString(item).replace(/[.,]/g, ""),
+  const data =
+    hoveredRecords.length > 0
+      ? hoveredRecords
+      : helper.getAllPointerEventsData(event);
+  const cleanedItems = Array.from(
+    new Set(
+      data.map((item: string) => utils.cleanString(item).replace(/[.,]/g, "")),
+    ),
   );
+  const clickedRecord = d?.[hoverlabel]
+    ? utils.cleanString(String(d[hoverlabel])).replace(/[.,]/g, "")
+    : null;
+  const targetRecords =
+    cleanedItems.length > 0
+      ? cleanedItems
+      : clickedRecord != null
+        ? [clickedRecord]
+        : [];
 
-  if (cleanedItems.length > 1) {
+  if (targetRecords.length === 0) return;
+
+  if (targetRecords.length > 1) {
     select("#selectRecord").text("Select Records");
     select("#unSelectRecord").text("Unselect Records");
     select("#toggleRecord").text("Toggle Selection");
@@ -925,24 +1009,25 @@ export function handleRecordContextMenu(
   }
 
   const x = event.clientX - rect.left;
-  const y = (event.clientY - rect.top) / 16;
-  const left = getContextMenuLeftPosition(container, menuElement, x) / 16;
+  const y = event.clientY - rect.top;
+  const left = getContextMenuLeftPosition(container, menuElement, x);
+  const top = getContextMenuTopPosition(container, menuElement, y);
   contextMenu
-    .style("left", left + "rem")
-    .style("top", y + "rem")
+    .style("left", pxToRem(left) + "rem")
+    .style("top", pxToRem(top) + "rem")
     .style("display", "block")
     .on("click", (event: { stopPropagation: () => void }) => {
       event.stopPropagation();
     });
 
   select("#selectRecord").on("click", (event: any) => {
-    api.setSelection(cleanedItems);
+    api.setSelection(targetRecords);
     event.stopPropagation();
     select("#contextmenuRecords").style("display", "none");
   });
 
   select("#unSelectRecord").on("click", (event: any) => {
-    cleanedItems.forEach((item: string) => {
+    targetRecords.forEach((item: string) => {
       api.setUnselected(item);
     });
     event.stopPropagation();
@@ -952,7 +1037,7 @@ export function handleRecordContextMenu(
   select("#toggleRecord")
     .style("border-top", "0.08rem solid var(--spcd3-border-subtle)")
     .on("click", (event: any) => {
-      cleanedItems.forEach((item: string) => {
+      targetRecords.forEach((item: string) => {
         api.toggleSelection(item);
       });
       event.stopPropagation();
@@ -964,14 +1049,14 @@ export function handleRecordContextMenu(
     .on("click", (event: any) => {
       let selectedRecords: string[] = [];
       selectedRecords = api.getSelected();
-      const records = [...selectedRecords, ...cleanedItems];
+      const records = [...selectedRecords, ...targetRecords];
       api.setSelection(records);
       event.stopPropagation();
       select("#contextmenuRecords").style("display", "none");
     });
 
   select("#removeSelection").on("click", (event: any) => {
-    cleanedItems.forEach((item: string) => {
+    targetRecords.forEach((item: string) => {
       api.setUnselected(item);
     });
     event.stopPropagation();
