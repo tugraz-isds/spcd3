@@ -30,7 +30,7 @@ The SPCD3 library uses the following D3v7 modules:
 In addition to D3, the following JavaScript library is used:
 
 - [xml-formatter](https://github.com/chrisbottin/xml-formatter#readme):
-  To prettify the SVG file of the parallel coordinate plot for download.
+  To prettify the SVG file of the parallel coordinate chart for download.
 
 The task runner [Gulp](https://gulpjs.com/) is used to automate
 repeatable tasks and [Rollup](https://rollupjs.org/)
@@ -141,7 +141,7 @@ yarn exec gulp cleanTauri
 ## Usage
 
 SPCD3 includes an example application that demonstrates how the library is
-used and what a parallel coordinates plot built with SPCD3 looks like.
+used and what a parallel coordinates chart built with SPCD3 looks like.
 
 The [SPCD3 API Guide](./README-API.md) lists all available functions in SPCD3's API.
 
@@ -154,7 +154,7 @@ imported by the library together with [`stylesheet.css`](./src/lib/stylesheet.cs
 ## Data-Handling
 
 A CSV file is required to visualise a dataset as a parallel coordinate
-plot. The CSV should be separated by a comma. Otherwise, there are no
+chart. The CSV should be separated by a comma. Otherwise, there are no
 special requirements. Data dimensions can be categorical or
 numerical. Three example datasets can be found in folder
 [data](./src/example/data/). Other datasets should have the same

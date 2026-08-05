@@ -428,7 +428,7 @@ table.spcd3-tablecontainer td {
   width: 100%;
   height: 100%;
   background-color: var(--spcd3-backdrop);
-  z-index: 999;
+  z-index: 10020;
   display: block;
 }
 
@@ -444,7 +444,7 @@ table.spcd3-tablecontainer td {
   border-radius: 0.5rem;
   max-height: 80vh;
   max-width: 90vh;
-  z-index: 1000;
+  z-index: 10021;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -457,6 +457,123 @@ table.spcd3-tablecontainer td {
   width: 100%;
   overflow: auto;
   max-height: 100%;
+}
+
+.spcd3-chart-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--spcd3-backdrop);
+  z-index: 10000;
+}
+
+.spcd3-chart-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  inline-size: min(96vw, 120rem);
+  block-size: min(94vh, 72rem);
+  min-block-size: 24rem;
+  background: var(--spcd3-panel-bg);
+  border: 0.08rem solid var(--spcd3-border-emphasis);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 0.625rem var(--spcd3-shadow-modal);
+  overflow: hidden;
+}
+
+.spcd3-chart-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 3rem 0.5rem 1rem;
+  border-bottom: 0.08rem solid var(--spcd3-border-subtle);
+}
+
+.spcd3-chart-modal-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--spcd3-text-primary);
+}
+
+.spcd3-chart-modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.spcd3-chart-modal-control {
+  min-block-size: 1.9rem;
+  padding: 0.2rem 0.65rem;
+}
+
+.spcd3-chart-modal-control--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.9rem;
+  padding: 0.2rem;
+}
+
+.spcd3-chart-modal-control--icon .spcd3-toolbar-buttonicon {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: auto;
+}
+
+.spcd3-chart-modal-control.is-active {
+  background: var(--spcd3-control-bg-hover);
+  border-color: var(--spcd3-border-emphasis);
+}
+
+.spcd3-chart-modal-zoom-label {
+  min-inline-size: 3.2rem;
+  text-align: center;
+  color: var(--spcd3-text-secondary);
+  font-size: 0.8rem;
+}
+
+.spcd3-chart-modal-hint {
+  padding: 0.5rem 1rem 0;
+  color: var(--spcd3-text-secondary);
+  font-size: 0.75rem;
+}
+
+.spcd3-chart-modal-viewport {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow: auto;
+  padding: 1rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--spcd3-page-bg) 92%, transparent),
+      var(--spcd3-page-bg)
+    );
+}
+
+.spcd3-chart-modal-viewport--pannable {
+  cursor: grab;
+  user-select: none;
+}
+
+.spcd3-chart-modal-viewport--dragging {
+  cursor: grabbing;
+}
+
+.spcd3-chartWrapper--modal {
+  inline-size: max-content;
+  min-inline-size: 100%;
+  margin-left: 0;
+}
+
+.spcd3-chartWrapper--modal #spcd3-toolbarRow {
+  display: none;
 }
 
 .spcd3-contextmenu-records {
@@ -489,7 +606,7 @@ table.spcd3-tablecontainer td {
   height: 100%;
   background-color: var(--spcd3-backdrop);
   display: none;
-  z-index: 9999;
+  z-index: 10020;
 }
 
 .spcd3-modal {
@@ -497,7 +614,7 @@ table.spcd3-tablecontainer td {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 9999;
+  z-index: 10021;
   background-color: var(--spcd3-panel-bg);
   padding: 1rem;
   border-radius: 0.5rem;

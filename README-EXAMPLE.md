@@ -8,7 +8,7 @@ complete list of all available functions can be found in the
 [API Guide](./API.md).
 The example application loads an example dataset of student marks
 and provides buttons and dropdown menus to manipulate the
-parallel coordinates plot via the API.
+parallel coordinates chart via the API.
 
 ![screenshot](screenshots/exampleSpcd3.png)
 
@@ -134,7 +134,7 @@ integrated:
 - Uploading File
 - Downloading SVG
 - Adjusting Dimension Ranges
-- Resetting the Plot
+- Resetting the Chart
 - Setting Selection Sensitivity
 - Setting Dimension Spacing
 - Showing and Hiding Dimensions
@@ -147,23 +147,23 @@ integrated:
 
 ![screenshot](screenshots/outsideFunc.png)
 
-Five buttons, located above the plot, serve specific functions.
+Five buttons, located above the chart, serve specific functions.
 The first button is for uploading a CSV file containing a dataset.
-The second button enables downloading the plot as an SVG file.
+The second button enables downloading the chart as an SVG file.
 The remaining three buttons facilitate resetting the ranges of all
 dimensions to their original or rounded range, respectively and resetting
-the entire plot.
+the entire chart.
 
-Two sliders are also available above the plot. **Selection Sensitivity**
+Two sliders are also available above the chart. **Selection Sensitivity**
 controls the width of the invisible interaction area around each
 polyline, making record hovering and selection either more precise or
 more tolerant. **Dimension Spacing** adjusts the horizontal distance
-between adjacent axes and therefore changes the overall plot layout.
+between adjacent axes and therefore changes the overall chart layout.
 
-Seven additional functionalities are available below the plot. Clicking
+Seven additional functionalities are available below the chart. Clicking
 on **Show Dimension** opens a box where users can control the
 visibility of one or more dimensions. All dimensions are visible by
-default, and with this feature, a more customised plot view is
+default, and with this feature, a more customised chart view is
 available.
 
 Clicking on **Invert Dimensions** opens a box with all dimensions,

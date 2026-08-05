@@ -152,6 +152,7 @@ export function refresh(): void {
 }
 
 export function deleteChart(): void {
+  toolbar.closeChartModal();
   select("#spcd3-pc_svg").remove();
   select("#contextmenu").remove();
   select("#contextmenuRecords").remove();

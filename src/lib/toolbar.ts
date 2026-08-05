@@ -2,7 +2,46 @@ import * as d3 from "d3-selection";
 import * as icon from "./icons/icons";
 import * as pc from "./parallelcoordinates";
 import * as io from "./io";
-import { numberOfDimensions, numberOfRecords } from "./globals";
+import {
+  numberOfDimensions,
+  numberOfRecords,
+  resetContentData,
+} from "./globals";
+
+type ChartModalState = {
+  overlay: HTMLDivElement;
+  panel: HTMLDivElement;
+  viewport: HTMLDivElement;
+  chartWrapper: HTMLDivElement;
+  placeholder: Comment;
+  originalParent: HTMLElement;
+  closeButton: HTMLSpanElement;
+  zoomInButton: HTMLButtonElement;
+  zoomOutButton: HTMLButtonElement;
+  resetButton: HTMLButtonElement;
+  panButton: HTMLButtonElement;
+  zoomLabel: HTMLSpanElement;
+  svg: SVGSVGElement;
+  baseSvgWidth: number;
+  baseSvgHeight: number;
+  previousSvgInlineSize: string;
+  previousSvgBlockSize: string;
+  scale: number;
+  panMode: boolean;
+  isDraggingPan: boolean;
+  panStartX: number;
+  panStartY: number;
+  panScrollLeft: number;
+  panScrollTop: number;
+  tooltipElements: HTMLSpanElement[];
+  onPointerMove: (event: PointerEvent) => void;
+  onPointerUp: () => void;
+};
+
+let chartModalState: ChartModalState | null = null;
+const MIN_MODAL_SCALE = 0.5;
+const MAX_MODAL_SCALE = 3;
+const MODAL_SCALE_STEP = 0.25;
 
 export function createToolbar(dataset: any[]): void {
   const toolbarRow = d3.select("#spcd3-toolbarRow");
@@ -22,6 +61,13 @@ export function createToolbar(dataset: any[]): void {
     iconHtml: icon.getTableIcon(),
     tipText: "Show Table",
     onClick: () => showModalWithData(dataset),
+  });
+
+  makeIconButton(toolbar, {
+    id: "zoomModeButton",
+    iconHtml: icon.getZoomButton(),
+    tipText: "Zoom Mode",
+    onClick: () => openZoomMode(dataset),
   });
 
   makeIconButton(toolbar, {
@@ -63,6 +109,27 @@ export function createToolbar(dataset: any[]): void {
       : icon.getExpandToolbarIcon();
     toggleButton.select("#toggleButtonicon").html(currentIcon);
   });
+}
+
+export function closeChartModal(): void {
+  if (!chartModalState) return;
+
+  const state = chartModalState;
+  window.removeEventListener("pointermove", state.onPointerMove);
+  window.removeEventListener("pointerup", state.onPointerUp);
+  window.removeEventListener("pointercancel", state.onPointerUp);
+
+  setPanMode(false);
+
+  state.chartWrapper.classList.remove("spcd3-chartWrapper--modal");
+  state.svg.style.inlineSize = state.previousSvgInlineSize;
+  state.svg.style.blockSize = state.previousSvgBlockSize;
+  state.tooltipElements.forEach((element) => element.remove());
+
+  state.originalParent.insertBefore(state.chartWrapper, state.placeholder);
+  state.placeholder.remove();
+  state.overlay.remove();
+  chartModalState = null;
 }
 
 function makeIconButton(parent: any, opts: any) {
@@ -307,4 +374,296 @@ function downloadCSV(dataset: any[], filename = "data.csv") {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+function openZoomMode(dataset: any[]): void {
+  if (chartModalState) return;
+
+  const chartRoot = document.querySelector("#spcd3-parallelcoords");
+  const chartWrapper = chartRoot?.querySelector(
+    ".spcd3-chartWrapper",
+  ) as HTMLDivElement | null;
+
+  if (!chartRoot || !chartWrapper || !chartWrapper.parentElement) return;
+
+  const svg = chartWrapper.querySelector("#spcd3-pc_svg") as SVGSVGElement | null;
+  if (!svg) return;
+
+  const baseSvgWidth =
+    Number(svg.getAttribute("width")) ||
+    svg.viewBox.baseVal.width ||
+    svg.getBoundingClientRect().width;
+  const baseSvgHeight =
+    Number(svg.getAttribute("height")) ||
+    svg.viewBox.baseVal.height ||
+    svg.getBoundingClientRect().height;
+
+  const originalParent = chartWrapper.parentElement as HTMLElement;
+  const placeholder = document.createComment("spcd3-chart-modal-anchor");
+  originalParent.insertBefore(placeholder, chartWrapper);
+
+  const overlay = document.createElement("div");
+  overlay.className = "spcd3-chart-modal-overlay";
+
+  const panel = document.createElement("div");
+  panel.className = "spcd3-chart-modal";
+  overlay.appendChild(panel);
+
+  const header = document.createElement("div");
+  header.className = "spcd3-chart-modal-header";
+  panel.appendChild(header);
+
+  const controls = document.createElement("div");
+  controls.className = "spcd3-chart-modal-controls";
+  header.appendChild(controls);
+
+  const showTableButton = createModalIconControlButton(
+    icon.getTableIcon(),
+    "Show Table",
+  );
+  const downloadButton = createModalIconControlButton(
+    icon.getDownloadButton(),
+    "Download Chart (SVG)",
+  );
+  const resetButton = createModalIconControlButton(
+    icon.getResetIcon(),
+    "Reset chart",
+  );
+  const zoomOutButton = createModalControlButton("−", "Zoom Out");
+  const zoomInButton = createModalControlButton("+", "Zoom In");
+  const panButton = createModalIconControlButton(
+    icon.getPanButton(),
+    "Toggle Pan Mode",
+  );
+  panButton.setAttribute("aria-pressed", "false");
+
+  const zoomLabel = document.createElement("span");
+  zoomLabel.className = "spcd3-chart-modal-zoom-label";
+
+  const closeButton = document.createElement("span");
+  closeButton.className = "spcd3-close-button";
+  closeButton.innerHTML = "&times;";
+
+  controls.appendChild(zoomOutButton);
+  controls.appendChild(zoomInButton);
+  controls.appendChild(zoomLabel);
+  controls.appendChild(panButton);
+  controls.appendChild(showTableButton);
+  controls.appendChild(downloadButton);
+  controls.appendChild(resetButton);
+  panel.appendChild(closeButton);
+
+  const viewport = document.createElement("div");
+  viewport.className = "spcd3-chart-modal-viewport";
+  panel.appendChild(viewport);
+
+  chartWrapper.classList.add("spcd3-chartWrapper--modal");
+  viewport.appendChild(chartWrapper);
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!chartModalState || !chartModalState.isDraggingPan) return;
+
+    const deltaX = event.clientX - chartModalState.panStartX;
+    const deltaY = event.clientY - chartModalState.panStartY;
+
+    chartModalState.viewport.scrollLeft = chartModalState.panScrollLeft - deltaX;
+    chartModalState.viewport.scrollTop = chartModalState.panScrollTop - deltaY;
+  };
+
+  const onPointerUp = () => {
+    if (!chartModalState) return;
+    chartModalState.isDraggingPan = false;
+    if (chartModalState.panMode) {
+      chartModalState.viewport.classList.remove("spcd3-chart-modal-viewport--dragging");
+    }
+  };
+
+  chartModalState = {
+    overlay,
+    panel,
+    viewport,
+    chartWrapper,
+    placeholder,
+    originalParent,
+    closeButton,
+    zoomInButton,
+    zoomOutButton,
+    resetButton,
+    panButton,
+    zoomLabel,
+    svg,
+    baseSvgWidth,
+    baseSvgHeight,
+    previousSvgInlineSize: svg.style.inlineSize,
+    previousSvgBlockSize: svg.style.blockSize,
+    scale: 1,
+    panMode: false,
+    isDraggingPan: false,
+    panStartX: 0,
+    panStartY: 0,
+    panScrollLeft: 0,
+    panScrollTop: 0,
+    tooltipElements: [
+      attachTooltip(showTableButton, "Show Table"),
+      attachTooltip(downloadButton, "Download Chart (SVG)"),
+      attachTooltip(resetButton, "Reset"),
+      attachTooltip(zoomOutButton, "Zoom Out"),
+      attachTooltip(zoomInButton, "Zoom In"),
+      attachTooltip(panButton, "Toggle Pan Mode"),
+    ],
+    onPointerMove,
+    onPointerUp,
+  };
+
+  closeButton.addEventListener("click", closeChartModal);
+  closeButton.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      closeChartModal();
+    }
+  });
+  overlay.addEventListener("click", (event: MouseEvent) => {
+    if (event.target === overlay) {
+      closeChartModal();
+    }
+  });
+
+  showTableButton.addEventListener("click", () => {
+    showModalWithData(dataset);
+  });
+  downloadButton.addEventListener("click", () => {
+    io.saveAsSvg();
+  });
+  resetButton.addEventListener("click", () => {
+    const modalDataset = resetContentData ?? dataset;
+    pc.reset();
+    requestAnimationFrame(() => {
+      openZoomMode(modalDataset);
+    });
+  });
+  zoomOutButton.addEventListener("click", () => {
+    setChartModalScale((chartModalState?.scale ?? 1) - MODAL_SCALE_STEP);
+  });
+  zoomInButton.addEventListener("click", () => {
+    setChartModalScale((chartModalState?.scale ?? 1) + MODAL_SCALE_STEP);
+  });
+  panButton.addEventListener("click", () => {
+    setPanMode(!(chartModalState?.panMode ?? false));
+  });
+
+  viewport.addEventListener("pointerdown", (event: PointerEvent) => {
+    if (!chartModalState?.panMode) return;
+    if (event.button !== 0) return;
+
+    event.preventDefault();
+    chartModalState.isDraggingPan = true;
+    chartModalState.panStartX = event.clientX;
+    chartModalState.panStartY = event.clientY;
+    chartModalState.panScrollLeft = chartModalState.viewport.scrollLeft;
+    chartModalState.panScrollTop = chartModalState.viewport.scrollTop;
+    chartModalState.viewport.classList.add("spcd3-chart-modal-viewport--dragging");
+  });
+
+  document.body.appendChild(overlay);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("pointercancel", onPointerUp);
+
+  setChartModalScale(1);
+}
+
+function createModalControlButton(
+  text: string,
+  ariaLabel: string,
+): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = "spcd3-button spcd3-chart-modal-control";
+  button.type = "button";
+  button.setAttribute("aria-label", ariaLabel);
+  button.textContent = text;
+  return button;
+}
+
+function createModalIconControlButton(
+  iconHtml: string,
+  ariaLabel: string,
+): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = "spcd3-button spcd3-chart-modal-control spcd3-chart-modal-control--icon";
+  button.type = "button";
+  button.setAttribute("aria-label", ariaLabel);
+
+  const iconElement = document.createElement("span");
+  iconElement.className = "spcd3-toolbar-buttonicon";
+  iconElement.innerHTML = iconHtml;
+  iconElement
+    .querySelectorAll("svg")
+    .forEach((svgElement) => svgElement.classList.add("spcd3-toolbar-svg"));
+
+  button.appendChild(iconElement);
+  return button;
+}
+
+function attachTooltip(button: HTMLButtonElement, text: string): HTMLSpanElement {
+  const tip = document.createElement("span");
+  tip.className = "spcd3-toolbar-buttontip";
+  tip.setAttribute("popover", "manual");
+  tip.textContent = text;
+  document.body.appendChild(tip);
+
+  function show() {
+    if (!tip.matches(":popover-open")) {
+      tip.showPopover();
+    }
+    positionTip(button, tip);
+  }
+
+  function hide() {
+    if (tip.matches(":popover-open")) {
+      tip.hidePopover();
+    }
+  }
+
+  button.addEventListener("mouseenter", show);
+  button.addEventListener("mouseleave", hide);
+  button.addEventListener("focus", show);
+  button.addEventListener("blur", hide);
+  return tip;
+}
+
+function setChartModalScale(nextScale: number): void {
+  if (!chartModalState) return;
+
+  const scale = Math.min(MAX_MODAL_SCALE, Math.max(MIN_MODAL_SCALE, nextScale));
+  chartModalState.scale = scale;
+  chartModalState.svg.style.inlineSize = `${pxToRem(chartModalState.baseSvgWidth * scale)}rem`;
+  chartModalState.svg.style.blockSize = `${pxToRem(chartModalState.baseSvgHeight * scale)}rem`;
+  chartModalState.zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+}
+
+function setPanMode(isActive: boolean): void {
+  if (!chartModalState) return;
+
+  chartModalState.panMode = isActive;
+  chartModalState.isDraggingPan = false;
+  chartModalState.panButton.setAttribute("aria-pressed", String(isActive));
+  chartModalState.panButton.classList.toggle("is-active", isActive);
+  chartModalState.viewport.classList.toggle("spcd3-chart-modal-viewport--pannable", isActive);
+  chartModalState.viewport.classList.remove("spcd3-chart-modal-viewport--dragging");
+  chartModalState.svg.style.pointerEvents = isActive ? "none" : "";
+  chartModalState.zoomLabel.textContent = `${Math.round(chartModalState.scale * 100)}%`;
+  d3.select("#contextmenu").style("display", "none");
+  d3.select("#contextmenuRecords").style("display", "none");
+}
+
+function pxToRem(value: number): number {
+  const rootFontSize = Number(
+    getComputedStyle(document.documentElement).fontSize.replace("px", ""),
+  );
+
+  if (!Number.isFinite(rootFontSize) || rootFontSize <= 0) {
+    return value / 16;
+  }
+
+  return value / rootFontSize;
 }
