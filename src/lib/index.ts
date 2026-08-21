@@ -5,3 +5,4 @@ export * from "./parallelcoordinates";
 export * from "./io";
 export * from "./loadData";
 export * from "./helperApiFunc";
+export * from "./persistence";

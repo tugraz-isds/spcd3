@@ -6,6 +6,12 @@
     "main"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    "core:webview:allow-set-webview-zoom",
+    "dialog:default",
+    "window-state:default",
+    "fs:default",
+    "fs:allow-write-text-file",
+    "opener:default"
   ]
 }

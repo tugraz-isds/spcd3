@@ -13,7 +13,7 @@
     "declarationDir": "types",
     "allowJs": true,
     "paths": {
-      "pc-lib": ["./src/lib/index.ts"]
+      "spcd3": ["./src/lib/index.ts"]
     }
   },
   "include": [

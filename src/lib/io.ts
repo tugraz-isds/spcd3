@@ -4,8 +4,57 @@ import * as api from "./helperApiFunc";
 import * as helper from "./helper";
 import { create } from "d3-selection";
 import { parcoords, height, width } from "./globals";
+import {
+  getSvgDownloadSettings,
+  setSvgDownloadSettings,
+  getTauriSvgSaveDirectory,
+  setTauriSvgSaveDirectory,
+} from "./persistence";
 
 const DOWNLOAD_TOP_BALANCE_PADDING = 32;
+const DEFAULT_SVG_FILENAME = "parcoords.svg";
+
+type TauriGlobalApi = {
+  dialog?: {
+    save?: (options: {
+      defaultPath?: string;
+      filters?: Array<{ name: string; extensions: string[] }>;
+      title?: string;
+    }) => Promise<string | null>;
+  };
+  fs?: {
+    writeTextFile?: (path: string, data: string) => Promise<void>;
+  };
+  path?: {
+    join?: (...paths: string[]) => Promise<string> | string;
+    dirname?: (path: string) => Promise<string> | string;
+  };
+};
+
+type BrowserSaveFilePickerOptions = {
+  excludeAcceptAllOption?: boolean;
+  id?: string;
+  suggestedName?: string;
+  types?: Array<{
+    description?: string;
+    accept: Record<string, string[]>;
+  }>;
+};
+
+type BrowserWritableFileStream = {
+  write: (data: Blob | BufferSource | string) => Promise<void>;
+  close: () => Promise<void>;
+};
+
+type BrowserFileSystemFileHandle = {
+  createWritable: () => Promise<BrowserWritableFileStream>;
+};
+
+type BrowserSaveWindow = Window & {
+  showSaveFilePicker?: (
+    options?: BrowserSaveFilePickerOptions,
+  ) => Promise<BrowserFileSystemFileHandle>;
+};
 
 export function createSvgString(includeDataValues = false): string {
   type Feature = { name: string };
@@ -105,7 +154,7 @@ export function saveAsSvg(): void {
 }
 
 function setOptionsAndDownload() {
-  let name = "parcoords.svg";
+  const persistedSettings = getSvgDownloadSettings();
 
   const modalOverlay = document.createElement("div");
   modalOverlay.className = "spcd3-modal-overlay";
@@ -150,7 +199,7 @@ function setOptionsAndDownload() {
   input.type = "number";
   input.min = "0";
   input.max = "10";
-  input.value = "2";
+  input.value = persistedSettings.decimals.toString();
   input.id = "decimalsInput";
 
   rowDecimals.appendChild(label);
@@ -167,7 +216,7 @@ function setOptionsAndDownload() {
   inputKeepClasses.className = "spcd3-input";
   inputKeepClasses.type = "checkbox";
   inputKeepClasses.id = "keepClassesInput";
-  inputKeepClasses.checked = true;
+  inputKeepClasses.checked = persistedSettings.keepClasses;
 
   rowKeepClasses.appendChild(labelKeepClasses);
   rowKeepClasses.appendChild(inputKeepClasses);
@@ -183,7 +232,7 @@ function setOptionsAndDownload() {
   inputIncludeUiControls.className = "spcd3-input";
   inputIncludeUiControls.type = "checkbox";
   inputIncludeUiControls.id = "includeUiControlsInput";
-  inputIncludeUiControls.checked = true;
+  inputIncludeUiControls.checked = persistedSettings.includeUiControls;
 
   rowIncludeUiControls.appendChild(labelIncludeUiControls);
   rowIncludeUiControls.appendChild(inputIncludeUiControls);
@@ -200,7 +249,7 @@ function setOptionsAndDownload() {
   inputIncludeDataValues.className = "spcd3-input";
   inputIncludeDataValues.type = "checkbox";
   inputIncludeDataValues.id = "includeDataValuesInput";
-  inputIncludeDataValues.checked = true;
+  inputIncludeDataValues.checked = persistedSettings.includeDataValues;
 
   rowIncludeDataValues.appendChild(labelIncludeDataValues);
   rowIncludeDataValues.appendChild(inputIncludeDataValues);
@@ -216,7 +265,7 @@ function setOptionsAndDownload() {
   inputConvertSymbols.className = "spcd3-input";
   inputConvertSymbols.type = "checkbox";
   inputConvertSymbols.id = "convertSymbolsInput";
-  inputConvertSymbols.checked = false;
+  inputConvertSymbols.checked = persistedSettings.convertSymbolsToPaths;
 
   rowConvertSymbols.appendChild(labelConvertSymbols);
   rowConvertSymbols.appendChild(inputConvertSymbols);
@@ -237,13 +286,23 @@ function setOptionsAndDownload() {
 
   input.focus();
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
+    const name = DEFAULT_SVG_FILENAME;
+
     const decimals = parseInt(input.value);
     if (isNaN(decimals) || decimals < 0 || decimals > 10) {
       alert("Please enter a number between 2 and 10.");
       input.focus();
       return;
     }
+
+    setSvgDownloadSettings({
+      decimals,
+      keepClasses: inputKeepClasses.checked,
+      includeUiControls: inputIncludeUiControls.checked,
+      includeDataValues: inputIncludeDataValues.checked,
+      convertSymbolsToPaths: inputConvertSymbols.checked,
+    });
 
     let svgString = createSvgString(inputIncludeDataValues.checked);
     svgString = svgString.replaceAll("currentColor", "black");
@@ -290,17 +349,32 @@ function setOptionsAndDownload() {
     });
 
     let preface = '<?xml version="1.0" standalone="no"?>\r\n';
-    let svgBlob = new Blob([preface, processedData], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-    let svgUrl = URL.createObjectURL(svgBlob);
-    let downloadLink = document.createElement("a");
-    downloadLink.href = svgUrl;
-    downloadLink.download = name;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    document.body.removeChild(modalOverlay);
+    const svgContent = `${preface}${processedData}`;
+
+    button.disabled = true;
+
+    try {
+      const savedInTauri = await saveSvgWithTauri(svgContent, name);
+      if (savedInTauri) {
+        document.body.removeChild(modalOverlay);
+        return;
+      }
+
+      const savedInBrowserPicker = await saveSvgWithBrowserFilePicker(
+        svgContent,
+        name,
+      );
+      if (!savedInBrowserPicker) {
+        downloadSvgInBrowser(svgContent, name);
+      }
+
+      document.body.removeChild(modalOverlay);
+    } catch (error) {
+      console.error("Failed to save SVG", error);
+      alert("The SVG file could not be saved.");
+    } finally {
+      button.disabled = false;
+    }
   });
 
   modalOverlay.addEventListener("click", (e) => {
@@ -312,6 +386,116 @@ function setOptionsAndDownload() {
   closeButton.addEventListener("click", () => {
     document.body.removeChild(modalOverlay);
   });
+}
+
+function getTauriGlobalApi(): TauriGlobalApi | null {
+  if (typeof window === "undefined") return null;
+  return (window as Window & { __TAURI__?: TauriGlobalApi }).__TAURI__ ?? null;
+}
+
+async function saveSvgWithBrowserFilePicker(
+  svgContent: string,
+  suggestedFileName: string,
+): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+
+  const browserWindow = window as BrowserSaveWindow;
+  const showSaveFilePicker = browserWindow.showSaveFilePicker;
+  if (!showSaveFilePicker) {
+    return false;
+  }
+
+  try {
+    const fileHandle = await showSaveFilePicker({
+      id: "spcd3-svg-download",
+      suggestedName: suggestedFileName,
+      types: [
+        {
+          description: "SVG files",
+          accept: { "image/svg+xml": [".svg"] },
+        },
+      ],
+    });
+
+    const writable = await fileHandle.createWritable();
+    await writable.write(svgContent);
+    await writable.close();
+    return true;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return true;
+    }
+
+    console.warn("Browser file picker save failed, falling back to download", error);
+    return false;
+  }
+}
+
+async function saveSvgWithTauri(
+  svgContent: string,
+  suggestedFileName: string,
+): Promise<boolean> {
+  const tauri = getTauriGlobalApi();
+  const save = tauri?.dialog?.save;
+  const writeTextFile = tauri?.fs?.writeTextFile;
+
+  if (!save || !writeTextFile) {
+    return false;
+  }
+
+  const defaultPath = await getTauriSvgDefaultPath(suggestedFileName);
+  const selectedPath = await save({
+    title: "Download Chart (SVG)",
+    defaultPath,
+    filters: [{ name: "SVG", extensions: ["svg"] }],
+  });
+
+  if (!selectedPath) {
+    return true;
+  }
+
+  await writeTextFile(selectedPath, svgContent);
+  await rememberTauriSvgSaveDirectory(selectedPath);
+  return true;
+}
+
+async function getTauriSvgDefaultPath(
+  suggestedFileName: string,
+): Promise<string> {
+  const tauri = getTauriGlobalApi();
+  const join = tauri?.path?.join;
+  const storedDirectory = getTauriSvgSaveDirectory();
+
+  if (join && storedDirectory) {
+    return await Promise.resolve(join(storedDirectory, suggestedFileName));
+  }
+
+  return suggestedFileName;
+}
+
+async function rememberTauriSvgSaveDirectory(selectedPath: string): Promise<void> {
+  const tauri = getTauriGlobalApi();
+  const dirname = tauri?.path?.dirname;
+  if (!dirname) return;
+
+  const directory = await Promise.resolve(dirname(selectedPath));
+  if (directory) {
+    setTauriSvgSaveDirectory(directory);
+  }
+}
+
+function downloadSvgInBrowser(svgContent: string, filename: string): void {
+  const svgBlob = new Blob([svgContent], {
+    type: "image/svg+xml;charset=utf-8",
+  });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = svgUrl;
+  downloadLink.download = filename;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(svgUrl);
 }
 
 type SymbolPathDefinition = {

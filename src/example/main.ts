@@ -29,7 +29,9 @@ import {
   setSelectableWidth,
   getSelectableWith,
   setDimensionSpacing,
-} from "pc-lib";
+  getExampleUiSettings,
+  setExampleUiSettings,
+} from "spcd3";
 
 type ParsedData = ReturnType<typeof loadCSV>;
 
@@ -47,11 +49,36 @@ const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
 const DEFAULT_DIMENSION_SPACING_REM = 6;
 const RANGE_TRANSITION_DURATION_MS = 1000;
 const REPOSITORY_URL = "https://github.com/tugraz-isds/spcd3";
+const persistedUiSettings = getExampleUiSettings();
 
 type PackageMetadata = {
   version?: string;
   releaseDate?: string;
 };
+
+type TauriOpenerApi = {
+  openUrl?: (url: string) => Promise<void>;
+};
+
+type TauriWebviewHandle = {
+  setZoom?: (scaleFactor: number) => Promise<void>;
+};
+
+type TauriWebviewApi = {
+  getCurrentWebview?: () => TauriWebviewHandle;
+};
+
+type TauriWindowApi = Window & {
+  __TAURI__?: {
+    opener?: TauriOpenerApi;
+    webview?: TauriWebviewApi;
+  };
+};
+
+const DEFAULT_ZOOM_FACTOR = 1;
+const MIN_ZOOM_FACTOR = 0.2;
+const MAX_ZOOM_FACTOR = 5;
+const ZOOM_STEP = 0.2;
 
 function formatReleaseDate(dateString: string): string {
   const date = new Date(dateString);
@@ -91,6 +118,54 @@ function openAboutModal(): void {
 function closeAboutModal(): void {
   elementById<HTMLElement>("aboutModal").hidden = true;
   elementById<HTMLButtonElement>("aboutButton").focus();
+}
+
+function getTauriOpener(): TauriOpenerApi | null {
+  if (typeof window === "undefined") return null;
+  return (window as TauriWindowApi).__TAURI__?.opener ?? null;
+}
+
+function getTauriWebview(): TauriWebviewHandle | null {
+  if (typeof window === "undefined") return null;
+  return (window as TauriWindowApi).__TAURI__?.webview?.getCurrentWebview?.() ?? null;
+}
+
+function clampZoomFactor(value: number): number {
+  return Math.min(MAX_ZOOM_FACTOR, Math.max(MIN_ZOOM_FACTOR, value));
+}
+
+async function applyZoomFactor(value: number): Promise<void> {
+  const zoomFactor = clampZoomFactor(value);
+  const webview = getTauriWebview();
+  await webview?.setZoom?.(zoomFactor);
+
+  setExampleUiSettings({
+    selectionSensitivityRem: Number(selectionSensitivitySlider.value),
+    dimensionSpacingRem: Number(dimensionSpacingSlider.value),
+    zoomFactor,
+  });
+}
+
+async function adjustZoomFactor(delta: number): Promise<void> {
+  await applyZoomFactor(persistedUiSettings.zoomFactor + delta);
+  persistedUiSettings.zoomFactor = clampZoomFactor(
+    persistedUiSettings.zoomFactor + delta,
+  );
+}
+
+async function resetZoomFactor(): Promise<void> {
+  await applyZoomFactor(DEFAULT_ZOOM_FACTOR);
+  persistedUiSettings.zoomFactor = DEFAULT_ZOOM_FACTOR;
+}
+
+async function openRepositoryLink(event: MouseEvent): Promise<void> {
+  const opener = getTauriOpener();
+  if (!opener?.openUrl) {
+    return;
+  }
+
+  event.preventDefault();
+  await opener.openUrl(REPOSITORY_URL);
 }
 
 async function loadExampleVersion(): Promise<void> {
@@ -149,6 +224,29 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
   const aboutModal = document.getElementById("aboutModal");
   if (event.key === "Escape" && aboutModal && !aboutModal.hidden) {
     closeAboutModal();
+    return;
+  }
+
+  const isZoomShortcut = event.ctrlKey || event.metaKey;
+  if (!isZoomShortcut) {
+    return;
+  }
+
+  if (event.key === "+" || event.key === "=") {
+    event.preventDefault();
+    void adjustZoomFactor(ZOOM_STEP);
+    return;
+  }
+
+  if (event.key === "-") {
+    event.preventDefault();
+    void adjustZoomFactor(-ZOOM_STEP);
+    return;
+  }
+
+  if (event.key === "0") {
+    event.preventDefault();
+    void resetZoomFactor();
   }
 });
 
@@ -163,7 +261,11 @@ function elementById<T extends HTMLElement>(id: string): T {
 document.addEventListener(
   "DOMContentLoaded",
   function () {
-    elementById<HTMLAnchorElement>("repoButton").href = REPOSITORY_URL;
+    const repoButton = elementById<HTMLAnchorElement>("repoButton");
+    repoButton.href = REPOSITORY_URL;
+    repoButton.addEventListener("click", (event) => {
+      void openRepositoryLink(event);
+    });
     elementById<HTMLButtonElement>("aboutButton").addEventListener(
       "click",
       openAboutModal,
@@ -180,10 +282,10 @@ document.addEventListener(
 
     data = studentData;
     newData = loadCSV(data);
-    setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
+    setDimensionSpacing(persistedUiSettings.dimensionSpacingRem);
     showButtons();
     drawChart(newData);
-    syncSelectionSensitivityFromChart();
+    applySelectionSensitivity(persistedUiSettings.selectionSensitivityRem);
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -191,6 +293,7 @@ document.addEventListener(
     generateDropdownForRange();
     generateDropdownForMultiRange();
     generateDropdownForSelectRecords();
+    void applyZoomFactor(persistedUiSettings.zoomFactor);
   },
   false,
 );
@@ -246,6 +349,12 @@ function resetSlidersToDefaults(): void {
   dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
   updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
   setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
+
+  setExampleUiSettings({
+    selectionSensitivityRem: DEFAULT_SELECTION_SENSITIVITY_REM,
+    dimensionSpacingRem: DEFAULT_DIMENSION_SPACING_REM,
+    zoomFactor: persistedUiSettings.zoomFactor,
+  });
 }
 
 function syncSelectionSensitivityFromChart(): void {
@@ -257,21 +366,32 @@ function syncSelectionSensitivityFromChart(): void {
   updateSelectionSensitivityLabel(value);
 }
 
-selectionSensitivitySlider.value = DEFAULT_SELECTION_SENSITIVITY_REM.toString();
+function applySelectionSensitivity(value: number): void {
+  selectionSensitivitySlider.value = value.toString();
+  updateSelectionSensitivityLabel(value);
+  setSelectableWidth(`${value}rem`);
+}
+
+selectionSensitivitySlider.value =
+  persistedUiSettings.selectionSensitivityRem.toString();
 setSliderDefaultMarker(selectionSensitivitySlider);
-updateSelectionSensitivityLabel(DEFAULT_SELECTION_SENSITIVITY_REM);
+updateSelectionSensitivityLabel(persistedUiSettings.selectionSensitivityRem);
 
 selectionSensitivitySlider.addEventListener("input", (event: Event) => {
   const target = event.target as HTMLInputElement | null;
   if (!target) return;
   const value = Number(target.value);
-  updateSelectionSensitivityLabel(value);
-  setSelectableWidth(`${value}rem`);
+  applySelectionSensitivity(value);
+  setExampleUiSettings({
+    selectionSensitivityRem: value,
+    dimensionSpacingRem: Number(dimensionSpacingSlider.value),
+    zoomFactor: persistedUiSettings.zoomFactor,
+  });
 });
 
-dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
+dimensionSpacingSlider.value = persistedUiSettings.dimensionSpacingRem.toString();
 setSliderDefaultMarker(dimensionSpacingSlider);
-updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
+updateDimensionSpacingLabel(persistedUiSettings.dimensionSpacingRem);
 
 dimensionSpacingSlider.addEventListener("input", (event: Event) => {
   const target = event.target as HTMLInputElement | null;
@@ -279,6 +399,11 @@ dimensionSpacingSlider.addEventListener("input", (event: Event) => {
   const value = Number(target.value);
   updateDimensionSpacingLabel(value);
   setDimensionSpacing(value);
+  setExampleUiSettings({
+    selectionSensitivityRem: Number(selectionSensitivitySlider.value),
+    dimensionSpacingRem: value,
+    zoomFactor: persistedUiSettings.zoomFactor,
+  });
 });
 
 let inputButton = elementById<HTMLElement>("input");
@@ -333,7 +458,10 @@ function handleFileSelect(event: Event) {
       data = result;
       newData = loadCSV(data);
       drawChart(newData);
-      syncSelectionSensitivityFromChart();
+      applySelectionSensitivity(
+        Number(selectionSensitivitySlider.value) ||
+          DEFAULT_SELECTION_SENSITIVITY_REM,
+      );
 
       showButtons();
 
@@ -1613,7 +1741,7 @@ function generateModuleForMultiRangeSettings() {
 
   adjustFilterRow.appendChild(adjustFilterCheckbox);
   adjustFilterRow.appendChild(
-    createTextLabel("Reset all filters to new range", "label-text"),
+    createTextLabel("Also reset all filters to new range", "label-text"),
   );
 
   const row = document.createElement("div");

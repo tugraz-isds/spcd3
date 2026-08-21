@@ -27,7 +27,7 @@ function buildExampleTS() {
 }
 
 function buildLibraryTypes() {
-  return src("./src/lib/index.ts")
+  return src("./src/lib/**/*.ts")
     .pipe(typesProject())
     .dts.pipe(dest("./dist/library"));
 }

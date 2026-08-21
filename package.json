@@ -1,5 +1,5 @@
 {
-  "name": "SPCD3",
+  "name": "spcd3",
   "version": "1.0.0",
   "packageManager": "yarn@4.17.1",
   "releaseDate": "2026-07-26",
@@ -8,8 +8,17 @@
   "module": "./dist/library/esm/spcd3.js",
   "style": "./dist/library/spcd3.css",
   "types": "./dist/library/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/library/index.d.ts",
+      "import": "./dist/library/esm/spcd3.js",
+      "require": "./dist/library/cjs/spcd3.js",
+      "default": "./dist/library/esm/spcd3.js"
+    },
+    "./spcd3.css": "./dist/library/spcd3.css"
+  },
   "files": [
-    "/dist/library"
+    "dist/library/**/*"
   ],
   "scripts": {
     "clean": "gulp clean",

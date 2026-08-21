@@ -322,20 +322,30 @@ input::file-selector-button:hover {
 }
 
 #bottom-controls {
-  border-top: var(--example-header-surface) 0.4rem solid;
+  position: relative;
   margin-bottom: 4rem;
   padding-top: 2rem;
   padding-left: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(27rem, 1fr));
-  grid-column-gap: 1rem;
+  grid-template-columns: repeat(3, minmax(18.5rem, 19.5rem));
+  justify-content: start;
+  grid-column-gap: 0.35rem;
   grid-row-gap: 1rem;
   grid-auto-flow: dense;
 }
 
+#bottom-controls::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 0.4rem solid var(--example-header-surface);
+}
+
 @media (max-width: 75rem) {
   #bottom-controls {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(18.5rem, 19.5rem));
   }
 }
 
@@ -616,8 +626,8 @@ div#invertDimensionHeader {
 }
 
 .invertDimensionContainer {
-  margin-left: 7rem;
-  margin-right: 6rem;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .labels {
