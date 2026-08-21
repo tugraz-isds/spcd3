@@ -7,16 +7,7 @@
   "main": "./dist/library/cjs/spcd3.js",
   "module": "./dist/library/esm/spcd3.js",
   "style": "./dist/library/spcd3.css",
-  "types": "./dist/library/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/library/index.d.ts",
-      "import": "./dist/library/esm/spcd3.js",
-      "require": "./dist/library/cjs/spcd3.js",
-      "default": "./dist/library/esm/spcd3.js"
-    },
-    "./spcd3.css": "./dist/library/spcd3.css"
-  },
+  "types": "./dist/library/types/index.d.ts",
   "files": [
     "dist/library/**/*"
   ],

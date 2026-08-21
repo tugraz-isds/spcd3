@@ -14,8 +14,8 @@ const tsProject = ts.createProject("tsconfig.json");
 const typesProject = ts.createProject("tsconfig.json", {
   declaration: true,
   emitDeclarationOnly: true,
-  declarationDir: "./dist/library",
-  outDir: "./dist/library",
+  declarationDir: "./dist/library/types",
+  outDir: "./dist/library/types",
   rootDir: "./src/lib",
   sourceMap: false,
 });
@@ -27,7 +27,7 @@ function buildExampleTS() {
 }
 
 function buildLibraryTypes() {
-  return src("./src/lib/**/*.ts")
+  return src("./src/lib/index.ts")
     .pipe(typesProject())
     .dts.pipe(dest("./dist/library"));
 }
