@@ -21,11 +21,14 @@ type ChartModalState = {
   resetButton: HTMLButtonElement;
   panButton: HTMLButtonElement;
   zoomLabel: HTMLSpanElement;
+  panInteractionBlocker: HTMLDivElement;
   svg: SVGSVGElement;
   baseSvgWidth: number;
   baseSvgHeight: number;
   previousSvgInlineSize: string;
   previousSvgBlockSize: string;
+  previousSvgPointerEvents: string;
+  previousChartWrapperInert: boolean;
   scale: number;
   panMode: boolean;
   isDraggingPan: boolean;
@@ -122,8 +125,10 @@ export function closeChartModal(): void {
   setPanMode(false);
 
   state.chartWrapper.classList.remove("spcd3-chartWrapper--modal");
+  state.chartWrapper.inert = state.previousChartWrapperInert;
   state.svg.style.inlineSize = state.previousSvgInlineSize;
   state.svg.style.blockSize = state.previousSvgBlockSize;
+  state.svg.style.pointerEvents = state.previousSvgPointerEvents;
   state.tooltipElements.forEach((element) => element.remove());
 
   state.originalParent.insertBefore(state.chartWrapper, state.placeholder);
@@ -457,6 +462,10 @@ function openZoomMode(dataset: any[]): void {
   viewport.className = "spcd3-chart-modal-viewport";
   panel.appendChild(viewport);
 
+  const panInteractionBlocker = document.createElement("div");
+  panInteractionBlocker.className = "spcd3-chart-modal-pan-interaction-blocker";
+  viewport.appendChild(panInteractionBlocker);
+
   chartWrapper.classList.add("spcd3-chartWrapper--modal");
   viewport.appendChild(chartWrapper);
 
@@ -491,11 +500,14 @@ function openZoomMode(dataset: any[]): void {
     resetButton,
     panButton,
     zoomLabel,
+    panInteractionBlocker,
     svg,
     baseSvgWidth,
     baseSvgHeight,
     previousSvgInlineSize: svg.style.inlineSize,
     previousSvgBlockSize: svg.style.blockSize,
+    previousSvgPointerEvents: svg.style.pointerEvents,
+    previousChartWrapperInert: chartWrapper.inert,
     scale: 1,
     panMode: false,
     isDraggingPan: false,
@@ -650,7 +662,11 @@ function setPanMode(isActive: boolean): void {
   chartModalState.panButton.classList.toggle("is-active", isActive);
   chartModalState.viewport.classList.toggle("spcd3-chart-modal-viewport--pannable", isActive);
   chartModalState.viewport.classList.remove("spcd3-chart-modal-viewport--dragging");
-  chartModalState.svg.style.pointerEvents = isActive ? "none" : "";
+  chartModalState.panInteractionBlocker.classList.toggle("is-active", isActive);
+  chartModalState.chartWrapper.inert = isActive;
+  chartModalState.svg.style.pointerEvents = isActive
+    ? "none"
+    : chartModalState.previousSvgPointerEvents;
   chartModalState.zoomLabel.textContent = `${Math.round(chartModalState.scale * 100)}%`;
   d3.select("#contextmenu").style("display", "none");
   d3.select("#contextmenuRecords").style("display", "none");

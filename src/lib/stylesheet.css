@@ -545,6 +545,7 @@ table.spcd3-tablecontainer td {
 }
 
 .spcd3-chart-modal-viewport {
+  position: relative;
   flex: 1 1 auto;
   min-block-size: 0;
   overflow: auto;
@@ -554,7 +555,18 @@ table.spcd3-tablecontainer td {
       180deg,
       color-mix(in srgb, var(--spcd3-page-bg) 92%, transparent),
       var(--spcd3-page-bg)
-    );
+  );
+}
+
+.spcd3-chart-modal-pan-interaction-blocker {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+
+.spcd3-chart-modal-pan-interaction-blocker.is-active {
+  display: block;
 }
 
 .spcd3-chart-modal-viewport--pannable {
