@@ -137,6 +137,7 @@ export function drawChart(content: []): void {
   window.onclick = () => {
     select("#contextmenu").style("display", "none");
     select("#contextmenuRecords").style("display", "none");
+    releaseRecordHover();
   };
 }
 
@@ -421,6 +422,8 @@ function alignToolbarWithLeftmostAxisLabels(): void {
 }
 
 function handlePointerEnter(event: any, d: any) {
+  if (isRecordHoverLocked) return;
+
   clearExistingDelay();
   doNotHighlight();
 
@@ -445,6 +448,8 @@ function handlePointerEnter(event: any, d: any) {
 }
 
 function handlePointerLeaveOrOut() {
+  if (isRecordHoverLocked) return;
+
   doNotHighlight();
   clearExistingDelay();
   setHoveredRecords([]);
@@ -547,7 +552,13 @@ function setActivePathLines(svg: any, content: any, parcoords: any): any {
     .on("pointerout", handlePointerLeaveOrOut)
     .on("click", handleClick)
     .on("contextmenu", function (event: any, d: any) {
-      context.handleRecordContextMenu(contextMenuRecords, event, d);
+      const isMenuOpen = context.handleRecordContextMenu(
+        contextMenuRecords,
+        event,
+        d,
+        releaseRecordHover,
+      );
+      isRecordHoverLocked = isMenuOpen;
       select("#contextmenu").style("display", "none");
     });
 
@@ -754,6 +765,16 @@ function setInvertIcon(featureAxis: any): void {
 let currentlyHighlightedItems: string[] = [];
 
 let hoverSnapshot: any = null;
+
+let isRecordHoverLocked = false;
+
+function releaseRecordHover(): void {
+  if (!isRecordHoverLocked) return;
+
+  isRecordHoverLocked = false;
+  handlePointerLeaveOrOut();
+  hoverSnapshot = null;
+}
 
 function highlight(data: any[]) {
   hoverSnapshot = data;

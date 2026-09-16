@@ -969,13 +969,14 @@ export function handleRecordContextMenu(
   contextMenu: any,
   event: any,
   d: any,
-): void {
+  onClose: () => void,
+): boolean {
   const container =
     document.querySelector("#spcd3-parallelcoords .spcd3-chartWrapper") ??
     document.querySelector("#spcd3-parallelcoords");
-  if (!container) return;
+  if (!container) return false;
   const menuElement = contextMenu.node() as HTMLElement | null;
-  if (!menuElement) return;
+  if (!menuElement) return false;
   const rect = container.getBoundingClientRect();
   const data =
     hoveredRecords.length > 0
@@ -996,7 +997,7 @@ export function handleRecordContextMenu(
         ? [clickedRecord]
         : [];
 
-  if (targetRecords.length === 0) return;
+  if (targetRecords.length === 0) return false;
 
   if (targetRecords.length > 1) {
     select("#selectRecord").text("Select Records");
@@ -1020,10 +1021,15 @@ export function handleRecordContextMenu(
       event.stopPropagation();
     });
 
+  const closeMenu = () => {
+    select("#contextmenuRecords").style("display", "none");
+    onClose();
+  };
+
   select("#selectRecord").on("click", (event: any) => {
     api.setSelection(targetRecords);
     event.stopPropagation();
-    select("#contextmenuRecords").style("display", "none");
+    closeMenu();
   });
 
   select("#unSelectRecord").on("click", (event: any) => {
@@ -1031,7 +1037,7 @@ export function handleRecordContextMenu(
       api.setUnselected(item);
     });
     event.stopPropagation();
-    select("#contextmenuRecords").style("display", "none");
+    closeMenu();
   });
 
   select("#toggleRecord")
@@ -1041,7 +1047,7 @@ export function handleRecordContextMenu(
         api.toggleSelection(item);
       });
       event.stopPropagation();
-      select("#contextmenuRecords").style("display", "none");
+      closeMenu();
     });
 
   select("#addSelection")
@@ -1052,7 +1058,7 @@ export function handleRecordContextMenu(
       const records = [...selectedRecords, ...targetRecords];
       api.setSelection(records);
       event.stopPropagation();
-      select("#contextmenuRecords").style("display", "none");
+      closeMenu();
     });
 
   select("#removeSelection").on("click", (event: any) => {
@@ -1060,10 +1066,11 @@ export function handleRecordContextMenu(
       api.setUnselected(item);
     });
     event.stopPropagation();
-    select("#contextmenuRecords").style("display", "none");
+    closeMenu();
   });
 
   selectAll(".contextmenu").style("padding", 0.35 + "rem");
 
   event.preventDefault();
+  return true;
 }

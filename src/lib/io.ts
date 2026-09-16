@@ -314,7 +314,6 @@ function setOptionsAndDownload() {
       'fill="none" font-size="8" text-anchor="end" stroke="black"',
     );
     svgString = svgString.replaceAll("domain", "dimension");
-    svgString = svgString.replaceAll("12px", "12");
     svgString = svgString.replaceAll(
       'class="tick" opacity="1"',
       'class="tick" fill="black" stroke="none"',
