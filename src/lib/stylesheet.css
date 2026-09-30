@@ -211,6 +211,22 @@ table.spcd3-tablecontainer td {
   box-sizing: border-box;
 }
 
+.spcd3-chartWrapper--pannable {
+  user-select: none;
+}
+
+.spcd3-chartWrapper--pannable #spcd3-pc_svg {
+  cursor: grab;
+}
+
+.spcd3-chartWrapper--pannable #spcd3-pc_svg * {
+  cursor: auto;
+}
+
+.spcd3-chartWrapper--dragging #spcd3-pc_svg {
+  cursor: grabbing;
+}
+
 .spcd3-tip-layer {
   position: absolute;
   left: 0;
@@ -344,12 +360,18 @@ table.spcd3-tablecontainer td {
 }
 
 #spcd3-toolbarRow {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
+  inline-size: max-content;
   overflow: visible;
   padding-left: 1rem;
+  background: var(--spcd3-page-bg);
   visibility: hidden;
 }
 
@@ -377,6 +399,37 @@ table.spcd3-tablecontainer td {
   box-shadow: none;
   opacity: 1;
   text-transform: none;
+}
+
+.spcd3-toolbar-textbutton {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.spcd3-toolbar-zoom-label {
+  padding: 0 0.1rem;
+  color: var(--spcd3-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.4rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.spcd3-toolbar-zoom-input {
+  inline-size: 1.2rem;
+  padding: 0;
+  border: 0;
+  outline-offset: 0.1rem;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  text-align: right;
+}
+
+.spcd3-toolbar-button:disabled {
+  cursor: default;
+  color: var(--spcd3-text-disabled);
 }
 
 .spcd3-toolbar-buttonicon {
@@ -457,135 +510,6 @@ table.spcd3-tablecontainer td {
   width: 100%;
   overflow: auto;
   max-height: 100%;
-}
-
-.spcd3-chart-modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  padding: 1rem;
-  background-color: var(--spcd3-backdrop);
-  z-index: 10000;
-}
-
-.spcd3-chart-modal {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  inline-size: min(96vw, 120rem);
-  block-size: min(94vh, 72rem);
-  min-block-size: 24rem;
-  background: var(--spcd3-panel-bg);
-  border: 0.08rem solid var(--spcd3-border-emphasis);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.25rem 0.625rem var(--spcd3-shadow-modal);
-  overflow: hidden;
-}
-
-.spcd3-chart-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 1rem;
-  padding: 0.75rem 3rem 0.5rem 1rem;
-  border-bottom: 0.08rem solid var(--spcd3-border-subtle);
-}
-
-.spcd3-chart-modal-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--spcd3-text-primary);
-}
-
-.spcd3-chart-modal-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.spcd3-chart-modal-control {
-  min-block-size: 1.9rem;
-  padding: 0.2rem 0.65rem;
-}
-
-.spcd3-chart-modal-control--icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-inline-size: 1.9rem;
-  padding: 0.2rem;
-}
-
-.spcd3-chart-modal-control--icon .spcd3-toolbar-buttonicon {
-  width: 0.95rem;
-  height: 0.95rem;
-  margin: auto;
-}
-
-.spcd3-chart-modal-control.is-active {
-  background: var(--spcd3-control-bg-hover);
-  border-color: var(--spcd3-border-emphasis);
-}
-
-.spcd3-chart-modal-zoom-label {
-  min-inline-size: 3.2rem;
-  text-align: center;
-  color: var(--spcd3-text-secondary);
-  font-size: 0.8rem;
-}
-
-.spcd3-chart-modal-hint {
-  padding: 0.5rem 1rem 0;
-  color: var(--spcd3-text-secondary);
-  font-size: 0.75rem;
-}
-
-.spcd3-chart-modal-viewport {
-  position: relative;
-  flex: 1 1 auto;
-  min-block-size: 0;
-  overflow: auto;
-  padding: 1rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--spcd3-page-bg) 92%, transparent),
-      var(--spcd3-page-bg)
-  );
-}
-
-.spcd3-chart-modal-pan-interaction-blocker {
-  display: none;
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-}
-
-.spcd3-chart-modal-pan-interaction-blocker.is-active {
-  display: block;
-}
-
-.spcd3-chart-modal-viewport--pannable {
-  cursor: grab;
-  user-select: none;
-}
-
-.spcd3-chart-modal-viewport--dragging {
-  cursor: grabbing;
-}
-
-.spcd3-chartWrapper--modal {
-  inline-size: max-content;
-  min-inline-size: 100%;
-  margin-left: 0;
-}
-
-.spcd3-chartWrapper--modal #spcd3-toolbarRow {
-  display: none;
 }
 
 .spcd3-contextmenu-records {

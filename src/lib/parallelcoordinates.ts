@@ -7,6 +7,7 @@ import * as context from "./contextMenu";
 import * as icon from "./icons/icons";
 import * as toolbar from "./toolbar";
 import * as api from "./helperApiFunc";
+import { setChartZoomScale } from "./persistence";
 import {
   yAxis,
   parcoords,
@@ -77,8 +78,6 @@ export function drawChart(content: []): void {
 
   chartWrapper.append("div").attr("id", "spcd3-toolbarRow");
 
-  toolbar.createToolbar(parcoords.newDataset);
-
   setSvg(
     chartWrapper
       .append("svg")
@@ -88,6 +87,8 @@ export function drawChart(content: []): void {
       .attr("viewBox", [0, 0, width, height])
       .attr("preserveAspectRatio", "none"),
   );
+
+  toolbar.createToolbar(parcoords.newDataset);
 
   const plot = svg.append("g").attr("class", "plot");
 
@@ -142,6 +143,7 @@ export function drawChart(content: []): void {
 }
 
 export function reset() {
+  setChartZoomScale(1);
   drawChart(resetContentData);
 }
 

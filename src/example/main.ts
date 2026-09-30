@@ -29,6 +29,7 @@ import {
   setSelectableWidth,
   getSelectableWith,
   setDimensionSpacing,
+  setChartZoomScale,
   getExampleUiSettings,
   setExampleUiSettings,
 } from "spcd3";
@@ -136,6 +137,7 @@ function clampZoomFactor(value: number): number {
 
 async function applyZoomFactor(value: number): Promise<void> {
   const zoomFactor = clampZoomFactor(value);
+  persistedUiSettings.zoomFactor = zoomFactor;
   const webview = getTauriWebview();
   await webview?.setZoom?.(zoomFactor);
 
@@ -148,14 +150,10 @@ async function applyZoomFactor(value: number): Promise<void> {
 
 async function adjustZoomFactor(delta: number): Promise<void> {
   await applyZoomFactor(persistedUiSettings.zoomFactor + delta);
-  persistedUiSettings.zoomFactor = clampZoomFactor(
-    persistedUiSettings.zoomFactor + delta,
-  );
 }
 
 async function resetZoomFactor(): Promise<void> {
   await applyZoomFactor(DEFAULT_ZOOM_FACTOR);
-  persistedUiSettings.zoomFactor = DEFAULT_ZOOM_FACTOR;
 }
 
 async function openRepositoryLink(event: MouseEvent): Promise<void> {
@@ -1888,6 +1886,8 @@ function resetToRoundedRange() {
 }
 
 function resetAll() {
+  void resetZoomFactor();
+  setChartZoomScale(1);
   let reloadedData = loadCSV(data);
   resetSlidersToDefaults();
   drawChart(reloadedData);
