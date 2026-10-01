@@ -2,7 +2,7 @@
   "name": "spcd3",
   "version": "1.0.0",
   "packageManager": "yarn@4.17.1",
-  "releaseDate": "2026-09-30",
+  "releaseDate": "2026-10-01",
   "description": "Steerable Parallel Coordinates in D3",
   "main": "./dist/library/cjs/spcd3.js",
   "module": "./dist/library/esm/spcd3.js",
