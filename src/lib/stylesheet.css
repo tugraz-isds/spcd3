@@ -412,7 +412,6 @@ table.spcd3-tablecontainer td {
 .spcd3-toolbar-zoom-label {
   align-self: center;
   display: inline-flex;
-  transform: translateY(0.22rem);
   align-items: center;
   block-size: 1.4rem;
   padding: 0 0.1rem;
@@ -427,7 +426,7 @@ table.spcd3-tablecontainer td {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   inline-size: 1.75rem;
   block-size: 1.4rem;
   margin: 0;
@@ -438,7 +437,7 @@ table.spcd3-tablecontainer td {
   font: inherit;
   font-size: inherit;
   line-height: 1;
-  text-align: right;
+  text-align: center;
   user-select: text;
 }
 
