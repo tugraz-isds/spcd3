@@ -18,6 +18,7 @@ import * as utils from "./utils";
 import * as helper from "./helper";
 import * as brush from "./brush";
 import * as icon from "./icons/icons";
+import { updateChartZoomBaseWidth } from "./toolbar";
 import { select, selectAll } from "d3-selection";
 import { easeCubic } from "d3-ease";
 
@@ -154,10 +155,8 @@ function refreshChartLayoutForVisibleDimensions(): void {
     .attr("viewBox", [0, 0, layout.chartWidth, height])
     .style("inline-size", pixelsToRem(layout.chartWidth));
 
-  select(".spcd3-chartWrapper").style(
-    "inline-size",
-    pixelsToRem(layout.chartWidth),
-  );
+  select(".spcd3-chartWrapper").style("inline-size", null);
+  updateChartZoomBaseWidth(layout.chartWidth);
 
   select(".spcd3-brush-overlay").attr("width", layout.chartWidth);
 }
@@ -1286,10 +1285,8 @@ export function setDimensionSpacing(spacingRem: number): void {
     .attr("viewBox", [0, 0, layout.chartWidth, height])
     .style("inline-size", pixelsToRem(layout.chartWidth));
 
-  select(".spcd3-chartWrapper").style(
-    "inline-size",
-    pixelsToRem(layout.chartWidth),
-  );
+  select(".spcd3-chartWrapper").style("inline-size", null);
+  updateChartZoomBaseWidth(layout.chartWidth);
 
   select("#spcd3-pc_svg .plot > rect").attr("width", layout.chartWidth);
 

@@ -85,7 +85,7 @@ export function drawChart(content: []): void {
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height])
-      .attr("preserveAspectRatio", "none"),
+      .attr("preserveAspectRatio", "xMinYMin meet"),
   );
 
   toolbar.createToolbar(parcoords.newDataset);

@@ -1,4 +1,8 @@
 import xmlFormat from "xml-formatter";
+import { isTauri } from "@tauri-apps/api/core";
+import { dirname, join } from "@tauri-apps/api/path";
+import { save as saveWithNativeDialog } from "@tauri-apps/plugin-dialog";
+import { writeTextFile } from "@tauri-apps/plugin-fs";
 import * as svgcreator from "./svgStringCreator";
 import * as api from "./helperApiFunc";
 import * as helper from "./helper";
@@ -13,23 +17,6 @@ import {
 
 const DOWNLOAD_TOP_BALANCE_PADDING = 32;
 const DEFAULT_SVG_FILENAME = "parcoords.svg";
-
-type TauriGlobalApi = {
-  dialog?: {
-    save?: (options: {
-      defaultPath?: string;
-      filters?: Array<{ name: string; extensions: string[] }>;
-      title?: string;
-    }) => Promise<string | null>;
-  };
-  fs?: {
-    writeTextFile?: (path: string, data: string) => Promise<void>;
-  };
-  path?: {
-    join?: (...paths: string[]) => Promise<string> | string;
-    dirname?: (path: string) => Promise<string> | string;
-  };
-};
 
 type BrowserSaveFilePickerOptions = {
   excludeAcceptAllOption?: boolean;
@@ -387,11 +374,6 @@ function setOptionsAndDownload() {
   });
 }
 
-function getTauriGlobalApi(): TauriGlobalApi | null {
-  if (typeof window === "undefined") return null;
-  return (window as Window & { __TAURI__?: TauriGlobalApi }).__TAURI__ ?? null;
-}
-
 async function saveSvgWithBrowserFilePicker(
   svgContent: string,
   suggestedFileName: string,
@@ -434,16 +416,12 @@ async function saveSvgWithTauri(
   svgContent: string,
   suggestedFileName: string,
 ): Promise<boolean> {
-  const tauri = getTauriGlobalApi();
-  const save = tauri?.dialog?.save;
-  const writeTextFile = tauri?.fs?.writeTextFile;
-
-  if (!save || !writeTextFile) {
+  if (!isTauri()) {
     return false;
   }
 
-  const defaultPath = await getTauriSvgDefaultPath(suggestedFileName);
-  const selectedPath = await save({
+  const defaultPath = await getTauriSvgDefaultPath(suggestedFileName, join);
+  const selectedPath = await saveWithNativeDialog({
     title: "Download Chart (SVG)",
     defaultPath,
     filters: [{ name: "SVG", extensions: ["svg"] }],
@@ -454,30 +432,28 @@ async function saveSvgWithTauri(
   }
 
   await writeTextFile(selectedPath, svgContent);
-  await rememberTauriSvgSaveDirectory(selectedPath);
+  await rememberTauriSvgSaveDirectory(selectedPath, dirname);
   return true;
 }
 
 async function getTauriSvgDefaultPath(
   suggestedFileName: string,
+  join: (...paths: string[]) => Promise<string>,
 ): Promise<string> {
-  const tauri = getTauriGlobalApi();
-  const join = tauri?.path?.join;
   const storedDirectory = getTauriSvgSaveDirectory();
 
-  if (join && storedDirectory) {
-    return await Promise.resolve(join(storedDirectory, suggestedFileName));
+  if (storedDirectory) {
+    return await join(storedDirectory, suggestedFileName);
   }
 
   return suggestedFileName;
 }
 
-async function rememberTauriSvgSaveDirectory(selectedPath: string): Promise<void> {
-  const tauri = getTauriGlobalApi();
-  const dirname = tauri?.path?.dirname;
-  if (!dirname) return;
-
-  const directory = await Promise.resolve(dirname(selectedPath));
+async function rememberTauriSvgSaveDirectory(
+  selectedPath: string,
+  dirname: (path: string) => Promise<string>,
+): Promise<void> {
+  const directory = await dirname(selectedPath);
   if (directory) {
     setTauriSvgSaveDirectory(directory);
   }

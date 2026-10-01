@@ -145,8 +145,10 @@ export function calculateChartLayout(
   const tickLabelWidth = getTextWidthSVG(longestTickLabel, "0.75rem Verdana");
   const axisGap =
     dimensionSpacingVar ?? Math.max(96, Math.ceil(dimensionLabelWidth + 56));
-  const leftPadding = Math.max(72, Math.ceil(tickLabelWidth + 44));
-  const rightPadding = Math.max(48, Math.ceil(dimensionLabelWidth / 2 + 36));
+  const requiredLeftPadding = Math.max(72, Math.ceil(tickLabelWidth + 44));
+  const requiredRightPadding = Math.max(48, Math.ceil(dimensionLabelWidth / 2 + 36));
+  const leftPadding = requiredLeftPadding;
+  const rightPadding = requiredRightPadding;
   const chartWidth = Math.ceil(
     leftPadding + rightPadding + Math.max(0, n - 1) * axisGap,
   );

@@ -2,7 +2,7 @@ import * as d3 from "d3-selection";
 import * as icon from "./icons/icons";
 import * as pc from "./parallelcoordinates";
 import * as io from "./io";
-import { getChartZoomScale, setChartZoomScale } from "./persistence";
+import { setChartZoomScale } from "./persistence";
 import {
   numberOfDimensions,
   numberOfRecords,
@@ -12,10 +12,11 @@ type ChartZoomState = {
   chartWrapper: HTMLDivElement;
   zoomInButton: HTMLButtonElement;
   zoomOutButton: HTMLButtonElement;
-  zoomInput: HTMLInputElement;
+  zoomInput: HTMLSpanElement;
   svg: SVGSVGElement;
   baseSvgWidth: number;
   baseSvgHeight: number;
+  toolbarHeight: number;
   previousSvgInlineSize: string;
   previousSvgBlockSize: string;
   previousChartWrapperBlockSize: string;
@@ -31,10 +32,11 @@ type ChartZoomState = {
   onPointerDown: (event: PointerEvent) => void;
   onClickCapture: (event: MouseEvent) => void;
   onWheel: (event: WheelEvent) => void;
+  onResize: () => void;
 };
 
 let chartZoomState: ChartZoomState | null = null;
-const MIN_CHART_SCALE = 0.5;
+const MIN_CHART_SCALE = 0.1;
 const MAX_CHART_SCALE = 3;
 const CHART_SCALE_STEP = 0.25;
 
@@ -67,12 +69,13 @@ export function createToolbar(dataset: any[]): void {
     .append("span")
     .attr("class", "spcd3-toolbar-zoom-label");
   const zoomInput = zoomControl
-    .append("input")
+    .append("span")
     .attr("class", "spcd3-toolbar-zoom-input")
-    .attr("type", "text")
-    .attr("inputmode", "decimal")
+    .attr("contenteditable", "true")
+    .attr("role", "textbox")
+    .attr("tabindex", "0")
     .attr("aria-label", "Zoom percentage")
-    .attr("value", "100");
+    .text("100");
   zoomControl.append("span").attr("aria-hidden", "true").text("%");
   const { btn: zoomInButton } = makeTextButton(toolbar, {
     id: "zoomInButton",
@@ -133,6 +136,7 @@ export function closeChartModal(): void {
   state.chartWrapper.removeEventListener("pointerdown", state.onPointerDown);
   state.chartWrapper.removeEventListener("click", state.onClickCapture, true);
   state.chartWrapper.removeEventListener("wheel", state.onWheel);
+  window.removeEventListener("resize", state.onResize);
   state.svg.style.inlineSize = state.previousSvgInlineSize;
   state.svg.style.blockSize = state.previousSvgBlockSize;
   state.chartWrapper.style.blockSize = state.previousChartWrapperBlockSize;
@@ -417,7 +421,7 @@ function downloadCSV(dataset: any[], filename = "data.csv") {
 function enableChartZoom(
   zoomInButton: HTMLButtonElement | null,
   zoomOutButton: HTMLButtonElement | null,
-  zoomInput: HTMLInputElement | null,
+  zoomInput: HTMLSpanElement | null,
 ): void {
   if (!zoomInButton || !zoomOutButton || !zoomInput) return;
 
@@ -427,6 +431,7 @@ function enableChartZoom(
 
   const baseSvgWidth = Number(svg.getAttribute("width")) || svg.viewBox.baseVal.width;
   const baseSvgHeight = Number(svg.getAttribute("height")) || svg.viewBox.baseVal.height;
+  const toolbarHeight = chartWrapper.querySelector("#spcd3-toolbarRow")?.getBoundingClientRect().height || 0;
   const onPointerMove = (event: PointerEvent) => {
     const state = chartZoomState;
     if (!state?.isDraggingPan) return;
@@ -467,25 +472,30 @@ function enableChartZoom(
     const direction = event.deltaY < 0 ? 1 : -1;
     setChartScale((chartZoomState?.scale ?? 1) + direction * CHART_SCALE_STEP);
   };
+  const onResize = () => {
+    if (shouldFitChartToViewport(chartWrapper)) {
+      requestAnimationFrame(fitChartToViewport);
+    }
+  };
 
   chartZoomState = {
-    chartWrapper, zoomInButton, zoomOutButton, zoomInput, svg, baseSvgWidth, baseSvgHeight,
+    chartWrapper, zoomInButton, zoomOutButton, zoomInput, svg, baseSvgWidth, baseSvgHeight, toolbarHeight,
     previousSvgInlineSize: svg.style.inlineSize, previousSvgBlockSize: svg.style.blockSize,
     previousChartWrapperBlockSize: chartWrapper.style.blockSize,
     scale: 1, isDraggingPan: false, didPan: false, panStartX: 0, panStartY: 0,
-    panScrollLeft: 0, panScrollTop: 0, onPointerMove, onPointerUp, onPointerDown, onClickCapture, onWheel,
+    panScrollLeft: 0, panScrollTop: 0, onPointerMove, onPointerUp, onPointerDown, onClickCapture, onWheel, onResize,
   };
   chartWrapper.classList.add("spcd3-chartWrapper--pannable");
-  chartWrapper.style.blockSize = `${pxToRem(baseSvgHeight)}rem`;
   chartWrapper.addEventListener("pointerdown", onPointerDown);
   chartWrapper.addEventListener("click", onClickCapture, true);
   chartWrapper.addEventListener("wheel", onWheel, { passive: false });
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("pointerup", onPointerUp);
   window.addEventListener("pointercancel", onPointerUp);
+  window.addEventListener("resize", onResize);
   zoomOutButton.addEventListener("click", () => setChartScale((chartZoomState?.scale ?? 1) - CHART_SCALE_STEP));
   zoomInButton.addEventListener("click", () => setChartScale((chartZoomState?.scale ?? 1) + CHART_SCALE_STEP));
-  zoomInput.addEventListener("change", () => setChartScaleFromInput());
+  zoomInput.addEventListener("blur", () => setChartScaleFromInput());
   zoomInput.addEventListener("keydown", (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -493,18 +503,64 @@ function enableChartZoom(
       zoomInput.blur();
     }
   });
-  setChartScale(getChartZoomScale());
+  if (shouldFitChartToViewport(chartWrapper)) {
+    fitChartToViewport();
+  } else {
+    setChartScale(1);
+  }
+}
+
+function shouldFitChartToViewport(chartWrapper: HTMLDivElement): boolean {
+  return (
+    chartWrapper.parentElement?.dataset.spcd3FitChartToViewport !== "false"
+  );
+}
+
+function fitChartToViewport(): void {
+  const state = chartZoomState;
+  if (!state) return;
+
+  state.chartWrapper.style.inlineSize = "";
+  const toolbarHeight = state.chartWrapper.querySelector("#spcd3-toolbarRow")?.getBoundingClientRect().height || 0;
+  const chartViewport = state.chartWrapper.parentElement;
+  const viewportStyle = chartViewport ? getComputedStyle(chartViewport) : null;
+  const hasConstrainedHeight = viewportStyle && ["auto", "scroll", "hidden", "clip"].includes(viewportStyle.overflowY);
+  const availableViewportHeight = hasConstrainedHeight && chartViewport && chartViewport.clientHeight > toolbarHeight
+    ? chartViewport.clientHeight - toolbarHeight
+    : Infinity;
+  const scale = Math.max(MIN_CHART_SCALE, Math.min(
+    MAX_CHART_SCALE,
+    state.chartWrapper.clientWidth / state.baseSvgWidth,
+    availableViewportHeight / state.baseSvgHeight,
+  ));
+
+  state.chartWrapper.style.blockSize = `${pxToRem(toolbarHeight + state.baseSvgHeight * scale)}rem`;
+  state.chartWrapper.scrollLeft = 0;
+  state.chartWrapper.scrollTop = 0;
+  setChartScale(scale);
+  pc.realignToolbar();
+}
+
+export function updateChartZoomBaseWidth(width: number): void {
+  if (!chartZoomState) return;
+
+  chartZoomState.baseSvgWidth = width;
+  if (shouldFitChartToViewport(chartZoomState.chartWrapper)) {
+    fitChartToViewport();
+  } else {
+    setChartScale(chartZoomState.scale);
+  }
 }
 
 function setChartScaleFromInput(): void {
   const state = chartZoomState;
   if (!state) return;
 
-  const percentage = Number(state.zoomInput.value.trim().replace(/%$/, ""));
+  const percentage = Number(state.zoomInput.textContent?.trim().replace(/%$/, ""));
   if (Number.isFinite(percentage)) {
     setChartScale(percentage / 100);
   } else {
-    state.zoomInput.value = String(Math.round(state.scale * 100));
+    state.zoomInput.textContent = String(Math.round(state.scale * 100));
   }
 }
 
@@ -516,7 +572,15 @@ function setChartScale(nextScale: number): void {
   state.scale = scale;
   state.svg.style.inlineSize = `${pxToRem(state.baseSvgWidth * scale)}rem`;
   state.svg.style.blockSize = `${pxToRem(state.baseSvgHeight * scale)}rem`;
-  state.zoomInput.value = String(Math.round(scale * 100));
+  if (!shouldFitChartToViewport(state.chartWrapper)) {
+    const toolbarHeight = state.chartWrapper
+      .querySelector("#spcd3-toolbarRow")
+      ?.getBoundingClientRect().height ?? 0;
+    state.chartWrapper.style.blockSize = `${pxToRem(
+      toolbarHeight + state.baseSvgHeight * scale,
+    )}rem`;
+  }
+  state.zoomInput.textContent = String(Math.round(scale * 100));
   state.zoomInButton.disabled = scale >= MAX_CHART_SCALE;
   state.zoomOutButton.disabled = scale <= MIN_CHART_SCALE;
   setChartZoomScale(scale);
