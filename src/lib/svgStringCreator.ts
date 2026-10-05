@@ -11,17 +11,6 @@ const DOWNLOAD_INVERT_ARROW_WIDTH = 6.8;
 const DOWNLOAD_INVERT_ARROW_HEIGHT = 11;
 const DOWNLOAD_INVERT_ARROW_X = -3.4;
 
-function getRenderedDimensionLabelFontSize(dimensionName: string): string | null {
-  const axis = document.getElementById(
-    "dimension_axis_" + utils.cleanString(dimensionName),
-  );
-  const label = axis?.parentElement?.querySelector<SVGTextElement>(
-    ":scope > text.dimension",
-  );
-
-  return label ? getComputedStyle(label).fontSize : null;
-}
-
 export function setActivePathLinesToDownload(svg: any): void {
   svg
     .append("g")
@@ -135,9 +124,7 @@ export function setFeatureAxisToDownload(
     .text((d: { name: string }) =>
       d.name.length > 10 ? d.name.substr(0, 10) + "..." : d.name,
     )
-    .attr("font-size", (d: { name: string }) =>
-      getRenderedDimensionLabelFontSize(d.name),
-    );
+    .attr("font-size", 11);
 
   featureAxis
     .selectAll(".tick text")

@@ -216,7 +216,7 @@ table.spcd3-tablecontainer td {
   user-select: none;
 }
 
-.spcd3-chartWrapper--pannable #spcd3-pc_svg {
+.spcd3-chartWrapper--can-pan #spcd3-pc_svg {
   cursor: grab;
 }
 
@@ -224,7 +224,7 @@ table.spcd3-tablecontainer td {
   cursor: auto;
 }
 
-.spcd3-chartWrapper--dragging #spcd3-pc_svg {
+.spcd3-chartWrapper--can-pan.spcd3-chartWrapper--dragging #spcd3-pc_svg {
   cursor: grabbing;
 }
 

@@ -36,9 +36,18 @@ type ChartZoomState = {
 };
 
 let chartZoomState: ChartZoomState | null = null;
-const MIN_CHART_SCALE = 0.1;
+let isWheelZoomEnabled = false;
+const MIN_CHART_SCALE = 0.2;
 const MAX_CHART_SCALE = 3;
-const CHART_SCALE_STEP = 0.25;
+const WHEEL_CHART_SCALE_STEP = 0.25;
+const TOOLBAR_ZOOM_SCALES = [
+  0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6,
+  1.8, 2, 2.2, 2.4, 2.6, 2.8, 3,
+];
+
+export function setWheelZoomEnabled(enabled: boolean): void {
+  isWheelZoomEnabled = enabled;
+}
 
 export function createToolbar(dataset: any[]): void {
   const toolbarRow = d3.select("#spcd3-toolbarRow");
@@ -141,6 +150,7 @@ export function closeChartModal(): void {
   state.svg.style.blockSize = state.previousSvgBlockSize;
   state.chartWrapper.style.blockSize = state.previousChartWrapperBlockSize;
   state.chartWrapper.classList.remove("spcd3-chartWrapper--pannable");
+  state.chartWrapper.classList.remove("spcd3-chartWrapper--can-pan");
   chartZoomState = null;
 }
 
@@ -450,7 +460,7 @@ function enableChartZoom(
     // Only empty SVG space starts panning; paths and axes retain their interactions.
     if (event.target !== svg) return;
     const state = chartZoomState;
-    if (!state) return;
+    if (!state || !state.chartWrapper.classList.contains("spcd3-chartWrapper--can-pan")) return;
     event.preventDefault();
     state.isDraggingPan = true;
     state.didPan = false;
@@ -468,13 +478,17 @@ function enableChartZoom(
     }
   };
   const onWheel = (event: WheelEvent) => {
+    if (!isWheelZoomEnabled) return;
+
     event.preventDefault();
     const direction = event.deltaY < 0 ? 1 : -1;
-    setChartScale((chartZoomState?.scale ?? 1) + direction * CHART_SCALE_STEP);
+    setChartScale((chartZoomState?.scale ?? 1) + direction * WHEEL_CHART_SCALE_STEP);
   };
   const onResize = () => {
     if (shouldFitChartToViewport(chartWrapper)) {
       requestAnimationFrame(fitChartToViewport);
+    } else {
+      updatePanAvailability();
     }
   };
 
@@ -493,8 +507,8 @@ function enableChartZoom(
   window.addEventListener("pointerup", onPointerUp);
   window.addEventListener("pointercancel", onPointerUp);
   window.addEventListener("resize", onResize);
-  zoomOutButton.addEventListener("click", () => setChartScale((chartZoomState?.scale ?? 1) - CHART_SCALE_STEP));
-  zoomInButton.addEventListener("click", () => setChartScale((chartZoomState?.scale ?? 1) + CHART_SCALE_STEP));
+  zoomOutButton.addEventListener("click", () => adjustChartScaleFromToolbar(-1));
+  zoomInButton.addEventListener("click", () => adjustChartScaleFromToolbar(1));
   zoomInput.addEventListener("blur", () => setChartScaleFromInput());
   zoomInput.addEventListener("keydown", (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -564,6 +578,18 @@ function setChartScaleFromInput(): void {
   }
 }
 
+function adjustChartScaleFromToolbar(direction: 1 | -1): void {
+  const currentScale = chartZoomState?.scale ?? 1;
+  const epsilon = 0.0001;
+  const nextScale = direction === 1
+    ? TOOLBAR_ZOOM_SCALES.find((scale) => scale > currentScale + epsilon)
+    : [...TOOLBAR_ZOOM_SCALES]
+      .reverse()
+      .find((scale) => scale < currentScale - epsilon);
+
+  setChartScale(nextScale ?? (direction === 1 ? MAX_CHART_SCALE : MIN_CHART_SCALE));
+}
+
 function setChartScale(nextScale: number): void {
   const state = chartZoomState;
   if (!state) return;
@@ -584,6 +610,22 @@ function setChartScale(nextScale: number): void {
   state.zoomInButton.disabled = scale >= MAX_CHART_SCALE;
   state.zoomOutButton.disabled = scale <= MIN_CHART_SCALE;
   setChartZoomScale(scale);
+  updatePanAvailability();
+}
+
+function updatePanAvailability(): void {
+  const state = chartZoomState;
+  if (!state) return;
+
+  const canPan =
+    state.chartWrapper.scrollWidth > state.chartWrapper.clientWidth ||
+    state.chartWrapper.scrollHeight > state.chartWrapper.clientHeight;
+  state.chartWrapper.classList.toggle("spcd3-chartWrapper--can-pan", canPan);
+
+  if (!canPan && state.isDraggingPan) {
+    state.isDraggingPan = false;
+    state.chartWrapper.classList.remove("spcd3-chartWrapper--dragging");
+  }
 }
 
 function pxToRem(value: number): number {

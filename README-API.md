@@ -401,6 +401,12 @@ Disables the interactivity of the chart.
 
 Enables the interactivity of the chart.
 
+#### setWheelZoom
+
+`function setWheelZoom(enabled: boolean): void`
+
+Enables or disables chart zooming with the mouse wheel or touchpad. Wheel zooming is disabled by default.
+
 #### setSelectableWidth
 
 `function setSelectableWidth(width: string)`

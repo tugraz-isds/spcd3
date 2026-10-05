@@ -18,7 +18,7 @@ import * as utils from "./utils";
 import * as helper from "./helper";
 import * as brush from "./brush";
 import * as icon from "./icons/icons";
-import { updateChartZoomBaseWidth } from "./toolbar";
+import { setWheelZoomEnabled, updateChartZoomBaseWidth } from "./toolbar";
 import { select, selectAll } from "d3-selection";
 import { easeCubic } from "d3-ease";
 
@@ -1247,6 +1247,10 @@ export function enableInteractivity() {
   selectAll(".hitarea").style("pointer-events", "stroke");
   selectAll(".spcd3-handle-hitbox").style("pointer-events", "auto");
   selectAll(".hitbox").style("pointer-events", "auto");
+}
+
+export function setWheelZoom(enabled: boolean): void {
+  setWheelZoomEnabled(enabled);
 }
 
 export function setSelectableWidth(width: string) {
