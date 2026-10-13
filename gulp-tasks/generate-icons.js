@@ -25,8 +25,9 @@ const ICON_MANIFEST = [
   ["getCollapseToolbarIcon", "toolbar_collapse.svg"],
   ["getResetIcon", "reset.svg"],
   ["getDownloadButton", "download.svg"],
-  ["getZoomButton", "zoom-plus-svgrepo-com.svg"],
-  ["getPanButton", "open-hand-svgrepo-com.svg"]
+  ["getZoomInButton", "zoom-in.svg"],
+  ["getZoomOutButton", "zoom-out.svg"],
+  ["getZoomResetButton", "zoom-reset.svg"]
 ];
 
 function parseCursorMeta(svg) {

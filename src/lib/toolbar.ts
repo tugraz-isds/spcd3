@@ -68,10 +68,21 @@ export function createToolbar(dataset: any[]): void {
     tipText: "Show Table",
     onClick: () => showModalWithData(dataset),
   });
+  makeIconButton(toolbar, {
+    id: "downloadButton",
+    iconHtml: icon.getDownloadButton(),
+    tipText: "Download Chart (SVG)",
+    onClick: io.saveAsSvg,
+  });
+  toolbar
+    .append("span")
+    .attr("class", "spcd3-toolbar-separator")
+    .attr("role", "separator")
+    .attr("aria-orientation", "vertical");
 
-  const { btn: zoomOutButton } = makeTextButton(toolbar, {
+  const { btn: zoomOutButton } = makeIconButton(toolbar, {
     id: "zoomOutButton",
-    text: "−",
+    iconHtml: icon.getZoomOutButton(),
     tipText: "Zoom Out",
   });
   const zoomControl = toolbar
@@ -86,18 +97,24 @@ export function createToolbar(dataset: any[]): void {
     .attr("aria-label", "Zoom percentage")
     .text("100");
   zoomControl.append("span").attr("aria-hidden", "true").text("%");
-  const { btn: zoomInButton } = makeTextButton(toolbar, {
+  const { btn: zoomInButton } = makeIconButton(toolbar, {
     id: "zoomInButton",
-    text: "+",
+    iconHtml: icon.getZoomInButton(),
     tipText: "Zoom In",
   });
 
   makeIconButton(toolbar, {
-    id: "downloadButton",
-    iconHtml: icon.getDownloadButton(),
-    tipText: "Download Chart (SVG)",
-    onClick: io.saveAsSvg,
+    id: "resetZoomButton",
+    iconHtml: icon.getZoomResetButton(),
+    tipText: "Reset Zoom",
+    onClick: () => setChartScale(1),
   });
+
+  toolbar
+    .append("span")
+    .attr("class", "spcd3-toolbar-separator")
+    .attr("role", "separator")
+    .attr("aria-orientation", "vertical");
 
   enableChartZoom(zoomInButton.node(), zoomOutButton.node(), zoomInput.node());
 
@@ -121,7 +138,7 @@ export function createToolbar(dataset: any[]): void {
     isExpanded = !isExpanded;
 
     toolbar
-      .style("max-width", isExpanded ? "12.5rem" : "0")
+      .style("max-width", isExpanded ? "14rem" : "0")
       .style("opacity", isExpanded ? "1" : "0")
       .style("pointer-events", isExpanded ? "auto" : "none")
       .style("overflow", isExpanded ? "visible" : "hidden");
@@ -219,36 +236,6 @@ function makeIconButton(parent: any, opts: any) {
     }
   });
 
-  return { btn, tip };
-}
-
-function makeTextButton(parent: any, opts: any) {
-  const { id, text, tipText } = opts;
-  const btn = parent
-    .append("button")
-    .attr("class", "spcd3-toolbar-button spcd3-toolbar-textbutton")
-    .attr("type", "button")
-    .attr("id", id)
-    .attr("aria-label", tipText)
-    .text(text);
-
-  const tip = parent
-    .append("span")
-    .attr("class", "spcd3-toolbar-buttontip")
-    .attr("id", `${id}tip`)
-    .attr("popover", "manual")
-    .text(tipText);
-  const btnNode = btn.node();
-  const tipNode = tip.node();
-  const show = () => {
-    if (!tipNode) return;
-    if (!tipNode.matches(":popover-open")) tipNode.showPopover();
-    positionTip(btnNode, tipNode);
-  };
-  const hide = () => {
-    if (tipNode?.matches(":popover-open")) tipNode.hidePopover();
-  };
-  btn.on("mouseenter", show).on("mouseleave", hide).on("focus", show).on("blur", hide);
   return { btn, tip };
 }
 
