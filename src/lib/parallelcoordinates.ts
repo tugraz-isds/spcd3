@@ -135,6 +135,8 @@ export function drawChart(content: []): void {
       }
     });
 
+  api.setWheelZoom(true);
+
   window.onclick = () => {
     select("#contextmenu").style("display", "none");
     select("#contextmenuRecords").style("display", "none");
