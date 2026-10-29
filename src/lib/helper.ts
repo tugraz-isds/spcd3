@@ -4,11 +4,11 @@ import { axisLeft } from "d3-axis";
 import { line } from "d3-shape";
 import * as utils from "./utils";
 import {
-  parcoords,
-  height,
-  width,
-  hoverlabel,
-  dimensionSpacingVar,
+  parallelCoordinates as parcoords,
+  chartHeight as height,
+  chartWidth as width,
+  hoverLabel as hoverlabel,
+  dimensionSpacing as dimensionSpacingVar,
 } from "./globals";
 
 const PADDING = 50;

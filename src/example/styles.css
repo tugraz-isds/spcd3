@@ -240,6 +240,13 @@ a {
   gap: 0.6rem;
 }
 
+.toggle-row {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
 .input-button {
   appearance: none;
   background-color: var(--example-control-bg);
@@ -299,6 +306,22 @@ input::file-selector-button:hover {
   width: 100%;
   min-width: 5rem;
   accent-color: var(--example-focus-ring);
+}
+
+.toggle-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  margin: 0 0 1rem 0;
+  padding: 0.2rem 0.55rem;
+  border: 0.01rem solid var(--example-border-subtle);
+  border-radius: 0.4rem;
+  background-color: var(--example-control-bg);
+  box-shadow:
+    var(--example-shadow-button) 0 0.01rem 0,
+    var(--example-shadow-inset) 0 0.01rem 0 inset;
+  white-space: nowrap;
 }
 
 .range-default-marker {

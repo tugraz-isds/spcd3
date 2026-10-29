@@ -29,6 +29,8 @@ import {
   setSelectableWidth,
   getSelectableWith,
   setDimensionSpacing,
+  setChartBorder,
+  setWheelZoom,
   setChartZoomScale,
   getExampleUiSettings,
   setExampleUiSettings,
@@ -48,6 +50,7 @@ let studentData =
 
 const DEFAULT_SELECTION_SENSITIVITY_REM = 0.4;
 const DEFAULT_DIMENSION_SPACING_REM = 6;
+const FRAME_BORDER = "0.08rem solid var(--spcd3-border-emphasis)";
 const RANGE_TRANSITION_DURATION_MS = 1000;
 const REPOSITORY_URL = "https://github.com/tugraz-isds/spcd3";
 const persistedUiSettings = getExampleUiSettings();
@@ -284,6 +287,8 @@ document.addEventListener(
     showButtons();
     drawChart(newData);
     applySelectionSensitivity(persistedUiSettings.selectionSensitivityRem);
+    applyFrame(drawFrameCheckbox.checked);
+    setWheelZoom(wheelZoomCheckbox.checked);
     generateDropdownForShow();
     generateDropdownForInvert();
     generateDropdownForMove();
@@ -308,6 +313,12 @@ const dimensionSpacingSlider = elementById<HTMLInputElement>(
 const dimensionSpacingValue = elementById<HTMLOutputElement>(
   "dimensionSpacingValue",
 );
+const drawFrameCheckbox = elementById<HTMLInputElement>("drawFrameCheckbox");
+const wheelZoomCheckbox = elementById<HTMLInputElement>("wheelZoomCheckbox");
+
+function applyFrame(enabled: boolean): void {
+  setChartBorder(enabled ? FRAME_BORDER : null);
+}
 
 function setSliderDefaultMarker(slider: HTMLInputElement): void {
   const shell = slider.closest<HTMLElement>(".range-slider-shell");
@@ -347,6 +358,11 @@ function resetSlidersToDefaults(): void {
   dimensionSpacingSlider.value = DEFAULT_DIMENSION_SPACING_REM.toString();
   updateDimensionSpacingLabel(DEFAULT_DIMENSION_SPACING_REM);
   setDimensionSpacing(DEFAULT_DIMENSION_SPACING_REM);
+
+  drawFrameCheckbox.checked = false;
+  applyFrame(false);
+  wheelZoomCheckbox.checked = false;
+  setWheelZoom(false);
 
   setExampleUiSettings({
     selectionSensitivityRem: DEFAULT_SELECTION_SENSITIVITY_REM,
@@ -402,6 +418,14 @@ dimensionSpacingSlider.addEventListener("input", (event: Event) => {
     dimensionSpacingRem: value,
     zoomFactor: persistedUiSettings.zoomFactor,
   });
+});
+
+drawFrameCheckbox.addEventListener("change", () => {
+  applyFrame(drawFrameCheckbox.checked);
+});
+
+wheelZoomCheckbox.addEventListener("change", () => {
+  setWheelZoom(wheelZoomCheckbox.checked);
 });
 
 let inputButton = elementById<HTMLElement>("input");

@@ -9,18 +9,18 @@ import * as toolbar from "./toolbar";
 import * as api from "./helperApiFunc";
 import { setChartZoomScale } from "./persistence";
 import {
-  yAxis,
-  parcoords,
-  width,
-  svg,
-  setYaxis,
-  setSvg,
-  setWidth,
-  setHeight,
-  setPadding,
-  setPaddingXaxis,
-  setInitDimension,
-  setActive,
+  yAxes as yAxis,
+  parallelCoordinates as parcoords,
+  chartWidth as width,
+  chartSvg as svg,
+  setYAxes as setYaxis,
+  setChartSvg as setSvg,
+  setChartWidth as setWidth,
+  setChartHeight as setHeight,
+  setChartPadding as setPadding,
+  setXAxisPadding as setPaddingXaxis,
+  setInitialDimensions as setInitDimension,
+  setActivePaths as setActive,
   setYScales,
   setData,
   setFeatures,
@@ -28,18 +28,20 @@ import {
   setNewFeatures,
   setXScales,
   setHoverLabel,
-  key,
-  hoverlabel,
-  setKey,
-  height,
-  setColumns,
-  thickness,
-  setLineThickness,
-  setNumberOfDimensions,
-  setNumberOfRecords,
-  setContent,
-  resetContentData,
-  setHoveredRecords,
+  recordKey as key,
+  hoverLabel as hoverlabel,
+  setRecordKey as setKey,
+  chartHeight as height,
+  setChartColumns as setColumns,
+  selectableStrokeWidth as selectableWidth,
+  setSelectableStrokeWidth as setSelectableWidth,
+  setDimensionCount as setNumberOfDimensions,
+  setRecordCount as setNumberOfRecords,
+  setChartContent as setContent,
+  chartContent as resetContentData,
+  setHoveredRecordIds as setHoveredRecords,
+  chartFrameBorder,
+  isInteractivityEnabled,
 } from "./globals";
 
 import "./reset.css";
@@ -60,8 +62,8 @@ export function drawChart(content: []): void {
 
   deleteChart();
 
-  if (thickness === undefined) {
-    setLineThickness("0.4rem");
+  if (selectableWidth === undefined) {
+    setSelectableWidth("0.4rem");
   }
 
   setUpParcoordData(content, columns);
@@ -74,7 +76,11 @@ export function drawChart(content: []): void {
       .attr("id", "spcd3-parallelcoords");
   }
 
-  const chartWrapper = chart.append("div").attr("class", "spcd3-chartWrapper");
+  const chartWrapper = chart
+    .append("div")
+    .attr("class", "spcd3-chartWrapper")
+    .style("border", chartFrameBorder)
+    .classed("spcd3-chartWrapper--framed", chartFrameBorder !== null);
 
   chartWrapper.append("div").attr("id", "spcd3-toolbarRow");
 
@@ -135,7 +141,9 @@ export function drawChart(content: []): void {
       }
     });
 
-  api.setWheelZoom(true);
+  if (!isInteractivityEnabled) {
+    api.disableInteractivity();
+  }
 
   window.onclick = () => {
     select("#contextmenu").style("display", "none");
@@ -549,7 +557,7 @@ function setActivePathLines(svg: any, content: any, parcoords: any): any {
     .attr("d", (d: any) => helper.linePath(d, parcoords.newFeatures))
     .style("stroke", "transparent")
     .style("fill", "none")
-    .style("stroke-width", thickness)
+    .style("stroke-width", selectableWidth)
     .style("pointer-events", "stroke")
     .on("pointerenter", handlePointerEnter)
     .on("pointerleave", handlePointerLeaveOrOut)

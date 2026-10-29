@@ -11,6 +11,7 @@
   --spcd3-text-primary: light-dark(#000000, #eef3f7);
   --spcd3-text-secondary: light-dark(#6f6f6f, #b1bcc7);
   --spcd3-text-disabled: light-dark(#a5a5a5, #7f8a95);
+  --spcd3-text-error: light-dark(#b91c1c, #ff9b9b);
   --spcd3-tooltip-surface: light-dark(#d3d3d3, #264664);
   --spcd3-tooltip-record-bg: light-dark(
     rgba(255, 0, 0, 0.4),
@@ -200,7 +201,7 @@ table.spcd3-tablecontainer td {
 
 .spcd3-chartWrapper {
   position: relative;
-  inline-size: var(--spcd3-chart-width, auto);
+  inline-size: var(--spcd3-chart-width, fit-content);
   block-size: var(--spcd3-chart-height, auto);
   min-inline-size: var(--spcd3-chart-min-width, 0);
   min-block-size: var(--spcd3-chart-min-height, 0);
@@ -209,6 +210,12 @@ table.spcd3-tablecontainer td {
   overflow: var(--spcd3-chart-overflow, auto);
   margin-left: 1rem;
   box-sizing: border-box;
+}
+
+.spcd3-chartWrapper--framed {
+  overflow: hidden;
+  padding: 0.5rem 0.5rem 0;
+  margin: 1rem;
 }
 
 .spcd3-chartWrapper--pannable {
@@ -635,7 +642,7 @@ table.spcd3-tablecontainer td {
   display: none;
   padding-left: 0.5rem;
   padding-top: 0.5rem;
-  color: var(--spcd3-tooltip-record-text);
+  color: var(--spcd3-text-error);
   font-size: x-small;
 }
 
@@ -643,7 +650,7 @@ table.spcd3-tablecontainer td {
   display: block;
   padding-left: 0.5rem;
   padding-top: 0.5rem;
-  color: var(--spcd3-tooltip-record-text);
+  color: var(--spcd3-text-error);
   font-size: x-small;
 }
 

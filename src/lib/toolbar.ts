@@ -4,8 +4,10 @@ import * as pc from "./parallelcoordinates";
 import * as io from "./io";
 import { setChartZoomScale } from "./persistence";
 import {
-  numberOfDimensions,
-  numberOfRecords,
+  dimensionCount as numberOfDimensions,
+  recordCount as numberOfRecords,
+  isWheelZoomEnabled,
+  setWheelZoomEnabled as setGlobalWheelZoomEnabled,
 } from "./globals";
 
 type ChartZoomState = {
@@ -33,20 +35,21 @@ type ChartZoomState = {
   onClickCapture: (event: MouseEvent) => void;
   onWheel: (event: WheelEvent) => void;
   onResize: () => void;
+  wheelDeltaAccumulator: number;
 };
 
 let chartZoomState: ChartZoomState | null = null;
-let isWheelZoomEnabled = false;
 const MIN_CHART_SCALE = 0.2;
 const MAX_CHART_SCALE = 3;
 const WHEEL_CHART_SCALE_STEP = 0.25;
+const TOUCHPAD_ZOOM_DELTA_THRESHOLD = 100;
 const TOOLBAR_ZOOM_SCALES = [
   0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6,
   1.8, 2, 2.2, 2.4, 2.6, 2.8, 3,
 ];
 
 export function setWheelZoomEnabled(enabled: boolean): void {
-  isWheelZoomEnabled = enabled;
+  setGlobalWheelZoomEnabled(enabled);
 }
 
 export function createToolbar(dataset: any[]): void {
@@ -468,8 +471,27 @@ function enableChartZoom(
     if (!isWheelZoomEnabled) return;
 
     event.preventDefault();
-    const direction = event.deltaY < 0 ? 1 : -1;
-    setChartScale((chartZoomState?.scale ?? 1) + direction * WHEEL_CHART_SCALE_STEP);
+    const state = chartZoomState;
+    if (!state) return;
+
+    let direction: 1 | -1;
+    if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+      state.wheelDeltaAccumulator += event.deltaY;
+      if (Math.abs(state.wheelDeltaAccumulator) < TOUCHPAD_ZOOM_DELTA_THRESHOLD) {
+        return;
+      }
+
+      direction = state.wheelDeltaAccumulator < 0 ? 1 : -1;
+      state.wheelDeltaAccumulator -=
+        direction * -TOUCHPAD_ZOOM_DELTA_THRESHOLD;
+    } else {
+      direction = event.deltaY < 0 ? 1 : -1;
+    }
+
+    zoomChartAtCursor(
+      state.scale + direction * WHEEL_CHART_SCALE_STEP,
+      event,
+    );
   };
   const onResize = () => {
     if (shouldFitChartToViewport(chartWrapper)) {
@@ -484,7 +506,8 @@ function enableChartZoom(
     previousSvgInlineSize: svg.style.inlineSize, previousSvgBlockSize: svg.style.blockSize,
     previousChartWrapperBlockSize: chartWrapper.style.blockSize,
     scale: 1, isDraggingPan: false, didPan: false, panStartX: 0, panStartY: 0,
-    panScrollLeft: 0, panScrollTop: 0, onPointerMove, onPointerUp, onPointerDown, onClickCapture, onWheel, onResize,
+    panScrollLeft: 0, panScrollTop: 0, wheelDeltaAccumulator: 0,
+    onPointerMove, onPointerUp, onPointerDown, onClickCapture, onWheel, onResize,
   };
   chartWrapper.classList.add("spcd3-chartWrapper--pannable");
   chartWrapper.addEventListener("pointerdown", onPointerDown);
@@ -575,6 +598,30 @@ function adjustChartScaleFromToolbar(direction: 1 | -1): void {
       .find((scale) => scale < currentScale - epsilon);
 
   setChartScale(nextScale ?? (direction === 1 ? MAX_CHART_SCALE : MIN_CHART_SCALE));
+}
+
+function zoomChartAtCursor(nextScale: number, event: WheelEvent): void {
+  const state = chartZoomState;
+  if (!state) return;
+
+  const previousScale = state.scale;
+  const scale = Math.min(MAX_CHART_SCALE, Math.max(MIN_CHART_SCALE, nextScale));
+  if (scale === previousScale) return;
+
+  const svgBounds = state.svg.getBoundingClientRect();
+  const focalX = Math.min(
+    svgBounds.width,
+    Math.max(0, event.clientX - svgBounds.left),
+  );
+  const focalY = Math.min(
+    svgBounds.height,
+    Math.max(0, event.clientY - svgBounds.top),
+  );
+  const scaleRatio = scale / previousScale;
+
+  setChartScale(scale);
+  state.chartWrapper.scrollLeft += focalX * (scaleRatio - 1);
+  state.chartWrapper.scrollTop += focalY * (scaleRatio - 1);
 }
 
 function setChartScale(nextScale: number): void {

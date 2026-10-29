@@ -4,9 +4,12 @@ import * as icon from "./icons/icons";
 import * as utils from "./utils";
 import { isDimensionCategorical } from "./helperApiFunc";
 import * as api from "./helperApiFunc";
-import { getLineThickness, parcoords } from "./globals";
+import {
+  getSelectableStrokeWidth as getSelectableWidth,
+  parallelCoordinates as parcoords,
+} from "./globals";
 import * as helper from "./helper";
-import { hoverlabel } from "./globals";
+import { hoverLabel as hoverlabel } from "./globals";
 
 // globals
 const TOP_AXIS_LOW_VALUE = 40;
@@ -1205,7 +1208,7 @@ function makeActive(
     select("#area_" + currentLineName)
       .style("pointer-events", "stroke")
       .style("stroke", "transparent")
-      .style("stroke-width", getLineThickness() + "rem")
+      .style("stroke-width", getSelectableWidth())
       .text("");
 
     if (!select("." + currentLineName).classed("colored")) {
@@ -1222,7 +1225,7 @@ function makeActive(
     select("#area_" + currentLineName)
       .style("pointer-events", "stroke")
       .style("stroke", "transparent")
-      .style("stroke-width", getLineThickness() + "rem")
+      .style("stroke-width", getSelectableWidth())
       .text("");
   } else {
     select("." + currentLineName)
@@ -1234,7 +1237,7 @@ function makeActive(
     select("#area_" + currentLineName)
       .style("pointer-events", "stroke")
       .style("stroke", "transparent")
-      .style("stroke-width", getLineThickness() + "rem")
+      .style("stroke-width", getSelectableWidth())
       .text("");
   }
 }
@@ -1264,7 +1267,7 @@ function makeInactive(
     .transition()
     .duration(duration)
     .style("stroke", "transparent")
-    .style("stroke-width", getLineThickness() + "rem")
+    .style("stroke-width", getSelectableWidth())
     .on("end", function (this: any) {
       select(this).style("pointer-events", "none");
     });

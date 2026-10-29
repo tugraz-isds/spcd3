@@ -6,12 +6,12 @@ import * as helper from "./helper";
 import * as api from "./helperApiFunc";
 import * as icon from "./icons/icons";
 import {
-  parcoords,
-  active,
-  width,
-  paddingXaxis,
-  hoverlabel,
-  hoveredRecords,
+  parallelCoordinates as parcoords,
+  activePaths as active,
+  chartWidth as width,
+  xAxisPadding as paddingXaxis,
+  hoverLabel as hoverlabel,
+  hoveredRecordIds as hoveredRecords,
 } from "./globals";
 
 let scrollXPos: number;

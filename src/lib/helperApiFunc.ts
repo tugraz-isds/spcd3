@@ -1,18 +1,20 @@
 import {
-  active,
-  parcoords,
+  activePaths as active,
+  parallelCoordinates as parcoords,
   setHoverLabel,
-  initDimension,
-  setInitDimension,
-  setYaxis,
-  yAxis,
-  columns,
-  setLineThickness,
-  getLineThickness,
-  hoverlabel,
-  setDimensionSpacingVar,
-  setWidth,
-  height,
+  initialDimensions as initDimension,
+  setInitialDimensions as setInitDimension,
+  setYAxes as setYaxis,
+  yAxes as yAxis,
+  chartColumns as columns,
+  setSelectableStrokeWidth as setGlobalSelectableWidth,
+  getSelectableStrokeWidth as getGlobalSelectableWidth,
+  hoverLabel as hoverlabel,
+  setDimensionSpacing as setDimensionSpacingVar,
+  setChartFrameBorder,
+  setChartWidth as setWidth,
+  chartHeight as height,
+  setInteractivityEnabled,
 } from "./globals";
 import * as utils from "./utils";
 import * as helper from "./helper";
@@ -23,12 +25,12 @@ import { select, selectAll } from "d3-selection";
 import { easeCubic } from "d3-ease";
 
 type StringKeyed = Record<string, any>;
-const BRUSH_STATE_EPSILON = 0.75;
-const FILTER_STATE_EPSILON = 0.75;
-const AXIS_VISIBILITY_DURATION = 1500;
+const brushStateEpsilon = 0.75;
+const filterStateEpsilon = 0.75;
+const axisVisibilityDuration = 1500;
 
 function isNear(value: number, target: number): boolean {
-  return Math.abs(value - target) < BRUSH_STATE_EPSILON;
+  return Math.abs(value - target) < brushStateEpsilon;
 }
 
 function hasActiveBrushFilterState(dimension: string): boolean {
@@ -39,9 +41,9 @@ function hasActiveBrushFilterState(dimension: string): boolean {
 
   return (
     Math.abs(settings.currentFilterTop - settings.currentRangeTop) >
-      FILTER_STATE_EPSILON ||
+      filterStateEpsilon ||
     Math.abs(settings.currentFilterBottom - settings.currentRangeBottom) >
-      FILTER_STATE_EPSILON
+      filterStateEpsilon
   );
 }
 
@@ -194,7 +196,7 @@ export function hide(dimension: string): void {
       parcoords.newFeatures.includes(d.name || d),
     )
     .transition()
-    .duration(AXIS_VISIBILITY_DURATION)
+    .duration(axisVisibilityDuration)
     .attr(
       "transform",
       (d: { name: string }) =>
@@ -206,7 +208,7 @@ export function hide(dimension: string): void {
   selectAll(".dimensions")
     .filter((d: { name: string }) => d.name === dimension)
     .transition()
-    .duration(AXIS_VISIBILITY_DURATION)
+    .duration(axisVisibilityDuration)
     .style("opacity", 0)
     .on("end", function (this: any) {
       select(this).attr("visibility", "hidden");
@@ -247,7 +249,7 @@ export function show(dimension: string): void {
     .style("opacity", 0)
     .transition()
     .attr("visibility", "visible")
-    .duration(AXIS_VISIBILITY_DURATION)
+    .duration(axisVisibilityDuration)
     .style("opacity", 1);
 
   selectAll(".dimensions")
@@ -255,7 +257,7 @@ export function show(dimension: string): void {
       parcoords.newFeatures.includes(typeof d === "object" ? d.name : d),
     )
     .transition()
-    .duration(AXIS_VISIBILITY_DURATION)
+    .duration(axisVisibilityDuration)
     .attr(
       "transform",
       (d: { name: string }) =>
@@ -1220,6 +1222,7 @@ export function setClassColoredFalse(record: string) {
 }
 
 export function disableInteractivity() {
+  setInteractivityEnabled(false);
   select("#spcd3-toolbarRow")
     .style("pointer-events", "none")
     .style("opacity", "0.45")
@@ -1236,6 +1239,7 @@ export function disableInteractivity() {
 }
 
 export function enableInteractivity() {
+  setInteractivityEnabled(true);
   select("#spcd3-toolbarRow")
     .style("pointer-events", "auto")
     .style("opacity", "1")
@@ -1253,8 +1257,15 @@ export function setWheelZoom(enabled: boolean): void {
   setWheelZoomEnabled(enabled);
 }
 
+export function setChartBorder(border: string | null): void {
+  setChartFrameBorder(border);
+  select(".spcd3-chartWrapper")
+    .style("border", border)
+    .classed("spcd3-chartWrapper--framed", border !== null);
+}
+
 export function setSelectableWidth(width: string) {
-  setLineThickness(width);
+  setGlobalSelectableWidth(width);
   let hitarea_active = selectAll("path.hitarea");
   hitarea_active.each(function (this: any, d: any) {
     const value = width;
@@ -1263,7 +1274,7 @@ export function setSelectableWidth(width: string) {
 }
 
 export function getSelectableWith(): string {
-  return getLineThickness();
+  return getGlobalSelectableWidth();
 }
 
 export function setDimensionSpacing(spacingRem: number): void {

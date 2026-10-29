@@ -2,7 +2,11 @@ import { select } from "d3-selection";
 import * as helper from "./helper";
 import * as utils from "./utils";
 import * as api from "./helperApiFunc";
-import { parcoords, key, hoverlabel } from "./globals";
+import {
+  parallelCoordinates as parcoords,
+  recordKey as key,
+  hoverLabel as hoverlabel,
+} from "./globals";
 
 const DOWNLOAD_BRUSH_ARROW_WIDTH = 11;
 const DOWNLOAD_BRUSH_ARROW_HEIGHT = 8;

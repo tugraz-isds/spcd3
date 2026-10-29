@@ -1,10 +1,10 @@
-export let padding: number;
-export let paddingXaxis: number;
-export let width: number;
-export let height: number;
-export let yAxis: {};
-export let selected: [];
-export let parcoords: {
+export let chartPadding: number;
+export let xAxisPadding: number;
+export let chartWidth: number;
+export let chartHeight: number;
+export let yAxes: {};
+export let selectedRecords: [];
+export let parallelCoordinates: {
   xScales: any;
   yScales: Record<string, any>;
   dragging: Record<string, any>;
@@ -25,132 +25,167 @@ export let parcoords: {
   newDataset: null,
   data: null,
 };
-export let active: any;
-export let key: string;
-export let svg: any;
-export let hoverlabel: string;
-export let refreshData: any;
-export let columns: any;
-export let initDimension: any;
-export let thickness: any;
-export let numberOfRecords: number;
-export let numberOfDimensions: number;
-export let resetContentData: any;
-export let dimensionSpacingVar: number | null = null;
-export let hoveredRecords: string[] = [];
+export let activePaths: any;
+export let recordKey: string;
+export let chartSvg: any;
+export let hoverLabel: string;
+export let dataRefreshCallback: any;
+export let chartColumns: any;
+export let initialDimensions: any;
+export let selectableStrokeWidth: string;
+export let recordCount: number;
+export let dimensionCount: number;
+export let chartContent: any;
+export let dimensionSpacing: number | null = null;
+export let hoveredRecordIds: string[] = [];
+export let chartFrameBorder: string | null = null;
+export let isWheelZoomEnabled = false;
+export let isInteractivityEnabled = true;
 
-export function setContent(contentdata: any): void {
-  resetContentData = contentdata;
+export const getChartPadding = (): number => chartPadding;
+export const getXAxisPadding = (): number => xAxisPadding;
+export const getChartWidth = (): number => chartWidth;
+export const getChartHeight = (): number => chartHeight;
+export const getYAxes = (): {} => yAxes;
+export const getSelectedRecords = (): [] => selectedRecords;
+export const getParallelCoordinates = () => parallelCoordinates;
+export const getActivePaths = (): any => activePaths;
+export const getRecordKey = (): string => recordKey;
+export const getChartSvg = (): any => chartSvg;
+export const getHoverLabel = (): string => hoverLabel;
+export const getDataRefreshCallback = (): any => dataRefreshCallback;
+export const getChartColumns = (): any => chartColumns;
+export const getInitialDimensions = (): any => initialDimensions;
+export const getSelectableStrokeWidth = (): string => selectableStrokeWidth;
+export const getRecordCount = (): number => recordCount;
+export const getDimensionCount = (): number => dimensionCount;
+export const getChartContent = (): any => chartContent;
+export const getDimensionSpacing = (): number | null => dimensionSpacing;
+export const getHoveredRecordIds = (): string[] => hoveredRecordIds;
+export const getChartFrameBorder = (): string | null => chartFrameBorder;
+export const getIsWheelZoomEnabled = (): boolean => isWheelZoomEnabled;
+export const getIsInteractivityEnabled = (): boolean => isInteractivityEnabled;
+
+export function setChartContent(contentdata: any): void {
+  chartContent = contentdata;
 }
 
-export function setHoveredRecords(records: string[]): void {
-  hoveredRecords = records;
+export function setHoveredRecordIds(records: string[]): void {
+  hoveredRecordIds = records;
 }
 
 export function setHoverLabel(label: string): void {
-  hoverlabel = label;
+  hoverLabel = label;
 }
 
-export function setYaxis(axis: any): void {
-  yAxis = axis;
+export function setYAxes(axis: any): void {
+  yAxes = axis;
 }
 
-export function setRefreshData(data: any): void {
-  refreshData = data;
+export function setDataRefreshCallback(data: any): void {
+  dataRefreshCallback = data;
 }
 
-export function setColumns(cols: any): void {
-  columns = cols;
+export function setChartColumns(cols: any): void {
+  chartColumns = cols;
 }
 
-export function setSvg(svgData: any): void {
-  svg = svgData;
+export function setChartSvg(svgData: any): void {
+  chartSvg = svgData;
 }
 
-export function setWidth(value: number): void {
-  width = value;
+export function setChartWidth(value: number): void {
+  chartWidth = value;
 }
 
-export function setHeight(value: number): void {
-  height = value;
+export function setChartHeight(value: number): void {
+  chartHeight = value;
 }
 
-export function setPadding(value: number): void {
-  padding = value;
+export function setChartPadding(value: number): void {
+  chartPadding = value;
 }
 
-export function setPaddingXaxis(value: number): void {
-  paddingXaxis = value;
+export function setXAxisPadding(value: number): void {
+  xAxisPadding = value;
 }
 
-export function setInitDimension(dimensions: any): void {
-  initDimension = Array.isArray(dimensions) ? [...dimensions] : dimensions;
+export function setInitialDimensions(dimensions: any): void {
+  initialDimensions = Array.isArray(dimensions) ? [...dimensions] : dimensions;
 }
 
-export function setActive(paths: any): void {
-  active = paths;
+export function setActivePaths(paths: any): void {
+  activePaths = paths;
 }
 
-export function setParcoords(value: typeof parcoords) {
-  parcoords = value;
+export function setParallelCoordinates(value: typeof parallelCoordinates) {
+  parallelCoordinates = value;
 }
 
 export function setXScales(value: any): void {
-  parcoords.xScales = value;
+  parallelCoordinates.xScales = value;
 }
 
 export function setYScales(value: Record<string, any>): void {
-  parcoords.yScales = value;
+  parallelCoordinates.yScales = value;
 }
 
 export function setDragging(value: Record<string, any>): void {
-  parcoords.dragging = value;
+  parallelCoordinates.dragging = value;
 }
 
 export function setDragPosStart(value: Record<string, any>): void {
-  parcoords.dragPosStart = value;
+  parallelCoordinates.dragPosStart = value;
 }
 
 export function setCurrentPosOfDims(value: any): void {
-  parcoords.currentPosOfDims = value;
+  parallelCoordinates.currentPosOfDims = value;
 }
 
 export function setNewFeatures(value: any): void {
-  parcoords.newFeatures = value;
+  parallelCoordinates.newFeatures = value;
 }
 
 export function setFeatures(value: any[]): void {
-  parcoords.features = value;
+  parallelCoordinates.features = value;
 }
 
 export function setNewDataset(value: any): void {
-  parcoords.newDataset = value;
+  parallelCoordinates.newDataset = value;
 }
 
 export function setData(value: any): void {
-  parcoords.data = value;
+  parallelCoordinates.data = value;
 }
 
-export function setKey(value: string): void {
-  key = value;
+export function setRecordKey(value: string): void {
+  recordKey = value;
 }
 
-export function setLineThickness(value: string): void {
-  thickness = value;
+export function setSelectableStrokeWidth(value: string): void {
+  selectableStrokeWidth = value;
 }
 
-export function getLineThickness(): string {
-  return thickness;
+export function setRecordCount(value: number): void {
+  recordCount = value;
 }
 
-export function setNumberOfRecords(value: number): void {
-  numberOfRecords = value;
+export function setDimensionCount(value: number): void {
+  dimensionCount = value;
 }
 
-export function setNumberOfDimensions(value: number): void {
-  numberOfDimensions = value;
+export function setDimensionSpacing(value: number | null): void {
+  dimensionSpacing = value;
 }
 
-export function setDimensionSpacingVar(value: number | null): void {
-  dimensionSpacingVar = value;
+export function setChartFrameBorder(value: string | null): void {
+  chartFrameBorder = value;
+}
+
+export function setWheelZoomEnabled(value: boolean): void {
+  isWheelZoomEnabled = value;
+}
+
+export function setInteractivityEnabled(value: boolean): void {
+  isInteractivityEnabled = value;
 }

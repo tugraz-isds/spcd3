@@ -407,6 +407,13 @@ Enables the interactivity of the chart.
 
 Enables or disables chart zooming with the mouse wheel or touchpad. Wheel zooming is disabled by default.
 
+#### setChartBorder
+
+`function setChartBorder(border: string | null): void`
+
+Sets a CSS border around the complete chart, including its toolbar. Pass a CSS
+border value such as `"0.08rem solid #6e90b5"`; pass `null` to remove the border.
+
 #### setSelectableWidth
 
 `function setSelectableWidth(width: string)`

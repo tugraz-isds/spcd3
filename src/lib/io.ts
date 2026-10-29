@@ -7,7 +7,11 @@ import * as svgcreator from "./svgStringCreator";
 import * as api from "./helperApiFunc";
 import * as helper from "./helper";
 import { create } from "d3-selection";
-import { parcoords, height, width } from "./globals";
+import {
+  parallelCoordinates as parcoords,
+  chartHeight as height,
+  chartWidth as width,
+} from "./globals";
 import {
   getSvgDownloadSettings,
   setSvgDownloadSettings,
