@@ -1260,8 +1260,8 @@ export function setWheelZoom(enabled: boolean): void {
 export function setChartBorder(border: string | null): void {
   setChartFrameBorder(border);
   select(".spcd3-chartWrapper")
-    .style("border", border)
     .classed("spcd3-chartWrapper--framed", border !== null);
+  select(".spcd3-chartFrame").style("border", border);
 }
 
 export function setSelectableWidth(width: string) {

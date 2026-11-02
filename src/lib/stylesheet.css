@@ -194,14 +194,13 @@ table.spcd3-tablecontainer td {
   display: block;
   inline-size: var(--spcd3-chart-svg-width, auto);
   block-size: var(--spcd3-chart-svg-height, auto);
-  padding-bottom: 1rem;
   box-sizing: border-box;
   touch-action: none;
 }
 
 .spcd3-chartWrapper {
   position: relative;
-  inline-size: var(--spcd3-chart-width, fit-content);
+  inline-size: var(--spcd3-chart-width, auto);
   block-size: var(--spcd3-chart-height, auto);
   min-inline-size: var(--spcd3-chart-min-width, 0);
   min-block-size: var(--spcd3-chart-min-height, 0);
@@ -212,10 +211,11 @@ table.spcd3-tablecontainer td {
   box-sizing: border-box;
 }
 
-.spcd3-chartWrapper--framed {
-  overflow: hidden;
-  padding: 0.5rem 0.5rem 0;
-  margin: 1rem;
+.spcd3-chartFrame {
+  inline-size: max-content;
+  box-sizing: border-box;
+  margin-block: 1rem;
+  padding-block: 0.5rem;
 }
 
 .spcd3-chartWrapper--pannable {

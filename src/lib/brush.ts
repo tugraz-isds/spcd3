@@ -14,7 +14,7 @@ import { hoverLabel as hoverlabel } from "./globals";
 // globals
 const TOP_AXIS_LOW_VALUE = 40;
 const TOP_AXIS_VALUE = 50;
-const BOTTOM_AXIS_VALUE = 350;
+const BOTTOM_AXIS_VALUE = 370;
 const RECT_VALUE = 300;
 const BRUSH_STATE_EPSILON = 0.75;
 const BRUSH_TOOLTIP_HEIGHT = 16;

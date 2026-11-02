@@ -447,11 +447,15 @@ function enableChartZoom(
   };
   const onPointerDown = (event: PointerEvent) => {
     if (event.button !== 0 && event.button !== 2) return;
-    // Only empty SVG space starts panning; paths and axes retain their interactions.
-    if (event.target !== svg) return;
+    const target = event.target;
+    if (!(target instanceof Element) || !svg.contains(target)) return;
+    if (target.closest(
+      ".hitarea, .hitbox, .spcd3-handle-hitbox, .spcd3-brush-overlay, .spcd3-marker, .spcd3-dimensions-axis",
+    )) return;
     const state = chartZoomState;
-    if (!state || !state.chartWrapper.classList.contains("spcd3-chartWrapper--can-pan")) return;
+    if (!state) return;
     event.preventDefault();
+    chartWrapper.setPointerCapture(event.pointerId);
     state.isDraggingPan = true;
     state.didPan = false;
     state.panStartX = event.clientX;
@@ -546,19 +550,20 @@ function fitChartToViewport(): void {
 
   state.chartWrapper.style.inlineSize = "";
   const toolbarHeight = state.chartWrapper.querySelector("#spcd3-toolbarRow")?.getBoundingClientRect().height || 0;
+  const frameVerticalExtras = getChartFrameVerticalExtras(state.chartWrapper);
   const chartViewport = state.chartWrapper.parentElement;
   const viewportStyle = chartViewport ? getComputedStyle(chartViewport) : null;
   const hasConstrainedHeight = viewportStyle && ["auto", "scroll", "hidden", "clip"].includes(viewportStyle.overflowY);
-  const availableViewportHeight = hasConstrainedHeight && chartViewport && chartViewport.clientHeight > toolbarHeight
-    ? chartViewport.clientHeight - toolbarHeight
+  const requiredVerticalSpace = toolbarHeight + frameVerticalExtras;
+  const availableViewportHeight = hasConstrainedHeight && chartViewport && chartViewport.clientHeight > requiredVerticalSpace
+    ? chartViewport.clientHeight - requiredVerticalSpace
     : Infinity;
-  const scale = Math.max(MIN_CHART_SCALE, Math.min(
-    MAX_CHART_SCALE,
+  const scale = Math.max(MIN_CHART_SCALE, Math.min(1, MAX_CHART_SCALE,
     state.chartWrapper.clientWidth / state.baseSvgWidth,
     availableViewportHeight / state.baseSvgHeight,
   ));
 
-  state.chartWrapper.style.blockSize = `${pxToRem(toolbarHeight + state.baseSvgHeight * scale)}rem`;
+  state.chartWrapper.style.blockSize = `${pxToRem(requiredVerticalSpace + state.baseSvgHeight * scale)}rem`;
   state.chartWrapper.scrollLeft = 0;
   state.chartWrapper.scrollTop = 0;
   setChartScale(scale);
@@ -617,11 +622,16 @@ function zoomChartAtCursor(nextScale: number, event: WheelEvent): void {
     svgBounds.height,
     Math.max(0, event.clientY - svgBounds.top),
   );
-  const scaleRatio = scale / previousScale;
+  const focalRatioX = svgBounds.width > 0 ? focalX / svgBounds.width : 0;
+  const focalRatioY = svgBounds.height > 0 ? focalY / svgBounds.height : 0;
 
   setChartScale(scale);
-  state.chartWrapper.scrollLeft += focalX * (scaleRatio - 1);
-  state.chartWrapper.scrollTop += focalY * (scaleRatio - 1);
+
+  const resizedSvgBounds = state.svg.getBoundingClientRect();
+  state.chartWrapper.scrollLeft +=
+    resizedSvgBounds.left + resizedSvgBounds.width * focalRatioX - event.clientX;
+  state.chartWrapper.scrollTop +=
+    resizedSvgBounds.top + resizedSvgBounds.height * focalRatioY - event.clientY;
 }
 
 function setChartScale(nextScale: number): void {
@@ -637,7 +647,7 @@ function setChartScale(nextScale: number): void {
       .querySelector("#spcd3-toolbarRow")
       ?.getBoundingClientRect().height ?? 0;
     state.chartWrapper.style.blockSize = `${pxToRem(
-      toolbarHeight + state.baseSvgHeight * scale,
+      toolbarHeight + getChartFrameVerticalExtras(state.chartWrapper) + state.baseSvgHeight * scale,
     )}rem`;
   }
   state.zoomInput.textContent = String(Math.round(scale * 100));
@@ -660,6 +670,21 @@ function updatePanAvailability(): void {
     state.isDraggingPan = false;
     state.chartWrapper.classList.remove("spcd3-chartWrapper--dragging");
   }
+}
+
+function getChartFrameVerticalExtras(chartWrapper: HTMLDivElement): number {
+  const chartFrame = chartWrapper.querySelector<HTMLElement>(".spcd3-chartFrame");
+  if (!chartFrame) return 0;
+
+  const frameStyle = getComputedStyle(chartFrame);
+  return [
+    frameStyle.marginTop,
+    frameStyle.marginBottom,
+    frameStyle.paddingTop,
+    frameStyle.paddingBottom,
+    frameStyle.borderTopWidth,
+    frameStyle.borderBottomWidth,
+  ].reduce((total, value) => total + (Number.parseFloat(value) || 0), 0);
 }
 
 function pxToRem(value: number): number {

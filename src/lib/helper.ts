@@ -11,7 +11,8 @@ import {
   dimensionSpacing as dimensionSpacingVar,
 } from "./globals";
 
-const PADDING = 50;
+const TOP_PADDING = 50;
+const BOTTOM_PADDING = 30;
 
 type DataValue = string | number | boolean | null | undefined;
 type DataRow = Record<string, DataValue>;
@@ -54,7 +55,7 @@ export function setupYScales(
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([PADDING, height - PADDING]);
+        .range([TOP_PADDING, height - BOTTOM_PADDING]);
     } else {
       const max = Math.max(
         ...dataset.map((o: { [x: string]: any }) => o[x.name]),
@@ -66,11 +67,11 @@ export function setupYScales(
         const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
         yScales[x.name] = scaleLinear()
           .domain([min - epsilon, max + epsilon])
-          .range([height - PADDING, PADDING]);
+          .range([height - BOTTOM_PADDING, TOP_PADDING]);
       } else {
         yScales[x.name] = scaleLinear()
           .domain([min, max])
-          .range([height - PADDING, PADDING]);
+          .range([height - BOTTOM_PADDING, TOP_PADDING]);
       }
     }
   });
@@ -145,7 +146,7 @@ export function calculateChartLayout(
   const tickLabelWidth = getTextWidthSVG(longestTickLabel, "0.75rem Verdana");
   const axisGap =
     dimensionSpacingVar ?? Math.max(96, Math.ceil(dimensionLabelWidth + 56));
-  const requiredLeftPadding = Math.max(72, Math.ceil(tickLabelWidth + 44));
+  const requiredLeftPadding = Math.max(48, Math.ceil(tickLabelWidth + 20));
   const requiredRightPadding = Math.max(48, Math.ceil(dimensionLabelWidth / 2 + 36));
   const leftPadding = requiredLeftPadding;
   const rightPadding = requiredRightPadding;

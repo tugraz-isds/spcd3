@@ -79,13 +79,16 @@ export function drawChart(content: []): void {
   const chartWrapper = chart
     .append("div")
     .attr("class", "spcd3-chartWrapper")
-    .style("border", chartFrameBorder)
     .classed("spcd3-chartWrapper--framed", chartFrameBorder !== null);
+  const chartFrame = chartWrapper
+    .append("div")
+    .attr("class", "spcd3-chartFrame")
+    .style("border", chartFrameBorder);
 
-  chartWrapper.append("div").attr("id", "spcd3-toolbarRow");
+  chartFrame.append("div").attr("id", "spcd3-toolbarRow");
 
   setSvg(
-    chartWrapper
+    chartFrame
       .append("svg")
       .attr("id", "spcd3-pc_svg")
       .attr("width", width)
