@@ -450,7 +450,7 @@ function enableChartZoom(
     const target = event.target;
     if (!(target instanceof Element) || !svg.contains(target)) return;
     if (target.closest(
-      ".hitarea, .hitbox, .spcd3-handle-hitbox, .spcd3-brush-overlay, .spcd3-marker, .spcd3-dimensions-axis",
+      ".hitarea, .hitbox, .spcd3-handle-hitbox, .spcd3-brush-overlay, .spcd3-marker, .dimensions, .dimension, .spcd3-dimensions-axis",
     )) return;
     const state = chartZoomState;
     if (!state) return;
