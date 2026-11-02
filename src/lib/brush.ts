@@ -10,12 +10,18 @@ import {
 } from "./globals";
 import * as helper from "./helper";
 import { hoverLabel as hoverlabel } from "./globals";
+import {
+  AXIS_BOTTOM,
+  AXIS_LENGTH,
+  AXIS_TOP,
+  AXIS_TOP_HANDLE,
+} from "./chartGeometry";
 
 // globals
-const TOP_AXIS_LOW_VALUE = 40;
-const TOP_AXIS_VALUE = 50;
-const BOTTOM_AXIS_VALUE = 370;
-const RECT_VALUE = 300;
+const TOP_AXIS_LOW_VALUE = AXIS_TOP_HANDLE;
+const TOP_AXIS_VALUE = AXIS_TOP;
+const BOTTOM_AXIS_VALUE = AXIS_BOTTOM;
+const RECT_VALUE = AXIS_LENGTH;
 const BRUSH_STATE_EPSILON = 0.75;
 const BRUSH_TOOLTIP_HEIGHT = 16;
 const BRUSH_TOOLTIP_X_OFFSET = 12;
@@ -80,7 +86,7 @@ export function setRectToDrag(
       .attr("width", 12)
       .attr("height", RECT_VALUE)
       .attr("x", -6)
-      .attr("y", 50)
+      .attr("y", TOP_AXIS_VALUE)
       .attr("fill", utils.BRUSH_IDLE_FILL)
       .attr("opacity", "0.5")
       .call(

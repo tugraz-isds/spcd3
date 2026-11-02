@@ -8,6 +8,7 @@ import * as icon from "./icons/icons";
 import * as toolbar from "./toolbar";
 import * as api from "./helperApiFunc";
 import { setChartZoomScale } from "./persistence";
+import { AXIS_BOTTOM, AXIS_TOP, CHART_HEIGHT } from "./chartGeometry";
 import {
   yAxes as yAxis,
   parallelCoordinates as parcoords,
@@ -191,7 +192,7 @@ function setUpParcoordData(data: any, newFeatures: []): void {
   setPadding(60);
   setPaddingXaxis(60);
   setInitDimension(newFeatures);
-  setHeight(400);
+  setHeight(CHART_HEIGHT);
 
   const label = newFeatures[newFeatures.length - 1];
 
@@ -252,8 +253,8 @@ function setUpParcoordData(data: any, newFeatures: []): void {
     const ranges = api.getDimensionRange(newFeatures[i]);
     parcoords.currentPosOfDims.push({
       key: newFeatures[i],
-      top: 50,
-      bottom: 350,
+      top: AXIS_TOP,
+      bottom: AXIS_BOTTOM,
       isInverted: false,
       index: i,
       min: min,

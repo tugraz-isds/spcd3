@@ -3,6 +3,7 @@ import { scalePoint, scaleLinear } from "d3-scale";
 import { axisLeft } from "d3-axis";
 import { line } from "d3-shape";
 import * as utils from "./utils";
+import { AXIS_BOTTOM, AXIS_TOP } from "./chartGeometry";
 import {
   parallelCoordinates as parcoords,
   chartHeight as height,
@@ -10,9 +11,6 @@ import {
   hoverLabel as hoverlabel,
   dimensionSpacing as dimensionSpacingVar,
 } from "./globals";
-
-const TOP_PADDING = 50;
-const BOTTOM_PADDING = 30;
 
 type DataValue = string | number | boolean | null | undefined;
 type DataRow = Record<string, DataValue>;
@@ -55,7 +53,7 @@ export function setupYScales(
       });
       yScales[x.name] = scalePoint()
         .domain(labels)
-        .range([TOP_PADDING, height - BOTTOM_PADDING]);
+        .range([AXIS_TOP, AXIS_BOTTOM]);
     } else {
       const max = Math.max(
         ...dataset.map((o: { [x: string]: any }) => o[x.name]),
@@ -67,11 +65,11 @@ export function setupYScales(
         const epsilon = min === 0 ? 1 : Math.abs(min) * 0.01;
         yScales[x.name] = scaleLinear()
           .domain([min - epsilon, max + epsilon])
-          .range([height - BOTTOM_PADDING, TOP_PADDING]);
+          .range([AXIS_BOTTOM, AXIS_TOP]);
       } else {
         yScales[x.name] = scaleLinear()
           .domain([min, max])
-          .range([height - BOTTOM_PADDING, TOP_PADDING]);
+          .range([AXIS_BOTTOM, AXIS_TOP]);
       }
     }
   });

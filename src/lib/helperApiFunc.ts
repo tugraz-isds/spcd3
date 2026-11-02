@@ -21,6 +21,7 @@ import * as helper from "./helper";
 import * as brush from "./brush";
 import * as icon from "./icons/icons";
 import { setWheelZoomEnabled, updateChartZoomBaseWidth } from "./toolbar";
+import { AXIS_BOTTOM, AXIS_TOP } from "./chartGeometry";
 import { select, selectAll } from "d3-selection";
 import { easeCubic } from "d3-ease";
 
@@ -623,7 +624,7 @@ function setFilterAfterSettingRanges(
 
   triUpHit.attr("y", rectY + rectH);
 
-  if (isNear(rectY, 50)) {
+  if (isNear(rectY, AXIS_TOP)) {
     select("#triangle_down_" + cleanDimensionName).attr(
       "href",
       "#brush_image_bottom",
@@ -635,7 +636,7 @@ function setFilterAfterSettingRanges(
     );
   }
 
-  if (isNear(rectY + rectH, 350)) {
+  if (isNear(rectY + rectH, AXIS_BOTTOM)) {
     select("#triangle_up_" + cleanDimensionName).attr(
       "href",
       "#brush_image_top",

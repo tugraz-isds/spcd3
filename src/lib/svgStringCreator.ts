@@ -2,6 +2,7 @@ import { select } from "d3-selection";
 import * as helper from "./helper";
 import * as utils from "./utils";
 import * as api from "./helperApiFunc";
+import { AXIS_BOTTOM, AXIS_TOP, AXIS_TOP_HANDLE } from "./chartGeometry";
 import {
   parallelCoordinates as parcoords,
   recordKey as key,
@@ -171,7 +172,12 @@ function setBrushDownToDownload(featureAxis: any): void {
       .append("g")
       .append("use")
       .attr("id", "triangle_down_" + processedDimensionName)
-      .attr("y", item.top == 50 ? 41 : item.top - DOWNLOAD_BRUSH_ARROW_HEIGHT)
+      .attr(
+        "y",
+        item.top == AXIS_TOP
+          ? AXIS_TOP_HANDLE + 1
+          : item.top - DOWNLOAD_BRUSH_ARROW_HEIGHT,
+      )
       .attr("x", DOWNLOAD_BRUSH_ARROW_X)
       .attr("width", DOWNLOAD_BRUSH_ARROW_WIDTH)
       .attr("height", DOWNLOAD_BRUSH_ARROW_HEIGHT)
@@ -204,7 +210,7 @@ function setRectToDragToDownload(featureAxis: any): void {
       (object: { key: any }) => object.key == d.name,
     );
     let height = item.bottom - item.top;
-    const isIdle = item.top == 50 && item.bottom == 350;
+    const isIdle = item.top == AXIS_TOP && item.bottom == AXIS_BOTTOM;
     select(this)
       .append("g")
       .append("rect")
